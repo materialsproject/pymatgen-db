@@ -72,15 +72,8 @@ def update_dev_doc():
         local("git push origin gh-pages")
 
 
-def log_ver():
-    filepath = os.path.join(os.environ["HOME"], "Dropbox", "Public", "matgendb", ver)
-    with open(filepath, "w") as f:
-        f.write("Release")
-
-
 def release():
     setver()
     test()
     makedoc()
     publish()
-    log_ver()

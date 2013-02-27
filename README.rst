@@ -90,9 +90,15 @@ To insert an entire directory of runs (where the topmost directory is
 Querying a database
 -------------------
 
-Once you have created your database using insert_into_db.py,
-you can now query the database using the query engine. Some examples of how
-to perform useful queries are as follows::
+The mgdb script allows you to make simple queries from the command line::
+
+    # Query for the task id and energy per atom of all calculations with
+    # formula Li2O. Note that the criteria has to be specified in the form of
+    # a json string.
+    mgdb query --crit '{"pretty_formula": "Li2O"}' --props task_id energy_per_atom
+
+For more advanced queries, you can use the QueryEngine class. Some examples
+are as follows::
 
     >>> from matgendb.query_engine import QueryEngine
 
