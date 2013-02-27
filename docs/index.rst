@@ -63,20 +63,34 @@ not already have pymatgen installed, you should refer to the `pymatgen docs
 
 Usage
 =====
+Initial setup
+-------------
 
-Creating a database
--------------------
+In this step, it is assumed that you have already installed and setup MongoDB
+on a server of your choice.
 
-A db creation/insertion script has been written (insert_into_db.py) has been
+A db initialization/insertion script has been written (mgdb) has been
 written and will be automatically installed as part of the installation
 process. Type::
 
-    insert_into_db.py --help
+    mgdb --help
 
-to see all the options. Typically, to insert an entire directory of runs into
-the database, all you need to do is::
+to see all the options.
 
-    insert_into_db.py -d DATABASE_HOST -b DATABASE_NAME -u USER -p PASSWORD dir_name
+Before use, first create a database config file by doing::
+
+    mgdb init -c db.json
+
+This creates an example json config file, which you should modify as needed
+for your database.
+
+Inserting calculations
+----------------------
+
+To insert an entire directory of runs (where the topmost directory is
+"dir_name") into the database, use the following command::
+
+    mgdb insert -c db.json dir_name
 
 Querying a database
 -------------------

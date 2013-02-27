@@ -1,0 +1,124 @@
+#!/usr/bin/env python
+
+"""
+A helper script for many matgendb functions.
+"""
+
+from __future__ import division
+
+__author__ = "Shyue Ping Ong"
+__copyright__ = "Copyright 2012, The Materials Project"
+__version__ = "1.1"
+__maintainer__ = "Shyue Ping Ong"
+__email__ = "shyue@mit.edu"
+__date__ = "Dec 1, 2012"
+
+
+import datetime
+import logging
+from matgendb.creator import VaspToDbTaskDrone
+from pymatgen.apps.borg.queen import BorgQueen
+import multiprocessing
+import json
+
+logger = logging.getLogger(__name__)
+
+
+def db_init(args):
+    if args.config_file:
+        d = {"host": "localhost",
+             "port": 27017,
+             "database": "vasp",
+             "admin_user": None,
+             "admin_password": None,
+             "readonly_user": None,
+             "readonly_password": None,
+             "collection": "tasks"}
+        with open(args.config_file, "w") as f:
+            json.dump(d, f, indent=4)
+
+
+def update_db(args):
+    FORMAT = "%(relativeCreated)d msecs : %(message)s"
+
+    if args.logfile:
+        logging.basicConfig(level=logging.INFO, format=FORMAT,
+                            filename=args.logfile[0])
+    else:
+        logging.basicConfig(level=logging.INFO, format=FORMAT)
+
+    db_settings = {}
+    if args.config_file:
+        with open(args.config_file) as f:
+            db_settings = json.load(f)
+
+    host = db_settings.get("host", "localhost")
+    port = db_settings.get("port", 27017)
+    database = db_settings.get("database", "vasp")
+    collection = db_settings.get("collection", "tasks")
+    user = db_settings.get("admin_user", None)
+    password = db_settings.get("admin_password", None)
+
+    logger.info("Db insertion started at {}.".format(datetime.datetime.now()))
+    additional_fields = {"author": args.author, "tags": args.tag}
+    drone = VaspToDbTaskDrone(
+        host=host, port=port,  database=database, user=user,
+        password=password, parse_dos=False, collection=collection,
+        update_duplicates=args.force_update_dupes,
+        additional_fields=additional_fields)
+    ncpus = multiprocessing.cpu_count()
+    queen = BorgQueen(drone, number_of_drones=ncpus)
+    queen.parallel_assimilate(args.directory)
+    tids = map(int, filter(lambda x: x, queen.get_data()))
+    logger.info("Db upate completed at {}.".format(datetime.datetime.now()))
+    logger.info("{} new task ids inserted.".format(len(tids)))
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="""
+    Command line db insertion script.
+
+    Author: Shyue Ping Ong
+    Version: 2.0
+    Last updated: Jun 21 2012""")
+
+    subparsers = parser.add_subparsers()
+
+    pinit = subparsers.add_parser("init", help="Initialization tools.")
+
+    pinit.add_argument("-c", "--config", dest="config_file", type=str,
+                       default=None,
+                       help="Creates an example config file for the database.")
+    pinit.set_defaults(func=db_init)
+
+    pinsert = subparsers.add_parser("insert", help="Insert vasp runs.")
+
+    pinsert.add_argument("directory", metavar="directory", type=str,
+                         default=".", help="Root directory for runs.")
+    pinsert.add_argument("-c", "--config", dest="config_file", type=str,
+                         default=None,
+                         help="Config file to use. Generate one using mgdb "
+                              "init --config filename.json if necessary. "
+                              "Otherwise, an no-authentication "
+                              "localhost:27017/vasp database and tasks "
+                              "collection is assumed.")
+
+    pinsert.add_argument("-l", "--logfile", dest="logfile", type=str,
+                         help="File to log db insertion. Defaults to stdout.")
+    pinsert.add_argument("-t", "--tag", dest="tag", type=str, nargs=1,
+                         default=[],
+                         help="Tag your runs for easier search."
+                             " Accepts multiple tags")
+    pinsert.add_argument("-f", "--force", dest="force_update_dupes",
+                         action="store_true",
+                         help="Force update duplicates. This forces the "
+                              "analyzer to reanalyze already inserted data.")
+    pinsert.add_argument("-a", "--author", dest="author", type=str, nargs=1,
+                         default=None,
+                         help="Enter a *unique* author field so that you can "
+                              "trace back what you ran.")
+    pinsert.set_defaults(func=update_db)
+
+    args = parser.parse_args()
+    args.func(args)
