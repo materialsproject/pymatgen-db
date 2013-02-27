@@ -1,8 +1,8 @@
 .. image:: https://travis-ci.org/materialsproject/pymatgen-db.png
 
-Pymatgen-db is a database plugin for the Python Materials Genomics (pymatgen)
-package. It enables the creation of Materials Project-style databases for
-management of materials data.
+Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
+materials analysis library. It enables the creation of Materials
+Project-style databases for management of materials data.
 
 For now, the creation of a `MongoDB`_ database is supported and a rudimentary
 query engine is provided to enable the easy translation of MongoDB docs to
