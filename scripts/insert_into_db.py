@@ -16,7 +16,7 @@ __date__ = "Dec 1, 2012"
 
 import datetime
 import logging
-from pymatgen.apps.db.creator import VaspToDbTaskDrone
+from matgendb.creator import VaspToDbTaskDrone
 from pymatgen.apps.borg.queen import BorgQueen
 import multiprocessing
 
