@@ -9,7 +9,7 @@ install: "pip install -q -r requirements.txt --use-mirrors"
 # extensions.
 before_script:
   - python setup.py --quiet install
-  - mv pymatgen-db pmgdb
+  - mv matgendb mdb
 # command to run tests, e.g. python setup.py test
 script: nosetests
 branches:
