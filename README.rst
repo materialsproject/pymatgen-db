@@ -1,4 +1,4 @@
-.. image:: https://travis-ci.org/materialsproject/pymatgen.png
+.. image:: https://travis-ci.org/materialsproject/pymatgen-db.png
 
 Pymatgen-db is a database plugin for the Python Materials Genomics (pymatgen)
 package.
