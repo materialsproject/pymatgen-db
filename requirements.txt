@@ -1,0 +1,2 @@
+pymatgen>=2.5
+pymongo>2.4

@@ -19,7 +19,6 @@ or::
 
     pip install pymatgen-db
 
-
 Developmental version
 ---------------------
 
