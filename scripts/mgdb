@@ -17,6 +17,7 @@ __date__ = "Dec 1, 2012"
 import datetime
 import logging
 from matgendb.creator import VaspToDbTaskDrone
+from matgendb.query_engine import QueryEngine
 from pymatgen.apps.borg.queen import BorgQueen
 import multiprocessing
 import json
@@ -24,7 +25,7 @@ import json
 logger = logging.getLogger(__name__)
 
 
-def db_init(args):
+def init_db(args):
     if args.config_file:
         d = {"host": "localhost",
              "port": 27017,
@@ -74,6 +75,30 @@ def update_db(args):
     logger.info("{} new task ids inserted.".format(len(tids)))
 
 
+def query_db(args):
+
+    db_settings = {}
+    if args.config_file:
+        with open(args.config_file) as f:
+            db_settings = json.load(f)
+
+    host = db_settings.get("host", "localhost")
+    port = db_settings.get("port", 27017)
+    database = db_settings.get("database", "vasp")
+    collection = db_settings.get("collection", "tasks")
+    user = db_settings.get("readonly_user", None)
+    password = db_settings.get("readonly_password", None)
+
+    qe = QueryEngine(host=host, port=port, database=database, user=user,
+                     password=password, collection=collection)
+    criteria = json.loads(args.criteria) if args.criteria else None
+    from prettytable import PrettyTable
+    t = PrettyTable(args.properties)
+    for r in qe.query(properties=args.properties, criteria=criteria):
+        t.add_row([r[p] for p in args.properties])
+    print t
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="""
@@ -90,7 +115,7 @@ if __name__ == "__main__":
     pinit.add_argument("-c", "--config", dest="config_file", type=str,
                        default=None,
                        help="Creates an example config file for the database.")
-    pinit.set_defaults(func=db_init)
+    pinit.set_defaults(func=init_db)
 
     pinsert = subparsers.add_parser("insert", help="Insert vasp runs.")
 
@@ -119,6 +144,28 @@ if __name__ == "__main__":
                          help="Enter a *unique* author field so that you can "
                               "trace back what you ran.")
     pinsert.set_defaults(func=update_db)
+
+    pquery = subparsers.add_parser("query", help="Query tools. Requires the "
+                                                 "use of pretty_table.")
+
+    pquery.add_argument("-c", "--config", dest="config_file", type=str,
+                        default=None,
+                        help="Config file to use. Generate one using mgdb "
+                             "init --config filename.json if necessary. "
+                             "Otherwise, an no-authentication "
+                             "localhost:27017/vasp database and tasks "
+                             "collection is assumed.")
+
+    pquery.add_argument("--crit", dest="criteria", type=str, default=None,
+                        help="Query criteria in typical json format. E.g., "
+                             "{\"task_id\": 1}.")
+
+    pquery.add_argument("--props", dest="properties", type=str,
+                        nargs='+', required=True,
+                        help="Desired properties. E.g., pretty_formula, "
+                             "task_id, energy...")
+
+    pquery.set_defaults(func=query_db)
 
     args = parser.parse_args()
     args.func(args)

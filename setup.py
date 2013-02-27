@@ -12,7 +12,7 @@ with open("README.rst") as f:
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="0.1.0dev",
+    version="0.1.1dev",
     install_requires=["pymatgen>=2.5", "pymongo>2.4"],
     package_data={"matgendb": ["*.json"]},
     author="Shyue Ping Ong",
