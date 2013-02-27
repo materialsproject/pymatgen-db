@@ -101,7 +101,7 @@ The mgdb script allows you to make simple queries from the command line::
     # Query for the task id and energy per atom of all calculations with
     # formula Li2O. Note that the criteria has to be specified in the form of
     # a json string.
-    mgdb query --crit '{"pretty_formula": "Li2O"}' --props task_id energy_per_atom
+    mgdb query -c db.json --crit '{"pretty_formula": "Li2O"}' --props task_id energy_per_atom
 
 For more advanced queries, you can use the QueryEngine class. Some examples
 are as follows::
