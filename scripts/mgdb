@@ -13,7 +13,7 @@ __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Dec 1, 2012"
 
-
+import os
 import datetime
 import logging
 from matgendb.creator import VaspToDbTaskDrone
@@ -25,18 +25,41 @@ import json
 logger = logging.getLogger(__name__)
 
 
+def get_settings(args):
+    if args.config_file:
+        with open(args.config_file) as f:
+            return json.load(f)
+    elif os.path.exists("db.json"):
+        with open("db.json") as f:
+            return json.load(f)
+    else:
+        return {"host": "localhost",
+                "port": 27017,
+                "database": "vasp",
+                "admin_user": None,
+                "admin_password": None,
+                "readonly_user": None,
+                "readonly_password": None,
+                "collection": "tasks"}
+
+
 def init_db(args):
     if args.config_file:
-        d = {"host": "localhost",
-             "port": 27017,
-             "database": "vasp",
-             "admin_user": None,
-             "admin_password": None,
-             "readonly_user": None,
-             "readonly_password": None,
-             "collection": "tasks"}
+        d = [("host", "localhost"),
+             ("port", 27017),
+             ("database", "vasp"),
+             ("admin_user", None),
+             ("admin_password", None),
+             ("readonly_user", None),
+             ("readonly_password", None),
+             ("collection", "tasks")]
+        doc = {}
+        for k, v in d:
+            val = raw_input("Enter {} (default: {}) : ".format(k, v))
+            doc[k] = val if val else v
+
         with open(args.config_file, "w") as f:
-            json.dump(d, f, indent=4)
+            json.dump(doc, f, indent=4)
 
 
 def update_db(args):
@@ -48,24 +71,14 @@ def update_db(args):
     else:
         logging.basicConfig(level=logging.INFO, format=FORMAT)
 
-    db_settings = {}
-    if args.config_file:
-        with open(args.config_file) as f:
-            db_settings = json.load(f)
-
-    host = db_settings.get("host", "localhost")
-    port = db_settings.get("port", 27017)
-    database = db_settings.get("database", "vasp")
-    collection = db_settings.get("collection", "tasks")
-    user = db_settings.get("admin_user", None)
-    password = db_settings.get("admin_password", None)
+    d = get_settings(args)
 
     logger.info("Db insertion started at {}.".format(datetime.datetime.now()))
     additional_fields = {"author": args.author, "tags": args.tag}
     drone = VaspToDbTaskDrone(
-        host=host, port=port,  database=database, user=user,
-        password=password, parse_dos=False, collection=collection,
-        update_duplicates=args.force_update_dupes,
+        host=d["host"], port=d["port"],  database=d["database"],
+        user=d["admin_user"], password=d["admin_password"], parse_dos=False,
+        collection=d["collection"], update_duplicates=args.force_update_dupes,
         additional_fields=additional_fields)
     ncpus = multiprocessing.cpu_count()
     queen = BorgQueen(drone, number_of_drones=ncpus)
@@ -76,24 +89,14 @@ def update_db(args):
 
 
 def query_db(args):
-
-    db_settings = {}
-    if args.config_file:
-        with open(args.config_file) as f:
-            db_settings = json.load(f)
-
-    host = db_settings.get("host", "localhost")
-    port = db_settings.get("port", 27017)
-    database = db_settings.get("database", "vasp")
-    collection = db_settings.get("collection", "tasks")
-    user = db_settings.get("readonly_user", None)
-    password = db_settings.get("readonly_password", None)
-
-    qe = QueryEngine(host=host, port=port, database=database, user=user,
-                     password=password, collection=collection)
+    d = get_settings(args)
+    qe = QueryEngine(host=d["host"], port=d["port"], database=d["database"],
+                     user=d["readonly_user"], password=d["readonly_password"],
+                     collection=d["collection"])
     criteria = json.loads(args.criteria) if args.criteria else None
     from prettytable import PrettyTable
     t = PrettyTable(args.properties)
+    t.float_format = "4.4"
     for r in qe.query(properties=args.properties, criteria=criteria):
         t.add_row([r[p] for p in args.properties])
     print t
@@ -113,8 +116,9 @@ if __name__ == "__main__":
     pinit = subparsers.add_parser("init", help="Initialization tools.")
 
     pinit.add_argument("-c", "--config", dest="config_file", type=str,
-                       default=None,
-                       help="Creates an example config file for the database.")
+                       nargs='?',
+                       help="Creates an db config file for the database. "
+                            "Default filename is db.json.")
     pinit.set_defaults(func=init_db)
 
     pinsert = subparsers.add_parser("insert", help="Insert vasp runs.")
@@ -122,10 +126,10 @@ if __name__ == "__main__":
     pinsert.add_argument("directory", metavar="directory", type=str,
                          default=".", help="Root directory for runs.")
     pinsert.add_argument("-c", "--config", dest="config_file", type=str,
-                         default=None,
                          help="Config file to use. Generate one using mgdb "
                               "init --config filename.json if necessary. "
-                              "Otherwise, an no-authentication "
+                              "Otherwise, the code searches for a db.json. If"
+                              "none is found, an no-authentication "
                               "localhost:27017/vasp database and tasks "
                               "collection is assumed.")
 
@@ -134,7 +138,7 @@ if __name__ == "__main__":
     pinsert.add_argument("-t", "--tag", dest="tag", type=str, nargs=1,
                          default=[],
                          help="Tag your runs for easier search."
-                             " Accepts multiple tags")
+                              " Accepts multiple tags")
     pinsert.add_argument("-f", "--force", dest="force_update_dupes",
                          action="store_true",
                          help="Force update duplicates. This forces the "
@@ -149,10 +153,10 @@ if __name__ == "__main__":
                                                  "use of pretty_table.")
 
     pquery.add_argument("-c", "--config", dest="config_file", type=str,
-                        default=None,
                         help="Config file to use. Generate one using mgdb "
                              "init --config filename.json if necessary. "
-                             "Otherwise, an no-authentication "
+                             "Otherwise, the code searches for a db.json. If"
+                             "none is found, an no-authentication "
                              "localhost:27017/vasp database and tasks "
                              "collection is assumed.")
 
