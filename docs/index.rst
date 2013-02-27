@@ -1,4 +1,10 @@
-.. image:: https://travis-ci.org/materialsproject/pymatgen-db.png
+.. pymatgen documentation master file, created by
+   sphinx-quickstart on Tue Nov 15 00:13:52 2011.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Pymatgen-db
+===========
 
 Pymatgen-db is a database plugin for the Python Materials Genomics (pymatgen)
 package. It enables the creation of Materials Project-style databases for
@@ -98,6 +104,15 @@ QueryEngine provides useful aliases for commonly used fields as well as
 translation to commonly used pymatgen objects like Structure and
 ComputedEntries.
 
+API/Reference Docs
+==================
+
+The API docs are generated using Sphinx auto-doc and outlines the purpose of all
+modules and classes, and the expected argument and returned objects for most
+methods. They are available at the link below.
+
+:doc:`pymatgen-db API docs </modules>`
+
 How to cite pymatgen-db
 =======================
 
@@ -110,5 +125,39 @@ the following work:
     Open-Source Python Library for Materials Analysis.* Computational
     Materials Science, 2013, 68, 314-319. `doi:10.1016/j.commatsci.2012.10.028
     <http://dx.doi.org/10.1016/j.commatsci.2012.10.028>`_
+
+License
+=======
+
+Pymatgen-db is released under the MIT License. The terms of the license are as
+follows::
+
+    The MIT License (MIT)
+    Copyright (c) 2011-2012 MIT & LBNL
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software")
+    , to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 .. _`MongoDB` : http://www.mongodb.org/
