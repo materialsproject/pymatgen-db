@@ -1,19 +1,41 @@
 .DS_Store
-pymatgen.egg-info
-dependencies/PyCifRW-3.3/PyCifRW.egg-info
-dependencies/spglib-1.2.2/pyspglib.egg-info
-dependencies/spglib-1.2.2/build
 *.o
-*.so
-*.pyc
-pymatgen/pymatgen.cfg
-dist
-_build
-build
-.project
-.pydevproject
-.settings
-.externalToolBuilders
-.idea
 distribute*.egg
 distribute*.tar.gz
+
+*.py[cod]
+.idea
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
