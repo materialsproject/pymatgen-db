@@ -1,7 +1,13 @@
 .. image:: https://travis-ci.org/materialsproject/pymatgen-db.png
 
 Pymatgen-db is a database plugin for the Python Materials Genomics (pymatgen)
-package.
+package. It enables the creation of Materials Project-style databases for
+management of materials data.
+
+For now, the creation of a `MongoDB`_ database is supported and a rudimentary
+query engine is provided to enable the easy translation of MongoDB docs to
+useful pymatgen objects for analysis purposes. A simple web-based interface is
+planned for the future.
 
 Getting pymatgen-db
 ===================
@@ -22,8 +28,8 @@ or::
 Developmental version
 ---------------------
 
-The bleeding edge developmental version is at the pymatgen's `Github repo
-<https://github.com/materialsproject/pymatgen>`_. The developmental
+The bleeding edge developmental version is at the pymatgen-db's `Github repo
+<https://github.com/materialsproject/pymatgen-db>`_. The developmental
 version is likely to be more buggy, but may contain new features. The
 Github version include test files as well for complete unit testing. After
 cloning the source, you can type::
@@ -34,26 +40,40 @@ or to install the package in developmental mode::
 
     python setup.py develop
 
-The docs for the developmental version are available at pymatgen's `Github
-pages <http://materialsproject.github.com/pymatgen/>`_.
-
 Requirements
 ============
 
-All required dependencies should be automatically taken care of if you
-install pymatgen using easy_install or pip. Otherwise, these packages should
-be available on `PyPI <http://pypi.python.org>`_.
+All required python dependencies should be automatically taken care of if you
+install pymatgen-db using easy_install or pip. Otherwise, these packages should
+be available on `PyPI <http://pypi.python.org>`_. Please note that if you do
+not already have pymatgen installed, you should refer to the `pymatgen docs
+<http://pythonhosted.org//pymatgen>`_ for detailed instructions.
 
 1. Python 2.7+ required. New default modules such as json are used, as well as
    new unittest features in Python 2.7.
 2. pymatgen 2.5+, including all dependencies associated with it.
 3. pymongo 2.4+: For interfacing with MongoDb.
+4. MongoDB 2.2+: Get it at the `MongoDB`_ website.
+
+Usage
+=====
+
+A db creation/insertion script has been written (insert_into_db.py) has been
+written and will be automatically installed as part of the installation
+process. Type::
+
+    insert_into_db.py --help
+
+to see all the options. Typically, to insert an entire directory of runs into
+the database, all you need to do is::
+
+    insert_into_db.py -d DATABASE_HOST -b DATABASE_NAME -u USER -p PASSWORD dir_name
 
 How to cite pymatgen
 ====================
 
-If you use pymatgen in your research, please consider citing the following
-work:
+If you use pymatgen and pymatgen-db in your research, please consider citing
+the following work:
 
     Shyue Ping Ong, William Davidson Richards, Anubhav Jain, Geoffroy Hautier,
     Michael Kocher, Shreyas Cholia, Dan Gunter, Vincent Chevrier, Kristin A.
@@ -66,3 +86,5 @@ In addition, some of pymatgen's functionality is based on scientific advances
 / principles developed by the computational materials scientists in our team.
 Please refer to `pymatgen's documentation
 <http://pythonhosted.org/pymatgen/>`_ on how to cite them.
+
+.. _`MongoDB` : http://www.mongodb.org/
