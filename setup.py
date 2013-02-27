@@ -16,6 +16,7 @@ setup(
     install_requires=["pymatgen>=2.5", "pymongo>2.4"],
     package_data={"matgendb": ["*.json"]},
     author="Shyue Ping Ong",
+    author_email="shyuep@gmail.com",
     maintainer="Shyue Ping Ong",
     url="https://github.com/materialsproject/pymatgen-db",
     license="MIT",
