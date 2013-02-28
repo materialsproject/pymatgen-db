@@ -13,6 +13,9 @@
     <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/static/js/jquery-ui-1.10.1.custom.min.js"></script>
     <script type="text/javascript" src="/static/js/jquery.json2html-3.1-min.js" ></script>
+    <script type="text/javascript" src="/static/js/DataTables-1.9.4/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/static/js/DataTables-1.9.4/extras/TableTools/media/js/TableTools.min.js"></script>
+
     <script>
 
         var currentData = [];
@@ -29,20 +32,33 @@
                     visualize(currentData);
                     $("#result-tree").show();
                     $("#num-results").show();
-                    $("#results-table").hide();
+                    $("#results-table-div").hide();
                 }
                 catch(e){
                     alert("Sorry error in json string, please correct and try again: " + e.message);
                 }
             }
             else if (currentData.length>0){
+                var props = [];
+                for (var j=0; j<properties.length; j++)
+                {
+                    props.push({ "sTitle": properties[j]});
+                }
+                var oTable = $('#results-table').dataTable(
+                        {
+                            "bPaginate": true,
+                            "bLengthChange": true,
+                            "bFilter": true,
+                            "bSort": true,
+                            "bInfo": true,
+                            "bAutoWidth": false,
+                            "sPaginationType": "full_numbers",
+                            "bRetrieve": true,
+                            "iDisplayLength": 50,
+                            "aoColumns": props
+                        });
                 $("#num-results").text("Number of results = " + currentData.length);
-                $("#results-table").find("tr").remove();
-
-                $("#results-table")
-                        .append($('<tr><th>'+properties.join("</th><th>")+"</th></tr>")
-                        );
-
+                var data = [];
                 for (var i=0; i<currentData.length; i++)
                 {
                     var row = [];
@@ -50,12 +66,15 @@
                     {
                         row.push(currentData[i][properties[j]]);
                     }
-
-                    $("#results-table")
+                    data.push(row);
+                    /*$("#results-table")
                             .append($('<tr><td>'+row.join("</td><td>")+"</td></tr>")
-                            );
+                            );*/
                 }
-                $("#results-table").show();
+                oTable.fnClearTable();
+                oTable.fnAddData(data);
+
+                $("#results-table-div").show();
                 $("#num-results").show();
                 $("#result-tree").hide();
             }
@@ -98,6 +117,9 @@
         }
     </script>
 
+    <link rel='stylesheet' href="/static/js/DataTables-1.9.4/extras/TableTools/media/css/TableTools.css" type='text/css'>
+    <link rel='stylesheet' href="/static/js/DataTables-1.9.4/media/css/jquery.dataTables.css" type='text/css'>
+
     <style type="text/css">
 
         h1{
@@ -108,7 +130,7 @@
             font-size: 1.1em;
         }
 
-        input[type=text]{
+        .text-search{
             height: 40px;
             width: 100%;
         }
@@ -138,31 +160,15 @@
             display: None;
         }
 
-        #results-table{
+        #results-table-div{
             width: 90%;
             margin-left: auto;
             margin-right: auto;
             display: None;
         }
 
-        table.pretty{
-            border: none;
-            margin: 0;
-        }
-        table.pretty th{
-            background-color: #000000;
-            color: #FFFFFF;
-            padding: .2em .6em;
-        }
-        table.pretty td{
-            border: 1px solid #FFFFFF;
-            padding: .2em .6em;
-        }
-        table.pretty tr:nth-child(even){
-            background-color: #DEDEDE;
-        }
-        table.pretty tr:nth-child(odd){
-            background-color: #EFEFEF;
+        #results-table{
+            font-size: 1.1em;
         }
 
         #num-results{
@@ -222,13 +228,15 @@
             chemical system or
             mongo query string</label>
         <input id="criteria-input" type="text" name="criteria"
+               class="text-search"
             placeholder='Examples: "Li2O", "1234", "Li-Fe-O", {"pretty_formula": "Li2O"}'/>
     </div>
     <div class="input-div">
         <label for="properties-input"><span
                 class="emph">properties</span> as space-separated
             strings</label>
-        <input id="properties-input" type="text" name="properties"
+        <input id="properties-input" type="text"
+               name="properties" class="text-search"
                placeholder='Example: "task_id energy_per_atom"'/>
     </div>
 
@@ -249,8 +257,10 @@
     <div class='divider' style='margin-top:40px;'></div>
     <h2 id="num-results">x results</h2>
     <div id='result-tree'></div>
-    <table id='results-table' class="pretty">
+    <div id='results-table-div'>
+    <table id='results-table'>
     </table>
+    </div>
 </div>
 
 </body>
