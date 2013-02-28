@@ -43,9 +43,14 @@ logger = logging.getLogger(__name__)
 
 class VaspToDbTaskDrone(AbstractDrone):
     """
-    VaspToDbDictDrone assimilates directories containing vasp input to
-    inserted db tasks. There are some restrictions on the valid directory
-    structures:
+    VaspToDbTaskDrone assimilates directories containing vasp input to
+    inserted db tasks. This drone is meant ot be used with pymatgen's
+    BorgQueen to assimilate entire directory structures and insert them into
+    a database using Python's multiprocessing. The current format assumes
+    standard VASP relaxation runs. If you have other kinds of runs,
+    you may design your own VaspDbTaskDrone based on this one.
+
+    There are some restrictions on the valid directory structures:
 
     1. There can be only one vasp run in each directory. Nested directories
        are fine.
@@ -437,12 +442,13 @@ class VaspToDbTaskDrone(AbstractDrone):
                 if additional_fields else {}
             d['dir_name'] = fullpath
             d['schema_version'] = VaspToDbTaskDrone.__version__
-            d['calculations'] = [cls.process_vasprun(dirname, taskname,
-                                                     filename, parse_dos)
-                                 for taskname, filename
-                                 in vasprun_files.items()]
+            d['calculations'] = [
+                cls.process_vasprun(dirname, taskname, filename, parse_dos)
+                for taskname, filename in vasprun_files.items()]
             d1 = d['calculations'][0]
             d2 = d['calculations'][-1]
+
+            #Now map some useful info to the root level.
             for root_key in ['completed_at', 'nsites', 'unit_cell_formula',
                              'reduced_cell_formula', 'pretty_formula',
                              'elements', 'nelements', 'cif', 'density',
