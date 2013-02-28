@@ -44,6 +44,8 @@
                 {
                     props.push({ "sTitle": properties[j]});
                 }
+                $("#results-table-div").empty();
+                $("#results-table-div").html("<table id='results-table'></table>");
                 var oTable = $('#results-table').dataTable(
                         {
                             "bPaginate": true,
@@ -73,7 +75,7 @@
                 }
                 oTable.fnClearTable();
                 oTable.fnAddData(data);
-
+                oTable.fnDraw();
                 $("#results-table-div").show();
                 $("#num-results").show();
                 $("#result-tree").hide();
@@ -158,6 +160,7 @@
             margin-left: auto;
             margin-right: auto;
             display: None;
+            font-size: 1.1em;
         }
 
         #results-table-div{

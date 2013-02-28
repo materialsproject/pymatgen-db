@@ -2,12 +2,10 @@
 
 Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
 materials analysis library. It enables the creation of Materials
-Project-style databases for management of materials data.
-
-For now, the creation of a `MongoDB`_ database is supported and a rudimentary
-query engine is provided to enable the easy translation of MongoDB docs to
-useful pymatgen objects for analysis purposes. A simple web-based interface is
-planned for the future.
+Project-style `MongoDB`_ databases for management of materials data and also
+provides a clean and intuitive web ui for exploring that data. A query engine
+is also provided to enable the easy translation of MongoDB docs to useful
+pymatgen objects for analysis purposes.
 
 Getting pymatgen-db
 ===================
@@ -93,8 +91,33 @@ To insert an entire directory of runs (where the topmost directory is
 
     mgdb insert -c db.json dir_name
 
+materials genomics ui
+---------------------
+
+.. figure:: http://pythonhosted.org/pymatgen-db/images/mgui_demo.png
+    :width: 100%
+    :alt: materials genomics ui
+    :align: center
+
+    materials genomics ui
+
+A simple web interface has been provided to assist in the querying and
+viewing of results. This web interface can be started by running::
+
+    mgdb -c db.json runserver
+
+This will run the web server at http://127.0.0.1:8000. Go to this address in
+your browser and you should see something like the figure below. Most queries
+can be performed using the web ui. Two options for presenting results are
+provided - a table format which is easier for comparing data,
+and a tree format which makes it much easier to explore highly nested trees
+of data.
+
 Querying a database
 -------------------
+
+Sometimes, more fine-grained querying is needed (e.g., for subsequent
+postprocessing and analysis).
 
 The mgdb script allows you to make simple queries from the command line::
 
