@@ -13,7 +13,7 @@ setup(
     name="pymatgen-db",
     packages=find_packages(),
     version="0.1.2dev",
-    install_requires=["pymatgen>=2.5", "pymongo>2.4"],
+    install_requires=["pymatgen>=2.5", "pymongo>=2.4", "prettytable>=0.7"],
     package_data={"matgendb": ["*.json"]},
     author="Shyue Ping Ong",
     author_email="shyuep@gmail.com",

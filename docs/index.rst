@@ -10,10 +10,15 @@ Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
 materials analysis library. It enables the creation of Materials
 Project-style databases for management of materials data.
 
-For now, the creation of a `MongoDB`_ database is supported and a rudimentary
-query engine is provided to enable the easy translation of MongoDB docs to
-useful pymatgen objects for analysis purposes. A simple web-based interface is
-planned for the future.
+For now, the creation of a `MongoDB`_ database is supported and a query engine
+is provided to enable the easy translation of MongoDB docs to useful pymatgen
+objects for analysis purposes. A simple web-based interface is planned for
+the future.
+
+Latest Change Log
+=================
+
+1. mgdb script for easy database creation and management.
 
 Getting pymatgen-db
 ===================
@@ -51,13 +56,13 @@ Requirements
 
 All required python dependencies should be automatically taken care of if you
 install pymatgen-db using easy_install or pip. Otherwise, these packages should
-be available on `PyPI <http://pypi.python.org>`_. Please note that if you do
-not already have pymatgen installed, you should refer to the `pymatgen docs
-<http://pythonhosted.org//pymatgen>`_ for detailed instructions.
+be available on `PyPI <http://pypi.python.org>`_.
 
 1. Python 2.7+ required. New default modules such as json are used, as well as
    new unittest features in Python 2.7.
-2. pymatgen 2.5+, including all dependencies associated with it.
+2. pymatgen 2.5+, including all dependencies associated with it. Please refer
+   to the `pymatgen docs <http://pythonhosted.org//pymatgen>`_ for detailed
+   installation instructions.
 3. pymongo 2.4+: For interfacing with MongoDb.
 4. MongoDB 2.2+: Get it at the `MongoDB`_ website.
 
@@ -68,7 +73,8 @@ Initial setup
 -------------
 
 In this step, it is assumed that you have already installed and setup MongoDB
-on a server of your choice.
+on a server of your choice. If you have not, the `MongoDB manual
+<http://docs.mongodb.org/manual/>`_ is an excellent place to start.
 
 A db initialization/insertion script has been written (mgdb) has been
 written and will be automatically installed as part of the installation
@@ -82,14 +88,19 @@ Before use, first create a database config file by doing::
 
     mgdb init -c db.json
 
-This creates an example json config file, which you should modify as needed
-for your database.
+This will prompt you for a few parameters to create a database config file,
+which will make it much easier to use in future. Note that the config file
+name can be anything of your choice, but using db.json will allow you to use
+mgdb without explicitly specifying the filename in future.
 
 Inserting calculations
 ----------------------
 
 To insert an entire directory of runs (where the topmost directory is
 "dir_name") into the database, use the following command::
+
+    # Note that "-c db.json" may be omitted if the config filename is the
+    # current directory under the default filename of db.json.
 
     mgdb insert -c db.json dir_name
 
@@ -100,13 +111,16 @@ The mgdb script allows you to make simple queries from the command line::
 
     # Query for the task id and energy per atom of all calculations with
     # formula Li2O. Note that the criteria has to be specified in the form of
-    # a json string.
+    # a json string. Note that "-c db.json" may be omitted if the config
+    # filename is the current directory under the default filename of db.json.
+
     mgdb query -c db.json --crit '{"pretty_formula": "Li2O"}' --props task_id energy_per_atom
 
 For more advanced queries, you can use the QueryEngine class. Some examples
 are as follows::
 
     >>> from matgendb.query_engine import QueryEngine
+    >>> qe = QueryEngine()
 
     #Print the task id and formula of all entries in the database.
     >>> for r in qe.query(properties=["pretty_formula", "task_id"]):
