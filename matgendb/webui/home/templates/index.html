@@ -1,0 +1,239 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>{% block title %} MatgenDB {% endblock %}</title>
+    <link rel='stylesheet'
+          href="/static/css/jquery-ui-1.10.1.custom.css"
+          type='text/css'>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="Materials Design, Materials Database, Materials Information, Materials Tools" />
+    <meta name="description"
+          content="Simple access web front end for pymatgen-db databases." />
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui-1.10.1.custom.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.json2html-3.1-min.js" ></script>
+    <script>
+
+        window.onload = function () {
+            $('input').addClass("ui-corner-all");
+            $("input").keyup(function(){
+                $("#error_msg").hide();
+            });
+            $(".buttons").button();
+
+            $("#search-button").click(function () {
+                var crit = $("#criteria-input").val();
+                var prop = $("#properties-input").val();
+
+                $.post("/query", { criteria: crit, properties: prop })
+                        .success(function (data) {
+
+                        if (data["valid_response"])
+                        {
+                                     try {
+                                         visualize(data["results"]);
+                                     }
+                                     catch (e) {
+                                         alert("Sorry error in json string, please correct and try again: " + e.message);
+                                     }
+                        }else{
+                            $("#error_msg").text(data["error_msg"]);
+                            $("#error_msg").show();
+                        }
+                                 })
+                        .error(function (data) {
+                            $("#error_msg").text(data["error_msg"]);
+                            $("#error_msg").show();
+                        });
+            });
+
+        }
+    </script>
+
+    <style type="text/css">
+
+        input{
+            font-size: 1.2em;
+        }
+
+        #page {min-height:600px;}
+        .package {margin-left:10px;padding:3px;border-radius:2px;margin-top:2px;}
+        .header {cursor:pointer;}
+
+        .name {color:gray;}
+
+        .array {background-color:#FFD8BB;border:thin solid #FFB780;}
+        .object {background-color:#E7F1FE;border:thin solid #7DA2CE;}
+        .string {color:red;}
+        .number {color:blue;}
+        .function {color:green;}
+
+        .open .children {display:block;}
+        .closed .children {display:none;}
+
+        .arrow {background-image:url("/static/images/d.png");background-repeat:no-repeat; background-color:transparent; height:15px; width:15px; display:inline-block;}
+
+        .open .arrow {background-position:-20px 0;}
+        .closed .arrow {background-position:0 0;}
+
+        .type {color:gray;font-size:8pt;float:right;}
+
+        .hide {display:none;}
+
+        #main {width:100%;height:500px;overflow-y:scroll;}
+
+    </style>
+
+    {% block extra_css %}{% endblock extra_css %}
+    {% block top_javascript %}{% endblock top_javascript %}
+</head>
+
+<body>
+
+<label for="criteria-input">Criteria: </label>
+<input id="criteria-input" type="text" name="criteria"/>
+<label for="properties-input">Properties: </label>
+<input id="properties-input" type="text" name="properties"/>
+<p id="error_msg"></p>
+<button class ="buttons" id="search-button">Search</button>
+<p id="help_msg"></p>
+<p id="search_results"></p>
+
+<div style=";margin-top:20px;">
+
+    <div class='divider' style='margin-top:40px;'></div>
+
+    <div id='top'></div>
+</div>
+
+</body>
+
+
+
+<script type="text/javascript">
+
+    var transforms = {
+        'object':{'tag':'div','class':'package ${show} ${type}','children':[
+            {'tag':'div','class':'header','children':[
+                {'tag':'div','class':function(obj){
+                    if( getValue(obj.value) !== undefined ) return('arrow hide');
+                    else return('arrow');
+                }},
+                {'tag':'span','class':'name','html':'${name}'},
+                {'tag':'span','class':'value','html':function(obj) {
+                    var value = getValue(obj.value);
+                    if( value !== undefined ) return(" : " + value);
+                    else return('');
+                }},
+                {'tag':'span','class':'type','html':'${type}'}
+            ]},
+            {'tag':'div','class':'children','children':function(obj){return(children(obj.value));}}
+        ]}
+    };
+
+    function visualize(json) {
+        $('#top').html('');
+        $('#top').json2html(convert('Results',json,'open'),transforms.object);
+        regEvents();
+    }
+
+    function getValue(obj) {
+        var type = $.type(obj);
+
+        //Determine if this object has children
+        switch(type) {
+            case 'array':
+            case 'object':
+                return(undefined);
+                break;
+
+            case 'function':
+                //none
+                return('function');
+                break;
+
+            case 'string':
+                return("'" + obj + "'");
+                break;
+
+            default:
+                return(obj);
+                break;
+        }
+    }
+
+    //Transform the children
+    function children(obj){
+        var type = $.type(obj);
+
+        //Determine if this object has children
+        switch(type) {
+            case 'array':
+            case 'object':
+                return($.json2html(obj,transforms.object));
+                break;
+
+            default:
+                //This must be a litteral
+                break;
+        }
+    }
+
+    function convert(name,obj,show) {
+
+        var type = $.type(obj);
+
+        if(show === undefined) show = 'closed';
+
+        var children = [];
+
+        //Determine the type of this object
+        switch(type) {
+            case 'array':
+                //Transform array
+                //Itterrate through the array and add it to the elements array
+                var len=obj.length;
+                for(var j=0;j<len;++j){
+                    //Concat the return elements from this objects tranformation
+                    children[j] = convert(j,obj[j]);
+                }
+                break;
+
+            case 'object':
+                //Transform Object
+                var j = 0;
+                for(var prop in obj) {
+                    children[j] = convert(prop,obj[prop]);
+                    j++;
+                }
+                break;
+
+            default:
+                //This must be a litteral (or function)
+                children = obj;
+                break;
+        }
+
+        return( {'name':name,'value':children,'type':type,'show':show} );
+
+    }
+
+    function regEvents() {
+
+        $('.header').click(function(){
+            var parent = $(this).parent();
+
+            if(parent.hasClass('closed')) {
+                parent.removeClass('closed');
+                parent.addClass('open');
+            } else {
+                parent.removeClass('open');
+                parent.addClass('closed');
+            }
+        });
+    }
+
+</script>
+
+</html>

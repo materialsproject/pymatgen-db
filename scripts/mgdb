@@ -111,6 +111,13 @@ def query_db(args):
     print t
 
 
+def run_server(args):
+    import os
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
+    from django.core.management import execute_from_command_line
+    execute_from_command_line(["manage.py", "runserver"])
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="""
@@ -158,8 +165,9 @@ if __name__ == "__main__":
                               "trace back what you ran.")
     pinsert.set_defaults(func=update_db)
 
-    pquery = subparsers.add_parser("query", help="Query tools. Requires the "
-                                                 "use of pretty_table.")
+    pquery = subparsers.add_parser("query",
+                                   help="Query tools. Requires the "
+                                        "use of pretty_table.")
 
     pquery.add_argument("-c", "--config", dest="config_file", type=str,
                         help="Config file to use. Generate one using mgdb "
@@ -179,6 +187,19 @@ if __name__ == "__main__":
                              "task_id, energy...")
 
     pquery.set_defaults(func=query_db)
+
+    pserve = subparsers.add_parser("runserver",
+                                   help="Run a server to the database.")
+
+    pserve.add_argument("-c", "--config", dest="config_file", type=str,
+                        help="Config file to use. Generate one using mgdb "
+                             "init --config filename.json if necessary. "
+                             "Otherwise, the code searches for a db.json. If"
+                             "none is found, an no-authentication "
+                             "localhost:27017/vasp database and tasks "
+                             "collection is assumed.")
+
+    pserve.set_defaults(func=run_server)
 
     args = parser.parse_args()
     args.func(args)
