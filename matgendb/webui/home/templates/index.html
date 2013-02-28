@@ -53,8 +53,39 @@
 
     <style type="text/css">
 
+        h1{
+            text-align: center;
+        }
+
         input{
             font-size: 1.2em;
+            width: 100%;
+        }
+
+        label{
+            font-size: 1.2em;
+        }
+
+        #search-div{
+            width: 100%;
+        }
+
+        .input-div{
+            width:  70%;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        #top{
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #search-button{
+            margin-left: auto;
+            margin-right: auto;
         }
 
         #page {min-height:600px;}
@@ -91,14 +122,24 @@
 
 <body>
 
-<label for="criteria-input">Criteria: </label>
-<input id="criteria-input" type="text" name="criteria"/>
-<label for="properties-input">Properties: </label>
-<input id="properties-input" type="text" name="properties"/>
-<p id="error_msg"></p>
-<button class ="buttons" id="search-button">Search</button>
-<p id="help_msg"></p>
-<p id="search_results"></p>
+<h1>MatgenDB WebUI</h1>
+<div id="search-div">
+    <div class="input-div">
+        <label for="criteria-input">Criteria</label>
+        <input id="criteria-input" type="text" name="criteria"
+               placeholder='Example: {"pretty_formula": "Li2O"}'/>
+    </div>
+    <div class="input-div">
+        <label for="properties-input">Properties</label>
+        <input id="properties-input" type="text" name="properties"
+               placeholder='Example: ["task_id", "energy_per_atom"]'/>
+    </div>
+    <div class="input-div">
+    <p id="error_msg"></p>
+    <button class ="buttons" id="search-button">Search</button>
+    <p id="help_msg"></p>
+    </div>
+</div>
 
 <div style=";margin-top:20px;">
 
