@@ -1,3 +1,3 @@
 __author__ = "Shyue Ping Ong"
 __date__ = "Feb 27 2013"
-__version__ = "0.1.3dev"
+__version__ = "0.1.4dev"

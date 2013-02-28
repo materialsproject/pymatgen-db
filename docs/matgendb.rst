@@ -25,3 +25,10 @@ matgendb Package
     :undoc-members:
     :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+
+    matgendb.webui
+
