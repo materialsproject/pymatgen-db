@@ -2,7 +2,7 @@
 
 Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
 materials analysis library. It enables the creation of Materials
-Project-style `MongoDB`_ databases for management of materials data and also
+Project-style `MongoDB`_ databases for management of materials data and
 provides a clean and intuitive web ui for exploring that data. A query engine
 is also provided to enable the easy translation of MongoDB docs to useful
 pymatgen objects for analysis purposes.
@@ -56,6 +56,12 @@ not already have pymatgen installed, you should refer to the `pymatgen docs
 Usage
 =====
 
+A powerful command-line script (mgdb) provides most of the access to many of
+the features in pymatgen-db, including db initialization, insertion of data,
+running the materials genomics ui, etc. To see all options available, type::
+
+    mgdb --help
+
 Initial setup
 -------------
 
@@ -63,21 +69,14 @@ In this step, it is assumed that you have already installed and setup MongoDB
 on a server of your choice. If you have not, the `MongoDB manual
 <http://docs.mongodb.org/manual/>`_ is an excellent place to start.
 
-A db initialization/insertion script has been written (mgdb) has been
-written and will be automatically installed as part of the installation
-process. Type::
-
-    mgdb --help
-
-to see all the options.
-
-Before use, first create a database config file by doing::
+Before use, first create a database config file by running the following
+command::
 
     mgdb init -c db.json
 
 This will prompt you for a few parameters to create a database config file,
-which will make it much easier to use in future. Note that the config file
-name can be anything of your choice, but using db.json will allow you to use
+which will make it much easier to use mgdb in future. Note that the config file
+name can be anything of your choice, but using "db.json" will allow you to use
 mgdb without explicitly specifying the filename in future.
 
 Inserting calculations
