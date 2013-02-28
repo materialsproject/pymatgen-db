@@ -9,15 +9,21 @@ with open("README.rst") as f:
     ind = long_desc.find("\n")
     long_desc = long_desc[ind + 1:]
 
+static_data = []
+for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
+                                                "static")):
+    for f in files:
+        static_data.append(os.path.join(parent.lstrip("matgendb/webui/"), f))
+
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="0.1.5dev",
+    version="0.2.0",
     install_requires=["pymatgen>=2.5", "pymongo>=2.4", "prettytable>=0.7",
                       "django>=1.4"],
     package_data={"matgendb": ["*.json"],
-                  "matgendb.webui": ["*.png", "*.gif", "*.js", "*.css",
-                                     "*.html"]},
+                  "matgendb.webui.home": ["templates/*"],
+                  "matgendb.webui": static_data},
     author="Shyue Ping Ong",
     author_email="shyuep@gmail.com",
     maintainer="Shyue Ping Ong",
