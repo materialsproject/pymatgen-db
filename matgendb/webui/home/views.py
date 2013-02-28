@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseBadRequest, \
     HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
-
+import os
 from matgendb.query_engine import QueryEngine
 
 
@@ -27,7 +27,11 @@ def query(request):
             return HttpResponse(
                 json.dumps(d), mimetype="application/json")
 
-        qe = QueryEngine()
+        d = json.loads(os.environ["MGDB_CONFIG"])
+        qe = QueryEngine(host=d["host"], port=d["port"],
+                         database=d["database"], user=d["readonly_user"],
+                         password=d["readonly_password"],
+                         collection=d["collection"])
         results = list(qe.query(criteria=criteria,
                                 properties=properties))
         d = {"valid_response": True, "results": results}

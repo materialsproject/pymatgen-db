@@ -114,6 +114,7 @@ def query_db(args):
 def run_server(args):
     import os
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
+    os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args))
     from django.core.management import execute_from_command_line
     execute_from_command_line(["manage.py", "runserver"])
 
