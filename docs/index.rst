@@ -106,13 +106,6 @@ To insert an entire directory of runs (where the topmost directory is
 Materials Genomics UI
 ---------------------
 
-.. figure:: _static/mgui_demo.png
-    :width: 100%
-    :alt: materials genomics ui
-    :align: center
-
-    materials genomics ui
-
 A simple web interface has been provided to assist in the querying and
 viewing of results. This web interface can be started by running::
 
@@ -124,6 +117,13 @@ can be performed using the web ui. Two options for presenting results are
 provided - a table format which is easier for comparing data,
 and a tree format which makes it much easier to explore highly nested trees
 of data.
+
+.. figure:: _static/mgui_demo.png
+    :width: 100%
+    :alt: materials genomics ui
+    :align: center
+
+    materials genomics ui
 
 Querying a database
 -------------------
