@@ -15,6 +15,46 @@
     <script type="text/javascript" src="/static/js/jquery.json2html-3.1-min.js" ></script>
     <script>
 
+        var currentData;
+        var properties;
+
+        function displayData(){
+            var myRadio = $('input[name=display]');
+            var checkedValue = myRadio.filter(':checked').val();
+            if (checkedValue == "Tree")
+            {
+                try {
+                    visualize(currentData);
+                    $("#result-tree").show();
+                    $("#results-table").hide();
+                }
+                catch(e){
+                    alert("Sorry error in json string, please correct and try again: " + e.message);
+                }
+            }
+            else{
+                $("#results-table").find("tr").remove();
+                $("#results-table")
+                        .append($('<tr><th>'+properties.join("</th><th>")+"</th></tr>")
+                        );
+
+                for (var i=0; i<currentData.length; i++)
+                {
+                    var row = [];
+                    for (var j=0; j<properties.length; j++)
+                    {
+                        row.push(currentData[i][properties[j]]);
+                    }
+
+                    $("#results-table")
+                            .append($('<tr><td>'+row.join("</td><td>")+"</td></tr>")
+                            );
+                }
+                $("#results-table").show();
+                $("#result-tree").hide();
+            }
+        }
+
         window.onload = function () {
             $('input').addClass("ui-corner-all");
             $("input").keyup(function(){
@@ -27,16 +67,13 @@
                 var prop = $("#properties-input").val();
 
                 $.post("/query", { criteria: crit, properties: prop })
-                        .success(function (data) {
+                    .success(function (data) {
 
-                        if (data["valid_response"])
-                        {
-                                     try {
-                                         visualize(data["results"]);
-                                     }
-                                     catch (e) {
-                                         alert("Sorry error in json string, please correct and try again: " + e.message);
-                                     }
+                       if (data["valid_response"])
+                       {
+                           currentData = data["results"];
+                           properties = data["properties"];
+                           displayData();
                         }else{
                             $("#error_msg").text(data["error_msg"]);
                             $("#error_msg").show();
@@ -46,6 +83,10 @@
                             $("#error_msg").text(data["error_msg"]);
                             $("#error_msg").show();
                         });
+            });
+
+            $("input[name=display]").click(function(){
+                displayData();
             });
 
         }
@@ -58,12 +99,16 @@
         }
 
         input{
-            font-size: 1.2em;
+            font-size: 1em;
+        }
+
+        input[type=text]{
+            height: 30px;
             width: 100%;
         }
 
         label{
-            font-size: 1.2em;
+            font-size: 1.1em;
         }
 
         #search-div{
@@ -75,12 +120,41 @@
             margin-left: auto;
             margin-right: auto;
             text-align: center;
+            font-size: 1.2em;
         }
 
-        #top{
+        #result-tree{
             width: 90%;
             margin-left: auto;
             margin-right: auto;
+            display: None;
+        }
+
+        #results-table{
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            display: None;
+        }
+
+        table.pretty{
+            border: none;
+            margin: 0;
+        }
+        table.pretty th{
+            background-color: #000000;
+            color: #FFFFFF;
+            padding: .2em .6em;
+        }
+        table.pretty td{
+            border: 1px solid #FFFFFF;
+            padding: .2em .6em;
+        }
+        table.pretty tr:nth-child(even){
+            background-color: #DEDEDE;
+        }
+        table.pretty tr:nth-child(odd){
+            background-color: #EFEFEF;
         }
 
         #search-button{
@@ -125,19 +199,27 @@
 <h1>MatgenDB WebUI</h1>
 <div id="search-div">
     <div class="input-div">
-        <label for="criteria-input">Criteria</label>
+        <label for="criteria-input">Criteria as a formula, integer
+            task_id, or Mongo query string</label>
         <input id="criteria-input" type="text" name="criteria"
-               placeholder='Example: {"pretty_formula": "Li2O"}'/>
+               placeholder='Examples: "Li2O", "1234", {"pretty_formula": "Li2O"}'/>
     </div>
     <div class="input-div">
-        <label for="properties-input">Properties</label>
+        <label for="properties-input">Properties as space-separated
+            strings</label>
         <input id="properties-input" type="text" name="properties"
-               placeholder='Example: ["task_id", "energy_per_atom"]'/>
+               placeholder='Example: "task_id energy_per_atom"'/>
+    </div>
+
+    <div class="input-div">
+        Choose display format:
+        <input type="radio" name="display" value="Table" checked>Table
+        <input type="radio" name="display" value="Tree">Tree<br>
     </div>
     <div class="input-div">
-    <p id="error_msg"></p>
-    <button class ="buttons" id="search-button">Search</button>
-    <p id="help_msg"></p>
+        <button class ="buttons" id="search-button">Search</button>
+        <p id="error_msg"></p>
+        <p id="help_msg"></p>
     </div>
 </div>
 
@@ -145,7 +227,9 @@
 
     <div class='divider' style='margin-top:40px;'></div>
 
-    <div id='top'></div>
+    <div id='result-tree'></div>
+    <table id='results-table' class="pretty">
+    </table>
 </div>
 
 </body>
@@ -174,8 +258,8 @@
     };
 
     function visualize(json) {
-        $('#top').html('');
-        $('#top').json2html(convert('Results',json,'open'),transforms.object);
+        $('#result-tree').html('');
+        $('#result-tree').json2html(convert('Results',json,'open'),transforms.object);
         regEvents();
     }
 

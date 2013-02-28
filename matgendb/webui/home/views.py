@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, \
 from django.views.decorators.csrf import csrf_exempt
 import os
 from matgendb.query_engine import QueryEngine
-
+from pymatgen import Composition
 
 def index(request):
     return render_to_response("home/templates/index.html",
@@ -19,8 +19,15 @@ def index(request):
 def query(request):
     if request.method == 'POST':
         try:
-            criteria = json.loads(request.POST["criteria"])
-            properties = json.loads(request.POST["properties"])
+            critstr = request.POST["criteria"]
+            try:
+                criteria = {"pretty_formula": Composition(critstr).reduced_formula}
+            except:
+                try:
+                    criteria = {"task_id": int(critstr)}
+                except ValueError:
+                    criteria = json.loads(critstr)
+            properties = request.POST["properties"].split()
         except ValueError:
             d = {"valid_response": False,
                  "error_msg": "Bad criteria or properties."}
@@ -34,6 +41,7 @@ def query(request):
                          collection=d["collection"])
         results = list(qe.query(criteria=criteria,
                                 properties=properties))
-        d = {"valid_response": True, "results": results}
+        d = {"valid_response": True, "results": results,
+             "properties": properties}
         return HttpResponse(json.dumps(d),
                             mimetype="application/json")
