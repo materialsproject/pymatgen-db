@@ -93,8 +93,12 @@
                 var crit = $("#criteria-input").val();
                 var prop = $("#properties-input").val();
 
-                $.post("/query", { criteria: crit, properties: prop })
-                    .success(function (data) {
+                $.ajax({
+                        url: "/query",
+                        type: "POST",
+                        data: { criteria: crit, properties: prop }
+                        }
+                ).success(function (data) {
 
                        if (data["valid_response"])
                        {
@@ -106,7 +110,7 @@
                             $("#error_msg").show();
                         }
                                  })
-                        .error(function (data) {
+                .error(function (data) {
                             $("#error_msg").text(data["error_msg"]);
                             $("#error_msg").show();
                         });

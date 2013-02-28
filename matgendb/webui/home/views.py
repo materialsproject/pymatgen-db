@@ -10,6 +10,10 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 from matgendb.query_engine import QueryEngine
 from pymatgen import Element, Composition
+import bson
+from django.core.serializers.json import DjangoJSONEncoder
+from django.utils.encoding import force_unicode
+import datetime
 
 def index(request):
     return render_to_response("home/templates/index.html",
@@ -34,6 +38,8 @@ def query(request):
                     except:
                         criteria = json.loads(critstr)
             properties = request.POST["properties"].split()
+            if not properties:
+                properties = None
         except ValueError:
             d = {"valid_response": False,
                  "error_msg": "Bad criteria or properties."}
@@ -49,5 +55,24 @@ def query(request):
                                 properties=properties))
         d = {"valid_response": True, "results": results,
              "properties": properties}
-        return HttpResponse(json.dumps(d),
+        return HttpResponse(json.dumps(d, cls=MongoJSONEncoder),
                             mimetype="application/json")
+
+
+class MongoJSONEncoder(DjangoJSONEncoder):
+    """
+    Encodes Mongo DB objects into JSON
+    In particular is handles BSON Object IDs and Datetime objects
+
+    eg.
+
+    >>> from django.core.serializers import json
+    >>> json.dumps(mongo_doc, cls=MongoJSONEncoder)
+    """
+
+    def default(self, obj):
+        if isinstance(obj, bson.objectid.ObjectId):
+            return force_unicode(obj)
+        elif isinstance(obj, datetime.datetime):
+            return str(obj)
+        return super(MongoJSONEncoder, self).default(obj)
