@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, \
 from django.views.decorators.csrf import csrf_exempt
 import os
 from matgendb.query_engine import QueryEngine
-from pymatgen import Composition
+from pymatgen import Element, Composition
 
 def index(request):
     return render_to_response("home/templates/index.html",
@@ -26,7 +26,13 @@ def query(request):
                 try:
                     criteria = {"task_id": int(critstr)}
                 except ValueError:
-                    criteria = json.loads(critstr)
+                    try:
+                        syms = [Element(sym).symbol
+                                for sym in critstr.split("-")]
+                        syms.sort()
+                        criteria = {"chemsys": "-".join(syms)}
+                    except:
+                        criteria = json.loads(critstr)
             properties = request.POST["properties"].split()
         except ValueError:
             d = {"valid_response": False,

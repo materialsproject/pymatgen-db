@@ -4,7 +4,7 @@
 <head>
     <title>{% block title %} MatgenDB {% endblock %}</title>
     <link rel='stylesheet'
-          href="/static/css/jquery-ui-1.10.1.custom.css"
+          href="/static/css/jquery-ui-1.10.1.custom.min.css"
           type='text/css'>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="keywords" content="Materials Design, Materials Database, Materials Information, Materials Tools" />
@@ -15,25 +15,30 @@
     <script type="text/javascript" src="/static/js/jquery.json2html-3.1-min.js" ></script>
     <script>
 
-        var currentData;
-        var properties;
+        var currentData = [];
+        var properties = [];
 
         function displayData(){
             var myRadio = $('input[name=display]');
             var checkedValue = myRadio.filter(':checked').val();
-            if (checkedValue == "Tree")
+            $("#num-results").text("Number of results = " + currentData.length);
+            if (checkedValue == "tree" && currentData.length > 0)
             {
+
                 try {
                     visualize(currentData);
                     $("#result-tree").show();
+                    $("#num-results").show();
                     $("#results-table").hide();
                 }
                 catch(e){
                     alert("Sorry error in json string, please correct and try again: " + e.message);
                 }
             }
-            else{
+            else if (currentData.length>0){
+                $("#num-results").text("Number of results = " + currentData.length);
                 $("#results-table").find("tr").remove();
+
                 $("#results-table")
                         .append($('<tr><th>'+properties.join("</th><th>")+"</th></tr>")
                         );
@@ -51,6 +56,7 @@
                             );
                 }
                 $("#results-table").show();
+                $("#num-results").show();
                 $("#result-tree").hide();
             }
         }
@@ -99,16 +105,17 @@
         }
 
         input{
-            font-size: 1em;
+            font-size: 1.1em;
         }
 
         input[type=text]{
-            height: 30px;
+            height: 40px;
             width: 100%;
         }
 
         label{
-            font-size: 1.1em;
+            font-size: 1em;
+            color: #888;
         }
 
         #search-div{
@@ -116,6 +123,7 @@
         }
 
         .input-div{
+            padding-top: 10px;
             width:  70%;
             margin-left: auto;
             margin-right: auto;
@@ -157,6 +165,11 @@
             background-color: #EFEFEF;
         }
 
+        #num-results{
+            display: None;
+            text-align: center;
+        }
+
         #search-button{
             margin-left: auto;
             margin-right: auto;
@@ -188,6 +201,11 @@
 
         #main {width:100%;height:500px;overflow-y:scroll;}
 
+        .emph{
+            font-size:  1.3em;
+            color: #000;
+        }
+
     </style>
 
     {% block extra_css %}{% endblock extra_css %}
@@ -196,25 +214,28 @@
 
 <body>
 
-<h1>MatgenDB WebUI</h1>
+<h1>materials genomics ui</h1>
 <div id="search-div">
     <div class="input-div">
-        <label for="criteria-input">Criteria as a formula, integer
-            task_id, or Mongo query string</label>
+        <label for="criteria-input"><span
+                class="emph">criteria</span> as formula, task_id,
+            chemical system or
+            mongo query string</label>
         <input id="criteria-input" type="text" name="criteria"
-               placeholder='Examples: "Li2O", "1234", {"pretty_formula": "Li2O"}'/>
+            placeholder='Examples: "Li2O", "1234", "Li-Fe-O", {"pretty_formula": "Li2O"}'/>
     </div>
     <div class="input-div">
-        <label for="properties-input">Properties as space-separated
+        <label for="properties-input"><span
+                class="emph">properties</span> as space-separated
             strings</label>
         <input id="properties-input" type="text" name="properties"
                placeholder='Example: "task_id energy_per_atom"'/>
     </div>
 
     <div class="input-div">
-        Choose display format:
-        <input type="radio" name="display" value="Table" checked>Table
-        <input type="radio" name="display" value="Tree">Tree<br>
+        <span class="emph">display format:
+        <input type="radio" name="display" value="table" checked>table
+        <input type="radio" name="display" value="tree">tree</span>
     </div>
     <div class="input-div">
         <button class ="buttons" id="search-button">Search</button>
@@ -226,7 +247,7 @@
 <div style=";margin-top:20px;">
 
     <div class='divider' style='margin-top:40px;'></div>
-
+    <h2 id="num-results">x results</h2>
     <div id='result-tree'></div>
     <table id='results-table' class="pretty">
     </table>
