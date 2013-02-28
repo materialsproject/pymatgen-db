@@ -91,7 +91,7 @@ To insert an entire directory of runs (where the topmost directory is
 
     mgdb insert -c db.json dir_name
 
-materials genomics ui
+Materials Genomics UI
 ---------------------
 
 .. figure:: http://pythonhosted.org/pymatgen-db/images/mgui_demo.png
