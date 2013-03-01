@@ -117,7 +117,7 @@ Materials Genomics UI
 A simple web interface has been provided to assist in the querying and
 viewing of results. This web interface can be started by running::
 
-    mgdb -c db.json runserver
+    mgdb runserver -c db.json
 
 This will run the web server at http://127.0.0.1:8000. Go to this address in
 your browser and you should see something like the figure below. Most queries
