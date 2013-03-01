@@ -13,8 +13,17 @@ provides a clean and intuitive web ui for exploring that data. A query engine
 is also provided to enable the easy translation of MongoDB docs to useful
 pymatgen objects for analysis purposes.
 
-Latest Change Log
-=================
+Change Log
+==========
+
+Version 0.2.1
+-------------
+
+1. Aesthetic improvements to materials genomics ui.
+2. Added support for aliases_config to be specified in db.json.
+
+Version 0.2.0
+-------------
 
 1. First release of the materials genomics ui for data querying and
    exploration.
