@@ -21,6 +21,7 @@ from matgendb import __version__ as ver
 
 
 def makedoc():
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
     with lcd("docs"):
         local("sphinx-apidoc -o . -f ../matgendb")
         local("rm matgendb*.tests.rst")

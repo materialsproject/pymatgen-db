@@ -55,17 +55,19 @@ class QueryEngine(object):
             aliases_config:
                 An alias dict to use. Defaults to None, which means the default
                 aliases defined in aliases.json is used. The aliases config
-                should be of the following format:
-                {
-                    "aliases": {
-                        "e_above_hull": "analysis.e_above_hull",
-                        "energy": "output.final_energy",
-                        ....
-                    },
-                    "defaults": {
-                        "state": "successful"
+                should be of the following format::
+
+                    {
+                        "aliases": {
+                            "e_above_hull": "analysis.e_above_hull",
+                            "energy": "output.final_energy",
+                            ....
+                        },
+                        "defaults": {
+                            "state": "successful"
+                        }
                     }
-                }
+
                 The "aliases" key defines mappings, which makes it easier to
                 query for certain nested quantities. While Mongo does make it
                 easy to map collections, it is sometimes beneficial to
@@ -115,11 +117,13 @@ class QueryEngine(object):
         Gets all entries in a chemical system, e.g. Li-Fe-O will return all
         Li-O, Fe-O, Li-Fe, Li-Fe-O compounds.
 
-        Caution: Note that the get_entries_in_system and get_entries methods
-        should be used with care. In essence, all entries, GGA, GGA+U or
-        otherwise, are returned.  The dataset is very heterogeneous and not
-        directly comparable.  It is highly recommended that you perform
-        post-processing using pymatgen.entries.compatibility.
+        .. note::
+
+            The get_entries_in_system and get_entries  methods should be used
+            with care. In essence, all entries, GGA, GGA+U or otherwise,
+            are returned.  The dataset is very heterogeneous and not
+            directly comparable.  It is highly recommended that you perform
+            post-processing using pymatgen.entries.compatibility.
 
         Args:
             elements:
@@ -149,11 +153,13 @@ class QueryEngine(object):
         """
         Get ComputedEntries satisfying a particular criteria.
 
-        Caution: Note that the get_entries_in_system and get_entries methods
-        should be used with care. In essence, all entries, GGA, GGA+U or
-        otherwise, are returned.  The dataset is very heterogeneous and not
-        directly comparable.  It is highly recommended that you perform
-        post-processing using pymatgen.entries.compatibility.
+        .. note::
+
+            The get_entries_in_system and get_entries  methods should be used
+            with care. In essence, all entries, GGA, GGA+U or otherwise,
+            are returned.  The dataset is very heterogeneous and not
+            directly comparable.  It is highly recommended that you perform
+            post-processing using pymatgen.entries.compatibility.
 
         Args:
             criteria:
