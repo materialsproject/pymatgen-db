@@ -69,29 +69,32 @@ class VaspToDbTaskDrone(AbstractDrone):
     __version__ = "2.0.0"
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
-                 user=None, password=None,  parse_dos=False,
-                 simulate_mode=False, collection='tasks',
+                 user=None, password=None,  collection="tasks",
+                 parse_dos=False, simulate_mode=False,
                  additional_fields=None, update_duplicates=True):
         """
         Args:
             host:
-                Hostname of database machine.
-            database:
-                Actual database to access.
-            user:
-                User for db access. Requires write access.
-            password:
-                Password for db access. Requires write access.
+                Hostname of database machine. Defaults to 127.0.0.1 or
+                localhost.
             port:
                 Port for db access. Defaults to mongo's default of 27017.
+            database:
+                Actual database to access. Defaults to "vasp".
+            user:
+                User for db access. Requires write access. Defaults to None,
+                which means no authentication.
+            password:
+                Password for db access. Requires write access. Defaults to
+                None, which means no authentication.
+            collection:
+                Collection to query. Defaults to "tasks".
             parse_dos:
                 Whether to parse the DOS data where possible. Defaults to
                 False.
             simulate_mode:
                 Allows one to simulate db insertion without actually performing
                 the insertion.
-            collection:
-                Collection to insert to.
             additional_fields:
                 Dict specifying additional fields to append to each doc
                 inserted into the collection. For example, allows one to add
@@ -142,18 +145,18 @@ class VaspToDbTaskDrone(AbstractDrone):
         d = None
         vasprun_files = OrderedDict()
         files = os.listdir(path)
-        if ('relax1' in files and 'relax2' in files and
-                os.path.isdir(os.path.join(path, 'relax1')) and
-                os.path.isdir(os.path.join(path, 'relax2'))):
+        if ("relax1" in files and "relax2" in files and
+                os.path.isdir(os.path.join(path, "relax1")) and
+                os.path.isdir(os.path.join(path, "relax2"))):
             #Materials project style aflow runs.
-            for subtask in ['relax1', 'relax2']:
+            for subtask in ["relax1", "relax2"]:
                 for f in os.listdir(os.path.join(path, subtask)):
                     if VaspToDbTaskDrone.vasprun_pattern.match(f):
                             vasprun_files[subtask] = os.path.join(subtask, f)
-        elif 'STOPCAR' in files:
+        elif "STOPCAR" in files:
             #Stopped runs. Try to parse as much as possible.
             logger.info(path + " contains stopped run")
-            for subtask in ['relax1', 'relax2']:
+            for subtask in ["relax1", "relax2"]:
                 if subtask in files and \
                         os.path.isdir(os.path.join(path, subtask)):
                     for f in os.listdir(os.path.join(path, subtask)):
@@ -184,8 +187,8 @@ class VaspToDbTaskDrone(AbstractDrone):
             if not d:
                 d = cls.process_killed_run(path)
             cls.post_process(path, d)
-        elif (not (path.endswith('relax1') or
-              path.endswith('relax2'))) and contains_vasp_input(path):
+        elif (not (path.endswith("relax1") or
+              path.endswith("relax2"))) and contains_vasp_input(path):
             #If not Materials Project style, process as a killed run.
             logger.warning(path + " contains killed run")
             d = cls.process_killed_run(path)
@@ -207,45 +210,45 @@ class VaspToDbTaskDrone(AbstractDrone):
             # Insert dos data into gridfs and then remove it from the dict.
             # DOS data tends to be above the 4Mb limit for mongo docs. A ref
             # to the dos file is in the dos_fs_id.
-            result = coll.find_one({'dir_name': d['dir_name']},
-                                   fields=['dir_name', 'task_id'])
+            result = coll.find_one({"dir_name": d["dir_name"]},
+                                   fields=["dir_name", "task_id"])
             if result is None or self._update_duplicates:
-                if self._parse_dos and 'calculations' in d:
-                    for calc in d['calculations']:
-                        if 'dos' in calc:
-                            dos = json.dumps(calc['dos'])
+                if self._parse_dos and "calculations" in d:
+                    for calc in d["calculations"]:
+                        if "dos" in calc:
+                            dos = json.dumps(calc["dos"])
                             if not self._simulate:
-                                fs = gridfs.GridFS(db, 'dos_fs')
+                                fs = gridfs.GridFS(db, "dos_fs")
                                 dosid = fs.put(dos)
-                                calc['dos_fs_id'] = dosid
-                                del calc['dos']
+                                calc["dos_fs_id"] = dosid
+                                del calc["dos"]
                             else:
                                 logger.info("Simulated Insert DOS into db.")
 
-                d['last_updated'] = datetime.datetime.today()
+                d["last_updated"] = datetime.datetime.today()
                 if result is None:
-                    if ('task_id' not in d) or (not d['task_id']):
+                    if ("task_id" not in d) or (not d["task_id"]):
                         if db.counter.find({"_id": "taskid"}).count() == 0:
                             db.counter.insert({"_id": "taskid", "c": 1})
-                        d['task_id'] = db.counter.find_and_modify(
-                            query={'_id': "taskid"},
-                            update={'$inc': {'c': 1}}
-                        )['c']
+                        d["task_id"] = db.counter.find_and_modify(
+                            query={"_id": "taskid"},
+                            update={"$inc": {"c": 1}}
+                        )["c"]
                     logger.info("Inserting {} with taskid = {}"
-                                .format(d['dir_name'], d['task_id']))
+                                .format(d["dir_name"], d["task_id"]))
                     coll.insert(d, safe=True)
                 elif self._update_duplicates:
-                    d['task_id'] = result['task_id']
+                    d["task_id"] = result["task_id"]
                     logger.info("Updating {} with taskid = {}"
-                                .format(d['dir_name'], d['task_id']))
-                    coll.update({'dir_name': d['dir_name']}, {'$set': d})
-                return d['task_id']
+                                .format(d["dir_name"], d["task_id"]))
+                    coll.update({"dir_name": d["dir_name"]}, {"$set": d})
+                return d["task_id"]
             else:
-                logger.info("Skipping duplicate {}".format(d['dir_name']))
+                logger.info("Skipping duplicate {}".format(d["dir_name"]))
         else:
             d["task_id"] = 0
             logger.info("Simulated Insert into database for {} with task_id {}"
-                        .format(d['dir_name'], d['task_id']))
+                        .format(d["dir_name"], d["task_id"]))
             return d
 
     @classmethod
@@ -323,81 +326,81 @@ class VaspToDbTaskDrone(AbstractDrone):
         """
         fullpath = os.path.abspath(dirname)
         logger.info("Processing Killed run " + fullpath)
-        d = {'dir_name': fullpath, 'state': 'killed', 'oszicar': {}}
+        d = {"dir_name": fullpath, "state": "killed", "oszicar": {}}
 
         for f in os.listdir(dirname):
             filename = os.path.join(dirname, f)
             if re.match("INCAR.*", f):
                 try:
                     incar = Incar.from_file(filename)
-                    d['incar'] = incar.to_dict
-                    d['is_hubbard'] = incar.get('LDAU', False)
-                    if d['is_hubbard']:
-                        us = incar.get('LDAUU', [])
-                        js = incar.get('LDAUJ', [])
+                    d["incar"] = incar.to_dict
+                    d["is_hubbard"] = incar.get("LDAU", False)
+                    if d["is_hubbard"]:
+                        us = incar.get("LDAUU", [])
+                        js = incar.get("LDAUJ", [])
                         if sum(us) == 0 and sum(js) == 0:
-                            d['is_hubbard'] = False
-                            d['hubbards'] = {}
+                            d["is_hubbard"] = False
+                            d["hubbards"] = {}
                     else:
-                        d['hubbards'] = {}
-                    if d['is_hubbard']:
-                        d['run_type'] = "GGA+U"
-                    elif incar.get('LHFCALC', False):
-                        d['run_type'] = "HF"
+                        d["hubbards"] = {}
+                    if d["is_hubbard"]:
+                        d["run_type"] = "GGA+U"
+                    elif incar.get("LHFCALC", False):
+                        d["run_type"] = "HF"
                     else:
-                        d['run_type'] = "GGA"
+                        d["run_type"] = "GGA"
                 except Exception as ex:
                     print str(ex)
-                    logger.error('Unable to parse INCAR for killed run {}.'
+                    logger.error("Unable to parse INCAR for killed run {}."
                                  .format(dirname))
             elif re.match("KPOINTS.*", f):
                 try:
                     kpoints = Kpoints.from_file(filename)
-                    d['kpoints'] = kpoints.to_dict
+                    d["kpoints"] = kpoints.to_dict
                 except:
-                    logger.error('Unable to parse KPOINTS for killed run {}.'
+                    logger.error("Unable to parse KPOINTS for killed run {}."
                                  .format(dirname))
             elif re.match("POSCAR.*", f):
                 try:
                     s = Poscar.from_file(filename).structure
                     comp = s.composition
                     el_amt = s.composition.get_el_amt_dict()
-                    d.update({'unit_cell_formula': comp.to_dict,
-                              'reduced_cell_formula': comp.to_reduced_dict,
-                              'elements': list(el_amt.keys()),
-                              'nelements': len(el_amt),
-                              'pretty_formula': comp.reduced_formula,
-                              'anonymous_formula': comp.anonymized_formula,
-                              'nsites': comp.num_atoms,
-                              'chemsys': "-".join(sorted(el_amt.keys()))})
-                    d['poscar'] = s.to_dict
+                    d.update({"unit_cell_formula": comp.to_dict,
+                              "reduced_cell_formula": comp.to_reduced_dict,
+                              "elements": list(el_amt.keys()),
+                              "nelements": len(el_amt),
+                              "pretty_formula": comp.reduced_formula,
+                              "anonymous_formula": comp.anonymized_formula,
+                              "nsites": comp.num_atoms,
+                              "chemsys": "-".join(sorted(el_amt.keys()))})
+                    d["poscar"] = s.to_dict
                 except:
-                    logger.error('Unable to parse POSCAR for killed run {}.'
+                    logger.error("Unable to parse POSCAR for killed run {}."
                                  .format(dirname))
             elif re.match("POTCAR.*", f):
                 try:
                     potcar = Potcar.from_file(filename)
-                    d['pseudo_potential'] = {'functional': 'pbe',
-                                             'pot_type': 'paw',
-                                             'labels': potcar.symbols}
+                    d["pseudo_potential"] = {"functional": "pbe",
+                                             "pot_type": "paw",
+                                             "labels": potcar.symbols}
                 except:
-                    logger.error('Unable to parse POTCAR for killed run in {}.'
+                    logger.error("Unable to parse POTCAR for killed run in {}."
                                  .format(dirname))
-            elif re.match('OSZICAR', f):
+            elif re.match("OSZICAR", f):
                 try:
-                    d['oszicar']['root'] = \
+                    d["oszicar"]["root"] = \
                         Oszicar(os.path.join(dirname, f)).to_dict
                 except:
-                    logger.error('Unable to parse OSZICAR for killed run in {}.'
+                    logger.error("Unable to parse OSZICAR for killed run in {}."
                                  .format(dirname))
-            elif re.match('relax\d', f):
-                if os.path.exists(os.path.join(dirname, f, 'OSZICAR')):
+            elif re.match("relax\d", f):
+                if os.path.exists(os.path.join(dirname, f, "OSZICAR")):
                     try:
-                        d['oszicar'][f] = Oszicar(
-                            os.path.join(dirname, f, 'OSZICAR')).to_dict
+                        d["oszicar"][f] = Oszicar(
+                            os.path.join(dirname, f, "OSZICAR")).to_dict
                     except:
-                        logger.error('Unable to parse OSZICAR for killed '
-                                     'run in {}.'.format(dirname))
+                        logger.error("Unable to parse OSZICAR for killed "
+                                     "run in {}.".format(dirname))
         return d
 
     @classmethod
@@ -408,22 +411,22 @@ class VaspToDbTaskDrone(AbstractDrone):
         vasprun_file = os.path.join(dirname, filename)
         r = Vasprun(vasprun_file)
         d = r.to_dict
-        d['dir_name'] = os.path.abspath(dirname)
-        d['completed_at'] = \
+        d["dir_name"] = os.path.abspath(dirname)
+        d["completed_at"] = \
             str(datetime.datetime.fromtimestamp(os.path.getmtime(
                 vasprun_file)))
-        d['cif'] = str(CifWriter(r.final_structure))
-        d['density'] = r.final_structure.density
+        d["cif"] = str(CifWriter(r.final_structure))
+        d["density"] = r.final_structure.density
         if parse_dos:
             try:
-                d['dos'] = r.complete_dos.to_dict
+                d["dos"] = r.complete_dos.to_dict
             except Exception:
                 logger.warn("No valid dos data exist in {}.\n Skipping dos"
                             .format(dirname))
-        if taskname == 'relax1' or taskname == 'relax2':
-            d['task'] = {'type': "aflow", "name": taskname}
+        if taskname == "relax1" or taskname == "relax2":
+            d["task"] = {"type": "aflow", "name": taskname}
         else:
-            d['task'] = {'type': "standard", "name": "standard"}
+            d["task"] = {"type": "standard", "name": "standard"}
         return d
 
     @classmethod
@@ -440,51 +443,51 @@ class VaspToDbTaskDrone(AbstractDrone):
             #will be overridden!!
             d = {k: v for k, v in additional_fields.items()} \
                 if additional_fields else {}
-            d['dir_name'] = fullpath
-            d['schema_version'] = VaspToDbTaskDrone.__version__
-            d['calculations'] = [
+            d["dir_name"] = fullpath
+            d["schema_version"] = VaspToDbTaskDrone.__version__
+            d["calculations"] = [
                 cls.process_vasprun(dirname, taskname, filename, parse_dos)
                 for taskname, filename in vasprun_files.items()]
-            d1 = d['calculations'][0]
-            d2 = d['calculations'][-1]
+            d1 = d["calculations"][0]
+            d2 = d["calculations"][-1]
 
             #Now map some useful info to the root level.
-            for root_key in ['completed_at', 'nsites', 'unit_cell_formula',
-                             'reduced_cell_formula', 'pretty_formula',
-                             'elements', 'nelements', 'cif', 'density',
-                             'is_hubbard', 'hubbards', 'run_type']:
+            for root_key in ["completed_at", "nsites", "unit_cell_formula",
+                             "reduced_cell_formula", "pretty_formula",
+                             "elements", "nelements", "cif", "density",
+                             "is_hubbard", "hubbards", "run_type"]:
                 d[root_key] = d2[root_key]
-            d['chemsys'] = '-'.join(sorted(d2['elements']))
-            d['input'] = {'crystal': d1['input']['crystal']}
-            vals = sorted(d2['reduced_cell_formula'].values())
-            d['anonymous_formula'] = {string.ascii_uppercase[i]: float(vals[i])
+            d["chemsys"] = "-".join(sorted(d2["elements"]))
+            d["input"] = {"crystal": d1["input"]["crystal"]}
+            vals = sorted(d2["reduced_cell_formula"].values())
+            d["anonymous_formula"] = {string.ascii_uppercase[i]: float(vals[i])
                                       for i in xrange(len(vals))}
-            d['output'] = {'crystal': d2['output']['crystal'],
-                           'final_energy': d2['output']['final_energy'],
-                           'final_energy_per_atom': d2['output']
-                           ['final_energy_per_atom']}
-            d['name'] = 'aflow'
-            d['pseudo_potential'] = {'functional': 'pbe', 'pot_type': 'paw',
-                                     'labels': d2['input']['potcar']}
+            d["output"] = {"crystal": d2["output"]["crystal"],
+                           "final_energy": d2["output"]["final_energy"],
+                           "final_energy_per_atom": d2["output"]
+                           ["final_energy_per_atom"]}
+            d["name"] = "aflow"
+            d["pseudo_potential"] = {"functional": "pbe", "pot_type": "paw",
+                                     "labels": d2["input"]["potcar"]}
 
-            if len(d['calculations']) == 2 or \
+            if len(d["calculations"]) == 2 or \
                     vasprun_files.keys()[0] != "relax1":
-                d['state'] = 'successful' if d2['has_vasp_completed'] \
-                    else 'unsuccessful'
+                d["state"] = "successful" if d2["has_vasp_completed"] \
+                    else "unsuccessful"
             else:
-                d['state'] = 'stopped'
-            d['analysis'] = get_basic_analysis_and_error_checks(d)
+                d["state"] = "stopped"
+            d["analysis"] = get_basic_analysis_and_error_checks(d)
 
-            sg = SymmetryFinder(Structure.from_dict(d['output']['crystal']),
+            sg = SymmetryFinder(Structure.from_dict(d["output"]["crystal"]),
                                 0.1)
-            d['spacegroup'] = {'symbol': sg.get_spacegroup_symbol(),
-                               'number': sg.get_spacegroup_number(),
-                               'point_group': unicode(sg.get_point_group(),
-                                                      errors='ignore'),
-                               'source': 'spglib',
-                               'crystal_system': sg.get_crystal_system(),
-                               'hall': sg.get_hall()}
-            d['last_updated'] = datetime.datetime.today()
+            d["spacegroup"] = {"symbol": sg.get_spacegroup_symbol(),
+                               "number": sg.get_spacegroup_number(),
+                               "point_group": unicode(sg.get_point_group(),
+                                                      errors="ignore"),
+                               "source": "spglib",
+                               "crystal_system": sg.get_crystal_system(),
+                               "hall": sg.get_hall()}
+            d["last_updated"] = datetime.datetime.today()
             return d
         except Exception as ex:
             logger.error("Error in " + os.path.abspath(dirname) +
@@ -493,10 +496,10 @@ class VaspToDbTaskDrone(AbstractDrone):
 
     def get_valid_paths(self, path):
         (parent, subdirs, files) = path
-        if 'relax1' in subdirs:
+        if "relax1" in subdirs:
             return [parent]
-        if ((not parent.endswith(os.sep + 'relax1')) and
-                (not parent.endswith(os.sep + 'relax2')) and
+        if ((not parent.endswith(os.sep + "relax1")) and
+                (not parent.endswith(os.sep + "relax2")) and
                 len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0):
             return [parent]
         return []
@@ -509,25 +512,25 @@ class VaspToDbTaskDrone(AbstractDrone):
 
     @property
     def to_dict(self):
-        init_args = {'additional_fields': self._additional_fields}
-        output = {'name': self.__class__.__name__,
-                  'init_args': init_args, 'version': __version__}
+        init_args = {"additional_fields": self._additional_fields}
+        output = {"name": self.__class__.__name__,
+                  "init_args": init_args, "version": __version__}
         return output
 
 
 def get_basic_analysis_and_error_checks(d):
-    initial_vol = d['input']['crystal']['lattice']['volume']
-    final_vol = d['output']['crystal']['lattice']['volume']
+    initial_vol = d["input"]["crystal"]["lattice"]["volume"]
+    final_vol = d["output"]["crystal"]["lattice"]["volume"]
     delta_vol = final_vol - initial_vol
     percent_delta_vol = delta_vol / initial_vol
     coord_num = get_coordination_numbers(d)
-    gap = d['calculations'][-1]['output']['bandgap']
-    cbm = d['calculations'][-1]['output']['cbm']
-    vbm = d['calculations'][-1]['output']['vbm']
-    is_direct = d['calculations'][-1]['output']['is_gap_direct']
+    gap = d["calculations"][-1]["output"]["bandgap"]
+    cbm = d["calculations"][-1]["output"]["cbm"]
+    vbm = d["calculations"][-1]["output"]["vbm"]
+    is_direct = d["calculations"][-1]["output"]["is_gap_direct"]
 
     if abs(percent_delta_vol) > 0.20:
-        warning_msgs = ['Volume change > 20%']
+        warning_msgs = ["Volume change > 20%"]
     else:
         warning_msgs = []
 
@@ -541,16 +544,27 @@ def get_basic_analysis_and_error_checks(d):
     except Exception as ex:
         logger.error("BVAnalyzer error {e}.".format(e=str(ex)))
 
-    return {'delta_volume': delta_vol,
-            'percent_delta_volume': percent_delta_vol,
-            'warnings': warning_msgs, 'coordination_numbers': coord_num,
-            'bandgap': gap, 'cbm': cbm, 'vbm': vbm,
-            'is_gap_direct': is_direct,
+    return {"delta_volume": delta_vol,
+            "percent_delta_volume": percent_delta_vol,
+            "warnings": warning_msgs, "coordination_numbers": coord_num,
+            "bandgap": gap, "cbm": cbm, "vbm": vbm,
+            "is_gap_direct": is_direct,
             "bv_structure": bv_struct.to_dict}
 
 
 def contains_vasp_input(dirname):
-    for f in ['INCAR', 'POSCAR', 'POTCAR', 'KPOINTS']:
+    """
+    Checks if a directory contains valid VASP input.
+
+    Args:
+        dirname:
+            Directory name to check.
+
+    Returns:
+        True if directory contains all four VASP input files (INCAR, POSCAR,
+        KPOINTS and POTCAR).
+    """
+    for f in ["INCAR", "POSCAR", "POTCAR", "KPOINTS"]:
         if not os.path.exists(os.path.join(dirname, f)) and \
                 not os.path.exists(os.path.join(dirname, f + ".orig")):
             return False
@@ -558,21 +572,44 @@ def contains_vasp_input(dirname):
 
 
 def get_coordination_numbers(d):
-    structure = Structure.from_dict(d['output']['crystal'])
+    """
+    Helper method to get the coordination number of all sites in the final
+    structure from a run.
+
+    Args:
+        d:
+            Run dict generated by VaspToDbTaskDrone.
+
+    Returns:
+        Coordination numbers as a list of dict of [{"site": site_dict,
+        "coordination": number}, ...].
+    """
+    structure = Structure.from_dict(d["output"]["crystal"])
     f = VoronoiCoordFinder(structure)
     cn = []
     for i, s in enumerate(structure.sites):
         try:
             n = f.get_coordination_number(i)
             number = int(round(n))
-            cn.append({'site': s.to_dict, 'coordination': number})
+            cn.append({"site": s.to_dict, "coordination": number})
         except Exception:
             logger.error("Unable to parse coordination errors")
     return cn
 
 
-def get_uri(mydir):
-    fullpath = os.path.abspath(mydir)
+def get_uri(dirname):
+    """
+    Returns the URI path for a directory. This allows files hosted on 
+    different file servers to have distinct locations.
+    
+    Args:
+        dirname:
+            A directory name.
+
+    Returns:
+        Full URI path, e.g., fileserver.host.com:/full/path/of/dirname.
+    """
+    fullpath = os.path.abspath(dirname)
     try:
         hostname = socket.gethostbyaddr(socket.gethostname())[0]
     except:

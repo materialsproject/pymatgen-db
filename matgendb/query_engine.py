@@ -41,20 +41,23 @@ class QueryEngine(object):
         """
         Args:
             host:
-                Hostname of database machine
+                Hostname of database machine. Defaults to 127.0.0.1 or
+                localhost.
             port:
                 Port for db access. Defaults to mongo's default of 27017.
             database:
-                Actual database to access
+                Actual database to access. Defaults to "vasp".
             user:
-                User for db access
+                User for db access. Defaults to None, which means no
+                authentication.
             password:
-                Password for db access
+                Password for db access. Defaults to None, which means no
+                authentication.
             collection:
-                Collection to query. Defaults to tasks.
+                Collection to query. Defaults to "tasks".
             aliases_config:
                 An alias dict to use. Defaults to None, which means the default
-                aliases defined in aliases.json is used. The aliases config
+                aliases defined in "aliases.json" is used. The aliases config
                 should be of the following format::
 
                     {
