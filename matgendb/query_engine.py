@@ -30,9 +30,21 @@ from pymatgen.entries.computed_entries import ComputedEntry,\
 class QueryEngine(object):
     """
     This class defines a QueryEngine interface to a Mongo Collection based on
-    a set of aliases. This query engine wraps around the pymongo methods to
-    provide convenient translation between various pymatgen objects and
-    database objects.
+    a set of aliases. This query engine also provides convenient translation
+    between various pymatgen objects and database objects.
+
+    The major difference between the QueryEngine's query() method and pymongo's
+    find() method is the treatment of nested fields. QueryEngine's query
+    will map the final result to a root level string, while pymmongo will
+    return the doc as is. For example, let's say you have a document
+    that is of the following form::
+
+        {"a": {"b" : 1}}
+
+    Using pymongo.find({}, fields=["a.b"]), you will get a doc where you need
+    to do doc["a"]["b"] to access the final result (1). Using
+    QueryEngine.query(properties=["a.b"], you will obtain a result that can be
+    accessed simply as doc["a.b"].
     """
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
@@ -301,6 +313,28 @@ class QueryEngine(object):
         else:
             cur.limit(limit)
             return QueryResults(prop_dict, cur)
+
+    def query_one(self, properties=None, criteria=None, index=0):
+        """
+        Just like query, but return a single doc.
+
+        Args:
+            properties:
+                Properties to query for. Defaults to None which means all
+                supported properties.
+            criteria:
+                Criteria to query for as a dict.
+            index:
+                Similar definition to pymongo.collection.find method.
+
+        Returns:
+            A single dict containing the result.
+        """
+
+        for r in self.query(properties=properties, criteria=criteria,
+                            index=index, limit=1):
+            return r
+        return None
 
     def get_structure_from_id(self, task_id, final_structure=True):
         """
