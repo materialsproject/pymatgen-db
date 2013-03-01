@@ -15,7 +15,7 @@ Stable version
 
 The version at the Python Package Index (PyPI) is always the latest stable
 release that will be hopefully, be relatively bug-free. The easiest way to
-install pymatgen on any system is to use easy_install or pip, as follows::
+install pymatgen-db on any system is to use easy_install or pip, as follows::
 
     easy_install pymatgen-db
 
@@ -43,13 +43,13 @@ Requirements
 
 All required python dependencies should be automatically taken care of if you
 install pymatgen-db using easy_install or pip. Otherwise, these packages should
-be available on `PyPI <http://pypi.python.org>`_. Please note that if you do
-not already have pymatgen installed, you should refer to the `pymatgen docs
-<http://pythonhosted.org//pymatgen>`_ for detailed instructions.
+be available on `PyPI <http://pypi.python.org>`_.
 
 1. Python 2.7+ required. New default modules such as json are used, as well as
    new unittest features in Python 2.7.
-2. pymatgen 2.5+, including all dependencies associated with it.
+2. pymatgen 2.5+, including all dependencies associated with it. Please refer
+   to the `pymatgen docs <http://pythonhosted.org//pymatgen>`_ for detailed
+   installation instructions.
 3. pymongo 2.4+: For interfacing with MongoDb.
 4. MongoDB 2.2+: Get it at the `MongoDB`_ website.
 
