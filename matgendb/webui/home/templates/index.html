@@ -146,11 +146,14 @@
         .text-search{
             height: 40px;
             width: 100%;
+            border: 2px solid #AAA;
+            text-align: center;
         }
 
         label{
-            font-size: 1em;
+            font-size: 0.9em;
             color: #888;
+            padding: 20px;
         }
 
         #search-div{
@@ -158,7 +161,7 @@
         }
 
         .input-div{
-            padding-top: 10px;
+            padding-top: 15px;
             width:  70%;
             margin-left: auto;
             margin-right: auto;
@@ -193,6 +196,14 @@
         #search-button{
             margin-left: auto;
             margin-right: auto;
+            font-size: 1em;
+        }
+
+        #subtitle{
+            margin-top: -10px;
+            font-size: 1em;
+            color: #888;
+            text-align: center;
         }
 
         #page {min-height:600px;}
@@ -235,6 +246,7 @@
 <body>
 
 <h1>materials genomics ui</h1>
+<h2 id="subtitle">Connected to: {{ host }}:{{port}} with {{ ndocs }} docs.</h2>
 <div id="search-div">
     <div class="input-div">
         <label for="criteria-input"><span

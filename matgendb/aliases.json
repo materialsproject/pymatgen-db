@@ -1,13 +1,11 @@
 {
     "aliases": {
-        "e_above_hull": "analysis.e_above_hull",
         "energy": "output.final_energy",
         "energy_per_atom": "output.final_energy_per_atom", 
         "final_atoms": "output.crystal.sites", 
         "final_lattice": "output.crystal.lattice", 
         "final_structure": "output.crystal", 
-        "formation_energy_per_atom": "analysis.formation_energy_per_atom", 
-        "formula": "unit_cell_formula", 
+        "formula": "unit_cell_formula",
         "initial_atoms": "input.crystal.sites",
         "initial_lattice": "input.crystal.lattice", 
         "initial_structure": "input.crystal", 

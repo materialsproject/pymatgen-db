@@ -15,9 +15,20 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import force_unicode
 import datetime
 
+
+config = json.loads(os.environ["MGDB_CONFIG"])
+qe = QueryEngine(host=config["host"], port=config["port"],
+                 database=config["database"], user=config["readonly_user"],
+                 password=config["readonly_password"],
+                 collection=config["collection"],
+                 aliases_config=config.get("aliases_config", None))
+
+
 def index(request):
+    d = config.copy()
+    d["ndocs"] = qe.collection.count()
     return render_to_response("home/templates/index.html",
-                              RequestContext(request, {}))
+                              RequestContext(request, d))
 
 @csrf_exempt
 def query(request):
@@ -46,11 +57,7 @@ def query(request):
             return HttpResponse(
                 json.dumps(d), mimetype="application/json")
 
-        d = json.loads(os.environ["MGDB_CONFIG"])
-        qe = QueryEngine(host=d["host"], port=d["port"],
-                         database=d["database"], user=d["readonly_user"],
-                         password=d["readonly_password"],
-                         collection=d["collection"])
+
         results = list(qe.query(criteria=criteria,
                                 properties=properties))
         d = {"valid_response": True, "results": results,

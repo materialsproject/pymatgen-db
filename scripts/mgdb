@@ -40,7 +40,8 @@ def get_settings(args):
                 "admin_password": None,
                 "readonly_user": None,
                 "readonly_password": None,
-                "collection": "tasks"}
+                "collection": "tasks",
+                "aliases_config": None}
 
 
 def init_db(args):
@@ -52,14 +53,15 @@ def init_db(args):
              ("admin_password", None),
              ("readonly_user", None),
              ("readonly_password", None),
-             ("collection", "tasks")]
+             ("collection", "tasks"),
+             ("aliases_config", None)]
         doc = {}
         for k, v in d:
             val = raw_input("Enter {} (default: {}) : ".format(k, v))
             doc[k] = val if val else v
 
         with open(args.config_file, "w") as f:
-            json.dump(doc, f, indent=4)
+            json.dump(doc, f, indent=4, sort_keys=True)
 
 
 def update_db(args):
@@ -94,7 +96,8 @@ def query_db(args):
     d = get_settings(args)
     qe = QueryEngine(host=d["host"], port=d["port"], database=d["database"],
                      user=d["readonly_user"], password=d["readonly_password"],
-                     collection=d["collection"])
+                     collection=d["collection"],
+                     aliases_config=d.get("aliases_config", None))
     criteria = None
     if args.criteria:
         try:
