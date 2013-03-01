@@ -362,6 +362,27 @@ class QueryEngine(object):
         return "QueryEngine: {}:{}/{}".format(self.host, self.port,
                                               self.database)
 
+    @staticmethod
+    def from_config(config_file):
+        """
+        Initialize a QueryEngine from a JSON config file generated using mgdb
+        init.
+
+        Args:
+            config_file:
+                Filename of config file.
+
+        Returns:
+            QueryEngine
+        """
+        with open(config_file) as f:
+            d = json.load(f)
+            return QueryEngine(
+                host=d["host"], port=d["port"], database=d["database"],
+                user=d["readonly_user"], password=d["readonly_password"],
+                collection=d["collection"],
+                aliases_config=d.get("aliases_config", None))
+
 
 class QueryResults(Iterable):
     """
