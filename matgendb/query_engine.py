@@ -52,9 +52,32 @@ class QueryEngine(object):
                 Password for db access
             collection:
                 Collection to query. Defaults to tasks.
-            aliases:
+            aliases_config:
                 An alias dict to use. Defaults to None, which means the default
-                aliases defined in aliases.json is used.
+                aliases defined in aliases.json is used. The aliases config
+                should be of the following format:
+                {
+                    "aliases": {
+                        "e_above_hull": "analysis.e_above_hull",
+                        "energy": "output.final_energy",
+                        ....
+                    },
+                    "defaults": {
+                        "state": "successful"
+                    }
+                }
+                The "aliases" key defines mappings, which makes it easier to
+                query for certain nested quantities. While Mongo does make it
+                easy to map collections, it is sometimes beneficial to
+                organize the doc format in a way that is different from the
+                query format.
+                The "defaults" key specifies criteria that should be applied
+                by default to all queries. For example, a collection may
+                contain data from both successful and unsuccessful runs but
+                for most querying purposes, you may want just successful runs
+                only. Note that defaults do not affect explicitly specified
+                criteria, i.e., if you suppy a query for {"state": "killed"},
+                this will override the default for {"state": "successful"}.
         """
         self.host = host
         self.port = port
@@ -272,6 +295,13 @@ class QueryEngine(object):
     def get_structure_from_id(self, task_id, final_structure=True):
         """
         Returns a structure from the database given the task id.
+
+        Args:
+            task_id:
+                The task_id to query for.
+            final_structure:
+                Whether to obtain the final or initial structure. Defaults to
+                True.
         """
         args = {'task_id': task_id}
         field = 'output.crystal' if final_structure else 'input.crystal'
