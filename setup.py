@@ -13,7 +13,9 @@ static_data = []
 for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
                                                 "static")):
     for f in files:
-        static_data.append(os.path.join(parent.lstrip("matgendb/webui/"), f))
+        if not f.endswith(".psd"):
+            static_data.append(os.path.join(parent.lstrip("matgendb/webui/"),
+                                            f))
 
 setup(
     name="pymatgen-db",
