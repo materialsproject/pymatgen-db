@@ -19,16 +19,16 @@ import warnings
 
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
+
 from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.core.structure import Structure
+
 from matgendb.query_engine import QueryEngine
 from matgendb.creator import VaspToDbTaskDrone
 
 test_dir = os.path.join(os.path.dirname(__file__), "..", "..",
                         'test_files')
-
-
 
 
 class VaspToDbTaskDroneTest(unittest.TestCase):

@@ -11,9 +11,9 @@ __author__ = "Shyue Ping Ong, Michael Kocher"
 __copyright__ = "Copyright 2011, The Materials Project"
 __version__ = "2.0"
 __maintainer__ = "Shyue Ping Ong"
-__email__ = "shyue@mit.edu"
+__email__ = "shyuep@gmail.com"
 __status__ = "Production"
-__date__ = "Jun 19 2012"
+__date__ = "Mar 2 2013"
 
 import json
 import itertools
@@ -98,9 +98,10 @@ class QueryEngine(object):
         """
         self.host = host
         self.port = port
-        self.database = database
+        self.database_name = database
+        self.collection_name = collection
         self.connection = MongoClient(self.host, self.port)
-        self.db = self.connection[self.database]
+        self.db = self.connection[database]
         if user:
             self.db.authenticate(user, password)
         self.collection = self.db[collection]
@@ -360,7 +361,7 @@ class QueryEngine(object):
 
     def __repr__(self):
         return "QueryEngine: {}:{}/{}".format(self.host, self.port,
-                                              self.database)
+                                              self.database_name)
 
     @staticmethod
     def from_config(config_file):
