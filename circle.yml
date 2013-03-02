@@ -5,5 +5,5 @@ dependencies:
     - python setup.py install
 test:
   override:
-    - mv pymatgen-db pmg-db
+    - mv matgendb mgdb
     - nosetests
