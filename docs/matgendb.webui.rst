@@ -1,6 +1,14 @@
 webui Package
 =============
 
+:mod:`webui` Package
+--------------------
+
+.. automodule:: matgendb.webui
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`settings` Module
 ----------------------
 

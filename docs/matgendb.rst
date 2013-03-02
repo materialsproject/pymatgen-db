@@ -30,5 +30,6 @@ Subpackages
 
 .. toctree::
 
+    matgendb.alchemy
     matgendb.webui
 
