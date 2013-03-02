@@ -153,10 +153,10 @@ The mgdb script allows you to make simple queries from the command line::
 
     mgdb query -c db.json --crit '{"pretty_formula": "Li2O"}' --props task_id energy_per_atom
 
-For more advanced queries, you can use the QueryEngine class. Some examples
-are as follows::
+For more advanced queries, you can use the QueryEngine class for which an
+alias is provided at the root package. Some examples are as follows::
 
-    >>> from matgendb.query_engine import QueryEngine
+    >>> from matgendb import QueryEngine
     >>> qe = QueryEngine()
 
     #Print the task id and formula of all entries in the database.
