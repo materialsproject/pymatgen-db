@@ -15,6 +15,7 @@ __date__ = "Jun 19, 2012"
 
 import unittest
 import os
+import warnings
 
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
@@ -52,7 +53,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             db = conn["creator_unittest"]
             data = db.tasks.find()
             self.assertEqual(data.count(), 5)
-            print "Actual insertion mode"
+            warnings.warn("Actual db insertion mode.")
 
         for d in data:
             dir_name = d['dir_name']
