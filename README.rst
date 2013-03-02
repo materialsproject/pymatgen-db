@@ -1,9 +1,13 @@
 Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
 materials analysis library. It enables the creation of Materials
-Project-style `MongoDB`_ databases for management of materials data and
-provides a clean and intuitive web ui for exploring that data. A query engine
-is also provided to enable the easy translation of MongoDB docs to useful
-pymatgen objects for analysis purposes.
+Project-style `MongoDB`_ databases for management of materials data. A query
+engine is also provided to enable the easy translation of MongoDB docs to
+useful pymatgen objects for analysis purposes.
+
+Pymatgen-db also provides a clean and intuitive web ui (the
+`Materials Genomics UI`_) for exploring Mongo collections. While the design
+originates for the purpose of exploring collections generated using
+pymatgen-db, it can be used to explore any Mongo database and collection.
 
 Getting pymatgen-db
 ===================

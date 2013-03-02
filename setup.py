@@ -45,7 +45,9 @@ setup(
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Scientific/Engineering :: Physics",
         "Topic :: Scientific/Engineering :: Chemistry",
-        "Topic :: Software Development :: Libraries :: Python Modules"
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Database",
+        "Topic :: Database :: Front-Ends"
     ],
     download_url="https://github.com/materialsproject/pymatgen-db/tarball/master",
     scripts=[os.path.join("scripts", f) for f in os.listdir("scripts")]
