@@ -90,7 +90,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
 
         if VaspToDbTaskDroneTest.conn:
             warnings.warn("Testing query engine mode.")
-            qe = QueryEngine()
+            qe = QueryEngine(database="creator_unittest")
             self.assertEqual(qe.query().count(), 5)
             #Test mappings by query engine.
             for r in qe.query(criteria={"pretty_formula": "Li2O"},
