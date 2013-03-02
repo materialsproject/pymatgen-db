@@ -88,8 +88,6 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                                        -14.31337758, 4)
                 self.assertEqual(len(d["calculations"]), 1)
 
-
-    def test_query_engine(self):
         if VaspToDbTaskDroneTest.conn:
             warnings.warn("Testing query engine mode.")
             qe = QueryEngine()
