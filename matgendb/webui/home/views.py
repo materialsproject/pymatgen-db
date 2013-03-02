@@ -60,6 +60,8 @@ def query(request):
 
         results = list(qe.query(criteria=criteria,
                                 properties=properties))
+        if properties is None and len(results) > 0:
+            properties = list(results[0].keys())
         d = {"valid_response": True, "results": results,
              "properties": properties}
         return HttpResponse(json.dumps(d, cls=MongoJSONEncoder),
