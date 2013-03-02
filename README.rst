@@ -78,14 +78,10 @@ following commands::
 
 This will create a test database and start the Mongo daemon. Once you are
 done with testing, you can simply press Ctrl-C to stop the server and delete
-the "test_db" folder.
+the "test_db" folder. Running a Mongo server this way is insecure as Mongo
+does not enable authentication by default. Please refer to the `MongoDB
+manual`_ when setting up your production database.
 
-.. note::
-
-    Running a Mongo server this way is insecure as Mongo does not enable
-    authentication by default. Please refer to the `MongoDB manual`_ when
-    setting up your production database.
-    
 After your server is up, you should create a database config file by running
 the following command::
 
