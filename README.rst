@@ -103,8 +103,8 @@ To insert an entire directory of runs (where the topmost directory is
 
     mgdb insert -c db.json dir_name
 
-A sample run has been provided for download
-`here <http://pythonhosted.org/pymatgen-db/static/Li2O.zip>`_ for testing
+A sample run has been provided for `download
+<http://pythonhosted.org/pymatgen-db/static/Li2O.zip>`_ for testing
 purposes. Unzip the file and run the above command in the directory.
 
 Materials Genomics UI

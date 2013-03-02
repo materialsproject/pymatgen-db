@@ -130,7 +130,7 @@ To insert an entire directory of runs (where the topmost directory is
 
     mgdb insert -c db.json dir_name
 
-A sample run has been provided for download `here <_static/Li2O.zip>`_ for
+A sample run has been provided for `download <_static/Li2O.zip>`_ for
 testing purposes. Unzip the file and run the above command in the directory.
 
 Materials Genomics UI
@@ -148,7 +148,7 @@ provided - a table format which is easier for comparing data,
 and a tree format which makes it much easier to explore highly nested trees
 of data.
 
-.. figure:: _static/mgui_demo.png
+.. figure:: _static/mgui_dual_demo.png
     :width: 100%
     :alt: materials genomics ui
     :align: center
