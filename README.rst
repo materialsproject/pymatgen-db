@@ -67,21 +67,25 @@ running the materials genomics ui, etc. To see all options available, type::
 Initial setup
 -------------
 
-In this step, it is assumed that you have already installed and setup MongoDB
-on a server of your choice. If you have not, the `MongoDB manual`_ is an
-excellent place to start. For the purposes of testing out the tools here,
-you may simply download the binary distributions corresponding to your OS
-from the `MongoDB`_ website, and then running the following commands::
+The first step is to install and setup MongoDB on a server of your choice.
+The `MongoDB manual`_ is an excellent place to start. For the purposes of
+testing out the tools here, you may simply download the binary distributions
+corresponding to your OS from the `MongoDB`_ website, and then running the
+following commands::
 
+    # For Mac and Linux OS.
     mkdir test_db && mongod --dbpath test_db
 
 This will create a test database and start the Mongo daemon. Once you are
-done with testing, you can simply press Ctrl-C to stop the server and detele
-the "test_db" folder. Please note that running a Mongo server this way is
-completely insecure as Mongo does not enable authentication by default.
-Please refer to the `MongoDB manual`_ when setting up your production database.
+done with testing, you can simply press Ctrl-C to stop the server and delete
+the "test_db" folder.
 
-First, create a database config file by running the following command::
+.. note:: Running a Mongo server this way is insecure as Mongo does not
+enable authentication by default. Please refer to the `MongoDB manual`_ when
+setting up your production database.
+
+After your server is up, you should create a database config file by running
+the following command::
 
     mgdb init -c db.json
 
