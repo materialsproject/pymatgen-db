@@ -16,6 +16,8 @@ __date__ = "Jun 19, 2012"
 import unittest
 import os
 
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
 from pymatgen.apps.borg.queen import BorgQueen
 
 from matgendb.creator import VaspToDbTaskDrone
@@ -23,24 +25,35 @@ from matgendb.creator import VaspToDbTaskDrone
 test_dir = os.path.join(os.path.dirname(__file__), "..", "..",
                         'test_files')
 
+try:
+    conn = MongoClient()
+    simulate = False
+except ConnectionFailure:
+    simulate = True
+
 
 class VaspToDbTaskDroneTest(unittest.TestCase):
 
-    def setUp(self):
-        self.drone = VaspToDbTaskDrone(
-            host='127.0.0.1', port=27017, parse_dos=False, simulate_mode=True)
-
     def test_get_valid_paths(self):
+        drone = VaspToDbTaskDrone()
         all_paths = []
         for path in os.walk(os.path.join(test_dir, 'db_test')):
-            all_paths.extend(self.drone.get_valid_paths(path))
+            all_paths.extend(drone.get_valid_paths(path))
         self.assertEqual(len(all_paths), 5)
 
     def test_assimilate(self):
-        queen = BorgQueen(self.drone)
+        drone = VaspToDbTaskDrone(database="creator_unittest",
+                                  simulate_mode=simulate)
+        queen = BorgQueen(drone)
         queen.serial_assimilate(os.path.join(test_dir, 'db_test'))
         data = queen.get_data()
         self.assertEqual(len(data), 5)
+        if not simulate:
+            db = conn["creator_unittest"]
+            data = db.tasks.find()
+            self.assertEqual(data.count(), 5)
+            print "Actual insertion mode"
+
         for d in data:
             dir_name = d['dir_name']
             if dir_name.endswith("killed_mp_aflow"):
@@ -67,6 +80,10 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                 self.assertAlmostEqual(d['output']['final_energy'],
                                        -14.31337758, 4)
                 self.assertEqual(len(d["calculations"]), 1)
+
+        if not simulate:
+            conn.drop_database("creator_unittest")
+
 
 if __name__ == "__main__":
     unittest.main()

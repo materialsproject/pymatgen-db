@@ -599,9 +599,9 @@ def get_coordination_numbers(d):
 
 def get_uri(dirname):
     """
-    Returns the URI path for a directory. This allows files hosted on 
+    Returns the URI path for a directory. This allows files hosted on
     different file servers to have distinct locations.
-    
+
     Args:
         dirname:
             A directory name.
