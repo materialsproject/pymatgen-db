@@ -68,18 +68,29 @@ Initial setup
 -------------
 
 In this step, it is assumed that you have already installed and setup MongoDB
-on a server of your choice. If you have not, the `MongoDB manual
-<http://docs.mongodb.org/manual/>`_ is an excellent place to start.
+on a server of your choice. If you have not, the `MongoDB manual`_ is an
+excellent place to start. For the purposes of testing out the tools here,
+you may simply download the binary distributions corresponding to your OS
+from the `MongoDB`_ website, and then running the following commands::
 
-Before use, first create a database config file by running the following
-command::
+    mkdir test_db && mongod --dbpath test_db
+
+This will create a test database and start the Mongo daemon. Once you are
+done with testing, you can simply press Ctrl-C to stop the server and detele
+the "test_db" folder. Please note that running a Mongo server this way is
+completely insecure as Mongo does not enable authentication by default.
+Please refer to the `MongoDB manual`_ when setting up your production database.
+
+First, create a database config file by running the following command::
 
     mgdb init -c db.json
 
 This will prompt you for a few parameters to create a database config file,
 which will make it much easier to use mgdb in future. Note that the config file
 name can be anything of your choice, but using "db.json" will allow you to use
-mgdb without explicitly specifying the filename in future.
+mgdb without explicitly specifying the filename in future. If you are just
+testing using the test database, simply hit Enter to accept the defaults for
+all settings.
 
 Inserting calculations
 ----------------------
@@ -91,6 +102,10 @@ To insert an entire directory of runs (where the topmost directory is
     # current directory under the default filename of db.json.
 
     mgdb insert -c db.json dir_name
+
+A sample run has been provided for download
+`here <http://pythonhosted.org/pymatgen-db/static/Li2O.zip>`_ for testing
+purposes. Unzip the file and run the above command in the directory.
 
 Materials Genomics UI
 ---------------------
@@ -166,3 +181,5 @@ the following work:
     <http://dx.doi.org/10.1016/j.commatsci.2012.10.028>`_
 
 .. _`MongoDB` : http://www.mongodb.org/
+.. _`Github repo` : https://github.com/materialsproject/pymatgen-db
+.. _`MongoDB manual` : http://docs.mongodb.org/manual/
