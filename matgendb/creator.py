@@ -184,7 +184,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             sorted_vasprun_files[k] = vasprun_files[k]
 
         if len(vasprun_files) > 0:
-            d = cls.generate_doc(path, vasprun_files, parse_dos,
+            d = cls.generate_doc(path, sorted_vasprun_files, parse_dos,
                                  additional_fields)
             if not d:
                 d = cls.process_killed_run(path)
