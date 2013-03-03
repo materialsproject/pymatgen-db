@@ -15,6 +15,7 @@
     <script type="text/javascript" src="/static/js/jquery.json2html-3.1-min.js" ></script>
     <script type="text/javascript" src="/static/js/DataTables-1.9.4/media/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="/static/js/DataTables-1.9.4/extras/TableTools/media/js/TableTools.min.js"></script>
+    <script type="text/javascript" src="/static/js/DataTables-1.9.4/extras/Scroller/media/js/dataTables.scroller.min.js"></script>
     <script type="text/javascript" src="/static/js/jquery.spinner.js"></script>
     <script>
 
@@ -57,6 +58,9 @@
                             "sPaginationType": "full_numbers",
                             "bRetrieve": true,
                             "iDisplayLength": 50,
+                            "sScrollX": "500px",
+                            "sScrollY": "300px",
+                            "sDom": "frtiS",
                             "aoColumns": props
                         });
                 $("#num-results").text("Number of results = " + currentData.length);
@@ -67,7 +71,15 @@
                     for (var j=0; j<properties.length; j++)
                     {
                         var item = currentData[i][properties[j]];
-                        if (item instanceof Object) {
+                        if (item instanceof Array) {
+                            var tempArr = [];
+                            for (var k in item)
+                            {
+                                tempArr.push(item[k]);
+                            }
+                            row.push("[" + tempArr.join(", ") + "]");
+                        }
+                        else if (item instanceof Object) {
                             var tempArr = [];
                             for (var k in item)
                             {
@@ -80,9 +92,6 @@
 
                     }
                     data.push(row);
-                    /*$("#results-table")
-                            .append($('<tr><td>'+row.join("</td><td>")+"</td></tr>")
-                            );*/
                 }
                 oTable.fnClearTable();
                 oTable.fnAddData(data);
@@ -129,6 +138,7 @@
                         }
                                  })
                 .error(function (data) {
+                            $("#search-button").spinner('remove');
                             $("#error_msg").text(data["error_msg"]);
                             $("#error_msg").show();
                         });

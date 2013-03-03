@@ -428,7 +428,7 @@ class QueryResults(Iterable):
                 data = r[v[0]]
                 for j in range(1, len(v)):
                     if isinstance(data, list):
-                        data = data[int(v[j])]
+                        data = [d[v[j]] for d in data]
                     else:
                         data = data[v[j]]
                 result[k] = data
