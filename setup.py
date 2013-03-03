@@ -6,8 +6,8 @@ from setuptools import setup, find_packages
 
 with open("README.rst") as f:
     long_desc = f.read()
-    ind = long_desc.find("\n")
-    long_desc = long_desc[ind + 1:]
+    #ind = long_desc.find("\n")
+    #long_desc = long_desc[ind + 1:]
 
 static_data = []
 for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
