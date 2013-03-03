@@ -126,6 +126,9 @@ mgdb without explicitly specifying the filename in future. If you are just
 testing using the test database, simply hit Enter to accept the defaults for
 all settings.
 
+For more advanced use of the "db.json" config file (e.g., specifying aliases,
+defaults, etc., please refer to the following `sample <_static/db.json>`_.
+
 Inserting calculations
 ----------------------
 
@@ -177,7 +180,8 @@ The mgdb script allows you to make simple queries from the command line::
 
     mgdb query -c db.json --crit '{"pretty_formula": "Li2O"}' --props task_id energy_per_atom
 
-For more advanced queries, you can use the QueryEngine class for which an
+For more advanced queries, you can use the
+:class:`matgendb.query_engine.QueryEngine` class for which a default
 alias is provided at the root package. Some examples are as follows::
 
     >>> from matgendb import QueryEngine
@@ -199,6 +203,18 @@ The language follows very closely to pymongo/MongoDB syntax, except that
 QueryEngine provides useful aliases for commonly used fields as well as
 translation to commonly used pymatgen objects like Structure and
 ComputedEntries.
+
+Extending pymatgen-db
+---------------------
+
+Currently, pymatgen-db is written with standard VASP runs in mind. However,
+it is perfectly extensible to any kind of data, e.g., other kinds of VASP runs
+(bandstructure, NEB, etc.) or just any form of data in general. Developers
+looking to adapt pymatgen-db for other purposes should look at the
+:class:`matgendb.creator.VaspToDbTaskDrone` class as an example and write
+similar drones for their needs. The
+:class:`matgendb.query_engine.QueryEngine` can generally be applied to any
+Mongo collection, with suitable specification of aliases if desired.
 
 API/Reference Docs
 ==================

@@ -87,12 +87,17 @@ the following command::
 
     mgdb init -c db.json
 
+
 This will prompt you for a few parameters to create a database config file,
 which will make it much easier to use mgdb in future. Note that the config file
 name can be anything of your choice, but using "db.json" will allow you to use
 mgdb without explicitly specifying the filename in future. If you are just
 testing using the test database, simply hit Enter to accept the defaults for
 all settings.
+
+For more advanced use of the "db.json" config file (e.g., specifying aliases,
+defaults, etc., please refer to the following `sample
+<http://pythonhosted.org/pymatgen-db/static/db.json>`_.
 
 Inserting calculations
 ----------------------
@@ -168,6 +173,17 @@ The language follows very closely to pymongo/MongoDB syntax, except that
 QueryEngine provides useful aliases for commonly used fields as well as
 translation to commonly used pymatgen objects like Structure and
 ComputedEntries.
+
+Extending pymatgen-db
+---------------------
+
+Currently, pymatgen-db is written with standard VASP runs in mind. However,
+it is perfectly extensible to any kind of data, e.g., other kinds of VASP runs
+(bandstructure, NEB, etc.) or just any form of data in general. Developers
+looking to adapt pymatgen-db for other purposes should look at the
+VaspToDbTaskDrone class as an example and write similar drones for their
+needs. The QueryEngine can generally be applied to any Mongo collection,
+with suitable specification of aliases if desired.
 
 How to cite pymatgen-db
 =======================

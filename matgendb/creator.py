@@ -48,7 +48,7 @@ class VaspToDbTaskDrone(AbstractDrone):
     BorgQueen to assimilate entire directory structures and insert them into
     a database using Python's multiprocessing. The current format assumes
     standard VASP relaxation runs. If you have other kinds of runs,
-    you may design your own VaspDbTaskDrone based on this one.
+    you may design your own Drone class based on this one.
 
     There are some restrictions on the valid directory structures:
 
