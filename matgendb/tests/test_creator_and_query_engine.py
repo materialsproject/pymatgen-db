@@ -79,13 +79,13 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                 self.assertEqual(d['state'], "successful")
                 self.assertEqual(d['pretty_formula'], "Li2O")
                 self.assertAlmostEqual(d['output']['final_energy'],
-                                       -14.31446494, 4)
+                                       -14.3145, 3)
                 self.assertEqual(len(d["calculations"]), 2)
             elif dir_name.endswith("Li2O"):
                 self.assertEqual(d['state'], "successful")
                 self.assertEqual(d['pretty_formula'], "Li2O")
                 self.assertAlmostEqual(d['output']['final_energy'],
-                                       -14.31337758, 4)
+                                       -14.31337758, 3)
                 self.assertEqual(len(d["calculations"]), 1)
 
         if VaspToDbTaskDroneTest.conn:
