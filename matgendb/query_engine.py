@@ -115,7 +115,6 @@ class QueryEngine(object):
             self.aliases = aliases_config["aliases"]
             self.defaults = aliases_config["defaults"]
 
-
     def __enter__(self):
         """Allows for use with the 'with' context manager"""
         return self
@@ -432,7 +431,7 @@ class QueryResults(Iterable):
                     else:
                         data = data[v[j]]
                 result[k] = data
-            except:
+            except (IndexError, KeyError, ValueError):
                 result[k] = None
         return result
 

@@ -5,8 +5,7 @@ import re
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseBadRequest, \
-    HttpResponseForbidden
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import os
 from matgendb.query_engine import QueryEngine
@@ -38,8 +37,8 @@ def query(request):
         try:
             critstr = request.POST["criteria"].strip()
             if re.match("^[\w\(\)]+$", critstr):
-                criteria = {"pretty_formula":
-                                Composition(critstr).reduced_formula}
+                comp = Composition(critstr)
+                criteria = {"pretty_formula": comp.reduced_formula}
             elif re.match("^\d+$", critstr):
                 criteria = {"task_id": int(critstr)}
             elif re.match("^[A-Za-z\-]+$", critstr):
@@ -57,7 +56,6 @@ def query(request):
                  "error_msg": "Bad criteria / properties: {}".format(str(ex))}
             return HttpResponse(
                 json.dumps(d), mimetype="application/json")
-
 
         results = list(qe.query(criteria=criteria,
                                 properties=properties))
