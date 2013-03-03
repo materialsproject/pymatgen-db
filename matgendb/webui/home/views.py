@@ -52,9 +52,9 @@ def query(request):
             properties = request.POST["properties"].split()
             if not properties:
                 properties = None
-        except ValueError:
+        except ValueError as ex:
             d = {"valid_response": False,
-                 "error_msg": "Bad criteria or properties."}
+                 "error_msg": "Bad criteria / properties: {}".format(str(ex))}
             return HttpResponse(
                 json.dumps(d), mimetype="application/json")
 
@@ -73,11 +73,6 @@ class MongoJSONEncoder(DjangoJSONEncoder):
     """
     Encodes Mongo DB objects into JSON
     In particular is handles BSON Object IDs and Datetime objects
-
-    eg.
-
-    >>> from django.core.serializers import json
-    >>> json.dumps(mongo_doc, cls=MongoJSONEncoder)
     """
 
     def default(self, obj):
