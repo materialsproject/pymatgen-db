@@ -61,11 +61,7 @@ class VaspToDbTaskDrone(AbstractDrone):
     """
     vasprun_pattern = re.compile("^vasprun.xml([\w\.]*)")
 
-    """
-    Version of this db creator document. As the document structure is updated,
-    so should this version number (other scripts could depend on it for
-    parsing)
-    """
+    #Version of this db creator document.
     __version__ = "2.0.0"
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
@@ -252,13 +248,21 @@ class VaspToDbTaskDrone(AbstractDrone):
             return d
 
     @classmethod
-    def post_process(cls, mydir, d):
+    def post_process(cls, dir_name, d):
         """
-        Postprocessing added by Anubhav Jain 7/20/2012
-        """
-        logger.info("Post-processing dir:{}".format(mydir))
+        Simple post-processing for various files other than the vasprun.xml.
+        Called by generate_task_doc. Modify this if your runs have other
+        kinds of processing requirements.
 
-        fullpath = os.path.abspath(mydir)
+        Args:
+            dir_name:
+                The dir_name.
+            d:
+                Current doc generated.
+        """
+        logger.info("Post-processing dir:{}".format(dir_name))
+
+        fullpath = os.path.abspath(dir_name)
         transformations = {}
         filenames = glob.glob(os.path.join(fullpath, "transformations.json*"))
         if len(filenames) >= 1:
@@ -272,7 +276,6 @@ class VaspToDbTaskDrone(AbstractDrone):
                         d["icsd_id"] = int(m.group(1))
                 except ValueError:
                     pass
-
         else:
             logger.warning("Transformations file does not exist.")
 
@@ -312,7 +315,8 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         d["run_stats"] = run_stats
 
-        d["dir_name"] = get_uri(mydir)
+        #Convert to full uri path.
+        d["dir_name"] = get_uri(dir_name)
 
         if new_tags:
             d["tags"] = new_tags
@@ -320,16 +324,16 @@ class VaspToDbTaskDrone(AbstractDrone):
         logger.info("Post-processed " + fullpath)
 
     @classmethod
-    def process_killed_run(cls, dirname):
+    def process_killed_run(cls, dir_name):
         """
         Process a killed vasp run.
         """
-        fullpath = os.path.abspath(dirname)
+        fullpath = os.path.abspath(dir_name)
         logger.info("Processing Killed run " + fullpath)
         d = {"dir_name": fullpath, "state": "killed", "oszicar": {}}
 
-        for f in os.listdir(dirname):
-            filename = os.path.join(dirname, f)
+        for f in os.listdir(dir_name):
+            filename = os.path.join(dir_name, f)
             if re.match("INCAR.*", f):
                 try:
                     incar = Incar.from_file(filename)
@@ -352,14 +356,14 @@ class VaspToDbTaskDrone(AbstractDrone):
                 except Exception as ex:
                     print str(ex)
                     logger.error("Unable to parse INCAR for killed run {}."
-                                 .format(dirname))
+                                 .format(dir_name))
             elif re.match("KPOINTS.*", f):
                 try:
                     kpoints = Kpoints.from_file(filename)
                     d["kpoints"] = kpoints.to_dict
                 except:
                     logger.error("Unable to parse KPOINTS for killed run {}."
-                                 .format(dirname))
+                                 .format(dir_name))
             elif re.match("POSCAR.*", f):
                 try:
                     s = Poscar.from_file(filename).structure
@@ -376,7 +380,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                     d["poscar"] = s.to_dict
                 except:
                     logger.error("Unable to parse POSCAR for killed run {}."
-                                 .format(dirname))
+                                 .format(dir_name))
             elif re.match("POTCAR.*", f):
                 try:
                     potcar = Potcar.from_file(filename)
@@ -385,33 +389,33 @@ class VaspToDbTaskDrone(AbstractDrone):
                                              "labels": potcar.symbols}
                 except:
                     logger.error("Unable to parse POTCAR for killed run in {}."
-                                 .format(dirname))
+                                 .format(dir_name))
             elif re.match("OSZICAR", f):
                 try:
                     d["oszicar"]["root"] = \
-                        Oszicar(os.path.join(dirname, f)).to_dict
+                        Oszicar(os.path.join(dir_name, f)).to_dict
                 except:
                     logger.error("Unable to parse OSZICAR for killed run in {}."
-                                 .format(dirname))
+                                 .format(dir_name))
             elif re.match("relax\d", f):
-                if os.path.exists(os.path.join(dirname, f, "OSZICAR")):
+                if os.path.exists(os.path.join(dir_name, f, "OSZICAR")):
                     try:
                         d["oszicar"][f] = Oszicar(
-                            os.path.join(dirname, f, "OSZICAR")).to_dict
+                            os.path.join(dir_name, f, "OSZICAR")).to_dict
                     except:
                         logger.error("Unable to parse OSZICAR for killed "
-                                     "run in {}.".format(dirname))
+                                     "run in {}.".format(dir_name))
         return d
 
     @classmethod
-    def process_vasprun(cls, dirname, taskname, filename, parse_dos):
+    def process_vasprun(cls, dir_name, taskname, filename, parse_dos):
         """
         Process a vasprun.xml file.
         """
-        vasprun_file = os.path.join(dirname, filename)
+        vasprun_file = os.path.join(dir_name, filename)
         r = Vasprun(vasprun_file)
         d = r.to_dict
-        d["dir_name"] = os.path.abspath(dirname)
+        d["dir_name"] = os.path.abspath(dir_name)
         d["completed_at"] = \
             str(datetime.datetime.fromtimestamp(os.path.getmtime(
                 vasprun_file)))
@@ -422,7 +426,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 d["dos"] = r.complete_dos.to_dict
             except Exception:
                 logger.warn("No valid dos data exist in {}.\n Skipping dos"
-                            .format(dirname))
+                            .format(dir_name))
         if taskname == "relax1" or taskname == "relax2":
             d["task"] = {"type": "aflow", "name": taskname}
         else:
@@ -430,14 +434,14 @@ class VaspToDbTaskDrone(AbstractDrone):
         return d
 
     @classmethod
-    def generate_doc(cls, dirname, vasprun_files, parse_dos,
+    def generate_doc(cls, dir_name, vasprun_files, parse_dos,
                      additional_fields):
         """
         Process aflow style runs, where each run is actually a combination of
         two vasp runs.
         """
         try:
-            fullpath = os.path.abspath(dirname)
+            fullpath = os.path.abspath(dir_name)
             #Defensively copy the additional fields first.  This is a MUST.
             #Otherwise, parallel updates will see the same object and inserts
             #will be overridden!!
@@ -446,7 +450,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             d["dir_name"] = fullpath
             d["schema_version"] = VaspToDbTaskDrone.__version__
             d["calculations"] = [
-                cls.process_vasprun(dirname, taskname, filename, parse_dos)
+                cls.process_vasprun(dir_name, taskname, filename, parse_dos)
                 for taskname, filename in vasprun_files.items()]
             d1 = d["calculations"][0]
             d2 = d["calculations"][-1]
@@ -490,11 +494,21 @@ class VaspToDbTaskDrone(AbstractDrone):
             d["last_updated"] = datetime.datetime.today()
             return d
         except Exception as ex:
-            logger.error("Error in " + os.path.abspath(dirname) +
+            logger.error("Error in " + os.path.abspath(dir_name) +
                          ".\nError msg: " + str(ex))
             return None
 
     def get_valid_paths(self, path):
+        """
+        There are some restrictions on the valid directory structures:
+
+        1. There can be only one vasp run in each directory. Nested directories
+           are fine.
+        2. Directories designated "relax1", "relax2" are considered to be 2
+           parts of an aflow style run.
+        3. Directories containing vasp output with ".relax1" and ".relax2" are
+           also considered as 2 parts of an aflow style run.
+        """
         (parent, subdirs, files) = path
         if "relax1" in subdirs:
             return [parent]
@@ -552,12 +566,12 @@ def get_basic_analysis_and_error_checks(d):
             "bv_structure": bv_struct.to_dict}
 
 
-def contains_vasp_input(dirname):
+def contains_vasp_input(dir_name):
     """
     Checks if a directory contains valid VASP input.
 
     Args:
-        dirname:
+        dir_name:
             Directory name to check.
 
     Returns:
@@ -565,8 +579,8 @@ def contains_vasp_input(dirname):
         KPOINTS and POTCAR).
     """
     for f in ["INCAR", "POSCAR", "POTCAR", "KPOINTS"]:
-        if not os.path.exists(os.path.join(dirname, f)) and \
-                not os.path.exists(os.path.join(dirname, f + ".orig")):
+        if not os.path.exists(os.path.join(dir_name, f)) and \
+                not os.path.exists(os.path.join(dir_name, f + ".orig")):
             return False
     return True
 
@@ -597,19 +611,19 @@ def get_coordination_numbers(d):
     return cn
 
 
-def get_uri(dirname):
+def get_uri(dir_name):
     """
     Returns the URI path for a directory. This allows files hosted on
     different file servers to have distinct locations.
 
     Args:
-        dirname:
+        dir_name:
             A directory name.
 
     Returns:
-        Full URI path, e.g., fileserver.host.com:/full/path/of/dirname.
+        Full URI path, e.g., fileserver.host.com:/full/path/of/dir_name.
     """
-    fullpath = os.path.abspath(dirname)
+    fullpath = os.path.abspath(dir_name)
     try:
         hostname = socket.gethostbyaddr(socket.gethostname())[0]
     except:

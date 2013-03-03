@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""""
+"""
 This module provides a QueryEngine that simplifies queries for Mongo databases
 generated using hive.
 """
