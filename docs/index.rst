@@ -15,6 +15,12 @@ pymatgen-db, it can be used to explore any Mongo database and collection.
 Change Log
 ==========
 
+Version 0.2.3
+-------------
+
+1. Bug fixes for query engine.
+2. UI improvements for materials genomics ui.
+
 Version 0.2.2
 -------------
 
