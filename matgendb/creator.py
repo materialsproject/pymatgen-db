@@ -110,12 +110,13 @@ class VaspToDbTaskDrone(AbstractDrone):
         self._additional_fields = {} if not additional_fields \
             else additional_fields
         self._update_duplicates = update_duplicates
-        conn = MongoClient(self._host, self._port)
-        db = conn[self._database]
-        if self._user:
-            db.authenticate(self._user, self._password)
-        if db.counter.find({"_id": "taskid"}).count() == 0:
-            db.counter.insert({"_id": "taskid", "c": 1})
+        if not simulate_mode:
+            conn = MongoClient(self._host, self._port)
+            db = conn[self._database]
+            if self._user:
+                db.authenticate(self._user, self._password)
+            if db.counter.find({"_id": "taskid"}).count() == 0:
+                db.counter.insert({"_id": "taskid", "c": 1})
 
     def assimilate(self, path):
         """

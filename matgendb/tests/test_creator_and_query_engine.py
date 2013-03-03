@@ -41,7 +41,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             cls.conn = None
 
     def test_get_valid_paths(self):
-        drone = VaspToDbTaskDrone()
+        drone = VaspToDbTaskDrone(simulate_mode=True)
         all_paths = []
         for path in os.walk(os.path.join(test_dir, 'db_test')):
             all_paths.extend(drone.get_valid_paths(path))
