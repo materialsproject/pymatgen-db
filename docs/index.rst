@@ -15,6 +15,11 @@ pymatgen-db, it can be used to explore any Mongo database and collection.
 Change Log
 ==========
 
+Version 0.2.4
+-------------
+
+1. Bug fixes for aflow style runs assimilation.
+
 Version 0.2.3
 -------------
 
