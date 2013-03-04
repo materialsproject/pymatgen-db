@@ -2,18 +2,20 @@
 
 import json
 import re
+import os
+import bson
+import datetime
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import os
-from matgendb.query_engine import QueryEngine
-from pymatgen import Element, Composition
-import bson
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import force_unicode
-import datetime
+
+from pymatgen import Element, Composition
+
+from matgendb.query_engine import QueryEngine
 
 
 config = json.loads(os.environ["MGDB_CONFIG"])
