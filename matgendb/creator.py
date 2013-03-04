@@ -539,7 +539,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         init_args = {"host": self.host, "port": self.port,
                      "database": self.database, "user": self.user,
                      "password": self.password,
-                     "collection":self.collection,
+                     "collection": self.collection,
                      "parse_dos": self.parse_dos,
                      "simulate_mode": self.simulate,
                      "additional_fields": self.additional_fields,
