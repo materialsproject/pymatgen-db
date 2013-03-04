@@ -100,22 +100,22 @@ class VaspToDbTaskDrone(AbstractDrone):
                 If True, if a duplicate path exists in the collection, the
                 entire doc is updated. Else, duplicates are skipped.
         """
-        self._host = host
-        self._database = database
-        self._user = user
-        self._password = password
-        self._collection = collection
-        self._port = port
-        self._simulate = simulate_mode
-        self._parse_dos = parse_dos
-        self._additional_fields = {} if not additional_fields \
+        self.host = host
+        self.database = database
+        self.user = user
+        self.password = password
+        self.collection = collection
+        self.port = port
+        self.simulate = simulate_mode
+        self.parse_dos = parse_dos
+        self.additional_fields = {} if not additional_fields \
             else additional_fields
-        self._update_duplicates = update_duplicates
+        self.update_duplicates = update_duplicates
         if not simulate_mode:
-            conn = MongoClient(self._host, self._port)
-            db = conn[self._database]
-            if self._user:
-                db.authenticate(self._user, self._password)
+            conn = MongoClient(self.host, self.port)
+            db = conn[self.database]
+            if self.user:
+                db.authenticate(self.user, self.password)
             if db.counter.find({"_id": "taskid"}).count() == 0:
                 db.counter.insert({"_id": "taskid", "c": 1})
 
@@ -129,8 +129,8 @@ class VaspToDbTaskDrone(AbstractDrone):
             purposes. Else, only the task_id of the inserted doc is returned.
         """
         try:
-            d = self.get_task_doc(path, self._parse_dos,
-                                  self._additional_fields)
+            d = self.get_task_doc(path, self.parse_dos,
+                                  self.additional_fields)
             tid = self._insert_doc(d)
             return tid
         except Exception as ex:
@@ -201,27 +201,27 @@ class VaspToDbTaskDrone(AbstractDrone):
         return d
 
     def _insert_doc(self, d):
-        if not self._simulate:
+        if not self.simulate:
             # Perform actual insertion into db. Because db connections cannot
             # be pickled, every insertion needs to create a new connection
             # to the db.
-            conn = MongoClient(self._host, self._port)
-            db = conn[self._database]
-            if self._user:
-                db.authenticate(self._user, self._password)
-            coll = db[self._collection]
+            conn = MongoClient(self.host, self.port)
+            db = conn[self.database]
+            if self.user:
+                db.authenticate(self.user, self.password)
+            coll = db[self.collection]
 
             # Insert dos data into gridfs and then remove it from the dict.
             # DOS data tends to be above the 4Mb limit for mongo docs. A ref
             # to the dos file is in the dos_fs_id.
             result = coll.find_one({"dir_name": d["dir_name"]},
                                    fields=["dir_name", "task_id"])
-            if result is None or self._update_duplicates:
-                if self._parse_dos and "calculations" in d:
+            if result is None or self.update_duplicates:
+                if self.parse_dos and "calculations" in d:
                     for calc in d["calculations"]:
                         if "dos" in calc:
                             dos = json.dumps(calc["dos"])
-                            if not self._simulate:
+                            if not self.simulate:
                                 fs = gridfs.GridFS(db, "dos_fs")
                                 dosid = fs.put(dos)
                                 calc["dos_fs_id"] = dosid
@@ -239,7 +239,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                     logger.info("Inserting {} with taskid = {}"
                                 .format(d["dir_name"], d["task_id"]))
                     coll.insert(d, safe=True)
-                elif self._update_duplicates:
+                elif self.update_duplicates:
                     d["task_id"] = result["task_id"]
                     logger.info("Updating {} with taskid = {}"
                                 .format(d["dir_name"], d["task_id"]))
@@ -530,9 +530,20 @@ class VaspToDbTaskDrone(AbstractDrone):
     def __str__(self):
         return "VaspToDbDictDrone"
 
+    @staticmethod
+    def from_dict(d):
+        return VaspToDbTaskDrone(**d["init_args"])
+
     @property
     def to_dict(self):
-        init_args = {"additional_fields": self._additional_fields}
+        init_args = {"host": self.host, "port": self.port,
+                     "database": self.database, "user": self.user,
+                     "password": self.password,
+                     "collection":self.collection,
+                     "parse_dos": self.parse_dos,
+                     "simulate_mode": self.simulate,
+                     "additional_fields": self.additional_fields,
+                     "update_duplicates": self.update_duplicates}
         output = {"name": self.__class__.__name__,
                   "init_args": init_args, "version": __version__}
         return output

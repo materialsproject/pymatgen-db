@@ -47,6 +47,13 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             all_paths.extend(drone.get_valid_paths(path))
         self.assertEqual(len(all_paths), 5)
 
+    def test_to_from_dict(self):
+        drone = VaspToDbTaskDrone(database="wacky", simulate_mode=True)
+        d = drone.to_dict
+        drone = VaspToDbTaskDrone.from_dict(d)
+        self.assertTrue(drone.simulate)
+        self.assertEqual(drone.database, "wacky")
+
     def test_assimilate(self):
         simulate = True if VaspToDbTaskDroneTest.conn is None else False
         drone = VaspToDbTaskDrone(database="creator_unittest",

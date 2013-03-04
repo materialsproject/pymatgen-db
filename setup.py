@@ -20,7 +20,7 @@ for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="0.2.4",
+    version="0.2.5",
     install_requires=["pymatgen>=2.5", "pymongo>=2.4", "prettytable>=0.7",
                       "django>=1.4"],
     package_data={"matgendb": ["*.json"],
@@ -31,8 +31,8 @@ setup(
     maintainer="Shyue Ping Ong",
     url="https://github.com/materialsproject/pymatgen-db",
     license="MIT",
-    description="pymatgen is the Python materials analysis library powering "
-                "the Materials Project (www.materialsproject.org).",
+    description="Pymatgen-db is a database add-on for the Python Materials "
+                "Genomics (pymatgen) materials analysis library.",
     long_description=long_desc,
     keywords=["vasp", "gaussian", "materials", "project", "electronic",
               "structure", "mongo"],
