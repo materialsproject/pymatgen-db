@@ -17,7 +17,6 @@ from pymatgen import Element, Composition
 
 from matgendb.query_engine import QueryEngine
 
-
 config = json.loads(os.environ["MGDB_CONFIG"])
 qe = QueryEngine(host=config["host"], port=config["port"],
                  database=config["database"], user=config["readonly_user"],
