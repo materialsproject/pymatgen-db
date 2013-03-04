@@ -87,7 +87,8 @@ class VaspToDbTaskDrone(AbstractDrone):
                 Collection to query. Defaults to "tasks".
             parse_dos:
                 Whether to parse the DOS data where possible. Defaults to
-                False.
+                False. If True, the dos will be inserted into a gridfs
+                collection called dos_fs.
             simulate_mode:
                 Allows one to simulate db insertion without actually performing
                 the insertion.
@@ -471,10 +472,10 @@ class VaspToDbTaskDrone(AbstractDrone):
             vals = sorted(d2["reduced_cell_formula"].values())
             d["anonymous_formula"] = {string.ascii_uppercase[i]: float(vals[i])
                                       for i in xrange(len(vals))}
-            d["output"] = {"crystal": d2["output"]["crystal"],
-                           "final_energy": d2["output"]["final_energy"],
-                           "final_energy_per_atom": d2["output"]
-                           ["final_energy_per_atom"]}
+            d["output"] = {
+                "crystal": d2["output"]["crystal"],
+                "final_energy": d2["output"]["final_energy"],
+                "final_energy_per_atom": d2["output"]["final_energy_per_atom"]}
             d["name"] = "aflow"
             d["pseudo_potential"] = {"functional": "pbe", "pot_type": "paw",
                                      "labels": d2["input"]["potcar"]}
