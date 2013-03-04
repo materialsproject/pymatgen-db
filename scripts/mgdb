@@ -16,12 +16,12 @@ __date__ = "Dec 1, 2012"
 import os
 import datetime
 import logging
-from matgendb.creator import VaspToDbTaskDrone
-from pymatgen.apps.borg.queen import BorgQueen
 import multiprocessing
 import json
 import sys
 import webbrowser
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,26 +46,28 @@ def get_settings(args):
 
 
 def init_db(args):
-    if args.config_file:
-        d = [("host", "localhost"),
-             ("port", 27017),
-             ("database", "vasp"),
-             ("admin_user", None),
-             ("admin_password", None),
-             ("readonly_user", None),
-             ("readonly_password", None),
-             ("collection", "tasks"),
-             ("aliases_config", None)]
-        doc = {}
-        for k, v in d:
-            val = raw_input("Enter {} (default: {}) : ".format(k, v))
-            doc[k] = val if val else v
-
-        with open(args.config_file, "w") as f:
-            json.dump(doc, f, indent=4, sort_keys=True)
-
+    d = [("host", "localhost"),
+         ("port", 27017),
+         ("database", "vasp"),
+         ("admin_user", None),
+         ("admin_password", None),
+         ("readonly_user", None),
+         ("readonly_password", None),
+         ("collection", "tasks"),
+         ("aliases_config", None)]
+    doc = {}
+    print("Please supply the following configuration values")
+    print("(press Enter if you want to accept the defaults)\n")
+    for k, v in d:
+        val = raw_input("Enter {} (default: {}) : ".format(k, v))
+        doc[k] = val if val else v
+    with open(args.config_file, "w") as f:
+        json.dump(doc, f, indent=4, sort_keys=True)
+    print "\nConfiguration written to {}!".format(args.config_file)
 
 def update_db(args):
+    from matgendb.creator import VaspToDbTaskDrone
+    from pymatgen.apps.borg.queen import BorgQueen
     FORMAT = "%(relativeCreated)d msecs : %(message)s"
 
     if args.logfile:
@@ -143,7 +145,7 @@ if __name__ == "__main__":
     pinit = subparsers.add_parser("init", help="Initialization tools.")
 
     pinit.add_argument("-c", "--config", dest="config_file", type=str,
-                       nargs='?',
+                       nargs='?', default="db.json",
                        help="Creates an db config file for the database. "
                             "Default filename is db.json.")
     pinit.set_defaults(func=init_db)
