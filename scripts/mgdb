@@ -83,7 +83,8 @@ def update_db(args):
         user=d["admin_user"], password=d["admin_password"], parse_dos=False,
         collection=d["collection"], update_duplicates=args.force_update_dupes,
         additional_fields=additional_fields)
-    ncpus = multiprocessing.cpu_count()
+    ncpus = multiprocessing.cpu_count() if not args.ncpus else args.ncpus
+    logger.info("Using {} cpus...".format(ncpus))
     queen = BorgQueen(drone, number_of_drones=ncpus)
     queen.parallel_assimilate(args.directory)
     tids = map(int, filter(lambda x: x, queen.get_data()))
@@ -173,6 +174,12 @@ if __name__ == "__main__":
                          default=None,
                          help="Enter a *unique* author field so that you can "
                               "trace back what you ran.")
+    pinsert.add_argument("-n", "--ncpus", dest="ncpus", type=int,
+                         default=None,
+                         help="Number of CPUs to use in inserting. If "
+                              "not specified, multiprocessing will use "
+                              "the number of cpus detected.")
+
     pinsert.set_defaults(func=update_db)
 
     pquery = subparsers.add_parser("query",
