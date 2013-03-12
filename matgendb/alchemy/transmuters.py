@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 
 """
-This module implements a version of pymatgen's Transmuster to generate
-TransformedStructures from various data sources. They enable the
-high-throughput generation of new
-structures and input files.
-
-It also includes the helper function, batch_write_vasp_input to generate an
-entire directory of vasp input files for running.
+This module implements a version of pymatgen's Transmuter to generate
+TransformedStructures from DB data sources. They enable the
+high-throughput generation of new structures and input files.
 """
 
 from __future__ import division
