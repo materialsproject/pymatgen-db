@@ -646,4 +646,4 @@ def get_uri(dir_name):
         hostname = socket.gethostbyaddr(socket.gethostname())[0]
     except:
         hostname = socket.gethostname()
-    return hostname + ":" + fullpath
+    return "{}:{}".format(hostname, fullpath)
