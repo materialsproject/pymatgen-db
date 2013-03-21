@@ -4,8 +4,6 @@
 A helper script for many matgendb functions.
 """
 
-from __future__ import division
-
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
 __version__ = "1.1"
@@ -20,8 +18,6 @@ import multiprocessing
 import json
 import sys
 import webbrowser
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +59,7 @@ def init_db(args):
         doc[k] = val if val else v
     with open(args.config_file, "w") as f:
         json.dump(doc, f, indent=4, sort_keys=True)
-    print "\nConfiguration written to {}!".format(args.config_file)
+    print("\nConfiguration written to {}!".format(args.config_file))
 
 def update_db(args):
     from matgendb.creator import VaspToDbTaskDrone
@@ -107,15 +103,15 @@ def query_db(args):
         try:
             criteria = json.loads(args.criteria)
         except ValueError:
-            print "Criteria {} is not a valid JSON string!".format(
-                args.criteria)
+            print("Criteria {} is not a valid JSON string!".format(
+                args.criteria))
             sys.exit(-1)
 
     t = PrettyTable(args.properties)
     t.float_format = "4.4"
     for r in qe.query(properties=args.properties, criteria=criteria):
         t.add_row([r[p] for p in args.properties])
-    print t
+    print(t)
 
 
 def run_server(args):
