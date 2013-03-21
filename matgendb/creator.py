@@ -22,6 +22,7 @@ import datetime
 import string
 import json
 import socket
+from fnmatch import fnmatch
 from collections import OrderedDict
 
 from pymongo import MongoClient
@@ -59,7 +60,6 @@ class VaspToDbTaskDrone(AbstractDrone):
     3. Directories containing vasp output with ".relax1" and ".relax2" are
        also considered as 2 parts of an aflow style run.
     """
-    vasprun_pattern = re.compile("^vasprun.xml([\w\.]*)")
 
     #Version of this db creator document.
     __version__ = "2.0.0"
@@ -155,8 +155,8 @@ class VaspToDbTaskDrone(AbstractDrone):
             #Materials project style aflow runs.
             for subtask in ["relax1", "relax2"]:
                 for f in os.listdir(os.path.join(path, subtask)):
-                    if VaspToDbTaskDrone.vasprun_pattern.match(f):
-                            vasprun_files[subtask] = os.path.join(subtask, f)
+                    if fnmatch(f, "vasprun.xml*"):
+                        vasprun_files[subtask] = os.path.join(subtask, f)
         elif "STOPCAR" in files:
             #Stopped runs. Try to parse as much as possible.
             logger.info(path + " contains stopped run")
@@ -164,12 +164,13 @@ class VaspToDbTaskDrone(AbstractDrone):
                 if subtask in files and \
                         os.path.isdir(os.path.join(path, subtask)):
                     for f in os.listdir(os.path.join(path, subtask)):
-                        if VaspToDbTaskDrone.vasprun_pattern.match(f):
+                        if fnmatch(f, "vasprun.xml*"):
                             vasprun_files[subtask] = os.path.join(
                                 subtask, f)
         else:
+            vasprun_pattern = re.compile("^vasprun.xml([\w\.]*)")
             for f in files:
-                m = VaspToDbTaskDrone.vasprun_pattern.match(f)
+                m = vasprun_pattern.match(f)
                 if m:
                     fileext = m.group(1)
                     if fileext.startswith(".relax2"):
