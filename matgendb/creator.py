@@ -341,7 +341,7 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         for f in os.listdir(dir_name):
             filename = os.path.join(dir_name, f)
-            if re.match("INCAR.*", f):
+            if fnmatch(f, "INCAR*"):
                 try:
                     incar = Incar.from_file(filename)
                     d["incar"] = incar.to_dict
@@ -364,14 +364,14 @@ class VaspToDbTaskDrone(AbstractDrone):
                     print str(ex)
                     logger.error("Unable to parse INCAR for killed run {}."
                                  .format(dir_name))
-            elif re.match("KPOINTS.*", f):
+            elif fnmatch(f, "KPOINTS*"):
                 try:
                     kpoints = Kpoints.from_file(filename)
                     d["kpoints"] = kpoints.to_dict
                 except:
                     logger.error("Unable to parse KPOINTS for killed run {}."
                                  .format(dir_name))
-            elif re.match("POSCAR.*", f):
+            elif fnmatch(f, "POSCAR*"):
                 try:
                     s = Poscar.from_file(filename).structure
                     comp = s.composition
@@ -388,7 +388,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 except:
                     logger.error("Unable to parse POSCAR for killed run {}."
                                  .format(dir_name))
-            elif re.match("POTCAR.*", f):
+            elif fnmatch(f, "POTCAR*"):
                 try:
                     potcar = Potcar.from_file(filename)
                     d["pseudo_potential"] = {"functional": "pbe",
@@ -397,7 +397,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 except:
                     logger.error("Unable to parse POTCAR for killed run in {}."
                                  .format(dir_name))
-            elif re.match("OSZICAR", f):
+            elif fnmatch(f, "OSZICAR"):
                 try:
                     d["oszicar"]["root"] = \
                         Oszicar(os.path.join(dir_name, f)).to_dict
