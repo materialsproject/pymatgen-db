@@ -57,6 +57,7 @@ def init_db(args):
     for k, v in d:
         val = raw_input("Enter {} (default: {}) : ".format(k, v))
         doc[k] = val if val else v
+    doc["port"] = int(doc["port"])  # enforce the port as an int
     with open(args.config_file, "w") as f:
         json.dump(doc, f, indent=4, sort_keys=True)
     print("\nConfiguration written to {}!".format(args.config_file))
