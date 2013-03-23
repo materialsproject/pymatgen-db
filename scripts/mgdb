@@ -62,6 +62,7 @@ def init_db(args):
         json.dump(doc, f, indent=4, sort_keys=True)
     print("\nConfiguration written to {}!".format(args.config_file))
 
+
 def update_db(args):
     from matgendb.creator import VaspToDbTaskDrone
     from pymatgen.apps.borg.queen import BorgQueen
@@ -128,14 +129,18 @@ def run_server(args):
     webbrowser.open_new_tab("http://127.0.0.1:8000")
     p1.join()
 
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="""
-    Command line db insertion script.
+    mgdb is a complete command line db management script for pymatgen-db. It
+    provides the facility to insert vasp runs, perform queries, and run a web
+    server for exploring databases that you create. Type mgdb -h to see the
+    various options.
 
     Author: Shyue Ping Ong
-    Version: 2.0
-    Last updated: Jun 21 2012""")
+    Version: 3.0
+    Last updated: Mar 23 2013""")
 
     subparsers = parser.add_subparsers()
 
