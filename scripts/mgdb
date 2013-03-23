@@ -125,7 +125,7 @@ def run_server(args):
     p1.start()
     import time
     time.sleep(2)
-    webbrowser.open_new_tab("127.0.0.1:8000")
+    webbrowser.open_new_tab("http://127.0.0.1:8000")
     p1.join()
 
 if __name__ == "__main__":
