@@ -32,6 +32,19 @@ function displayData() {
                 "bSort": true,
                 "bInfo": true,
                 "bAutoWidth": true,
+                "sDom": 'T<"clear">lfrtip',
+                "oTableTools": {
+                    "sSwfPath": "/static/js/DataTables-1.9.4/extras/TableTools/media/swf/copy_csv_xls_pdf.swf",
+                    "aButtons": [
+                        "copy",
+                        "print",
+                        {
+                            "sExtends":    "collection",
+                            "sButtonText": "Export",
+                            "aButtons":    [ "csv", "xls", "pdf" ]
+                        }
+                    ]
+                },
                 "sPaginationType": "full_numbers",
                 "iDisplayLength": 50,
                 "sScrollX": "100%",
