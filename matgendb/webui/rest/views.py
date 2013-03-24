@@ -10,7 +10,11 @@ from django.views.decorators.csrf import csrf_exempt
 from pymatgen import Composition, Element
 
 from matgendb.query_engine import QueryEngine
-from matgendb.webui import MongoJSONEncoder
+import bson
+import datetime
+
+from django.utils.encoding import force_unicode
+from django.core.serializers.json import DjangoJSONEncoder
 
 config = json.loads(os.environ["MGDB_CONFIG"])
 qe = QueryEngine(host=config["host"], port=config["port"],
@@ -77,3 +81,17 @@ def query(request):
         json.dumps({"error": "Bad response method. POST should be used."},
                    cls=MongoJSONEncoder),
         mimetype="application/json")
+
+
+class MongoJSONEncoder(DjangoJSONEncoder):
+    """
+    Encodes Mongo DB objects into JSON
+    In particular is handles BSON Object IDs and Datetime objects
+    """
+
+    def default(self, obj):
+        if isinstance(obj, bson.objectid.ObjectId):
+            return force_unicode(obj)
+        elif isinstance(obj, datetime.datetime):
+            return str(obj)
+        return super(MongoJSONEncoder, self).default(obj)

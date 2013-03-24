@@ -5,22 +5,3 @@ VaspToDbTaskDrone in mind, it can be used with any Mongo collection with the
 appropriate settings.
 """
 
-import bson
-import datetime
-
-from django.utils.encoding import force_unicode
-from django.core.serializers.json import DjangoJSONEncoder
-
-
-class MongoJSONEncoder(DjangoJSONEncoder):
-    """
-    Encodes Mongo DB objects into JSON
-    In particular is handles BSON Object IDs and Datetime objects
-    """
-
-    def default(self, obj):
-        if isinstance(obj, bson.objectid.ObjectId):
-            return force_unicode(obj)
-        elif isinstance(obj, datetime.datetime):
-            return str(obj)
-        return super(MongoJSONEncoder, self).default(obj)
