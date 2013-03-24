@@ -82,7 +82,7 @@ function doQuery() {
     $("#search-button").spinner(opts);
 
     $.ajax({
-               url: "/query",
+               url: "/rest/query",
                type: "POST",
                data: {criteria: crit, properties: prop}
            }

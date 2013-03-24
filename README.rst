@@ -136,6 +136,30 @@ of data.
 
     materials genomics ui
 
+Materials Genomics RESTful API
+------------------------------
+
+The Materials Genomics UI also implements a RESTful interface to the database.
+Two main methods are implemented now. A simple GET request that provides the
+ability to delve into a document. For example::
+
+    http://127.0.0.1:8000/rest/14/output
+
+returns the "output" key of task_id 14 as a JSON.
+
+A more advanced POST request provides the ability to make advanced queries.
+This is the basis upon which the Materials Genomics UI is built. For example,
+posting::
+
+    {criteria: "criteria as json string",
+     properties: "list of properties as json string"}
+
+to::
+
+    http://127.0.0.1:8000/rest/query
+
+would return the query as a JSON response.
+
 Querying a database
 -------------------
 
