@@ -15,10 +15,12 @@ pymatgen-db, it can be used to explore any Mongo database and collection.
 Change Log
 ==========
 
-Version 0.2.5
+Version 0.3.0
 -------------
 
-1. Bug fixes for aflow style runs assimilation.
+1. Significant update to materials genomics ui. Ability to export table data
+   to CSV, XLS or PDF.
+2. First version of RESTful interface implemented.
 
 :doc:`Older versions </changelog>`
 

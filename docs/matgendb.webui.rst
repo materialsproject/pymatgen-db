@@ -39,4 +39,5 @@ Subpackages
 .. toctree::
 
     matgendb.webui.home
+    matgendb.webui.rest
 
