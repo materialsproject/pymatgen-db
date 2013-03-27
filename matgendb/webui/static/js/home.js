@@ -71,21 +71,84 @@ function displayData() {
     }
     else{
         data = [];
-        var col = [];
+        var labels = [];
         for (i = 0; i < currentData.length; i++) {
             row = [];
             for (j = 0; j < properties.length; j++) {
                 row.push(currentData[i][properties[j]]);
-                col.push(currentData[i][properties[j]]);
+                labels.push(properties[j]);
             }
             data.push(row);
         }
-        var chart = d3.select("#plot-div").attr("class", "chart");
-        chart.selectAll("div")
-            .data(col)
-            .enter().append("div")
-            .style("width", function(d) { return d * 10 + "px"; })
-            .text(function(d) { return d; });
+        var chartData = [];
+        chartData.push({
+            name : "",
+            color: 'blue',
+            data: data
+        });
+        var xAxisOptions = {
+            title : {
+                text : labels[0],
+                style: {
+                    font: 'normal 1.5em Helvetica, sans-serif',
+                    color: 'black'
+                }
+            },
+            lineWidth:2,
+            gridLineWidth:1,
+            labels:{
+                style: {
+                    font: 'normal 1.2em Helvetica, sans-serif',
+                    color: 'black'
+                }
+            }
+        };
+        var yAxisOptions = {
+            title: {
+                text: labels[1],
+                style: {
+                    font: 'normal 1.5em Helvetica, sans-serif',
+                    color: 'black'
+                }
+            },
+            lineWidth:1,
+            gridLineWidth:1,
+            labels:{
+                style: {
+                    font: 'normal 1.2em Helvetica, sans-serif',
+                    color: 'black'
+                }
+            }
+
+        };
+        var chart = new Highcharts.Chart({
+            chart: {
+                renderTo: "plot-div",
+                type: 'scatter',
+                zoomType : 'xy',
+                animation: false
+            },
+            credits: {
+                enabled: false
+            },
+            title: {
+                text: "Plot of " + labels[1] + " vs " + labels[0]
+            },
+            xAxis: xAxisOptions,
+            yAxis: yAxisOptions,
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return this.point.x + ", " + this.point.y;
+                },
+                style : {
+                    font: 'normal 1em Helvetica, sans-serif'
+                }
+            },
+            series: chartData
+        });
         $("#results-table-div").hide();
         $("#num-results").show();
         $("#result-tree").hide();
