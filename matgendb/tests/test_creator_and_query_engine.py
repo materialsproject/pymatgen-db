@@ -94,6 +94,8 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                 self.assertAlmostEqual(d['output']['final_energy'],
                                        -14.31337758, 6)
                 self.assertEqual(len(d["calculations"]), 1)
+                self.assertEqual(len(d["custodian"]), 1)
+                self.assertEqual(len(d["custodian"][0]["corrections"]), 1)
 
         if VaspToDbTaskDroneTest.conn:
             warnings.warn("Testing query engine mode.")

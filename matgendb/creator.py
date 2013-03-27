@@ -301,6 +301,12 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         d["transformations"] = transformations
 
+        #Parse custodian.json files if present.
+        filenames = glob.glob(os.path.join(fullpath, "custodian.json*"))
+        if len(filenames) >= 1:
+            with zopen(filenames[0], "rb") as f:
+                d["custodian"] = json.load(f)
+
         # Parse OUTCAR for additional information and run stats.
         run_stats = {}
         for filename in glob.glob(os.path.join(fullpath, "OUTCAR*")):
