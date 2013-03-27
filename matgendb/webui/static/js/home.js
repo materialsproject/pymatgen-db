@@ -12,12 +12,13 @@ function displayData() {
             $("#result-tree").show();
             $("#num-results").show();
             $("#results-table-div").hide();
+            $("#plot-div").hide();
         }
         catch (e) {
             alert("Sorry error in json string, please correct and try again: " + e.message);
         }
     }
-    else if (currentData.length > 0) {
+    else if (checkedValue == "table" && currentData.length > 0) {
         props = [];
         for (j = 0; j < properties.length; j++) {
             props.push({ "sTitle": properties[j]});
@@ -66,6 +67,30 @@ function displayData() {
         $("#results-table-div").show();
         $("#num-results").show();
         $("#result-tree").hide();
+        $("#plot-div").hide();
+    }
+    else{
+        data = [];
+        var col = [];
+        for (i = 0; i < currentData.length; i++) {
+            row = [];
+            for (j = 0; j < properties.length; j++) {
+                row.push(currentData[i][properties[j]]);
+                col.push(currentData[i][properties[j]]);
+            }
+            data.push(row);
+        }
+        var chart = d3.select("#plot-div").attr("class", "chart");
+        chart.selectAll("div")
+            .data(col)
+            .enter().append("div")
+            .style("width", function(d) { return d * 10 + "px"; })
+            .text(function(d) { return d; });
+        $("#results-table-div").hide();
+        $("#num-results").show();
+        $("#result-tree").hide();
+        $("#plot-div").show();
+
     }
 }
 
