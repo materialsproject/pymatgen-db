@@ -124,9 +124,10 @@ def run_server(args):
     from multiprocessing import Process
     p1 = Process(target=call_command, args=("runserver",))
     p1.start()
-    import time
-    time.sleep(2)
-    webbrowser.open_new_tab("http://127.0.0.1:8000")
+    if not args.nobrowser:
+        import time
+        time.sleep(2)
+        webbrowser.open_new_tab("http://127.0.0.1:8000")
     p1.join()
 
 
@@ -219,6 +220,10 @@ if __name__ == "__main__":
                              "none is found, an no-authentication "
                              "localhost:27017/vasp database and tasks "
                              "collection is assumed.")
+
+    pserve.add_argument("--nobrowser", action="store_true",
+                         help="Don't automatically open a browser window "
+                              "(e.g. for shell-based servers)")
 
     pserve.set_defaults(func=run_server)
 
