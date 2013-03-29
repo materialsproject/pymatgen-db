@@ -6,7 +6,7 @@ A helper script for many matgendb functions.
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
-__version__ = "1.1"
+__version__ = "1.2"
 __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Dec 1, 2012"
