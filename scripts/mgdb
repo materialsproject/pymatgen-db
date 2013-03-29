@@ -82,7 +82,7 @@ def update_db(args):
         host=d["host"], port=d["port"],  database=d["database"],
         user=d["admin_user"], password=d["admin_password"], parse_dos=False,
         collection=d["collection"], update_duplicates=args.force_update_dupes,
-        additional_fields=additional_fields)
+        additional_fields=additional_fields, mapi_key=args.mapi_key)
     ncpus = multiprocessing.cpu_count() if not args.ncpus else args.ncpus
     logger.info("Using {} cpus...".format(ncpus))
     queen = BorgQueen(drone, number_of_drones=ncpus)
@@ -187,6 +187,12 @@ if __name__ == "__main__":
                               "not specified, multiprocessing will use "
                               "the number of cpus detected.")
 
+    pinsert.add_argument("-k", "--mapi_key", dest="mapi_key", type=str,
+                         default=None,
+                         help="Materials API key to use. If supplied, "
+                              "the insertion process will attempt to "
+                              "determine stability information using the "
+                              "Materials REST API.")
     pinsert.set_defaults(func=update_db)
 
     pquery = subparsers.add_parser("query",
