@@ -31,12 +31,15 @@ import gridfs
 from pymatgen.apps.borg.hive import AbstractDrone
 from pymatgen.analysis.structure_analyzer import VoronoiCoordFinder
 from pymatgen.core.structure import Structure
+from pymatgen.core.composition import Composition
 from pymatgen.io.vaspio import Vasprun, Incar, Kpoints, Potcar, Poscar, \
     Outcar, Oszicar
 from pymatgen.io.cifio import CifWriter
 from pymatgen.symmetry.finder import SymmetryFinder
 from pymatgen.analysis.bond_valence import BVAnalyzer
 from pymatgen.util.io_utils import zopen
+from pymatgen.matproj.rest import MPRester
+from pymatgen.entries.computed_entries import ComputedEntry
 
 
 logger = logging.getLogger(__name__)
@@ -67,7 +70,8 @@ class VaspToDbTaskDrone(AbstractDrone):
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None,  collection="tasks",
                  parse_dos=False, simulate_mode=False,
-                 additional_fields=None, update_duplicates=True):
+                 additional_fields=None, update_duplicates=True,
+                 mapi_key=None):
         """
         Args:
             host:
@@ -99,6 +103,19 @@ class VaspToDbTaskDrone(AbstractDrone):
             update_duplicates:
                 If True, if a duplicate path exists in the collection, the
                 entire doc is updated. Else, duplicates are skipped.
+            mapi_key:
+                A Materials API key. If this key is supplied,
+                the insertion code will attempt to use the Materials REST API
+                to calculate stability data for inserted calculations.
+                Stability assessment requires a large quantity of materials
+                data. E.g., to compute the stability of a new LixFeyOz
+                calculation, you need to the energies of all known
+                phases in the Li-Fe-O chemical system. Using
+                the Materials API, we can obtain the pre-calculated data from
+                the Materials Project.
+
+                Go to www.materialsproject.org/profile to generate or obtain
+                your API key.
         """
         self.host = host
         self.database = database
@@ -111,6 +128,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.additional_fields = {} if not additional_fields \
             else additional_fields
         self.update_duplicates = update_duplicates
+        self.mapi_key = mapi_key
         if not simulate_mode:
             conn = MongoClient(self.host, self.port)
             db = conn[self.database]
@@ -131,6 +149,8 @@ class VaspToDbTaskDrone(AbstractDrone):
         try:
             d = self.get_task_doc(path, self.parse_dos,
                                   self.additional_fields)
+            if self.mapi_key is not None and d["state"] == "successful":
+                self.calculate_stability(d)
             tid = self._insert_doc(d)
             return tid
         except Exception as ex:
@@ -138,6 +158,19 @@ class VaspToDbTaskDrone(AbstractDrone):
             print traceback.format_exc(ex)
             logger.error(traceback.format_exc(ex))
             return False
+
+    def calculate_stability(self, d):
+        m = MPRester(self.mapi_key)
+        functional = d["pseudo_potential"]["functional"]
+        syms = ["{} {}".format(functional, l)
+                for l in d["pseudo_potential"]["labels"]]
+        entry = ComputedEntry(Composition(d["unit_cell_formula"]),
+                              d["output"]["final_energy"],
+                              parameters={"hubbards": d["hubbards"],
+                                          "potcar_symbols": syms})
+        data = m.get_stability([entry])[0]
+        for k in ("e_above_hull", "decomposes_to"):
+            d["analysis"][k] = data[k]
 
     @classmethod
     def get_task_doc(cls, path, parse_dos=False, additional_fields=None):
