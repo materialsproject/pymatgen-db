@@ -15,6 +15,12 @@ pymatgen-db, it can be used to explore any Mongo database and collection.
 Change Log
 ==========
 
+Version 0.3.2
+-------------
+
+1. Add option to use the Materials API to obtain stability data during run
+   insertion.
+
 Version 0.3.0
 -------------
 
