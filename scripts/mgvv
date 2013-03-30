@@ -167,7 +167,7 @@ def get_constraint_sections(spec):
             else:
                 sections[cond] = constraints
         else:
-            sections[None] = item
+            sections[None] = [item]
     return sections
 
 
@@ -234,7 +234,8 @@ def main(cmdline=None):
         parser.error('Cannot connect to server: {}'.format(err))
     db_key = 'database'
     if not db_key in config:
-        parser.error('Configuration in "{}" is missing "db"'.format(fname))
+        parser.error('Configuration in "{}" is missing "{}"'.format(fname,
+            db_key))
     db = conn[config[db_key]]
     user, passwd = None, None
     # try both readonly and admin credentials
@@ -247,9 +248,10 @@ def main(cmdline=None):
                              .format(args.config_file, utype))
     if user and passwd:
         if not db.authenticate(user, passwd):
-            parser.error('Cannot authenticate to database: {}'.format(err))
+            parser.error('Cannot authenticate to database as user {}'.format(user))
     else:
         _log.info('Connecting to DB "{}" without authentication'.format(config[db_key]))
+
     # Init constraints from file or command-line
     constraints_from_file = args.constfile is not None
     if constraints_from_file:
@@ -309,6 +311,7 @@ def main(cmdline=None):
             coll = db[coll_name]
             try:
                 sect = get_constraint_sections(constraint_spec)
+                print("SECTIONS {}".format(sect))
                 for vnum, vgroup in enumerate(validator.validate(coll, sect, subject=coll_name)):
                     sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
                     sect_hdr.add('Condition', str(vgroup.condition))

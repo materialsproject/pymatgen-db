@@ -347,7 +347,7 @@ class ConstraintGroup:
             conflicts.append('cannot use range expressions on arrays')
         return conflicts
 
-    def add_existence(self):
+    def add_existence(self, rev):
         """Add existence constraint for the field.
 
         This is necessary because the normal meaning of 'x > 0' is: x > 0 and is present.
@@ -360,7 +360,8 @@ class ConstraintGroup:
             # both 'exists' and strict equality don't require the extra clause
             self.constraints[0].op.is_exists() or self.constraints[0].op.is_equality()):
             return
-        constraint = Constraint(self._field, ConstraintOperator.EXISTS, True)
+        value = not rev   # value is False if reversed, otherwise True
+        constraint = Constraint(self._field, ConstraintOperator.EXISTS, value)
         self.constraints.append(constraint)
 
     def __iter__(self):
@@ -860,13 +861,13 @@ class Validator(DoesLogging):
             self._report_fields.update(projection.to_mongo())
             cond_query = MongoQuery()
             if cond_expr_list is not None:
-                cond_groups = self._process_constraint_expressions(cond_expr_list)
+                cond_groups = self._process_constraint_expressions(cond_expr_list, rev=False)
                 for cg in cond_groups.itervalues():
                     for c in cg:
                         cond_query.add_clause(MongoClause(c, rev=False))
             self._sections.append((cond_query, query))
 
-    def _process_constraint_expressions(self, expr_list, conflict_check=True):
+    def _process_constraint_expressions(self, expr_list, conflict_check=True, rev=True):
         """Create and return constraints from expressions in expr_list.
 
         :param expr_list: The expressions
@@ -885,7 +886,7 @@ class Validator(DoesLogging):
 
         # add existence constraints
         for cgroup in groups.itervalues():
-            cgroup.add_existence()
+            cgroup.add_existence(rev)
 
         # optionally check for conflicts
         if conflict_check:
