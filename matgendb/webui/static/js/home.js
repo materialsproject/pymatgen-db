@@ -70,10 +70,10 @@ function displayData() {
 }
 
 function doQuery() {
-    var crit, prop, opts;
+    var crit, prop, opts, limit;
     crit = $("#criteria-input").val();
     prop = $("#properties-input").val();
-
+    limit = $("#limit-slider").slider("value");
     opts = {
         img: '/static/images/spinner-large.gif',
         height: 50,
@@ -84,7 +84,7 @@ function doQuery() {
     $.ajax({
                url: "/rest/query",
                type: "POST",
-               data: {criteria: crit, properties: prop}
+               data: {criteria: crit, properties: prop, limit: limit}
            }
     ).success(function (data) {
                   $("#search-button").spinner('remove');
@@ -248,5 +248,29 @@ window.onload = function () {
             doQuery();
         }
     });
+//    $("#skip-slider").slider(
+//        {
+//            orientation: "vertical",
+//            range: "min",
+//            min: 0,
+//            max: 1000,
+//            value: 0,
+//            slide: function(event, ui)
+//            {
+//                $("#skip-text").text("Skip: " + ui.value);
+//            }
+//        });
+    $("#limit-slider").slider(
+        {
+            orientation: "vertical",
+            range: "min",
+            min: 0,
+            max: 100,
+            value: 30,
+            slide: function(event, ui)
+            {
+                $("#limit-text").text("Limit: " + ui.value);
+            }
+        });
 
 }

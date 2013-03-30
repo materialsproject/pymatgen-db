@@ -48,11 +48,11 @@ def query(request):
     if request.method == 'POST':
         try:
             critstr = request.POST["criteria"].strip()
-            if re.match("^[\w\(\)]+$", critstr):
+            if re.match("^\d+$", critstr):
+                criteria = {"task_id": int(critstr)}
+            elif re.match("^[\w\(\)]+$", critstr):
                 comp = Composition(critstr)
                 criteria = {"pretty_formula": comp.reduced_formula}
-            elif re.match("^\d+$", critstr):
-                criteria = {"task_id": int(critstr)}
             elif re.match("^[A-Za-z\-]+$", critstr):
                 syms = [Element(sym).symbol
                         for sym in critstr.split("-")]
@@ -60,9 +60,13 @@ def query(request):
                 criteria = {"chemsys": "-".join(syms)}
             else:
                 criteria = json.loads(critstr)
-            properties = request.POST["properties"].split()
-            if not properties:
+            properties = request.POST["properties"]
+            if properties == "*":
                 properties = None
+            else:
+                properties = properties.split()
+            limit = int(request.POST["limit"])
+
         except ValueError as ex:
             d = {"valid_response": False,
                  "error_msg": "Bad criteria / properties: {}".format(str(ex))}
@@ -70,7 +74,7 @@ def query(request):
                 json.dumps(d), mimetype="application/json")
 
         results = list(qe.query(criteria=criteria,
-                                properties=properties))
+                                properties=properties, limit=limit))
         if properties is None and len(results) > 0:
             properties = list(results[0].keys())
         d = {"valid_response": True, "results": results,
