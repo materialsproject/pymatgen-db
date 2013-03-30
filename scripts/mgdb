@@ -37,6 +37,7 @@ def init_db(args):
         json.dump(doc, f, indent=4, sort_keys=True)
     print("\nConfiguration written to {}!".format(args.config_file))
 
+
 def update_db(args):
     from matgendb.creator import VaspToDbTaskDrone
     from pymatgen.apps.borg.queen import BorgQueen
