@@ -203,8 +203,8 @@ def main(cmdline=None):
                              'which should be a mapping with keys "from", "to", and "server".')
     parser.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
                         help='Main configuration file. Has constraints, and optionally email info.')
-#    parser.add_argument('--format', '-F', dest='format', metavar='FORMAT', default='json',
-#                        help='Report format (default=json)')
+    parser.add_argument('--format', '-F', dest='report_format', metavar='FORMAT', default='html',
+                        help='Report format (default=html)')
     parser.add_argument('--limit', '-m', dest='limit', metavar='NUM', type=int, default=50,
                         help='Limit number of displayed constraint violations per-collection 0=no limit (50)')
     parser.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
@@ -297,9 +297,16 @@ def main(cmdline=None):
     rpt_hdr.add('Report host', socket.gethostname())
     rpt_hdr.add('Limit', args.limit)
     rpt = report.Report(rpt_hdr)
+    # pick report formatter
+    fmt = args.report_format.lower()
+    formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter)
+    formatter_class = formatters.get(fmt, None)
+    if formatter_class is None:
+        parser.error('Unknown format "{}" for --format, choose from: {}'
+                    .format(fmt, textlist(formatters.keys())))
 
     # Run validation for each collection
-    validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=1)
+    validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=10)
     if args.progress > 0:
         validator.set_progress(args.progress)
     with Timing("validate"):
@@ -311,7 +318,7 @@ def main(cmdline=None):
             coll = db[coll_name]
             try:
                 sect = get_constraint_sections(constraint_spec)
-                print("SECTIONS {}".format(sect))
+                #print("SECTIONS {}".format(sect))
                 for vnum, vgroup in enumerate(validator.validate(coll, sect, subject=coll_name)):
                     sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
                     sect_hdr.add('Condition', str(vgroup.condition))
@@ -333,7 +340,7 @@ def main(cmdline=None):
         _log.warn("Report is empty, skipping output")
         retcode = 1
     else:
-        formatter = report.HTMLFormatter()
+        formatter = formatter_class()
         print(formatter.format(rpt))
 
     return retcode

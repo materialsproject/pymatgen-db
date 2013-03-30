@@ -5,10 +5,13 @@ __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '2/21/13'
 
 
+import bson
 from email.mime.text import MIMEText
+import json
 from operator import itemgetter
 import smtplib
 
+from pymatgen import PMGJSONEncoder
 from .util import DoesLogging
 
 class Report:
@@ -69,6 +72,8 @@ class Header:
     def __iter__(self):
         return iter(self._kv)
 
+    def to_dict(self):
+        return {k:v for k, v in self._kv}
 
 class ReportHeader(Header):
     """Header for entire report.
@@ -114,6 +119,11 @@ class Table:
 
     def __iter__(self):
         return iter(self._rows)
+
+    @property
+    def values(self):
+        return [{self._colnames[i]: r[i] for i in range(self._width)}
+                for r in self._rows]
 
     @property
     def column_names(self):
@@ -163,7 +173,10 @@ h1 { color: #FE5300; }
 h2 { color: #004489; }
 """.replace('\n', ' ').replace('  ', ' ')
 
+
 class HTMLFormatter:
+    """Format a report as HTML.
+    """
     def __init__(self, line_sep='\n', id_column=0, css=DEFAULT_CSS):
         self._sep = line_sep
         self._idcol = id_column
@@ -224,6 +237,43 @@ class HTMLFormatter:
         text.append('</body>')
         text.append('</html>')
         return self._sep.join(text)
+
+
+class JSONFormatter:
+    """Format a report as JSON.
+    """
+    def __init__(self, id_column=0, indent=2):
+        self._indent = indent
+        self._idcol = id_column
+
+    def format(self, report):
+        obj = dict(
+            title=report.header.title,
+            info=report.header,
+            sections=[
+                dict(title=s.header.title,
+                     info=s.header,
+                     conditions=[
+                        dict(title=cs.header.title,
+                             info=cs.header,
+                             violations=cs.body)
+                        for cs in s
+                     ]
+                )
+                for s in report
+            ]
+        )
+        return json.dumps(obj, indent=self._indent, cls=JSONReportEncoder)
+
+class JSONReportEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Header):
+            return o.to_dict()
+        elif isinstance(o, Table):
+            return o.values
+        elif isinstance(o, bson.objectid.ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 class Emailer(DoesLogging):
     """Send a report to an email recipient.

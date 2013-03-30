@@ -121,7 +121,7 @@ class TestCollectionFilter(unittest.TestCase):
         obj = CG(foobar)
         op, val = vv.ConstraintOperator('>'), 10
         obj.add_constraint(op, val)
-        obj.add_existence()
+        obj.add_existence(rev=False)
         self.failUnless(len(obj.constraints) == 2)
         self.failUnlessEqual(obj.constraints[0].op, op)
         self.failUnlessEqual(obj.constraints[0].value, val)
@@ -202,7 +202,7 @@ class TestCollectionFilter(unittest.TestCase):
         c = vv.MongoClause(vv.Constraint('foo', '>', 10))
         q.add_clause(c)
         m = q.to_mongo()
-        self.failUnlessEqual(m, {'$or': [c.expr]})
+        self.failUnlessEqual(m, c.expr)
 
     def test_MongoQuery_exists(self):
         "Test MongoQuery class, with an exists clause"
@@ -227,7 +227,7 @@ class TestCollectionFilter(unittest.TestCase):
         q.add_clause(vv.MongoClause(vv.Constraint('foo', '<=', 10)))
         m = q.to_mongo()
         w = 'this.{}.length != 10 || this.{}.length != 10'
-        self.failUnless(m['$where'] in wheres and m['$or'][0]['foo'] == {'$gt': 10})
+        self.failUnless(m['$where'] in wheres and m['foo'] == {'$gt': 10})
 
     def test_violations(self):
         "Test error determination in CollectionValidator.why_bad"
