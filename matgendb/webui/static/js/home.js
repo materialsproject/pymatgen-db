@@ -262,14 +262,13 @@ window.onload = function () {
 //        });
     $("#limit-slider").slider(
         {
-            orientation: "vertical",
             range: "min",
             min: 0,
             max: 100,
             value: 30,
             slide: function(event, ui)
             {
-                $("#limit-text").text("Limit: " + ui.value);
+                $("#limit-text").text(ui.value);
             }
         });
 

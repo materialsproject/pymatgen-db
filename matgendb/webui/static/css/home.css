@@ -6,31 +6,23 @@ input {
     font-size: 1.1em;
 }
 
-.left{
-    width: 90%;
-    float:left;
-}
-
-.right{
-    width: 10%;
-    float:right;
-}
-
-#limit-slider{
-
-    text-align:center;
-    height: 150px;
-}
-
 #limit-slider-wrapper{
-    padding-top: 5px;
-    padding-left: 40px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 200px;
+    margin-top: -15px;
+}
+
+#limit-label{
+    padding-left: 20px;
+    padding-right: 10px;
 }
 
 #fields-div{
     width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#options-div{
     margin-left: auto;
     margin-right: auto;
 }

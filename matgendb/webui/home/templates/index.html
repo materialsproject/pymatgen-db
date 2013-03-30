@@ -33,33 +33,41 @@
 <h2 id="subtitle">Connected to: {{ host }}:{{ port }} with {{ ndocs }} docs.</h2>
 <div id="search-div">
     <div id="fields-div">
-        <div class="left">
-            <div class="input-div">
-                <label for="criteria-input"><span
-                        class="emph">criteria</span> as formula, task_id,
-                    chemical system or
-                    mongo query string</label>
-                <input id="criteria-input" type="text" name="criteria"
-                       class="text-search"
-                    placeholder='Examples: "Li2O", "1234", "Li-Fe-O", {"pretty_formula": "Li2O"}'/>
-            </div>
-            <div class="input-div">
-                <label for="properties-input"><span
-                        class="emph">properties</span> as space-separated
-                    strings or "*" (slow) for all properties.</label>
-                <input id="properties-input" type="text"
-                       name="properties" class="text-search"
-                       placeholder='Example: "task_id energy_per_atom"'/>
-            </div>
-            <div class="input-div">
+        <div class="input-div">
+            <label for="criteria-input"><span
+                    class="emph">criteria</span> as formula, task_id,
+                chemical system or
+                mongo query string</label>
+            <input id="criteria-input" type="text" name="criteria"
+                   class="text-search"
+                   placeholder='Examples: "Li2O", "1234", "Li-Fe-O", {"pretty_formula": "Li2O"}'/>
+        </div>
+        <div class="input-div">
+            <label for="properties-input"><span
+                    class="emph">properties</span> as space-separated
+                strings or "*" (slow) for all properties.</label>
+            <input id="properties-input" type="text"
+                   name="properties" class="text-search"
+                   placeholder='Example: "task_id energy_per_atom"'/>
+        </div>
+        <div class="input-div">
+            <table id="options-div">
+                <tr>
+                    <td>
                 <span class="emph">display format:
                 <input type="radio" name="display" value="table" checked>table
                 <input type="radio" name="display" value="tree">tree</span>
+                    </td>
+                    <td>
+                <td><span id="limit-label" class="emph">limit: </span></td><td>
+            <div id="limit-slider-wrapper">
+                <label id="limit-text">30</label>
+                <div id="limit-slider"></div>
             </div>
-        </div>
-        <div class="right">
-            <label id="limit-text">Limit: 30</label>
-            <div id="limit-slider-wrapper"><div id="limit-slider"></div></div>
+                    </td>
+                </tr>
+            </table>
+
         </div>
     </div>
     <div id="search-button-div" class="input-div">
