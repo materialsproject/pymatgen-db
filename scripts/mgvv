@@ -191,10 +191,9 @@ def main(cmdline=None):
     parser.add_argument('--config', '-c', dest='config_file', metavar='FILE', default=None,
                         help="Configuration file for database connection. "
                              "Generate one using mgdb init --config filename.json, if necessary. "
-                             "Otherwise, the code searches for a db.json. If"
-                             "none is found, an no-authentication "
-                             "localhost:27017/vasp database and tasks "
-                             "collection is assumed.")
+                             "Otherwise, the code searches for a db.json. If "
+                             "none is found, a no-authentication "
+                             "localhost:27017/vasp database is assumed.")
     parser.add_argument('--collection', '-C', dest='coll', metavar='NAME', default=None,
                         help='Collection name for constraints given on command-line')
     parser.add_argument('--email', '-e', dest='email', default=None,
@@ -207,7 +206,7 @@ def main(cmdline=None):
 #    parser.add_argument('--format', '-F', dest='format', metavar='FORMAT', default='json',
 #                        help='Report format (default=json)')
     parser.add_argument('--limit', '-m', dest='limit', metavar='NUM', type=int, default=50,
-                        help='Limit number of displayed errors per-collection 0=no limit (50)')
+                        help='Limit number of displayed constraint violations per-collection 0=no limit (50)')
     parser.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
                         help='Report progress every NUM invalid records found')
     parser.add_argument('-v', '--verbose', dest='vb', action='count', help='Log message verbosity')
@@ -233,7 +232,7 @@ def main(cmdline=None):
         conn = pymongo.MongoClient(config['host'], config['port'])
     except pymongo.errors.ConnectionFailure, err:
         parser.error('Cannot connect to server: {}'.format(err))
-    db_key = 'db'
+    db_key = 'database'
     if not db_key in config:
         parser.error('Configuration in "{}" is missing "db"'.format(fname))
     db = conn[config[db_key]]
@@ -298,7 +297,7 @@ def main(cmdline=None):
     rpt = report.Report(rpt_hdr)
 
     # Run validation for each collection
-    validator = Validator(aliases=aliases, max_violations=args.limit)
+    validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=1)
     if args.progress > 0:
         validator.set_progress(args.progress)
     with Timing("validate"):
@@ -323,11 +322,16 @@ def main(cmdline=None):
                     rpt_sect.add_section(report.ReportSection(sect_hdr, table))
             except DBError, err:
                 _log.error('validating collecton {}: DB error: {}'.format(coll_name, err))
+                break
             rpt.add_section(rpt_sect)
 
     # Report results
-    formatter = report.HTMLFormatter()
-    print(formatter.format(rpt))
+    if rpt.is_empty():
+        _log.warn("Report is empty, skipping output")
+        retcode = 1
+    else:
+        formatter = report.HTMLFormatter()
+        print(formatter.format(rpt))
 
     return retcode
 

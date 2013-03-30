@@ -28,6 +28,9 @@ class Report:
     def header(self):
         return self._hdr
 
+    def is_empty(self):
+        return len(self._sections) == 0
+
     def __iter__(self):
         return iter(self._sections)
 
