@@ -23,6 +23,8 @@ import sys
 import time
 import urlparse
 import yaml
+# local module
+from matgendb.util import get_settings
 from matgendb.vv.validate import Validator, DBError
 from matgendb.vv import report
 
@@ -50,6 +52,8 @@ def wstrip(s):
 def textlist(items):
     return ', '.join(items)
 
+def mapdump(d):
+    return textlist(('{}={}'.format(k, v) for k, v in d.iteritems()))
 
 def nvpstr(s):
     """Return tuple (name, value) from string in form 'name=value'.
@@ -64,61 +68,43 @@ def nvpstr(s):
     #print("NVP: {}".format(nvp))
     return nvp
 
-
-def email_info(s):
-    """Return dict of info from email argument.
-
-    :param: s Command-line argument. If it has a ':' in it, the argument is parsed.
-              Otherwise, the argument is taken as the name of a YAML file.
-    :return: Mapping with sender, recipients and optionally server and port
-    :rtype: dict
-    """
+def _parse_email(s):
     d = {}
     # parse command-line args
-    if ':' in s:
-        items = s.split(':')
-        if len(items) < 2:
-            raise ValueError('from:to required in "{}"'.format(s))
-        if len(items) > 4:
-            raise ValueError('too many values in "{}"'.format(s))
-        d['sender'] = items[0]
-        d['recipients'] = [x.strip() for x in items[1].split(',')]
-        if len(items) > 2:
-            d['server'] = items[2]
-        if len(items) > 3:
-            d['port'] = items[3]
-    # read the file
-    else:
-        try:
-            f = open(s)
-        except OSError:
-            raise ValueError('cannot read from file "{}"'.format(s))
-        y = yaml.safe_load(f)
-        info = y['_email']
-        try:
-            d['sender'] = info['from']
-            d['recipients'] = info['to']
-            if isinstance(d['recipients'], str):
-                d['recipients'] = [d['recipients']]
-        except KeyError, err:
-            raise ValueError('from/to not found in file {} mapping key "_email"'
-                             .format(s))
-        except Exception, e:
-            print("{} happened!".format(e))
-            raise
-        if 'port' in info:
-            d['port'] = info['port']
-        if 'server' in info:
-            d['server'] = info['server']
-    # either way, parse & constrain integer port
-    if 'port' in d:
-        try:
-            d['port'] = int(d['port'])
-            if d['port'] < 0 or d['port'] > 65536:
-                raise ValueError()
-        except ValueError:
-            raise ValueError('bad port number: {}'.format(items[3]))
-    _log.info("send email from {sender} to {recipients}".format(**d))
+    items = s.split(':')
+    if len(items) < 2:
+        raise ValueError('from:to required in "{}"'.format(s))
+    if len(items) > 4:
+        raise ValueError('too many values in "{}"'.format(s))
+    d['sender'] = items[0]
+    d['recipients'] = [x.strip() for x in items[1].split(',')]
+    if len(items) > 2:
+        d['server'] = items[2]
+    if len(items) > 3:
+        d['port'] = int(items[3])
+    return d
+
+
+def _config_email(fname):
+    d = {}
+    try:
+        f = open(fname)
+    except OSError:
+        raise ValueError('cannot read from file "{}"'.format(fname))
+    y = yaml.safe_load(f)
+    info = y['_email']
+    try:
+        d['sender'] = info['from']
+        d['recipients'] = info['to']
+        if isinstance(d['recipients'], str):
+            d['recipients'] = [d['recipients']]
+    except KeyError, err:
+        raise ValueError('from/to not found in file {} mapping key "_email"'
+                         .format(fname))
+    if 'port' in info:
+        d['port'] = int(info['port'])
+    if 'server' in info:
+        d['server'] = info['server']
     return d
 
 
@@ -184,34 +170,6 @@ def get_constraint_sections(spec):
             sections[None] = item
     return sections
 
-DEFAULT_CSS = """
-html {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-body {
-    margin: 2em;
-}
-table { margin-top: 1em; clear: both; border: 1px solid grey; }
-dl, dt, dd { float: left; }
-dl, dt { clear: both; }
-dt { width: 8em; font-weight: 700; }
-dd { width: 32em; }
-tr.even { background-color: #F2F2FF; }
-tr.odd { background-color: white; }
-th, td {
-    padding: 0.2em 0.5em;
-}
-th {
-    text-align: left;
-    color: #000066;
-    border-bottom: 1px solid #000066;
-    margin: 0;
-}
-h1, h2, h3 { clear: both; margin: 0; padding: 0; }
-h1 { color: #FE5300; }
-h2 { color: #004489; }
-""".replace('\n', ' ').replace('  ', ' ')
-
 
 def main(cmdline=None):
     """Main program entry point.
@@ -230,29 +188,31 @@ def main(cmdline=None):
     parser.add_argument('constraint', nargs='*')
     parser.add_argument('--alias', '-a', dest='aliases', action='append', type=nvpstr, metavar="ALIAS", default=[],
                         help='Alias for a field used in a constraint or condition, in form alias=name_in_db')
-    parser.add_argument('--collection', '-c', dest='coll', metavar='NAME', default=None,
+    parser.add_argument('--config', '-c', dest='config_file', metavar='FILE', default=None,
+                        help="Configuration file for database connection. "
+                             "Generate one using mgdb init --config filename.json, if necessary. "
+                             "Otherwise, the code searches for a db.json. If"
+                             "none is found, an no-authentication "
+                             "localhost:27017/vasp database and tasks "
+                             "collection is assumed.")
+    parser.add_argument('--collection', '-C', dest='coll', metavar='NAME', default=None,
                         help='Collection name for constraints given on command-line')
-    parser.add_argument('--email', '-e', dest='email', type=email_info, metavar='INFO',
-                        default=None,
-                        help='Email report, value is {from}:{to}[:server] or a file.'
-                             'Default server is localhost. Files, without a colon, '
-                             'should be in YAML with the key "_email" being a mapping '
-                             'containing from:, to: and server:.')
+    parser.add_argument('--email', '-e', dest='email', default=None,
+                        help='Email report to EMAIL at {from}:{to}[:server].'
+                             'The "from" and "to" are required; default server is localhost. '
+                             'This information can also be in the main config file under the "_email" key, '
+                             'which should be a mapping with keys "from", "to", and "server".')
     parser.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
-                        help='Read collection/field constraints from FILE (YAML)')
+                        help='Main configuration file. Has constraints, and optionally email info.')
 #    parser.add_argument('--format', '-F', dest='format', metavar='FORMAT', default='json',
 #                        help='Report format (default=json)')
     parser.add_argument('--limit', '-m', dest='limit', metavar='NUM', type=int, default=50,
                         help='Limit number of displayed errors per-collection 0=no limit (50)')
     parser.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
                         help='Report progress every NUM invalid records found')
-    parser.add_argument('--server', '-s', dest='srv', metavar='FILE or URL', default=None,
-                        help='Read DB configuration from FILE')
     parser.add_argument('-v', '--verbose', dest='vb', action='count', help='Log message verbosity')
 
     args = parser.parse_args(cmdline)
-    if args.srv is None:
-        parser.error('-s/--server is required')
 
     # Set logging level from --verbose option
     if args.vb > 1:
@@ -262,15 +222,35 @@ def main(cmdline=None):
     else:
         _log.setLevel(logging.WARN)
 
-    # Connect
-    config = yaml.safe_load(open(args.srv))
-    db_config = config['_db']
-    kw = {'host': db_config['host'], 'port':db_config.get('port', 27017)}
-    conn = pymongo.MongoClient(**kw)
-    db = conn[db_config['db']]
-    if 'user_name' in db_config:
-        db.authenticate(db_config['user_name'], db_config['password'])
-
+    # Connect and authenticate
+    conn, config = None, None
+    fname = args.config_file if args.config_file else "db.json"
+    try:
+        config = get_settings(args.config_file)
+    except ValueError, err:
+        parser.error('Cannot parse configuration "{}": {}'.format(fname, err))
+    try:
+        conn = pymongo.MongoClient(config['host'], config['port'])
+    except pymongo.errors.ConnectionFailure, err:
+        parser.error('Cannot connect to server: {}'.format(err))
+    db_key = 'db'
+    if not db_key in config:
+        parser.error('Configuration in "{}" is missing "db"'.format(fname))
+    db = conn[config[db_key]]
+    user, passwd = None, None
+    # try both readonly and admin credentials
+    for utype in 'readonly', 'admin':
+        if (utype + '_user') in config:
+            try:
+                user, passwd = config[utype + '_user'], config[utype + '_password']
+            except KeyError:
+                parser.error('Configuration error in file {0}: {1}_user but no {1}_password'
+                             .format(args.config_file, utype))
+    if user and passwd:
+        if not db.authenticate(user, passwd):
+            parser.error('Cannot authenticate to database: {}'.format(err))
+    else:
+        _log.info('Connecting to DB "{}" without authentication'.format(config[db_key]))
     # Init constraints from file or command-line
     constraints_from_file = args.constfile is not None
     if constraints_from_file:
@@ -297,6 +277,17 @@ def main(cmdline=None):
         aliases = dict(args.aliases)
     else:
         aliases = {}
+
+    # Init email from file or command-line
+    if args.email is not None:
+        email = _parse_email(args.email)
+    elif args.constfile:
+        email = _config_email(args.constfile)
+    else:
+        email = None
+    if email is not None:
+        _log.info("Will email report to: {}".format(mapdump(email)))
+        # TODO: configure email
 
     # Initialize report
     rpt_hdr = report.ReportHeader("Materials Project Validation Report")
@@ -335,7 +326,7 @@ def main(cmdline=None):
             rpt.add_section(rpt_sect)
 
     # Report results
-    formatter = report.HTMLFormatter(css=DEFAULT_CSS)
+    formatter = report.HTMLFormatter()
     print(formatter.format(rpt))
 
     return retcode

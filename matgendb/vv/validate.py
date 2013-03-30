@@ -347,6 +347,22 @@ class ConstraintGroup:
             conflicts.append('cannot use range expressions on arrays')
         return conflicts
 
+    def add_existence(self):
+        """Add existence constraint for the field.
+
+        This is necessary because the normal meaning of 'x > 0' is: x > 0 and is present.
+        Without the existence constraint, MongoDB will treat 'x > 0' as: 'x' > 0 *or* is absent.
+        Of course, if the constraint is already about existence, nothing is done.
+
+        :rtype: None
+        """
+        if len(self.constraints) == 1 and (
+            # both 'exists' and strict equality don't require the extra clause
+            self.constraints[0].op.is_exists() or self.constraints[0].op.is_equality()):
+            return
+        constraint = Constraint(self._field, ConstraintOperator.EXISTS, True)
+        self.constraints.append(constraint)
+
     def __iter__(self):
         return iter(self.constraints)
 
@@ -357,7 +373,7 @@ class MongoClause:
     Ho! Ho! Ho! Merry Mongxmas!
     """
     # Target location, main part of query or where-clauses
-    LOC_MAIN, LOC_WHERE = 0, 1
+    LOC_MAIN, LOC_WHERE, LOC_MAIN2 = 0, 1, 2
 
     # Mongo versions of operations
     MONGO_OPS = {'>': '$gt', '>=': '$gte',
@@ -411,7 +427,7 @@ class MongoClause:
         return self._constraint
 
     def _create(self, constraint):
-        """Get MongoDB dictionary for a constraint.
+        """Create MongoDB query clause for a constraint.
 
         :param constraint: The constraint
         :type constraint: Constraint
@@ -425,9 +441,11 @@ class MongoClause:
         # build the clause parts: location and expression
         loc = MongoClause.LOC_MAIN  # default location
         if op.is_exists():
+            loc = MongoClause.LOC_MAIN2     # these can go elsewhere
             assert(isinstance(c.value, bool))
             # for exists, reverse the value instead of the operator
-            expr = {c.field.name: {mop: not c.value}}
+            not_c_val = not c.value if self._rev else c.value
+            expr = {c.field.name: {mop: not_c_val}}
         elif op.is_size():
             if op.is_variable():
                 # variables only support equality, and need to be in $where
@@ -448,6 +466,10 @@ class MongoClause:
         else:
             if mop is None:
                 expr = {c.field.name: c.value}
+            elif isinstance(c.value, bool):
+                # can simplify boolean {a: {'$ne': True/False}} to {a: False/True}
+                not_c_val = not c.value if self._rev else c.value
+                expr = {c.field.name: not_c_val}
             else:
                 expr = {c.field.name: {mop: c.value}}
         return loc, expr
@@ -493,6 +515,7 @@ class MongoQuery:
         """Create empty query.
         """
         self._main, self._where = [], []
+        self._main2 = []
 
     def add_clause(self, clause):
         """Add a new clause to the existing query.
@@ -503,6 +526,8 @@ class MongoQuery:
         """
         if clause.query_loc == MongoClause.LOC_MAIN:
             self._main.append(clause)
+        elif clause.query_loc == MongoClause.LOC_MAIN2:
+            self._main2.append(clause)
         elif clause.query_loc == MongoClause.LOC_WHERE:
             self._where.append(clause)
         else:
@@ -515,13 +540,26 @@ class MongoQuery:
         :rtype: dict
         """
         q = {}
-        # add all the clauses to `q`
+        # add all the main clauses to `q`
         clauses = [e.expr for e in self._main]
-        if disjunction:
-            q['$or'] = clauses
-        else:
-            for c in clauses:
-                q.update(c)
+        if clauses:
+            if disjunction:
+                if len(clauses) > 1:
+                    q['$or'] = clauses
+                else:
+                    # simplify 'or' of one thing
+                    q.update(clauses[0])
+            else:
+                for c in clauses:
+                    q.update(c)
+        # add all the main2 clauses; these are not or'ed
+        for c in (e.expr for e in self._main2):
+            # add to existing stuff for the field
+            for field in c:
+                if field in q:
+                    q[field].update(c[field])
+                else:
+                    q.update(c)
         # add where clauses, if any, to `q`
         if self._where:
             q['$where'] = ' || '.join([w.expr for w in self._where])
@@ -743,26 +781,31 @@ class Validator(DoesLogging):
         cvgroup = ConstraintViolationGroup()
         cvgroup.subject = subject
         cvgroup.condition = cond.to_mongo()
-        self._log.debug('Query: {}, Fields: {}'.format(query, self._report_fields))
+        self._log.debug('Query: {}'.format(query))
+        self._log.debug('Fields: {}'.format(self._report_fields))
         # Find records that violate 1 or more constraints
-        with coll.find(query, fields=self._report_fields, **self._find_kw) as cursor:
-            nbytes, num_dberr = 0, 0
-            while 1:
-                try:
-                    record = cursor.next()
-                    nbytes += total_size(record)
-                except StopIteration:
-                    break
-                except pymongo.errors.PyMongoError, err:
-                    if num_dberr > self._max_dberr > 0:
-                        raise DBError("Too many errors")
-                    continue
-                # report progress
-                if self._progress:
-                    self._progress.update(num_dberr, nbytes)
-                # get reasons for badness
-                violations = self._get_violations(body, record)
-                cvgroup.add_violations(violations, record)
+        cursor = coll.find(query, fields=self._report_fields, **self._find_kw)
+        nbytes, num_dberr = 0, 0
+        while 1:
+            try:
+                record = cursor.next()
+                nbytes += total_size(record)
+            except StopIteration:
+                self._log.debug("Done: {:d} bytes, {:d} errors".format(nbytes, num_dberr))
+                break
+            except pymongo.errors.PyMongoError, err:
+                num_dberr += 1
+                if num_dberr > self._max_dberr > 0:
+                    raise DBError("Too many errors")
+                self._log.warn("DB.{:d}: {}".format(num_dberr, err))
+                continue
+
+            # report progress
+            if self._progress:
+                self._progress.update(num_dberr, nbytes)
+            # get reasons for badness
+            violations = self._get_violations(body, record)
+            cvgroup.add_violations(violations, record)
         return None if nbytes == 0 else cvgroup
 
     def _get_violations(self, query, record):
@@ -823,6 +866,36 @@ class Validator(DoesLogging):
                         cond_query.add_clause(MongoClause(c, rev=False))
             self._sections.append((cond_query, query))
 
+    def _process_constraint_expressions(self, expr_list, conflict_check=True):
+        """Create and return constraints from expressions in expr_list.
+
+        :param expr_list: The expressions
+        :conflict_check: If True, check for conflicting expressions within each field
+        :return: Constraints grouped by field (the key is the field name)
+        :rtype: dict
+        """
+        # process expressions, grouping by field
+        groups = {}
+        for expr in expr_list:
+            field, raw_op, val = self._parse_expr(expr)
+            op = ConstraintOperator(raw_op)
+            if field not in groups:
+                groups[field] = ConstraintGroup(Field(field, self._aliases))
+            groups[field].add_constraint(op, val)
+
+        # add existence constraints
+        for cgroup in groups.itervalues():
+            cgroup.add_existence()
+
+        # optionally check for conflicts
+        if conflict_check:
+            # check for conflicts in each group
+            for field_name, group in groups.iteritems():
+                conflicts = group.get_conflicts()
+                if conflicts:
+                    raise ValueError('Conflicts for field {}: {}'.format(field_name, conflicts))
+
+        return groups
     def set_aliases(self, new_value):
         "Set aliases and wrap errors in ValueError"
         try:
@@ -859,32 +932,6 @@ class Validator(DoesLogging):
     def _get_op(self, op):
         return self.MONGO_RELATIONS[op]
 
-    def _process_constraint_expressions(self, expr_list, conflict_check=True):
-        """Create and return constraints from expressions in expr_list.
-
-        :param expr_list: The expressions
-        :conflict_check: If True, check for conflicting expressions within each field
-        :return: Constraints grouped by field (the key is the field name)
-        :rtype: dict
-        """
-        # process expressions, grouping by field
-        groups = {}
-        for expr in expr_list:
-            field, raw_op, val = self._parse_expr(expr)
-            op = ConstraintOperator(raw_op)
-            if field not in groups:
-                groups[field] = ConstraintGroup(Field(field, self._aliases))
-            groups[field].add_constraint(op, val)
-
-        # optionally check for conflicts
-        if conflict_check:
-            # check for conflicts in each group
-            for field_name, group in groups.iteritems():
-                conflicts = group.get_conflicts()
-                if conflicts:
-                    raise ValueError('Conflicts for field {}: {}'.format(field_name, conflicts))
-
-        return groups
 
 
 class Sampler:

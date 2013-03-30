@@ -131,8 +131,37 @@ class ReportBackupError(Exception): pass
 
 ## Formatting
 
+# CSS for HTML report output
+DEFAULT_CSS = """
+html {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+body {
+    margin: 2em;
+}
+table { margin-top: 1em; clear: both; border: 1px solid grey; }
+dl, dt, dd { float: left; }
+dl, dt { clear: both; }
+dt { width: 8em; font-weight: 700; }
+dd { width: 32em; }
+tr.even { background-color: #F2F2FF; }
+tr.odd { background-color: white; }
+th, td {
+    padding: 0.2em 0.5em;
+}
+th {
+    text-align: left;
+    color: #000066;
+    border-bottom: 1px solid #000066;
+    margin: 0;
+}
+h1, h2, h3 { clear: both; margin: 0; padding: 0; }
+h1 { color: #FE5300; }
+h2 { color: #004489; }
+""".replace('\n', ' ').replace('  ', ' ')
+
 class HTMLFormatter:
-    def __init__(self, line_sep='\n', id_column=0, css=''):
+    def __init__(self, line_sep='\n', id_column=0, css=DEFAULT_CSS):
         self._sep = line_sep
         self._idcol = id_column
         self._css = css

@@ -21,40 +21,13 @@ import json
 import sys
 import webbrowser
 
-
+from matgendb.util import get_settings, DEFAULT_SETTINGS
 
 logger = logging.getLogger(__name__)
 
 
-def get_settings(args):
-    if args.config_file:
-        with open(args.config_file) as f:
-            return json.load(f)
-    elif os.path.exists("db.json"):
-        with open("db.json") as f:
-            return json.load(f)
-    else:
-        return {"host": "localhost",
-                "port": 27017,
-                "database": "vasp",
-                "admin_user": None,
-                "admin_password": None,
-                "readonly_user": None,
-                "readonly_password": None,
-                "collection": "tasks",
-                "aliases_config": None}
-
-
 def init_db(args):
-    d = [("host", "localhost"),
-         ("port", 27017),
-         ("database", "vasp"),
-         ("admin_user", None),
-         ("admin_password", None),
-         ("readonly_user", None),
-         ("readonly_password", None),
-         ("collection", "tasks"),
-         ("aliases_config", None)]
+    d = DEFAULT_SETTINGS
     doc = {}
     print("Please supply the following configuration values")
     print("(press Enter if you want to accept the defaults)\n")
@@ -64,6 +37,7 @@ def init_db(args):
     with open(args.config_file, "w") as f:
         json.dump(doc, f, indent=4, sort_keys=True)
     print "\nConfiguration written to {}!".format(args.config_file)
+
 
 def update_db(args):
     from matgendb.creator import VaspToDbTaskDrone
@@ -76,7 +50,7 @@ def update_db(args):
     else:
         logging.basicConfig(level=logging.INFO, format=FORMAT)
 
-    d = get_settings(args)
+    d = get_settings(args.config_file)
 
     logger.info("Db insertion started at {}.".format(datetime.datetime.now()))
     additional_fields = {"author": args.author, "tags": args.tag}
@@ -97,7 +71,7 @@ def update_db(args):
 def query_db(args):
     from matgendb.query_engine import QueryEngine
     from prettytable import PrettyTable
-    d = get_settings(args)
+    d = get_settings(args.config_file)
     qe = QueryEngine(host=d["host"], port=d["port"], database=d["database"],
                      user=d["readonly_user"], password=d["readonly_password"],
                      collection=d["collection"],
@@ -121,7 +95,7 @@ def query_db(args):
 def run_server(args):
     import os
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
-    os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args))
+    os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args.config_file))
     from django.core.management import call_command
     from multiprocessing import Process
     p1 = Process(target=call_command, args=("runserver",))
