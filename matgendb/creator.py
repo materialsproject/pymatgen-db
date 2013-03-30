@@ -22,6 +22,7 @@ import datetime
 import string
 import json
 import socket
+from fnmatch import fnmatch
 from collections import OrderedDict
 
 from pymongo import MongoClient
@@ -30,12 +31,15 @@ import gridfs
 from pymatgen.apps.borg.hive import AbstractDrone
 from pymatgen.analysis.structure_analyzer import VoronoiCoordFinder
 from pymatgen.core.structure import Structure
+from pymatgen.core.composition import Composition
 from pymatgen.io.vaspio import Vasprun, Incar, Kpoints, Potcar, Poscar, \
     Outcar, Oszicar
 from pymatgen.io.cifio import CifWriter
 from pymatgen.symmetry.finder import SymmetryFinder
 from pymatgen.analysis.bond_valence import BVAnalyzer
 from pymatgen.util.io_utils import zopen
+from pymatgen.matproj.rest import MPRester
+from pymatgen.entries.computed_entries import ComputedEntry
 
 
 logger = logging.getLogger(__name__)
@@ -59,7 +63,6 @@ class VaspToDbTaskDrone(AbstractDrone):
     3. Directories containing vasp output with ".relax1" and ".relax2" are
        also considered as 2 parts of an aflow style run.
     """
-    vasprun_pattern = re.compile("^vasprun.xml([\w\.]*)")
 
     #Version of this db creator document.
     __version__ = "2.0.0"
@@ -67,7 +70,8 @@ class VaspToDbTaskDrone(AbstractDrone):
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None,  collection="tasks",
                  parse_dos=False, simulate_mode=False,
-                 additional_fields=None, update_duplicates=True):
+                 additional_fields=None, update_duplicates=True,
+                 mapi_key=None):
         """
         Args:
             host:
@@ -99,6 +103,19 @@ class VaspToDbTaskDrone(AbstractDrone):
             update_duplicates:
                 If True, if a duplicate path exists in the collection, the
                 entire doc is updated. Else, duplicates are skipped.
+            mapi_key:
+                A Materials API key. If this key is supplied,
+                the insertion code will attempt to use the Materials REST API
+                to calculate stability data for inserted calculations.
+                Stability assessment requires a large quantity of materials
+                data. E.g., to compute the stability of a new LixFeyOz
+                calculation, you need to the energies of all known
+                phases in the Li-Fe-O chemical system. Using
+                the Materials API, we can obtain the pre-calculated data from
+                the Materials Project.
+
+                Go to www.materialsproject.org/profile to generate or obtain
+                your API key.
         """
         self.host = host
         self.database = database
@@ -111,6 +128,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.additional_fields = {} if not additional_fields \
             else additional_fields
         self.update_duplicates = update_duplicates
+        self.mapi_key = mapi_key
         if not simulate_mode:
             conn = MongoClient(self.host, self.port)
             db = conn[self.database]
@@ -131,6 +149,8 @@ class VaspToDbTaskDrone(AbstractDrone):
         try:
             d = self.get_task_doc(path, self.parse_dos,
                                   self.additional_fields)
+            if self.mapi_key is not None and d["state"] == "successful":
+                self.calculate_stability(d)
             tid = self._insert_doc(d)
             return tid
         except Exception as ex:
@@ -138,6 +158,19 @@ class VaspToDbTaskDrone(AbstractDrone):
             print traceback.format_exc(ex)
             logger.error(traceback.format_exc(ex))
             return False
+
+    def calculate_stability(self, d):
+        m = MPRester(self.mapi_key)
+        functional = d["pseudo_potential"]["functional"]
+        syms = ["{} {}".format(functional, l)
+                for l in d["pseudo_potential"]["labels"]]
+        entry = ComputedEntry(Composition(d["unit_cell_formula"]),
+                              d["output"]["final_energy"],
+                              parameters={"hubbards": d["hubbards"],
+                                          "potcar_symbols": syms})
+        data = m.get_stability([entry])[0]
+        for k in ("e_above_hull", "decomposes_to"):
+            d["analysis"][k] = data[k]
 
     @classmethod
     def get_task_doc(cls, path, parse_dos=False, additional_fields=None):
@@ -155,8 +188,8 @@ class VaspToDbTaskDrone(AbstractDrone):
             #Materials project style aflow runs.
             for subtask in ["relax1", "relax2"]:
                 for f in os.listdir(os.path.join(path, subtask)):
-                    if VaspToDbTaskDrone.vasprun_pattern.match(f):
-                            vasprun_files[subtask] = os.path.join(subtask, f)
+                    if fnmatch(f, "vasprun.xml*"):
+                        vasprun_files[subtask] = os.path.join(subtask, f)
         elif "STOPCAR" in files:
             #Stopped runs. Try to parse as much as possible.
             logger.info(path + " contains stopped run")
@@ -164,12 +197,13 @@ class VaspToDbTaskDrone(AbstractDrone):
                 if subtask in files and \
                         os.path.isdir(os.path.join(path, subtask)):
                     for f in os.listdir(os.path.join(path, subtask)):
-                        if VaspToDbTaskDrone.vasprun_pattern.match(f):
+                        if fnmatch(f, "vasprun.xml*"):
                             vasprun_files[subtask] = os.path.join(
                                 subtask, f)
         else:
+            vasprun_pattern = re.compile("^vasprun.xml([\w\.]*)")
             for f in files:
-                m = VaspToDbTaskDrone.vasprun_pattern.match(f)
+                m = vasprun_pattern.match(f)
                 if m:
                     fileext = m.group(1)
                     if fileext.startswith(".relax2"):
@@ -269,10 +303,15 @@ class VaspToDbTaskDrone(AbstractDrone):
         logger.info("Post-processing dir:{}".format(dir_name))
 
         fullpath = os.path.abspath(dir_name)
+
+        # VASP input generated by pymatgen's alchemy has a
+        # transformations.json file that keeps track of the origin of a
+        # particular structure. This is extremely useful for tracing back a
+        # result. If such a file is found, it is inserted into the task doc
+        # as d["transformations"]
         transformations = {}
         filenames = glob.glob(os.path.join(fullpath, "transformations.json*"))
         if len(filenames) >= 1:
-            # Handles the new style transformations file.
             with zopen(filenames[0], "rb") as f:
                 transformations = json.load(f)
                 try:
@@ -300,7 +339,18 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         d["transformations"] = transformations
 
-        # Parse OUTCAR for additional information and run stats.
+        # Calculations done using custodian has a custodian.json,
+        # which tracks the jobs performed and any errors detected and fixed.
+        # This is useful for tracking what has actually be done to get a
+        # result. If such a file is found, it is inserted into the task doc
+        # as d["custodian"]
+        filenames = glob.glob(os.path.join(fullpath, "custodian.json*"))
+        if len(filenames) >= 1:
+            with zopen(filenames[0], "rb") as f:
+                d["custodian"] = json.load(f)
+
+        # Parse OUTCAR for additional information and run stats that are
+        # generally not in vasprun.xml.
         run_stats = {}
         for filename in glob.glob(os.path.join(fullpath, "OUTCAR*")):
             outcar = Outcar(filename)
@@ -340,7 +390,7 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         for f in os.listdir(dir_name):
             filename = os.path.join(dir_name, f)
-            if re.match("INCAR.*", f):
+            if fnmatch(f, "INCAR*"):
                 try:
                     incar = Incar.from_file(filename)
                     d["incar"] = incar.to_dict
@@ -363,14 +413,14 @@ class VaspToDbTaskDrone(AbstractDrone):
                     print str(ex)
                     logger.error("Unable to parse INCAR for killed run {}."
                                  .format(dir_name))
-            elif re.match("KPOINTS.*", f):
+            elif fnmatch(f, "KPOINTS*"):
                 try:
                     kpoints = Kpoints.from_file(filename)
                     d["kpoints"] = kpoints.to_dict
                 except:
                     logger.error("Unable to parse KPOINTS for killed run {}."
                                  .format(dir_name))
-            elif re.match("POSCAR.*", f):
+            elif fnmatch(f, "POSCAR*"):
                 try:
                     s = Poscar.from_file(filename).structure
                     comp = s.composition
@@ -387,7 +437,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 except:
                     logger.error("Unable to parse POSCAR for killed run {}."
                                  .format(dir_name))
-            elif re.match("POTCAR.*", f):
+            elif fnmatch(f, "POTCAR*"):
                 try:
                     potcar = Potcar.from_file(filename)
                     d["pseudo_potential"] = {"functional": "pbe",
@@ -396,7 +446,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 except:
                     logger.error("Unable to parse POTCAR for killed run in {}."
                                  .format(dir_name))
-            elif re.match("OSZICAR", f):
+            elif fnmatch(f, "OSZICAR"):
                 try:
                     d["oszicar"]["root"] = \
                         Oszicar(os.path.join(dir_name, f)).to_dict
@@ -645,4 +695,4 @@ def get_uri(dir_name):
         hostname = socket.gethostbyaddr(socket.gethostname())[0]
     except:
         hostname = socket.gethostname()
-    return hostname + ":" + fullpath
+    return "{}:{}".format(hostname, fullpath)

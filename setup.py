@@ -1,7 +1,7 @@
 import os
 
 from distribute_setup import use_setuptools
-use_setuptools(version='0.6.10')
+use_setuptools()
 from setuptools import setup, find_packages
 
 with open("README.rst") as f:
@@ -20,9 +20,9 @@ for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="0.2.5",
+    version="0.3.2b",
     install_requires=["pymatgen>=2.5", "pymongo>=2.4", "prettytable>=0.7",
-                      "django>=1.4"],
+                      "django>=1.5"],
     package_data={"matgendb": ["*.json"],
                   "matgendb.webui.home": ["templates/*"],
                   "matgendb.webui": static_data},
@@ -49,6 +49,5 @@ setup(
         "Topic :: Database",
         "Topic :: Database :: Front-Ends"
     ],
-    download_url="https://github.com/materialsproject/pymatgen-db/tarball/master",
     scripts=[os.path.join("scripts", f) for f in os.listdir("scripts")]
 )

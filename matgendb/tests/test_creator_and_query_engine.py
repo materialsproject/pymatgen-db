@@ -77,7 +77,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             elif dir_name.endswith("stopped_mp_aflow"):
                 self.assertEqual(d['state'], "stopped")
                 self.assertEqual(d['pretty_formula'], "ThFe5P3")
-            elif dir_name.endswith("sucess_mp_aflow"):
+            elif dir_name.endswith("success_mp_aflow"):
                 self.assertEqual(d['state'], "successful")
                 self.assertEqual(d['pretty_formula'], "TbZn(BO2)5")
                 self.assertAlmostEqual(d['output']['final_energy'],
@@ -94,6 +94,8 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                 self.assertAlmostEqual(d['output']['final_energy'],
                                        -14.31337758, 6)
                 self.assertEqual(len(d["calculations"]), 1)
+                self.assertEqual(len(d["custodian"]), 1)
+                self.assertEqual(len(d["custodian"][0]["corrections"]), 1)
 
         if VaspToDbTaskDroneTest.conn:
             warnings.warn("Testing query engine mode.")

@@ -4,11 +4,9 @@
 A helper script for many matgendb functions.
 """
 
-from __future__ import division
-
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
-__version__ = "1.1"
+__version__ = "1.2"
 __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Dec 1, 2012"
@@ -34,10 +32,10 @@ def init_db(args):
     for k, v in d:
         val = raw_input("Enter {} (default: {}) : ".format(k, v))
         doc[k] = val if val else v
+    doc["port"] = int(doc["port"])  # enforce the port as an int
     with open(args.config_file, "w") as f:
         json.dump(doc, f, indent=4, sort_keys=True)
-    print "\nConfiguration written to {}!".format(args.config_file)
-
+    print("\nConfiguration written to {}!".format(args.config_file))
 
 def update_db(args):
     from matgendb.creator import VaspToDbTaskDrone
@@ -58,7 +56,7 @@ def update_db(args):
         host=d["host"], port=d["port"],  database=d["database"],
         user=d["admin_user"], password=d["admin_password"], parse_dos=False,
         collection=d["collection"], update_duplicates=args.force_update_dupes,
-        additional_fields=additional_fields)
+        additional_fields=additional_fields, mapi_key=args.mapi_key)
     ncpus = multiprocessing.cpu_count() if not args.ncpus else args.ncpus
     logger.info("Using {} cpus...".format(ncpus))
     queen = BorgQueen(drone, number_of_drones=ncpus)
@@ -81,15 +79,15 @@ def query_db(args):
         try:
             criteria = json.loads(args.criteria)
         except ValueError:
-            print "Criteria {} is not a valid JSON string!".format(
-                args.criteria)
+            print("Criteria {} is not a valid JSON string!".format(
+                args.criteria))
             sys.exit(-1)
 
     t = PrettyTable(args.properties)
     t.float_format = "4.4"
     for r in qe.query(properties=args.properties, criteria=criteria):
         t.add_row([r[p] for p in args.properties])
-    print t
+    print(t)
 
 
 def run_server(args):
@@ -98,21 +96,28 @@ def run_server(args):
     os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args.config_file))
     from django.core.management import call_command
     from multiprocessing import Process
-    p1 = Process(target=call_command, args=("runserver",))
+    p1 = Process(target=call_command, args=("runserver",
+                                            "{}:{}".format(args.host,
+                                                           args.port)))
     p1.start()
-    import time
-    time.sleep(2)
-    webbrowser.open_new_tab("127.0.0.1:8000")
+    if not args.nobrowser:
+        import time
+        time.sleep(2)
+        webbrowser.open_new_tab("http://{}:{}".format(args.host, args.port))
     p1.join()
+
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="""
-    Command line db insertion script.
+    mgdb is a complete command line db management script for pymatgen-db. It
+    provides the facility to insert vasp runs, perform queries, and run a web
+    server for exploring databases that you create. Type mgdb -h to see the
+    various options.
 
     Author: Shyue Ping Ong
-    Version: 2.0
-    Last updated: Jun 21 2012""")
+    Version: 3.0
+    Last updated: Mar 23 2013""")
 
     subparsers = parser.add_subparsers()
 
@@ -156,6 +161,12 @@ if __name__ == "__main__":
                               "not specified, multiprocessing will use "
                               "the number of cpus detected.")
 
+    pinsert.add_argument("-k", "--mapi_key", dest="mapi_key", type=str,
+                         default=None,
+                         help="Materials API key to use. If supplied, "
+                              "the insertion process will attempt to "
+                              "determine stability information using the "
+                              "Materials REST API.")
     pinsert.set_defaults(func=update_db)
 
     pquery = subparsers.add_parser("query",
@@ -191,6 +202,16 @@ if __name__ == "__main__":
                              "none is found, an no-authentication "
                              "localhost:27017/vasp database and tasks "
                              "collection is assumed.")
+
+    pserve.add_argument("--nobrowser", dest="nobrowser", action="store_true",
+                        help="Don't automatically open a browser window "
+                             "(e.g. for shell-based servers)")
+
+    pserve.add_argument("--port", dest="port", type=int, default=8000,
+                        help="Port to run the server on (default: 8000)")
+
+    pserve.add_argument("--host", dest="host", type=str, default="127.0.0.1",
+                        help="Host to run the server on (default: 127.0.0.1)")
 
     pserve.set_defaults(func=run_server)
 

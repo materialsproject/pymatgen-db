@@ -1,0 +1,42 @@
+[
+    {
+        "corrections": [
+            {
+                "errors": [
+                    "tet"
+                ], 
+                "actions": [
+                    {
+                        "action": {
+                            "_set": {
+                                "ISMEAR": 0
+                            }
+                        }, 
+                        "dict": "INCAR"
+                    }
+                ]
+            }
+        ], 
+        "job": {
+            "settings_override": null, 
+            "suffix": ".relax1", 
+            "vasp_command": [
+                "mpirun", 
+                "/share/apps/bin/pvasp.5.3.2"
+            ], 
+            "output_file": "vasp.out", 
+            "@module": "custodian.vasp.jobs", 
+            "default_vasp_input_set": {
+                "user_incar_settings": null, 
+                "constrain_total_magmom": false, 
+                "name": "MIT", 
+                "@class": "MITVaspInputSet", 
+                "@module": "pymatgen.io.vaspio_set"
+            }, 
+            "gzipped": false, 
+            "backup": true, 
+            "final": true, 
+            "@class": "VaspJob"
+        }
+    }
+]
