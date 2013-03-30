@@ -9,8 +9,6 @@ __email__ = "dkgunter@lbl.gov"
 __status__ = "Development"
 __date__ = "1/31/13"
 
-__author__ = 'dang'
-
 import unittest
 import matgendb.vv.validate as vv
 
