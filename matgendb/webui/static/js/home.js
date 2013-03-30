@@ -84,7 +84,11 @@ function doQuery() {
     $.ajax({
                url: "/rest/query",
                type: "POST",
-               data: {criteria: crit, properties: prop, limit: limit}
+               data: {
+                   criteria: crit,
+                   properties: prop,
+                   limit: limit
+               }
            }
     ).success(function (data) {
                   $("#search-button").spinner('remove');
@@ -93,13 +97,13 @@ function doQuery() {
                       properties = data["properties"];
                       displayData();
                   } else {
-                      $("#error_msg").text(data["error_msg"]);
+                      $("#error_msg").text(data["error"]);
                       $("#error_msg").show();
                   }
               })
         .error(function (data) {
                    $("#search-button").spinner('remove');
-                   $("#error_msg").text(data["error_msg"]);
+                   $("#error_msg").text(data["error"]);
                    $("#error_msg").show();
                });
 }

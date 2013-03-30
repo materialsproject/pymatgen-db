@@ -69,7 +69,7 @@ def query(request):
 
         except ValueError as ex:
             d = {"valid_response": False,
-                 "error_msg": "Bad criteria / properties: {}".format(str(ex))}
+                 "error": "Bad criteria / properties: {}".format(str(ex))}
             return HttpResponse(
                 json.dumps(d), mimetype="application/json")
 
