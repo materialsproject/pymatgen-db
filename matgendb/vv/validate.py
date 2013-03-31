@@ -96,6 +96,7 @@ class ConstraintOperator:
     """
     SIZE = 'size'
     EXISTS = 'exists'
+    TYPE = 'type'
 
     # enumeration of size operation modifiers
     SZ_EQ, SZ_GT, SZ_LT, SZ_VAR = 1, 2, 3, 4
@@ -104,7 +105,7 @@ class ConstraintOperator:
 
     # logical 'not' of an operator
     OP_NOT = {'>': '<=', '>=': '<', '<': '>=', '<=': '>', '=': '!=', '!=': '=',
-              EXISTS: 'exists', SIZE: SIZE}
+              EXISTS: EXISTS, SIZE: SIZE, TYPE: TYPE}
 
     # set of valid operations
     VALID_OPS = set(OP_NOT.keys())
@@ -136,7 +137,7 @@ class ConstraintOperator:
         """Get whether this is an existence operator.
         :return: True or False
         """
-        return self._op == 'exists'
+        return self._op == self.EXISTS
 
     @property
     def size_op(self):
@@ -203,6 +204,13 @@ class ConstraintOperator:
         self._check_size()
         return self._size_code == self.SZ_GT
 
+    def is_type(self):
+        """Whether the operator is 'type'
+
+        :return: True or False
+        """
+        return self._op == self.TYPE
+
     def reverse(self):
         self._op = self.OP_NOT[self._op]
 
@@ -251,16 +259,30 @@ class ConstraintOperator:
             if self.is_size_lt():
                 return lhs_value < rhs_value
             raise RuntimeError('unexpected size operator: {}'.format(self._op))
-        elif self.is_inequality():
+        if self.is_inequality():
             if not isinstance(lhs_value, Number):
                 raise ValueError('Number required for inequality')
             py_op = self.PY_INEQ.get(self._op, self._op)
             return eval('{} {} {}'.format(lhs_value, py_op, rhs_value))
+        if self.is_type():
+            ltype = type(lhs_value)
+            if rhs_value is Number:
+                return ltype in (int, float)
+            elif rhs_value is str:
+                return ltype is str
+            elif rhs_value is bool:
+                return ltype is bool
+            return False
 
 
 class Constraint:
     """Definition of a single constraint.
     """
+
+    # Convert name of type into Python class
+    TYPE_MAPPING = {'number': Number, 'int': Number, 'integer': Number, 'float': Number,
+                    'str': str, 'string': str, 'bool': bool, 'boolean': bool}
+
     def __init__(self, field, operator, value):
         """Create constraint on a field.
 
@@ -279,9 +301,16 @@ class Constraint:
             field = Field(field)
         self.field = field
         self.op = operator
-        self.value = value
         if self.op.is_inequality() and not isinstance(value, Number):
             raise ValueError('inequality with non-numeric value: {}'.format(value))
+        elif self.op.is_type():
+            value = value.lower()
+            t = self.TYPE_MAPPING.get(value, None)
+            if t is None:
+                allowed = ', '.join(self.TYPE_MAPPING.keys())
+                raise ValueError('value for type, {}, not in ({})'.format(value, allowed))
+            self._orig_value, value = value, t
+        self.value = value
 
     def passes(self, value):
         """Does the given value pass this constraint?
@@ -297,6 +326,8 @@ class Constraint:
         except ValueError, err:
             return False, str(err)
 
+    def __str__(self):
+        return '{} {}'.format(self.field.name, self.op)
 
 class ConstraintGroup:
     """Definition of a group of constraints, for a given field.
@@ -323,9 +354,12 @@ class ConstraintGroup:
         """
         if len(self.constraints) > 0:
             if op.is_equality():
-                raise ValueError('equality operator cannot be combined with others')
+                clist = ', '.join(map(str, self.constraints))
+                raise ValueError('Field {}: equality operator cannot be combined '
+                                 'with others: {}'.format(self._field.name, clist))
             elif op.is_exists():
-                raise ValueError('existence is implied by other operators')
+                raise ValueError('Field {}: existence is implied '
+                                 'by other operators'.format(self._field.name))
         constraint = Constraint(self._field, op, val)
         self.constraints.append(constraint)
         if self._field.has_subfield():
@@ -381,6 +415,7 @@ class MongoClause:
                  '<': '$lt', '<=': '$lte',
                  ConstraintOperator.EXISTS: '$exists',
                  ConstraintOperator.SIZE: '$size',
+                 ConstraintOperator.TYPE: '$type',
                  '!=': '$ne', '=': None}
 
     # Javascript version of operations, for $where clauses
@@ -389,6 +424,9 @@ class MongoClause:
     # Reverse-mapping of operations
     MONGO_OPS_REV = {v: k for k, v in MONGO_OPS.iteritems()
                      if v is not None}
+
+    # Map of Python types to Javascript type names
+    JS_TYPES = {Number: 'number', str: 'string', bool: 'boolean'}
 
     def __init__(self, constraint, rev=True):
         """Create new clause from a constraint.
@@ -464,6 +502,13 @@ class MongoClause:
                     szop.reverse()
                 js_op = self._js_op_str(szop)
                 expr = 'this.{}.length {} {}'.format(c.field.name, js_op, c.value)
+        elif op.is_type():
+            loc = MongoClause.LOC_WHERE
+            type_name = self.JS_TYPES.get(c.value, None)
+            if type_name is None:
+                raise RuntimeError('Could not get JS type for {}'.format(c.value))
+            typeop = '!=' if self._rev else '=='
+            expr = 'typeof this.{} {} "{}"'.format(c.field.name, typeop, type_name)
         else:
             if mop is None:
                 expr = {c.field.name: c.value}
@@ -545,7 +590,7 @@ class MongoQuery:
         clauses = [e.expr for e in self._main]
         if clauses:
             if disjunction:
-                if len(clauses) > 1:
+                if len(clauses) + len(self._where) > 1:
                     q['$or'] = clauses
                 else:
                     # simplify 'or' of one thing
@@ -563,7 +608,13 @@ class MongoQuery:
                     q.update(c)
         # add where clauses, if any, to `q`
         if self._where:
-            q['$where'] = ' || '.join([w.expr for w in self._where])
+            where_clause = ' || '.join([w.expr for w in self._where])
+            if disjunction:
+                if not '$or' in q:
+                    q['$or'] = []
+                q['$or'].append({'$where': where_clause})
+            else:
+                q['$where'] = where_clause
         return q
 
     @property
@@ -708,6 +759,7 @@ class Validator(DoesLogging):
     _relation_re = re.compile(r'''\s*
         ([a-zA-Z_.0-9]+(?:/[a-zA-Z_.0-9]+)?)\s*         # Identifier
         (<=?|>=?|!?=|exists|        # Operator (1)
+        type|                       # Operator (1a)
         size[><$]?)\s*              # operator (2)
         ([-]?\d+(?:\.\d+)?|         # Value: number
             \'[^\']+\'|             #   single-quoted string
@@ -727,7 +779,7 @@ class Validator(DoesLogging):
         else:
             self._find_kw = {}
         self._max_dberr = max_dberrors
-        self._base_report_fields = {'_id': 1, 'task_ids': 1}
+        self._base_report_fields = {'_id': 1, 'task_id': 1}
 
     def set_aliases(self, a):
         """Set aliases.
@@ -781,7 +833,7 @@ class Validator(DoesLogging):
         query.update(body.to_mongo())
         cvgroup = ConstraintViolationGroup()
         cvgroup.subject = subject
-        cvgroup.condition = cond.to_mongo()
+        cvgroup.condition = cond.to_mongo(disjunction=False)
         self._log.debug('Query: {}'.format(query))
         self._log.debug('Fields: {}'.format(self._report_fields))
         # Find records that violate 1 or more constraints
@@ -852,8 +904,11 @@ class Validator(DoesLogging):
         self._report_fields = self._base_report_fields
         # loopover each condition on the records
         for cond_expr_list, expr_list in constraint_sections.iteritems():
+            #print("@@ CONDS = {}".format(cond_expr_list))
+            #print("@@ MAIN = {}".format(expr_list))
             groups = self._process_constraint_expressions(expr_list)
-            projection, query = Projection(), MongoQuery()
+            projection = Projection()
+            query = MongoQuery()
             for cg in groups.itervalues():
                 for c in cg:
                     projection.add(c.field, c.op, c.value)

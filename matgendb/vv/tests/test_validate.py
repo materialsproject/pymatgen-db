@@ -40,6 +40,11 @@ class TestCollectionFilter(unittest.TestCase):
         obj.reverse()
         self.failUnless(obj.is_neq())
 
+    def test_ConstraintOperator_type(self):
+        "Test the ConstraintOperator class for types"
+        obj = vv.ConstraintOperator('type')
+        self.failUnless(obj.is_type())
+
     def test_Field(self):
         "Test the Field class"
         for bad_field in (None, 10):
@@ -74,6 +79,24 @@ class TestCollectionFilter(unittest.TestCase):
     def test_Constraint_init(self):
         "Test the Constraint class init variations"
         obj = vv.Constraint('foo', '>', 10)
+
+    def test_Constraint_type(self):
+        "Test the Constraint class for types"
+        obj = vv.Constraint('foo', 'type', 'number')
+        self.failIf(obj.passes('123')[0])
+        self.failIf(obj.passes(True)[0])
+        self.failUnless(obj.passes(123)[0])
+        self.failUnless(obj.passes(1.23)[0])
+        obj = vv.Constraint('foo', 'type', 'string')
+        self.failUnless(obj.passes('123')[0])
+        self.failIf(obj.passes(True)[0])
+        self.failIf(obj.passes(123)[0])
+        self.failIf(obj.passes(1.23)[0])
+        obj = vv.Constraint('foo', 'type', 'bool')
+        self.failIf(obj.passes('123')[0])
+        self.failUnless(obj.passes(True)[0])
+        self.failIf(obj.passes(123)[0])
+        self.failIf(obj.passes(1.23)[0])
 
     def test_Projection(self):
         """Test Projection class
@@ -193,6 +216,17 @@ class TestCollectionFilter(unittest.TestCase):
         self.failUnlessEqual(obj.query_loc, vv.MongoClause.LOC_MAIN)
         self.failUnlessEqual(obj.expr, {'foo': {'$size': 10}})
 
+    def test_MongoClause_type(self):
+        "Test MongoClause class for types"
+        fld, op = 'foo', 'type'
+        for rev, whereop in ((True, '!='), (False, '==')):
+            for val, type_js in (('int', 'number'), ('str', 'string'),
+                                 ('bool', 'boolean'), ('number', 'number')):
+                obj = vv.MongoClause(vv.Constraint(fld, op, val), rev=rev)
+                self.failUnlessEqual(obj.query_loc, vv.MongoClause.LOC_WHERE)
+                expected = 'typeof this.{} {} "{}"'.format(fld, whereop, type_js)
+                self.failUnlessEqual(obj.expr, expected)
+
     def test_MongoQuery_base(self):
         "Test MongoQuery class"
         q = vv.MongoQuery()
@@ -217,13 +251,20 @@ class TestCollectionFilter(unittest.TestCase):
         c2 = vv.MongoClause(vv.Constraint('bar', 'size', 10))
         q.add_clause(c1)
         q.add_clause(c2)
-        m = q.to_mongo()
+        # no disjunction
+        m = q.to_mongo(False)
         w = 'this.{}.length != 10 || this.{}.length != 10'
         wheres = (w.format('foo', 'bar'), w.format('bar', 'foo'))
         self.failUnless(m['$where'] in wheres)
+        # disjunction
+        m = q.to_mongo()
+        w = 'this.{}.length != 10 || this.{}.length != 10'
+        wheres = (w.format('foo', 'bar'), w.format('bar', 'foo'))
+        mwhere = m['$or'][0]['$where']
+        self.failUnless(mwhere in wheres)
         # where and non-where together
         q.add_clause(vv.MongoClause(vv.Constraint('foo', '<=', 10)))
-        m = q.to_mongo()
+        m = q.to_mongo(False)
         w = 'this.{}.length != 10 || this.{}.length != 10'
         self.failUnless(m['$where'] in wheres and m['foo'] == {'$gt': 10})
 

@@ -69,6 +69,17 @@ def nvpstr(s):
     return nvp
 
 def _parse_email(s):
+    """Parse an email specification into component parts.
+
+    Keys:
+    - sender
+    - recipients
+    - server
+    - port
+
+    :return: Parsed email information
+    :rtype: dict
+    """
     d = {}
     # parse command-line args
     items = s.split(':')
@@ -127,8 +138,12 @@ class Timing:
         nvp = ', '.join(['{}={}'.format(k,v) for k,v in self.kw.iteritems()])
         _log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
 
+
 def parse_mongo_url(url):
-    "Parse mongodb:// URL, return dict of information"
+    """Parse mongodb:// URL, return dict of information
+
+    XXX: Not used right now.
+    """
     parts = urlparse.urlsplit(url)
     netloc = parts[1]
     urlexpr = '''
@@ -236,8 +251,7 @@ def main(cmdline=None):
         parser.error('Cannot connect to server: {}'.format(err))
     db_key = 'database'
     if not db_key in config:
-        parser.error('Configuration in "{}" is missing "{}"'.format(fname,
-            db_key))
+        parser.error('Configuration in "{}" is missing "{}"'.format(fname, db_key))
     db = conn[config[db_key]]
     user, passwd = None, None
     # try both readonly and admin credentials
@@ -273,9 +287,10 @@ def main(cmdline=None):
     # Init aliases from file or command-line
     if constraints_from_file:
         try:
-            aliases = dict(map(nvpstr, constraints.get(ALIASES_KEY, {})))
+            astr = constraints.get(ALIASES_KEY, {})
+            aliases = dict(map(nvpstr, astr))
         except ValueError, err:
-            parser.error('aliases should be list of name=value, got "{}": {}'.format(aliases, err))
+            parser.error('aliases should be list of name=value, got "{}": {}'.format(astr, err))
     elif len(args.aliases) > 0:
         aliases = dict(args.aliases)
     else:
@@ -319,21 +334,23 @@ def main(cmdline=None):
             coll = db[coll_name]
             try:
                 sect = get_constraint_sections(constraint_spec)
-                #print("SECTIONS {}".format(sect))
                 for vnum, vgroup in enumerate(validator.validate(coll, sect, subject=coll_name)):
                     sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
                     sect_hdr.add('Condition', str(vgroup.condition))
-                    table = report.Table(colnames=('ID', 'TaskIds', 'Field', 'Constraint', 'Value'))
+                    table = report.Table(colnames=('Id', 'TaskId', 'Field', 'Constraint', 'Value'))
                     for viol, vrec in vgroup:
                         rec_id = vrec['_id']
-                        task_ids = '/'.join(vrec['task_ids'])
-                        table.add((rec_id, task_ids, viol.field,
+                        task_id = vrec['task_id']
+                        table.add((rec_id, task_id, viol.field,
                                    '{} {}'.format(viol.op, viol.expected_value),
                                    viol.got_value))
-                    table.sortby('ID')
+                    table.sortby('Id')
                     rpt_sect.add_section(report.ReportSection(sect_hdr, table))
             except DBError, err:
                 _log.error('validating collecton {}: DB error: {}'.format(coll_name, err))
+                break
+            except ValueError, err:
+                _log.error('validating collecton {}: {}'.format(coll_name, err))
                 break
             rpt.add_section(rpt_sect)
 
