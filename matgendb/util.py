@@ -25,6 +25,7 @@ DEFAULT_SETTINGS = [
     ("aliases_config", None)
 ]
 
+
 def get_settings(config_file):
     if config_file:
         with open(config_file) as f:
