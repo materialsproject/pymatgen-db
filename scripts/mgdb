@@ -97,14 +97,13 @@ def run_server(args):
     os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args.config_file))
     from django.core.management import call_command
     from multiprocessing import Process
-    p1 = Process(target=call_command, args=("runserver",
-                                            "{}:{}".format(args.host,
-                                                           args.port)))
+    p1 = Process(target=call_command,
+                 args=("runserver",  "{}:{}".format(args.host, args.port)))
     p1.start()
     if not args.nobrowser:
         import time
         time.sleep(2)
-        webbrowser.open_new_tab("http://{}:{}".format(args.host, args.port))
+        webbrowser.open("http://{}:{}".format(args.host, args.port))
     p1.join()
 
 
