@@ -48,18 +48,35 @@ def query(request):
     if request.method == 'POST':
         try:
             critstr = request.POST["criteria"].strip()
-            if re.match("^\d+$", critstr):
-                criteria = {"task_id": int(critstr)}
-            elif re.match("^[\w\(\)]+$", critstr):
-                comp = Composition(critstr)
-                criteria = {"pretty_formula": comp.reduced_formula}
-            elif re.match("^[A-Za-z\-]+$", critstr):
-                syms = [Element(sym).symbol
-                        for sym in critstr.split("-")]
-                syms.sort()
-                criteria = {"chemsys": "-".join(syms)}
-            else:
+            if re.match("^{.*}$", critstr):
                 criteria = json.loads(critstr)
+            else:
+                toks = critstr.split()
+                tids = []
+                formulas = []
+                chemsys = []
+                for tok in toks:
+                    if re.match("^\d+$", tok):
+                        tids.append(int(tok))
+                    elif re.match("^[\w\(\)]+$", tok):
+                        comp = Composition(tok)
+                        formulas.append(comp.reduced_formula)
+                    elif re.match("^[A-Za-z\-]+$", tok):
+                        syms = [Element(sym).symbol
+                                for sym in tok.split("-")]
+                        syms.sort()
+                        chemsys.append("-".join(syms))
+                    else:
+                        raise ValueError("{} not understood".format(tok))
+                criteria = []
+                if tids:
+                    criteria.append({"task_id": {"$in": tids}})
+                if formulas:
+                    criteria.append({"pretty_formula": {"$in": formulas}})
+                if chemsys:
+                    criteria.append({"chemsys": {"$in": chemsys}})
+                criteria = {"$or": criteria} if len(criteria)> 1 else \
+                    criteria[0]
             properties = request.POST["properties"]
             if properties == "*":
                 properties = None
