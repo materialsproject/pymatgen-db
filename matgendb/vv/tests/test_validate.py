@@ -143,11 +143,13 @@ class TestCollectionFilter(unittest.TestCase):
         op, val = vv.ConstraintOperator('>'), 10
         obj.add_constraint(op, val)
         obj.add_existence(rev=False)
-        self.failUnless(len(obj.constraints) == 2)
+        # expect 1 constraint and auxiliary existence constraint
+        self.failUnless(len(obj.constraints) == 1)
         self.failUnlessEqual(obj.constraints[0].op, op)
         self.failUnlessEqual(obj.constraints[0].value, val)
-        self.failUnless(obj.constraints[1].op.is_exists())
-        self.failUnlessEqual(obj.constraints[1].value, True)
+        self.failUnlessEqual(len(obj.existence_constraints), 1)
+        self.failUnless(obj.existence_constraints[0].op.is_exists())
+        self.failUnlessEqual(obj.existence_constraints[0].value, True)
 
     def test_MongoClause(self):
         "Test MongoClause class"

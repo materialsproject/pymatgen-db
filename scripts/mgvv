@@ -169,8 +169,7 @@ def get_constraint_sections(spec):
     sections = {}
     for item in spec:
         if isinstance(item, dict):
-            # if/then clause
-            cond_raw, constraints = item['if'], item['then']
+            cond_raw, constraints = item['filter'], item['constraints']
             # make condition(s) into a tuple
             if isinstance(cond_raw, basestring):
                 cond = (cond_raw,)
@@ -200,7 +199,8 @@ def main(cmdline=None):
     if cmdline is None:
         cmdline = sys.argv[1:]
     desc = ' '.join(__doc__.split())
-
+    formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter,
+                      md=report.MarkdownFormatter)
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('constraint', nargs='*')
     parser.add_argument('--alias', '-a', dest='aliases', action='append', type=nvpstr, metavar="ALIAS", default=[],
@@ -221,7 +221,7 @@ def main(cmdline=None):
     parser.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
                         help='Main configuration file. Has constraints, and optionally email info.')
     parser.add_argument('--format', '-F', dest='report_format', metavar='FORMAT', default='html',
-                        help='Report format (default=html)')
+                        help='Report format: {} (default=html)'.format(', '.join(formatters.keys())))
     parser.add_argument('--limit', '-m', dest='limit', metavar='NUM', type=int, default=50,
                         help='Limit number of displayed constraint violations per-collection 0=no limit (50)')
     parser.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
@@ -315,7 +315,6 @@ def main(cmdline=None):
     rpt = report.Report(rpt_hdr)
     # pick report formatter
     fmt = args.report_format.lower()
-    formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter)
     formatter_class = formatters.get(fmt, None)
     if formatter_class is None:
         parser.error('Unknown format "{}" for --format, choose from: {}'
@@ -341,6 +340,8 @@ def main(cmdline=None):
                     for viol, vrec in vgroup:
                         rec_id = vrec['_id']
                         task_id = vrec['task_id']
+                        if isinstance(viol.expected_value, type):
+                           viol.expected_value = viol.expected_value.__name__
                         table.add((rec_id, task_id, viol.field,
                                    '{} {}'.format(viol.op, viol.expected_value),
                                    viol.got_value))

@@ -340,6 +340,7 @@ class ConstraintGroup:
         """
         assert(field is not None)
         self.constraints = []
+        self._existence_constraints = []
         self._array, self._range = False, False
         self._field = field
 
@@ -396,7 +397,11 @@ class ConstraintGroup:
             return
         value = not rev   # value is False if reversed, otherwise True
         constraint = Constraint(self._field, ConstraintOperator.EXISTS, value)
-        self.constraints.append(constraint)
+        self._existence_constraints.append(constraint)
+
+    @property
+    def existence_constraints(self):
+        return self._existence_constraints
 
     def __iter__(self):
         return iter(self.constraints)
@@ -428,7 +433,7 @@ class MongoClause:
     # Map of Python types to Javascript type names
     JS_TYPES = {Number: 'number', str: 'string', bool: 'boolean'}
 
-    def __init__(self, constraint, rev=True):
+    def __init__(self, constraint, rev=True, exists_main=False):
         """Create new clause from a constraint.
 
         :param constraint: The constraint
@@ -436,11 +441,13 @@ class MongoClause:
         :param rev: Whether to reverse the sense of the constraint, i.e. in order
         to select records that do not meet it.
         :type rev: bool
+        :param exists_main: Put exists into main clause
+        :type exists_main: bool
         :raise: AssertionError if constraint is None
         """
         assert constraint is not None
         self._rev = rev
-        self._loc, self._expr = self._create(constraint)
+        self._loc, self._expr = self._create(constraint, exists_main)
         self._constraint = constraint
 
     @property
@@ -465,11 +472,13 @@ class MongoClause:
     def constraint(self):
         return self._constraint
 
-    def _create(self, constraint):
+    def _create(self, constraint, exists_main):
         """Create MongoDB query clause for a constraint.
 
         :param constraint: The constraint
         :type constraint: Constraint
+        :param exists_main: Put exists into main clause
+        :type exists_main: bool
         :return: New clause
         :rtype: MongoClause
         :raise: ValueError if value doesn't make sense for operator
@@ -480,7 +489,7 @@ class MongoClause:
         # build the clause parts: location and expression
         loc = MongoClause.LOC_MAIN  # default location
         if op.is_exists():
-            loc = MongoClause.LOC_MAIN2     # these can go elsewhere
+            loc = MongoClause.LOC_MAIN2 if exists_main else MongoClause.LOC_MAIN
             assert(isinstance(c.value, bool))
             # for exists, reverse the value instead of the operator
             not_c_val = not c.value if self._rev else c.value
@@ -834,17 +843,19 @@ class Validator(DoesLogging):
         cvgroup = ConstraintViolationGroup()
         cvgroup.subject = subject
         cvgroup.condition = cond.to_mongo(disjunction=False)
-        self._log.debug('Query: {}'.format(query))
-        self._log.debug('Fields: {}'.format(self._report_fields))
+        self._log.debug('Query spec: {}'.format(query))
+        self._log.debug('Query fields: {}'.format(self._report_fields))
         # Find records that violate 1 or more constraints
         cursor = coll.find(query, fields=self._report_fields, **self._find_kw)
-        nbytes, num_dberr = 0, 0
+        nbytes, num_dberr, num_rec = 0, 0, 0
         while 1:
             try:
                 record = cursor.next()
                 nbytes += total_size(record)
+                num_rec += 1
             except StopIteration:
-                self._log.debug("Done: {:d} bytes, {:d} errors".format(nbytes, num_dberr))
+                self._log.info("collection {}: {:d} records, {:d} bytes, {:d} db-errors"
+                                .format(subject, num_rec, nbytes, num_dberr))
                 break
             except pymongo.errors.PyMongoError, err:
                 num_dberr += 1
@@ -913,6 +924,8 @@ class Validator(DoesLogging):
                 for c in cg:
                     projection.add(c.field, c.op, c.value)
                     query.add_clause(MongoClause(c))
+                for c in cg.existence_constraints:
+                    query.add_clause(MongoClause(c, exists_main=True))
             self._report_fields.update(projection.to_mongo())
             cond_query = MongoQuery()
             if cond_expr_list is not None:
@@ -950,8 +963,8 @@ class Validator(DoesLogging):
                 conflicts = group.get_conflicts()
                 if conflicts:
                     raise ValueError('Conflicts for field {}: {}'.format(field_name, conflicts))
-
         return groups
+
     def set_aliases(self, new_value):
         "Set aliases and wrap errors in ValueError"
         try:

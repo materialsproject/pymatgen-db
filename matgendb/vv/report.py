@@ -94,11 +94,16 @@ class Table:
         self._colnames = colnames
         self._rows = []
         self._width = len(colnames)
+        self._max_col_widths = map(len, colnames)
 
     def add(self, values):
         if len(values) != self._width:
             raise ValueError('expected {:d} values, got {:d}'.format(self._width, len(values)))
         self._rows.append(values)
+        for i, v in enumerate(values):
+            n = len(str(v))
+            if self._max_col_widths[i] < n:
+                self._max_col_widths[i] = n
 
     def sortby(self, name_or_index):
         name, index = None, None
@@ -128,6 +133,10 @@ class Table:
     @property
     def column_names(self):
         return self._colnames
+
+    @property
+    def column_widths(self):
+        return self._max_col_widths
 
     @property
     def ncol(self):
@@ -265,6 +274,7 @@ class JSONFormatter:
         )
         return json.dumps(obj, indent=self._indent, cls=JSONReportEncoder)
 
+
 class JSONReportEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, Header):
@@ -274,6 +284,42 @@ class JSONReportEncoder(json.JSONEncoder):
         elif isinstance(o, bson.objectid.ObjectId):
             return str(o)
         return json.JSONEncoder.default(self, o)
+
+
+class MarkdownFormatter:
+    """Format a report as markdown
+    """
+    def __init__(self, id_column=0):
+        self._idcol = id_column
+
+    def _mapdump(self, d):
+        return ', '.join((('{}={}'.format(k, v) for k, v in d.iteritems())))
+
+    def _fixed_width(self, values, widths):
+        s = ''.join(["{{:{:d}s}}".format(w+1).format(str(v))
+                       for w, v in zip(widths, values)])
+        return s
+
+    def format(self, report):
+        lines = []
+        lines.append('# {} #\n'.format(report.header.title))
+        lines.append('Info: {}'.format(self._mapdump(report.header.to_dict())))
+        for section in report:
+            lines.append('\n## {} ##\n'.format(section.header.title))
+            if section.header:
+                lines.append('Info: {}'.format(self._mapdump(section.header.to_dict())))
+            for cond in section:
+                lines.append('\n### {} ###\n'.format(cond.header.title))
+                if cond.header:
+                    lines.append('Info: {}'.format(self._mapdump(cond.header.to_dict())))
+                lines.append('\nViolations:\n')
+                indent = '    '
+                tbl = cond.body
+                lines.append(indent + self._fixed_width(tbl.column_names, tbl.column_widths))
+                for row in tbl:
+                    lines.append(indent + self._fixed_width(row, tbl.column_widths))
+        return '\n'.join(lines)
+
 
 class Emailer(DoesLogging):
     """Send a report to an email recipient.
