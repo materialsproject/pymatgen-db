@@ -92,7 +92,9 @@ def _config_email(fname):
     except OSError:
         raise ValueError('cannot read from file "{}"'.format(fname))
     y = yaml.safe_load(f)
-    info = y['_email']
+    info = y.get('_email', None)
+    if info is None:
+        return None
     try:
         d['sender'] = info['from']
         d['recipients'] = info['to']
@@ -280,15 +282,14 @@ def main(cmdline=None):
         aliases = {}
 
     # Init email from file or command-line
+    emailer, email_kw = None, None
     if args.email is not None:
-        email = _parse_email(args.email)
+        email_kw = _parse_email(args.email)
     elif args.constfile:
-        email = _config_email(args.constfile)
-    else:
-        email = None
-    if email is not None:
-        _log.info("Will email report to: {}".format(mapdump(email)))
-        # TODO: configure email
+        email_kw = _config_email(args.constfile)
+    if email_kw is not None:
+        _log.info("Will email report to: {}".format(mapdump(email_kw)))
+        emailer = report.Emailer(subject="Materials Project Validation Report", **email_kw)
 
     # Initialize report
     rpt_hdr = report.ReportHeader("Materials Project Validation Report")
@@ -322,10 +323,11 @@ def main(cmdline=None):
                 for vnum, vgroup in enumerate(validator.validate(coll, sect, subject=coll_name)):
                     sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
                     sect_hdr.add('Condition', str(vgroup.condition))
-                    table = report.Table(colnames=('ID', 'Field', 'Constraint', 'Value'))
+                    table = report.Table(colnames=('ID', 'TaskIds', 'Field', 'Constraint', 'Value'))
                     for viol, vrec in vgroup:
                         rec_id = vrec['_id']
-                        table.add((rec_id, viol.field,
+                        task_ids = '/'.join(vrec['task_ids'])
+                        table.add((rec_id, task_ids, viol.field,
                                    '{} {}'.format(viol.op, viol.expected_value),
                                    viol.got_value))
                     table.sortby('ID')
@@ -341,7 +343,19 @@ def main(cmdline=None):
         retcode = 1
     else:
         formatter = formatter_class()
-        print(formatter.format(rpt))
+        text = formatter.format(rpt)
+        if emailer:
+            msgfmt = 'text/plain'
+            for mt in ((report.HTMLFormatter, 'text/html'),
+                       (report.JSONFormatter, 'text/plain')):
+                if isinstance(formatter, mt[0]):
+                    msgfmt = mt[1]
+                    break
+            n = emailer.send(text, fmt=msgfmt)
+            if n < 1:
+                _log.error("Email report not sent")
+        else:
+            print(text)
 
     return retcode
 

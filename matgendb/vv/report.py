@@ -288,19 +288,25 @@ class Emailer(DoesLogging):
         :param: server SMTP server host
         :param: port SMTP server port (None for default)
         """
-        DoesLogging.__init__(self, 'emailer')
+        DoesLogging.__init__(self, 'mg.emailer')
         self._sender, self._recipients, self._subject = sender, recipients, subject
         self._server, self._port = server, port
         self._message = ""
 
-    def send(self, text):
+    def send(self, text, fmt):
         """Send the email message.
 
+        :param text: The text to send
+        :type text: str
+        :param fmt: The name of the format of the text
+        :type fmt: str
         :return: Number of recipients it was sent to
         :rtype: int
         """
         num_recip = 0
-        msg = MIMEText(text)
+        main_fmt, sub_fmt = fmt.split('/')
+        mime_class = dict(text=MIMEText).get(main_fmt, MIMEText)
+        msg = mime_class(text, sub_fmt)
         msg['Subject'] = self._subject
         msg['From'] = self._sender
         msg['To'] = ', '.join(self._recipients)

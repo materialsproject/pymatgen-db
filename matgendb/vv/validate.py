@@ -727,7 +727,7 @@ class Validator(DoesLogging):
         else:
             self._find_kw = {}
         self._max_dberr = max_dberrors
-        self._base_report_fields = {'_id': 1, 'task_ids':1}
+        self._base_report_fields = {'_id': 1, 'task_ids': 1}
 
     def set_aliases(self, a):
         """Set aliases.
