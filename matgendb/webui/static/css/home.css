@@ -6,6 +6,31 @@ input {
     font-size: 1.1em;
 }
 
+#limit-slider-wrapper{
+    width: 200px;
+    margin-top: -15px;
+}
+
+#limit-label{
+    padding-left: 20px;
+    padding-right: 10px;
+}
+
+#fields-div{
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#options-div{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#search-button-div{
+    clear: both;
+}
+
 .text-search {
     height: 40px;
     width: 100%;
@@ -25,7 +50,7 @@ label {
 
 .input-div {
     padding-top: 15px;
-    width: 70%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
     text-align: center;

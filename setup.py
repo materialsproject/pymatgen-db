@@ -20,7 +20,7 @@ for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="0.3.1",
+    version="0.3.2b",
     install_requires=["pymatgen>=2.5", "pymongo>=2.4", "prettytable>=0.7",
                       "django>=1.5"],
     package_data={"matgendb": ["*.json"],

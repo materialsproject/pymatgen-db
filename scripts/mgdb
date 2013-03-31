@@ -6,7 +6,7 @@ A helper script for many matgendb functions.
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
-__version__ = "1.1"
+__version__ = "1.2"
 __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Dec 1, 2012"
@@ -19,38 +19,13 @@ import json
 import sys
 import webbrowser
 
+from matgendb.util import get_settings, DEFAULT_SETTINGS
+
 logger = logging.getLogger(__name__)
 
 
-def get_settings(args):
-    if args.config_file:
-        with open(args.config_file) as f:
-            return json.load(f)
-    elif os.path.exists("db.json"):
-        with open("db.json") as f:
-            return json.load(f)
-    else:
-        return {"host": "localhost",
-                "port": 27017,
-                "database": "vasp",
-                "admin_user": None,
-                "admin_password": None,
-                "readonly_user": None,
-                "readonly_password": None,
-                "collection": "tasks",
-                "aliases_config": None}
-
-
 def init_db(args):
-    d = [("host", "localhost"),
-         ("port", 27017),
-         ("database", "vasp"),
-         ("admin_user", None),
-         ("admin_password", None),
-         ("readonly_user", None),
-         ("readonly_password", None),
-         ("collection", "tasks"),
-         ("aliases_config", None)]
+    d = DEFAULT_SETTINGS
     doc = {}
     print("Please supply the following configuration values")
     print("(press Enter if you want to accept the defaults)\n")
@@ -74,7 +49,7 @@ def update_db(args):
     else:
         logging.basicConfig(level=logging.INFO, format=FORMAT)
 
-    d = get_settings(args)
+    d = get_settings(args.config_file)
 
     logger.info("Db insertion started at {}.".format(datetime.datetime.now()))
     additional_fields = {"author": args.author, "tags": args.tag}
@@ -82,7 +57,7 @@ def update_db(args):
         host=d["host"], port=d["port"],  database=d["database"],
         user=d["admin_user"], password=d["admin_password"], parse_dos=False,
         collection=d["collection"], update_duplicates=args.force_update_dupes,
-        additional_fields=additional_fields)
+        additional_fields=additional_fields, mapi_key=args.mapi_key)
     ncpus = multiprocessing.cpu_count() if not args.ncpus else args.ncpus
     logger.info("Using {} cpus...".format(ncpus))
     queen = BorgQueen(drone, number_of_drones=ncpus)
@@ -95,7 +70,7 @@ def update_db(args):
 def query_db(args):
     from matgendb.query_engine import QueryEngine
     from prettytable import PrettyTable
-    d = get_settings(args)
+    d = get_settings(args.config_file)
     qe = QueryEngine(host=d["host"], port=d["port"], database=d["database"],
                      user=d["readonly_user"], password=d["readonly_password"],
                      collection=d["collection"],
@@ -119,7 +94,7 @@ def query_db(args):
 def run_server(args):
     import os
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
-    os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args))
+    os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args.config_file))
     from django.core.management import call_command
     from multiprocessing import Process
     p1 = Process(target=call_command, args=("runserver",
@@ -187,6 +162,12 @@ if __name__ == "__main__":
                               "not specified, multiprocessing will use "
                               "the number of cpus detected.")
 
+    pinsert.add_argument("-k", "--mapi_key", dest="mapi_key", type=str,
+                         default=None,
+                         help="Materials API key to use. If supplied, "
+                              "the insertion process will attempt to "
+                              "determine stability information using the "
+                              "Materials REST API.")
     pinsert.set_defaults(func=update_db)
 
     pquery = subparsers.add_parser("query",

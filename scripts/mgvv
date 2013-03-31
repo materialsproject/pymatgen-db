@@ -1,0 +1,349 @@
+#!/usr/bin/env python
+# -*- coding: utf8 -*-
+"""
+Run validation tests of (MongoDB) databases.
+Database connections are configured from a file
+and the constraints to validate against can come from a file or the command-line.
+"""
+__author__ = "Dan Gunter"
+__copyright__ = "Copyright 2012-2013, The Materials Project"
+__version__ = "1.0"
+__maintainer__ = "Dan Gunter"
+__email__ = "dkgunter@lbl.gov"
+__status__ = "Development"
+__date__ = "3/29/13"
+
+import argparse
+import logging
+import os
+import pymongo
+import re
+import socket
+import sys
+import time
+import urlparse
+import yaml
+# local module
+from matgendb.util import get_settings
+from matgendb.vv.validate import Validator, DBError
+from matgendb.vv import report
+
+# Initialize module logging
+_log_name = 'mg'
+_log = logging.getLogger(_log_name)
+_handler = logging.StreamHandler()
+_handler.setFormatter(logging.Formatter('%(levelname)-7s [%(name)s] %(message)s'))
+_log.addHandler(_handler)
+
+## Constants
+
+DB_KEY = '_db'              # in YAML file
+ALIASES_KEY = '_aliases'    # in YAML file
+
+PATTERN_KEY_PREFIX_IGNORE = '_'
+
+## Functions
+
+
+def wstrip(s):
+    return s.strip()
+
+
+def textlist(items):
+    return ', '.join(items)
+
+def mapdump(d):
+    return textlist(('{}={}'.format(k, v) for k, v in d.iteritems()))
+
+def nvpstr(s):
+    """Return tuple (name, value) from string in form 'name=value'.
+    Used as type for argparse.
+
+    :raise: ValueError if input string is invalid
+    """
+    p = s.find('=')
+    if p < 0:
+        raise ValueError('expected "name=value", got "{}"'.format(s))
+    nvp = (s[:p].strip(), s[p+1:].strip())
+    #print("NVP: {}".format(nvp))
+    return nvp
+
+def _parse_email(s):
+    d = {}
+    # parse command-line args
+    items = s.split(':')
+    if len(items) < 2:
+        raise ValueError('from:to required in "{}"'.format(s))
+    if len(items) > 4:
+        raise ValueError('too many values in "{}"'.format(s))
+    d['sender'] = items[0]
+    d['recipients'] = [x.strip() for x in items[1].split(',')]
+    if len(items) > 2:
+        d['server'] = items[2]
+    if len(items) > 3:
+        d['port'] = int(items[3])
+    return d
+
+
+def _config_email(fname):
+    d = {}
+    try:
+        f = open(fname)
+    except OSError:
+        raise ValueError('cannot read from file "{}"'.format(fname))
+    y = yaml.safe_load(f)
+    info = y['_email']
+    try:
+        d['sender'] = info['from']
+        d['recipients'] = info['to']
+        if isinstance(d['recipients'], str):
+            d['recipients'] = [d['recipients']]
+    except KeyError, err:
+        raise ValueError('from/to not found in file {} mapping key "_email"'
+                         .format(fname))
+    if 'port' in info:
+        d['port'] = int(info['port'])
+    if 'server' in info:
+        d['server'] = info['server']
+    return d
+
+
+class Timing:
+    """Perform and report timings using the 'with' keyword.
+
+    For example:
+        with Timing('foo', info='bar'):
+            do_foo1()
+            do_foo2()
+    """
+    def __init__(self, name, level=logging.DEBUG, **kwargs):
+        self.name, self.kw, self.level = name, kwargs, level
+    def __enter__(self):
+        self.begin = time.time()
+    def __exit__(self, type, value, tb):
+        elapsed = time.time() - self.begin
+        nvp = ', '.join(['{}={}'.format(k,v) for k,v in self.kw.iteritems()])
+        _log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
+
+def parse_mongo_url(url):
+    "Parse mongodb:// URL, return dict of information"
+    parts = urlparse.urlsplit(url)
+    netloc = parts[1]
+    urlexpr = '''
+            (?P<user>\w+)           # user
+            :(?P<password>\S+)      # password
+            @(?P<host>[a-zA-Z.]+)   # host
+            (?::(?P<port>\d+))?     # optional port'''
+    m = re.match(urlexpr, netloc, flags=re.X)
+    if m is None:
+        raise ValueError("bad format: {}".format(url))
+    g = m.groupdict()
+    d = {'host':g['host'], 'user_name':g['user'],
+         'password':g['password']}
+    if g['port'] is not None:
+        d['port'] = int(g['port'])
+    d['db'] = parts[2][1:]
+    return d
+
+
+def get_constraint_sections(spec):
+    """Parse out sections within a collection.
+    """
+    sections = {}
+    for item in spec:
+        if isinstance(item, dict):
+            # if/then clause
+            cond_raw, constraints = item['if'], item['then']
+            # make condition(s) into a tuple
+            if isinstance(cond_raw, basestring):
+                cond = (cond_raw,)
+            elif cond_raw is None:
+                cond = None
+            else:
+                cond = tuple(cond_raw)   # tuples can be used as keys
+            # add
+            if cond in sections:
+                sections[cond].extend(constraints)
+            else:
+                sections[cond] = constraints
+        else:
+            sections[None] = [item]
+    return sections
+
+
+def main(cmdline=None):
+    """Main program entry point.
+
+    :param cmdline: command-line
+    :return: Status, 0=ok otherwise an error
+    :rtype : int
+    """
+    retcode = 0
+
+    if cmdline is None:
+        cmdline = sys.argv[1:]
+    desc = ' '.join(__doc__.split())
+
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('constraint', nargs='*')
+    parser.add_argument('--alias', '-a', dest='aliases', action='append', type=nvpstr, metavar="ALIAS", default=[],
+                        help='Alias for a field used in a constraint or condition, in form alias=name_in_db')
+    parser.add_argument('--config', '-c', dest='config_file', metavar='FILE', default=None,
+                        help="Configuration file for database connection. "
+                             "Generate one using mgdb init --config filename.json, if necessary. "
+                             "Otherwise, the code searches for a db.json. If "
+                             "none is found, a no-authentication "
+                             "localhost:27017/vasp database is assumed.")
+    parser.add_argument('--collection', '-C', dest='coll', metavar='NAME', default=None,
+                        help='Collection name for constraints given on command-line')
+    parser.add_argument('--email', '-e', dest='email', default=None,
+                        help='Email report to EMAIL at {from}:{to}[:server].'
+                             'The "from" and "to" are required; default server is localhost. '
+                             'This information can also be in the main config file under the "_email" key, '
+                             'which should be a mapping with keys "from", "to", and "server".')
+    parser.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
+                        help='Main configuration file. Has constraints, and optionally email info.')
+    parser.add_argument('--format', '-F', dest='report_format', metavar='FORMAT', default='html',
+                        help='Report format (default=html)')
+    parser.add_argument('--limit', '-m', dest='limit', metavar='NUM', type=int, default=50,
+                        help='Limit number of displayed constraint violations per-collection 0=no limit (50)')
+    parser.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
+                        help='Report progress every NUM invalid records found')
+    parser.add_argument('-v', '--verbose', dest='vb', action='count', help='Log message verbosity')
+
+    args = parser.parse_args(cmdline)
+
+    # Set logging level from --verbose option
+    if args.vb > 1:
+        _log.setLevel(logging.DEBUG)
+    elif args.vb > 0:
+        _log.setLevel(logging.INFO)
+    else:
+        _log.setLevel(logging.WARN)
+
+    # Connect and authenticate
+    conn, config = None, None
+    fname = args.config_file if args.config_file else "db.json"
+    try:
+        config = get_settings(args.config_file)
+    except ValueError, err:
+        parser.error('Cannot parse configuration "{}": {}'.format(fname, err))
+    try:
+        conn = pymongo.MongoClient(config['host'], config['port'])
+    except pymongo.errors.ConnectionFailure, err:
+        parser.error('Cannot connect to server: {}'.format(err))
+    db_key = 'database'
+    if not db_key in config:
+        parser.error('Configuration in "{}" is missing "{}"'.format(fname,
+            db_key))
+    db = conn[config[db_key]]
+    user, passwd = None, None
+    # try both readonly and admin credentials
+    for utype in 'readonly', 'admin':
+        if (utype + '_user') in config:
+            try:
+                user, passwd = config[utype + '_user'], config[utype + '_password']
+            except KeyError:
+                parser.error('Configuration error in file {0}: {1}_user but no {1}_password'
+                             .format(args.config_file, utype))
+    if user and passwd:
+        if not db.authenticate(user, passwd):
+            parser.error('Cannot authenticate to database as user {}'.format(user))
+    else:
+        _log.info('Connecting to DB "{}" without authentication'.format(config[db_key]))
+
+    # Init constraints from file or command-line
+    constraints_from_file = args.constfile is not None
+    if constraints_from_file:
+        f = open(args.constfile, 'rb')
+        with Timing('load.yaml', file=f.name):
+            constraints = yaml.safe_load(f)
+    else:
+        if args.coll is None:
+            parser.error('collection name required for command-line constraints')
+        if not args.constraint:
+            parser.error('at least one constraint is required')
+        # re-split command-line arguments on commas (not whitespace)
+        plist = ' '.join(args.constraint).split(',')
+        # make dict(key=collection) of list of the constraints, just like YAML config file
+        constraints = {args.coll: plist}
+
+    # Init aliases from file or command-line
+    if constraints_from_file:
+        try:
+            aliases = dict(map(nvpstr, constraints.get(ALIASES_KEY, {})))
+        except ValueError, err:
+            parser.error('aliases should be list of name=value, got "{}": {}'.format(aliases, err))
+    elif len(args.aliases) > 0:
+        aliases = dict(args.aliases)
+    else:
+        aliases = {}
+
+    # Init email from file or command-line
+    if args.email is not None:
+        email = _parse_email(args.email)
+    elif args.constfile:
+        email = _config_email(args.constfile)
+    else:
+        email = None
+    if email is not None:
+        _log.info("Will email report to: {}".format(mapdump(email)))
+        # TODO: configure email
+
+    # Initialize report
+    rpt_hdr = report.ReportHeader("Materials Project Validation Report")
+    rpt_hdr.add('Report time', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()))
+    rpt_hdr.add('Report user',  os.getlogin())
+    rpt_hdr.add('Report host', socket.gethostname())
+    rpt_hdr.add('Limit', args.limit)
+    rpt = report.Report(rpt_hdr)
+    # pick report formatter
+    fmt = args.report_format.lower()
+    formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter)
+    formatter_class = formatters.get(fmt, None)
+    if formatter_class is None:
+        parser.error('Unknown format "{}" for --format, choose from: {}'
+                    .format(fmt, textlist(formatters.keys())))
+
+    # Run validation for each collection
+    validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=10)
+    if args.progress > 0:
+        validator.set_progress(args.progress)
+    with Timing("validate"):
+        for coll_name, constraint_spec in constraints.iteritems():
+            sect_hdr = report.SectionHeader(title="Collection {}".format(coll_name))
+            rpt_sect = report.ReportSection(sect_hdr)
+            if coll_name.startswith(PATTERN_KEY_PREFIX_IGNORE):
+                continue
+            coll = db[coll_name]
+            try:
+                sect = get_constraint_sections(constraint_spec)
+                #print("SECTIONS {}".format(sect))
+                for vnum, vgroup in enumerate(validator.validate(coll, sect, subject=coll_name)):
+                    sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
+                    sect_hdr.add('Condition', str(vgroup.condition))
+                    table = report.Table(colnames=('ID', 'Field', 'Constraint', 'Value'))
+                    for viol, vrec in vgroup:
+                        rec_id = vrec['_id']
+                        table.add((rec_id, viol.field,
+                                   '{} {}'.format(viol.op, viol.expected_value),
+                                   viol.got_value))
+                    table.sortby('ID')
+                    rpt_sect.add_section(report.ReportSection(sect_hdr, table))
+            except DBError, err:
+                _log.error('validating collecton {}: DB error: {}'.format(coll_name, err))
+                break
+            rpt.add_section(rpt_sect)
+
+    # Report results
+    if rpt.is_empty():
+        _log.warn("Report is empty, skipping output")
+        retcode = 1
+    else:
+        formatter = formatter_class()
+        print(formatter.format(rpt))
+
+    return retcode
+
+if __name__ == '__main__':
+    sys.exit(main())
