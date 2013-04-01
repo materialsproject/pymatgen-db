@@ -6,8 +6,6 @@ from setuptools import setup, find_packages
 
 with open("README.rst") as f:
     long_desc = f.read()
-    #ind = long_desc.find("\n")
-    #long_desc = long_desc[ind + 1:]
 
 static_data = []
 for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
@@ -20,7 +18,7 @@ for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="0.3.2b",
+    version="0.3.2",
     install_requires=["pymatgen>=2.6.3", "pymongo>=2.4", "prettytable>=0.7",
                       "django>=1.5"],
     package_data={"matgendb": ["*.json"],

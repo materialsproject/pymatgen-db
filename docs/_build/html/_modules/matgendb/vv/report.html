@@ -1,0 +1,487 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb.vv.report &mdash; pymatgen-db 0.3.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/proBlue.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    <link rel="top" title="pymatgen-db 0.3.2 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+ 
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pymatgen-db 0.3.2 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for matgendb.vv.report</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Description.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;Dan Gunter &lt;dkgunter@lbl.gov&gt;&#39;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s">&#39;2/21/13&#39;</span>
+
+
+<span class="kn">import</span> <span class="nn">bson</span>
+<span class="kn">from</span> <span class="nn">email.mime.text</span> <span class="kn">import</span> <span class="n">MIMEText</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="kn">import</span> <span class="nn">smtplib</span>
+
+<span class="kn">from</span> <span class="nn">pymatgen</span> <span class="kn">import</span> <span class="n">PMGJSONEncoder</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">DoesLogging</span>
+
+<div class="viewcode-block" id="Report"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Report">[docs]</a><span class="k">class</span> <span class="nc">Report</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create blank report, with a header.</span>
+
+<span class="sd">        :param header: Report header</span>
+<span class="sd">        :type header: ReportHeader</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hdr</span> <span class="o">=</span> <span class="n">header</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Report.add_section"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Report.add_section">[docs]</a>    <span class="k">def</span> <span class="nf">add_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Report.header"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Report.header">[docs]</a>    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdr</span>
+</div>
+<div class="viewcode-block" id="Report.is_empty"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Report.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+</div>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="ReportSection"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.ReportSection">[docs]</a><span class="k">class</span> <span class="nc">ReportSection</span><span class="p">(</span><span class="n">Report</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Section within a report, with data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create new report section, initialized with header and body.</span>
+
+<span class="sd">        :param header: The header for the section</span>
+<span class="sd">        :type header: SectionHeader</span>
+<span class="sd">        :param body: The body of the section, or None if this is a container for sub-sections</span>
+<span class="sd">        :type body: Table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Report</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_body</span> <span class="o">=</span> <span class="n">body</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="ReportSection.body"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.ReportSection.body">[docs]</a>    <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_body</span>
+</div></div>
+<div class="viewcode-block" id="Header"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Header">[docs]</a><span class="k">class</span> <span class="nc">Header</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base header class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kv</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+
+<div class="viewcode-block" id="Header.add"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Header.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kv</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Header.get"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Header.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kv</span> <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kv</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Header.to_dict"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Header.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kv</span><span class="p">}</span>
+</div></div>
+<div class="viewcode-block" id="ReportHeader"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.ReportHeader">[docs]</a><span class="k">class</span> <span class="nc">ReportHeader</span><span class="p">(</span><span class="n">Header</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Header for entire report.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="SectionHeader"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.SectionHeader">[docs]</a><span class="k">class</span> <span class="nc">SectionHeader</span><span class="p">(</span><span class="n">Header</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Header for one section of a report.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="Table"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Table">[docs]</a><span class="k">class</span> <span class="nc">Table</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Table of values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colnames</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colnames</span> <span class="o">=</span> <span class="n">colnames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">colnames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_col_widths</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">colnames</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Table.add"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Table.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;expected {:d} values, got {:d}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_col_widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_max_col_widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+</div>
+<div class="viewcode-block" id="Table.sortby"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Table.sortby">[docs]</a>    <span class="k">def</span> <span class="nf">sortby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_or_index</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name_or_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">name_or_index</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name_or_index</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">colnum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colnames</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;column {} not in {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colnames</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;index out of range 0..{:d}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">colnum</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rows</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="n">colnum</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rows</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Table.values"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Table.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[{</span><span class="bp">self</span><span class="o">.</span><span class="n">_colnames</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">)}</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rows</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Table.column_names"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Table.column_names">[docs]</a>    <span class="k">def</span> <span class="nf">column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colnames</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Table.column_widths"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Table.column_widths">[docs]</a>    <span class="k">def</span> <span class="nf">column_widths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_col_widths</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Table.ncol"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Table.ncol">[docs]</a>    <span class="k">def</span> <span class="nf">ncol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Table.nrow"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Table.nrow">[docs]</a>    <span class="k">def</span> <span class="nf">nrow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rows</span><span class="p">)</span>
+
+
+<span class="c">## Exceptions</span>
+</div></div>
+<div class="viewcode-block" id="ReportBackupError"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.ReportBackupError">[docs]</a><span class="k">class</span> <span class="nc">ReportBackupError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span>
+
+<span class="c">## Formatting</span>
+
+<span class="c"># CSS for HTML report output</span></div>
+<span class="n">DEFAULT_CSS</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">html {</span>
+<span class="s">    font-family: &#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif;</span>
+<span class="s">}</span>
+<span class="s">body {</span>
+<span class="s">    margin: 2em;</span>
+<span class="s">}</span>
+<span class="s">table { margin-top: 1em; clear: both; border: 1px solid grey; }</span>
+<span class="s">dl, dt, dd { float: left; }</span>
+<span class="s">dl, dt { clear: both; }</span>
+<span class="s">dt { width: 8em; font-weight: 700; }</span>
+<span class="s">dd { width: 32em; }</span>
+<span class="s">tr.even { background-color: #F2F2FF; }</span>
+<span class="s">tr.odd { background-color: white; }</span>
+<span class="s">th, td {</span>
+<span class="s">    padding: 0.2em 0.5em;</span>
+<span class="s">}</span>
+<span class="s">th {</span>
+<span class="s">    text-align: left;</span>
+<span class="s">    color: #000066;</span>
+<span class="s">    border-bottom: 1px solid #000066;</span>
+<span class="s">    margin: 0;</span>
+<span class="s">}</span>
+<span class="s">h1, h2, h3 { clear: both; margin: 0; padding: 0; }</span>
+<span class="s">h1 { color: #FE5300; }</span>
+<span class="s">h2 { color: #004489; }</span>
+<span class="s">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;  &#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="HTMLFormatter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.HTMLFormatter">[docs]</a><span class="k">class</span> <span class="nc">HTMLFormatter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Format a report as HTML.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">css</span><span class="o">=</span><span class="n">DEFAULT_CSS</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sep</span> <span class="o">=</span> <span class="n">line_sep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idcol</span> <span class="o">=</span> <span class="n">id_column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_css</span> <span class="o">=</span> <span class="n">css</span>
+
+<div class="viewcode-block" id="HTMLFormatter.format"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.HTMLFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;!DOCTYPE html&gt;&#39;</span><span class="p">)</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;html&gt;&#39;</span><span class="p">)</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;title&gt;{}&lt;/title&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">))</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;head&gt;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_css</span><span class="p">:</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;style&gt;&#39;</span><span class="p">)</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_css</span><span class="p">)</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/style&gt;&#39;</span><span class="p">)</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/head&gt;&#39;</span><span class="p">)</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;body&gt;&#39;</span><span class="p">)</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;h1&gt;{}&lt;/h1&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">))</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dl class=&quot;rptmeta&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dt&gt;{}&lt;/dt&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dd&gt;{}&lt;/dd&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/dl&gt;&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">report</span><span class="p">:</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;h2&gt;{}&lt;/h2&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">))</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dl class=&quot;sectmeta&quot;&gt;&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">section</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dt&gt;{}&lt;/dt&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dd&gt;{}&lt;/dd&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/dl&gt;&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">cond_section</span> <span class="ow">in</span> <span class="n">section</span><span class="p">:</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;h3&gt;{}&lt;/h3&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cond_section</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">))</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dl class=&quot;subsectmeta&quot;&gt;&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">cond_section</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+                    <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dt&gt;{}&lt;/dt&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                    <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;dd&gt;{}&lt;/dd&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/dl&gt;&#39;</span><span class="p">)</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;table&gt;&#39;</span><span class="p">)</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;tr&gt;&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cond_section</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
+                    <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;th&gt;{}&lt;/th&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/tr&gt;&#39;</span><span class="p">)</span>
+                <span class="n">prev_key</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cond_section</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+                    <span class="n">row</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_idcol</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">prev_key</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">==</span> <span class="n">prev_key</span><span class="p">:</span>
+                        <span class="n">row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_idcol</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">prev_key</span> <span class="o">=</span> <span class="n">key</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">rclass</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;even&#39;</span><span class="p">,</span> <span class="s">&#39;odd&#39;</span><span class="p">)[</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]</span>
+                    <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;tr class=&quot;{}&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rclass</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;td&gt;{}&lt;/td&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                    <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/tr&gt;&#39;</span><span class="p">)</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/table&gt;&#39;</span><span class="p">)</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/body&gt;&#39;</span><span class="p">)</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/html&gt;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="JSONFormatter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.JSONFormatter">[docs]</a><span class="k">class</span> <span class="nc">JSONFormatter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Format a report as JSON.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indent</span> <span class="o">=</span> <span class="n">indent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idcol</span> <span class="o">=</span> <span class="n">id_column</span>
+
+<div class="viewcode-block" id="JSONFormatter.format"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.JSONFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">info</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
+            <span class="n">sections</span><span class="o">=</span><span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                     <span class="n">info</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
+                     <span class="n">conditions</span><span class="o">=</span><span class="p">[</span>
+                        <span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">cs</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                             <span class="n">info</span><span class="o">=</span><span class="n">cs</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
+                             <span class="n">violations</span><span class="o">=</span><span class="n">cs</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">s</span>
+                     <span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">report</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indent</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">JSONReportEncoder</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="JSONReportEncoder"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.JSONReportEncoder">[docs]</a><span class="k">class</span> <span class="nc">JSONReportEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+<div class="viewcode-block" id="JSONReportEncoder.default"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.JSONReportEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Header</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Table</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">bson</span><span class="o">.</span><span class="n">objectid</span><span class="o">.</span><span class="n">ObjectId</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="MarkdownFormatter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.MarkdownFormatter">[docs]</a><span class="k">class</span> <span class="nc">MarkdownFormatter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Format a report as markdown</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idcol</span> <span class="o">=</span> <span class="n">id_column</span>
+
+    <span class="k">def</span> <span class="nf">_mapdump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(((</span><span class="s">&#39;{}={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">iteritems</span><span class="p">())))</span>
+
+    <span class="k">def</span> <span class="nf">_fixed_width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">widths</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;{{:{:d}s}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">w</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                       <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">widths</span><span class="p">,</span> <span class="n">values</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+<div class="viewcode-block" id="MarkdownFormatter.format"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.MarkdownFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;# {} #</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">))</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;Info: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapdump</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())))</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">report</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">## {} ##</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;Info: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapdump</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())))</span>
+            <span class="k">for</span> <span class="n">cond</span> <span class="ow">in</span> <span class="n">section</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">### {} ###</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cond</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">title</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">cond</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;Info: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mapdump</span><span class="p">(</span><span class="n">cond</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())))</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Violations:</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">indent</span> <span class="o">=</span> <span class="s">&#39;    &#39;</span>
+                <span class="n">tbl</span> <span class="o">=</span> <span class="n">cond</span><span class="o">.</span><span class="n">body</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_width</span><span class="p">(</span><span class="n">tbl</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">tbl</span><span class="o">.</span><span class="n">column_widths</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tbl</span><span class="p">:</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_width</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">tbl</span><span class="o">.</span><span class="n">column_widths</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="Emailer"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Emailer">[docs]</a><span class="k">class</span> <span class="nc">Emailer</span><span class="p">(</span><span class="n">DoesLogging</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Send a report to an email recipient.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="s">&#39;me@localhost&#39;</span><span class="p">,</span> <span class="n">recipients</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;you@remote.host&#39;</span><span class="p">,),</span>
+                 <span class="n">subject</span><span class="o">=</span><span class="s">&#39;Report&#39;</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send reports as email.</span>
+
+<span class="sd">        :param: sender Sender of the email</span>
+<span class="sd">        :param: recipients List of _recipients of the email</span>
+<span class="sd">        :param: subject Email _subject line</span>
+<span class="sd">        :param: server SMTP server host</span>
+<span class="sd">        :param: port SMTP server port (None for default)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">DoesLogging</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;mg.emailer&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sender</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recipients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="n">sender</span><span class="p">,</span> <span class="n">recipients</span><span class="p">,</span> <span class="n">subject</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="n">server</span><span class="p">,</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+<div class="viewcode-block" id="Emailer.send"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Emailer.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">fmt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send the email message.</span>
+
+<span class="sd">        :param text: The text to send</span>
+<span class="sd">        :type text: str</span>
+<span class="sd">        :param fmt: The name of the format of the text</span>
+<span class="sd">        :type fmt: str</span>
+<span class="sd">        :return: Number of recipients it was sent to</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">num_recip</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">main_fmt</span><span class="p">,</span> <span class="n">sub_fmt</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">mime_class</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">MIMEText</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">main_fmt</span><span class="p">,</span> <span class="n">MIMEText</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">mime_class</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">sub_fmt</span><span class="p">)</span>
+        <span class="n">msg</span><span class="p">[</span><span class="s">&#39;Subject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subject</span>
+        <span class="n">msg</span><span class="p">[</span><span class="s">&#39;From&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sender</span>
+        <span class="n">msg</span><span class="p">[</span><span class="s">&#39;To&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recipients</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">conn_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">conn_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;connect to email server {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">conn_kwargs</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP</span><span class="p">(</span><span class="o">**</span><span class="n">conn_kwargs</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">sendmail</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sender</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recipients</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">as_string</span><span class="p">())</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+            <span class="n">n_recip</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recipients</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;connection to SMTP server failed: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="n">n_recip</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">n_recip</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pymatgen-db 0.3.2 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2011, Shyue Ping Ong.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

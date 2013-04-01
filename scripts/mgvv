@@ -69,6 +69,17 @@ def nvpstr(s):
     return nvp
 
 def _parse_email(s):
+    """Parse an email specification into component parts.
+
+    Keys:
+    - sender
+    - recipients
+    - server
+    - port
+
+    :return: Parsed email information
+    :rtype: dict
+    """
     d = {}
     # parse command-line args
     items = s.split(':')
@@ -92,7 +103,9 @@ def _config_email(fname):
     except OSError:
         raise ValueError('cannot read from file "{}"'.format(fname))
     y = yaml.safe_load(f)
-    info = y['_email']
+    info = y.get('_email', None)
+    if info is None:
+        return None
     try:
         d['sender'] = info['from']
         d['recipients'] = info['to']
@@ -125,8 +138,12 @@ class Timing:
         nvp = ', '.join(['{}={}'.format(k,v) for k,v in self.kw.iteritems()])
         _log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
 
+
 def parse_mongo_url(url):
-    "Parse mongodb:// URL, return dict of information"
+    """Parse mongodb:// URL, return dict of information
+
+    XXX: Not used right now.
+    """
     parts = urlparse.urlsplit(url)
     netloc = parts[1]
     urlexpr = '''
@@ -152,8 +169,7 @@ def get_constraint_sections(spec):
     sections = {}
     for item in spec:
         if isinstance(item, dict):
-            # if/then clause
-            cond_raw, constraints = item['if'], item['then']
+            cond_raw, constraints = item['filter'], item['constraints']
             # make condition(s) into a tuple
             if isinstance(cond_raw, basestring):
                 cond = (cond_raw,)
@@ -183,7 +199,8 @@ def main(cmdline=None):
     if cmdline is None:
         cmdline = sys.argv[1:]
     desc = ' '.join(__doc__.split())
-
+    formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter,
+                      md=report.MarkdownFormatter)
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('constraint', nargs='*')
     parser.add_argument('--alias', '-a', dest='aliases', action='append', type=nvpstr, metavar="ALIAS", default=[],
@@ -204,7 +221,7 @@ def main(cmdline=None):
     parser.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
                         help='Main configuration file. Has constraints, and optionally email info.')
     parser.add_argument('--format', '-F', dest='report_format', metavar='FORMAT', default='html',
-                        help='Report format (default=html)')
+                        help='Report format: {} (default=html)'.format(', '.join(formatters.keys())))
     parser.add_argument('--limit', '-m', dest='limit', metavar='NUM', type=int, default=50,
                         help='Limit number of displayed constraint violations per-collection 0=no limit (50)')
     parser.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
@@ -234,8 +251,7 @@ def main(cmdline=None):
         parser.error('Cannot connect to server: {}'.format(err))
     db_key = 'database'
     if not db_key in config:
-        parser.error('Configuration in "{}" is missing "{}"'.format(fname,
-            db_key))
+        parser.error('Configuration in "{}" is missing "{}"'.format(fname, db_key))
     db = conn[config[db_key]]
     user, passwd = None, None
     # try both readonly and admin credentials
@@ -271,24 +287,24 @@ def main(cmdline=None):
     # Init aliases from file or command-line
     if constraints_from_file:
         try:
-            aliases = dict(map(nvpstr, constraints.get(ALIASES_KEY, {})))
+            astr = constraints.get(ALIASES_KEY, {})
+            aliases = dict(map(nvpstr, astr))
         except ValueError, err:
-            parser.error('aliases should be list of name=value, got "{}": {}'.format(aliases, err))
+            parser.error('aliases should be list of name=value, got "{}": {}'.format(astr, err))
     elif len(args.aliases) > 0:
         aliases = dict(args.aliases)
     else:
         aliases = {}
 
     # Init email from file or command-line
+    emailer, email_kw = None, None
     if args.email is not None:
-        email = _parse_email(args.email)
+        email_kw = _parse_email(args.email)
     elif args.constfile:
-        email = _config_email(args.constfile)
-    else:
-        email = None
-    if email is not None:
-        _log.info("Will email report to: {}".format(mapdump(email)))
-        # TODO: configure email
+        email_kw = _config_email(args.constfile)
+    if email_kw is not None:
+        _log.info("Will email report to: {}".format(mapdump(email_kw)))
+        emailer = report.Emailer(subject="Materials Project Validation Report", **email_kw)
 
     # Initialize report
     rpt_hdr = report.ReportHeader("Materials Project Validation Report")
@@ -299,7 +315,6 @@ def main(cmdline=None):
     rpt = report.Report(rpt_hdr)
     # pick report formatter
     fmt = args.report_format.lower()
-    formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter)
     formatter_class = formatters.get(fmt, None)
     if formatter_class is None:
         parser.error('Unknown format "{}" for --format, choose from: {}'
@@ -318,20 +333,25 @@ def main(cmdline=None):
             coll = db[coll_name]
             try:
                 sect = get_constraint_sections(constraint_spec)
-                #print("SECTIONS {}".format(sect))
                 for vnum, vgroup in enumerate(validator.validate(coll, sect, subject=coll_name)):
                     sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
                     sect_hdr.add('Condition', str(vgroup.condition))
-                    table = report.Table(colnames=('ID', 'Field', 'Constraint', 'Value'))
+                    table = report.Table(colnames=('Id', 'TaskId', 'Field', 'Constraint', 'Value'))
                     for viol, vrec in vgroup:
                         rec_id = vrec['_id']
-                        table.add((rec_id, viol.field,
+                        task_id = vrec['task_id']
+                        if isinstance(viol.expected_value, type):
+                           viol.expected_value = viol.expected_value.__name__
+                        table.add((rec_id, task_id, viol.field,
                                    '{} {}'.format(viol.op, viol.expected_value),
                                    viol.got_value))
-                    table.sortby('ID')
+                    table.sortby('Id')
                     rpt_sect.add_section(report.ReportSection(sect_hdr, table))
             except DBError, err:
                 _log.error('validating collecton {}: DB error: {}'.format(coll_name, err))
+                break
+            except ValueError, err:
+                _log.error('validating collecton {}: {}'.format(coll_name, err))
                 break
             rpt.add_section(rpt_sect)
 
@@ -341,7 +361,19 @@ def main(cmdline=None):
         retcode = 1
     else:
         formatter = formatter_class()
-        print(formatter.format(rpt))
+        text = formatter.format(rpt)
+        if emailer:
+            msgfmt = 'text/plain'
+            for mt in ((report.HTMLFormatter, 'text/html'),
+                       (report.JSONFormatter, 'text/plain')):
+                if isinstance(formatter, mt[0]):
+                    msgfmt = mt[1]
+                    break
+            n = emailer.send(text, fmt=msgfmt)
+            if n < 1:
+                _log.error("Email report not sent")
+        else:
+            print(text)
 
     return retcode
 

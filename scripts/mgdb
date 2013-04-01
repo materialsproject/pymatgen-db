@@ -18,8 +18,14 @@ import multiprocessing
 import json
 import sys
 import webbrowser
+import time
+import argparse
+
+from pymatgen.apps.borg.queen import BorgQueen
 
 from matgendb.util import get_settings, DEFAULT_SETTINGS
+from matgendb.query_engine import QueryEngine
+from matgendb.creator import VaspToDbTaskDrone
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +45,6 @@ def init_db(args):
 
 
 def update_db(args):
-    from matgendb.creator import VaspToDbTaskDrone
-    from pymatgen.apps.borg.queen import BorgQueen
     FORMAT = "%(relativeCreated)d msecs : %(message)s"
 
     if args.logfile:
@@ -68,7 +72,6 @@ def update_db(args):
 
 
 def query_db(args):
-    from matgendb.query_engine import QueryEngine
     from prettytable import PrettyTable
     d = get_settings(args.config_file)
     qe = QueryEngine(host=d["host"], port=d["port"], database=d["database"],
@@ -92,24 +95,20 @@ def query_db(args):
 
 
 def run_server(args):
-    import os
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
     os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args.config_file))
     from django.core.management import call_command
     from multiprocessing import Process
-    p1 = Process(target=call_command, args=("runserver",
-                                            "{}:{}".format(args.host,
-                                                           args.port)))
+    p1 = Process(target=call_command,
+                 args=("runserver",  "{}:{}".format(args.host, args.port)))
     p1.start()
     if not args.nobrowser:
-        import time
         time.sleep(2)
-        webbrowser.open_new_tab("http://{}:{}".format(args.host, args.port))
+        webbrowser.open("http://{}:{}".format(args.host, args.port))
     p1.join()
 
 
 if __name__ == "__main__":
-    import argparse
     parser = argparse.ArgumentParser(description="""
     mgdb is a complete command line db management script for pymatgen-db. It
     provides the facility to insert vasp runs, perform queries, and run a web
