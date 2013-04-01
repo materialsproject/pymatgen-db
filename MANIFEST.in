@@ -1,6 +1,7 @@
-include *.rst LICENSE
+include *.rst LICENSE *.cfg
 include distribute_setup.py
 recursive-include matgendb *
 recursive-include scripts *
 prune */*/tests
 prune */*/*/tests
+prune *.psd

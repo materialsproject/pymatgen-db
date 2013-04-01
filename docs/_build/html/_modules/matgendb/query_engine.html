@@ -1,0 +1,573 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb.query_engine &mdash; pymatgen-db 0.3.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/proBlue.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.3.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="top" title="pymatgen-db 0.3.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+ 
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pymatgen-db 0.3.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for matgendb.query_engine</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides a QueryEngine that simplifies queries for Mongo databases</span>
+<span class="sd">generated using hive.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong, Michael Kocher&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2011, The Materials Project&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;2.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;shyuep@gmail.com&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s">&quot;Production&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s">&quot;Mar 2 2013&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">Iterable</span>
+
+<span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+
+<span class="kn">from</span> <span class="nn">pymatgen</span> <span class="kn">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span><span class="p">,</span>\
+    <span class="n">ComputedStructureEntry</span>
+
+
+<div class="viewcode-block" id="QueryEngine"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine">[docs]</a><span class="k">class</span> <span class="nc">QueryEngine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class defines a QueryEngine interface to a Mongo Collection based on</span>
+<span class="sd">    a set of aliases. This query engine also provides convenient translation</span>
+<span class="sd">    between various pymatgen objects and database objects.</span>
+
+<span class="sd">    The major difference between the QueryEngine&#39;s query() method and pymongo&#39;s</span>
+<span class="sd">    find() method is the treatment of nested fields. QueryEngine&#39;s query</span>
+<span class="sd">    will map the final result to a root level string, while pymmongo will</span>
+<span class="sd">    return the doc as is. For example, let&#39;s say you have a document</span>
+<span class="sd">    that is of the following form::</span>
+
+<span class="sd">        {&quot;a&quot;: {&quot;b&quot; : 1}}</span>
+
+<span class="sd">    Using pymongo.find({}, fields=[&quot;a.b&quot;]), you will get a doc where you need</span>
+<span class="sd">    to do doc[&quot;a&quot;][&quot;b&quot;] to access the final result (1). Using</span>
+<span class="sd">    QueryEngine.query(properties=[&quot;a.b&quot;], you will obtain a result that can be</span>
+<span class="sd">    accessed simply as doc[&quot;a.b&quot;].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">27017</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s">&quot;vasp&quot;</span><span class="p">,</span>
+                 <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s">&quot;tasks&quot;</span><span class="p">,</span>
+                 <span class="n">aliases_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            host:</span>
+<span class="sd">                Hostname of database machine. Defaults to 127.0.0.1 or</span>
+<span class="sd">                localhost.</span>
+<span class="sd">            port:</span>
+<span class="sd">                Port for db access. Defaults to mongo&#39;s default of 27017.</span>
+<span class="sd">            database:</span>
+<span class="sd">                Actual database to access. Defaults to &quot;vasp&quot;.</span>
+<span class="sd">            user:</span>
+<span class="sd">                User for db access. Defaults to None, which means no</span>
+<span class="sd">                authentication.</span>
+<span class="sd">            password:</span>
+<span class="sd">                Password for db access. Defaults to None, which means no</span>
+<span class="sd">                authentication.</span>
+<span class="sd">            collection:</span>
+<span class="sd">                Collection to query. Defaults to &quot;tasks&quot;.</span>
+<span class="sd">            aliases_config:</span>
+<span class="sd">                An alias dict to use. Defaults to None, which means the default</span>
+<span class="sd">                aliases defined in &quot;aliases.json&quot; is used. The aliases config</span>
+<span class="sd">                should be of the following format::</span>
+
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;aliases&quot;: {</span>
+<span class="sd">                            &quot;e_above_hull&quot;: &quot;analysis.e_above_hull&quot;,</span>
+<span class="sd">                            &quot;energy&quot;: &quot;output.final_energy&quot;,</span>
+<span class="sd">                            ....</span>
+<span class="sd">                        },</span>
+<span class="sd">                        &quot;defaults&quot;: {</span>
+<span class="sd">                            &quot;state&quot;: &quot;successful&quot;</span>
+<span class="sd">                        }</span>
+<span class="sd">                    }</span>
+
+<span class="sd">                The &quot;aliases&quot; key defines mappings, which makes it easier to</span>
+<span class="sd">                query for certain nested quantities. While Mongo does make it</span>
+<span class="sd">                easy to map collections, it is sometimes beneficial to</span>
+<span class="sd">                organize the doc format in a way that is different from the</span>
+<span class="sd">                query format.</span>
+<span class="sd">                The &quot;defaults&quot; key specifies criteria that should be applied</span>
+<span class="sd">                by default to all queries. For example, a collection may</span>
+<span class="sd">                contain data from both successful and unsuccessful runs but</span>
+<span class="sd">                for most querying purposes, you may want just successful runs</span>
+<span class="sd">                only. Note that defaults do not affect explicitly specified</span>
+<span class="sd">                criteria, i.e., if you suppy a query for {&quot;state&quot;: &quot;killed&quot;},</span>
+<span class="sd">                this will override the default for {&quot;state&quot;: &quot;successful&quot;}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database_name</span> <span class="o">=</span> <span class="n">database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span> <span class="o">=</span> <span class="n">collection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">[</span><span class="n">database</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">aliases_config</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span>
+                                   <span class="s">&quot;aliases.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;aliases&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;defaults&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span> <span class="o">=</span> <span class="n">aliases_config</span><span class="p">[</span><span class="s">&quot;aliases&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="n">aliases_config</span><span class="p">[</span><span class="s">&quot;defaults&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allows for use with the &#39;with&#39; context manager&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allows for use with the &#39;with&#39; context manager&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="QueryEngine.close"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Disconnects the connection.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="QueryEngine.get_entries_in_system"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.get_entries_in_system">[docs]</a>    <span class="k">def</span> <span class="nf">get_entries_in_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                              <span class="n">optional_data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets all entries in a chemical system, e.g. Li-Fe-O will return all</span>
+<span class="sd">        Li-O, Fe-O, Li-Fe, Li-Fe-O compounds.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The get_entries_in_system and get_entries  methods should be used</span>
+<span class="sd">            with care. In essence, all entries, GGA, GGA+U or otherwise,</span>
+<span class="sd">            are returned.  The dataset is very heterogeneous and not</span>
+<span class="sd">            directly comparable.  It is highly recommended that you perform</span>
+<span class="sd">            post-processing using pymatgen.entries.compatibility.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            elements:</span>
+<span class="sd">                Sequence of element symbols, e.g. [&#39;Li&#39;,&#39;Fe&#39;,&#39;O&#39;]</span>
+<span class="sd">            inc_structure:</span>
+<span class="sd">                Optional parameter as to whether to include a structure with</span>
+<span class="sd">                the ComputedEntry. Defaults to False. Use with care - including</span>
+<span class="sd">                structures with a large number of entries can potentially slow</span>
+<span class="sd">                down your code to a crawl.</span>
+<span class="sd">            optional_data:</span>
+<span class="sd">                Optional data to include with the entry. This allows the data</span>
+<span class="sd">                to be access via entry.data[key].</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of ComputedEntries in the chemical system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chemsys_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">combi</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">chemsys</span> <span class="o">=</span> <span class="s">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">combi</span><span class="p">))</span>
+                <span class="n">chemsys_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chemsys</span><span class="p">)</span>
+        <span class="n">crit</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;chemsys&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="n">chemsys_list</span><span class="p">}}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entries</span><span class="p">(</span><span class="n">crit</span><span class="p">,</span> <span class="n">inc_structure</span><span class="p">,</span>
+                                <span class="n">optional_data</span><span class="o">=</span><span class="n">optional_data</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="QueryEngine.get_entries"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.get_entries">[docs]</a>    <span class="k">def</span> <span class="nf">get_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">criteria</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">optional_data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get ComputedEntries satisfying a particular criteria.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The get_entries_in_system and get_entries  methods should be used</span>
+<span class="sd">            with care. In essence, all entries, GGA, GGA+U or otherwise,</span>
+<span class="sd">            are returned.  The dataset is very heterogeneous and not</span>
+<span class="sd">            directly comparable.  It is highly recommended that you perform</span>
+<span class="sd">            post-processing using pymatgen.entries.compatibility.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            criteria:</span>
+<span class="sd">                Criteria obeying the same syntax as query.</span>
+<span class="sd">            inc_structure:</span>
+<span class="sd">                Optional parameter as to whether to include a structure with</span>
+<span class="sd">                the ComputedEntry. Defaults to False. Use with care - including</span>
+<span class="sd">                structures with a large number of entries can potentially slow</span>
+<span class="sd">                down your code to a crawl.</span>
+<span class="sd">            optional_data:</span>
+<span class="sd">                Optional data to include with the entry. This allows the data</span>
+<span class="sd">                to be access via entry.data[key].</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of pymatgen.entries.ComputedEntries satisfying criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_entries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">optional_data</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">optional_data</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">optional_data</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">optional_data</span><span class="p">]</span>
+        <span class="n">fields</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;task_id&quot;</span><span class="p">,</span> <span class="s">&quot;unit_cell_formula&quot;</span><span class="p">,</span> <span class="s">&quot;energy&quot;</span><span class="p">,</span> <span class="s">&quot;is_hubbard&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;hubbards&quot;</span><span class="p">,</span> <span class="s">&quot;pseudo_potential.labels&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;pseudo_potential.functional&quot;</span><span class="p">,</span> <span class="s">&quot;run_type&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&quot;pseudo_potential.functional&quot;</span><span class="p">]</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s">&quot;pseudo_potential.labels&quot;</span><span class="p">]</span>
+            <span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;run_type&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&quot;run_type&quot;</span><span class="p">],</span>
+                          <span class="s">&quot;is_hubbard&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&quot;is_hubbard&quot;</span><span class="p">],</span>
+                          <span class="s">&quot;hubbards&quot;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&quot;hubbards&quot;</span><span class="p">],</span>
+                          <span class="s">&quot;potcar_symbols&quot;</span><span class="p">:</span> <span class="n">symbols</span><span class="p">}</span>
+            <span class="n">optional_data</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">optional_data</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">inc_structure</span><span class="p">:</span>
+                <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_from_id</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">])</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="n">ComputedStructureEntry</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s">&quot;energy&quot;</span><span class="p">],</span>
+                                               <span class="mf">0.0</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+                                               <span class="n">data</span><span class="o">=</span><span class="n">optional_data</span><span class="p">,</span>
+                                               <span class="n">entry_id</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="n">ComputedEntry</span><span class="p">(</span><span class="n">Composition</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&quot;unit_cell_formula&quot;</span><span class="p">]),</span>
+                                      <span class="n">c</span><span class="p">[</span><span class="s">&quot;energy&quot;</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+                                      <span class="n">data</span><span class="o">=</span><span class="n">optional_data</span><span class="p">,</span>
+                                      <span class="n">entry_id</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">])</span>
+            <span class="n">all_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">all_entries</span>
+</div>
+    <span class="k">def</span> <span class="nf">_parse_criteria</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal method to perform mapping of criteria to proper mongo queries</span>
+<span class="sd">        using aliases, as well as some useful sanitization. For example, string</span>
+<span class="sd">        formulas such as &quot;Fe2O3&quot; are auto-converted to proper mongo queries of</span>
+<span class="sd">        {&quot;Fe&quot;:2, &quot;O&quot;:3}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parsed_crit</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">criteria</span><span class="p">:</span>
+                <span class="n">parsed_crit</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">crit</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">criteria</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;normalized_formula&quot;</span><span class="p">,</span> <span class="s">&quot;reduced_cell_formula&quot;</span><span class="p">]:</span>
+                <span class="n">comp</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">crit</span><span class="p">)</span>
+                <span class="n">parsed_crit</span><span class="p">[</span><span class="s">&quot;pretty_formula&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">reduced_formula</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;unit_cell_formula&quot;</span><span class="p">:</span>
+                <span class="n">comp</span> <span class="o">=</span> <span class="n">Composition</span><span class="p">(</span><span class="n">crit</span><span class="p">)</span>
+                <span class="n">crit</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">to_dict</span>
+                <span class="k">for</span> <span class="n">el</span><span class="p">,</span> <span class="n">amt</span> <span class="ow">in</span> <span class="n">crit</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">parsed_crit</span><span class="p">[</span><span class="s">&quot;{}.{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">el</span><span class="p">)]</span> <span class="o">=</span> <span class="n">amt</span>
+                <span class="n">parsed_crit</span><span class="p">[</span><span class="s">&quot;nelements&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">crit</span><span class="p">)</span>
+                <span class="n">parsed_crit</span><span class="p">[</span><span class="s">&#39;pretty_formula&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">reduced_formula</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;$or&quot;</span><span class="p">,</span> <span class="s">&quot;$and&quot;</span><span class="p">]:</span>
+                <span class="n">parsed_crit</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_criteria</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">crit</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parsed_crit</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">crit</span>
+        <span class="k">return</span> <span class="n">parsed_crit</span>
+
+<div class="viewcode-block" id="QueryEngine.query"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convenience method for database access.  All properties and criteria</span>
+<span class="sd">        can be specified using simplified names defined in Aliases.  You can</span>
+<span class="sd">        use the supported_properties property to get the list of supported</span>
+<span class="sd">        properties.</span>
+
+<span class="sd">        Results are returned as an iterator of dicts to ensure memory and cpu</span>
+<span class="sd">        efficiency.</span>
+
+<span class="sd">        Note that the dict returned have keys also in the simplified names</span>
+<span class="sd">        form, not in the mongo format. For example, if you query for</span>
+<span class="sd">        &quot;analysis.e_above_hull&quot;, the returned result must be accessed as</span>
+<span class="sd">        r[&#39;analysis.e_above_hull&#39;] instead of mongo&#39;s</span>
+<span class="sd">        r[&#39;analysis&#39;][&#39;e_above_hull&#39;]. This is a *feature* of the query engine</span>
+<span class="sd">        to allow simple access to deeply nested docs without having to resort</span>
+<span class="sd">        to some recursion to go deep into the result.</span>
+
+<span class="sd">        However, if you query for &#39;analysis&#39;, the entire &#39;analysis&#39; key is</span>
+<span class="sd">        returned as r[&#39;analysis&#39;] and then the subkeys can be accessed in the</span>
+<span class="sd">        usual form, i.e., r[&#39;analysis&#39;][&#39;e_above_hull&#39;]</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            properties:</span>
+<span class="sd">                Properties to query for. Defaults to None which means all</span>
+<span class="sd">                supported properties.</span>
+<span class="sd">            criteria:</span>
+<span class="sd">                Criteria to query for as a dict.</span>
+<span class="sd">            index:</span>
+<span class="sd">                Similar definition to pymongo.collection.find method.</span>
+<span class="sd">            limit:</span>
+<span class="sd">                Similar definition to pymongo.collection.find method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An QueryResults Iterable, which is somewhat like pymongo&#39;s</span>
+<span class="sd">            cursor except that it performs mapping. In general, the dev does</span>
+<span class="sd">            not need to concern himself with the form. It is sufficient to know</span>
+<span class="sd">            that the results are in the form of an iterable of dicts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">properties</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">prop_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
+                    <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">p</span><span class="p">])</span>
+                    <span class="n">prop_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                    <span class="n">prop_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">crit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_criteria</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span> <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">crit</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">props</span><span class="p">,</span>
+                                   <span class="n">timeout</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="n">prop_dict</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="n">prop_dict</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="QueryEngine.query_one"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.query_one">[docs]</a>    <span class="k">def</span> <span class="nf">query_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Just like query, but return a single doc.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            properties:</span>
+<span class="sd">                Properties to query for. Defaults to None which means all</span>
+<span class="sd">                supported properties.</span>
+<span class="sd">            criteria:</span>
+<span class="sd">                Criteria to query for as a dict.</span>
+<span class="sd">            index:</span>
+<span class="sd">                Similar definition to pymongo.collection.find method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A single dict containing the result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">properties</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
+                            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">r</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="QueryEngine.get_structure_from_id"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.get_structure_from_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_from_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">final_structure</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a structure from the database given the task id.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            task_id:</span>
+<span class="sd">                The task_id to query for.</span>
+<span class="sd">            final_structure:</span>
+<span class="sd">                Whether to obtain the final or initial structure. Defaults to</span>
+<span class="sd">                True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;task_id&#39;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">}</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s">&#39;output.crystal&#39;</span> <span class="k">if</span> <span class="n">final_structure</span> <span class="k">else</span> <span class="s">&#39;input.crystal&#39;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">([</span><span class="n">field</span><span class="p">],</span> <span class="n">args</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">QueryError</span><span class="p">(</span><span class="s">&quot;More than one result found for task_id!&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">QueryError</span><span class="p">(</span><span class="s">&quot;No structure found for task_id!&quot;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">field</span><span class="p">])</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;QueryEngine: {}:{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">database_name</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="QueryEngine.from_config"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.from_config">[docs]</a>    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a QueryEngine from a JSON config file generated using mgdb</span>
+<span class="sd">        init.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config_file:</span>
+<span class="sd">                Filename of config file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            QueryEngine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">QueryEngine</span><span class="p">(</span>
+                <span class="n">host</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;host&quot;</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;port&quot;</span><span class="p">],</span> <span class="n">database</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;database&quot;</span><span class="p">],</span>
+                <span class="n">user</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;readonly_user&quot;</span><span class="p">],</span> <span class="n">password</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;readonly_password&quot;</span><span class="p">],</span>
+                <span class="n">collection</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;collection&quot;</span><span class="p">],</span>
+                <span class="n">aliases_config</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;aliases_config&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+
+</div></div>
+<div class="viewcode-block" id="QueryResults"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryResults">[docs]</a><span class="k">class</span> <span class="nc">QueryResults</span><span class="p">(</span><span class="n">Iterable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iterable wrapper for results from QueryEngine.</span>
+<span class="sd">    Like pymongo&#39;s cursor, this object should generally not be instantiated,</span>
+<span class="sd">    but should be obtained from a queryengine.</span>
+<span class="sd">    It delegates many attributes to the underlying pymongo cursor, and should</span>
+<span class="sd">    support nearly all cursor like attributes such as count(), explain(),</span>
+<span class="sd">    hint(), etc. Please see pymongo cursor documentation for details.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_dict</span><span class="p">,</span> <span class="n">result_cursor</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">result_cursor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span> <span class="o">=</span> <span class="n">prop_dict</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Override getattr to make QueryResults inherit all pymongo cursor</span>
+<span class="sd">        attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+<div class="viewcode-block" id="QueryResults.clone"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryResults.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">clone</span><span class="p">())</span>
+</div>
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapped_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_generator</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_mapped_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">r</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_result_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapped_result</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="QueryError"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryError">[docs]</a><span class="k">class</span> <span class="nc">QueryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception class for QueryEngine. Allows more information exception messages</span>
+<span class="sd">    to cover situations not covered by standard exception classes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            msg:</span>
+<span class="sd">                Message for the error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Query Error : &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pymatgen-db 0.3.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2011, Shyue Ping Ong.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

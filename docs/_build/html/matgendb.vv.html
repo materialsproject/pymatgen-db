@@ -1,0 +1,1232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vv Package &mdash; pymatgen-db 0.3.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/proBlue.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="pymatgen-db 0.3.2 documentation" href="index.html" />
+ 
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">pymatgen-db 0.3.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="vv-package">
+<h1>vv Package<a class="headerlink" href="#vv-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-matgendb.vv.report">
+<span id="report-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">report</span></tt> Module<a class="headerlink" href="#module-matgendb.vv.report" title="Permalink to this headline">¶</a></h2>
+<p>Description.</p>
+<dl class="class">
+<dt id="matgendb.vv.report.Emailer">
+<em class="property">class </em><tt class="descname">Emailer</tt><big>(</big><em>sender='me&#64;localhost'</em>, <em>recipients=('you&#64;remote.host'</em>, <em>)</em>, <em>subject='Report'</em>, <em>server='localhost'</em>, <em>port=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Emailer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Emailer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.vv.util.DoesLogging" title="matgendb.vv.util.DoesLogging"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.vv.util.DoesLogging</span></tt></a></p>
+<p>Send a report to an email recipient.</p>
+<p>Send reports as email.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param :</th><td class="field-body">sender Sender of the email</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Param :</th><td class="field-body">recipients List of _recipients of the email</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Param :</th><td class="field-body">subject Email _subject line</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Param :</th><td class="field-body">server SMTP server host</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Param :</th><td class="field-body">port SMTP server port (None for default)</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matgendb.vv.report.Emailer.send">
+<tt class="descname">send</tt><big>(</big><em>text</em>, <em>fmt</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Emailer.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Emailer.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the email message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>text</strong> (<em>str</em>) &#8211; The text to send</li>
+<li><strong>fmt</strong> (<em>str</em>) &#8211; The name of the format of the text</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Number of recipients it was sent to</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.HTMLFormatter">
+<em class="property">class </em><tt class="descname">HTMLFormatter</tt><big>(</big><em>line_sep='n'</em>, <em>id_column=0</em>, <em>css=&quot; html {   font-family: 'Helvetica Neue'</em>, <em>Helvetica</em>, <em>Arial</em>, <em>sans-serif; } body {   margin: 2em; } table { margin-top: 1em; clear: both; border: 1px solid grey; } dl</em>, <em>dt</em>, <em>dd { float: left; } dl</em>, <em>dt { clear: both; } dt { width: 8em; font-weight: 700; } dd { width: 32em; } tr.even { background-color: #F2F2FF; } tr.odd { background-color: white; } th</em>, <em>td {   padding: 0.2em 0.5em; } th {   text-align: left;   color: #000066;   border-bottom: 1px solid #000066;   margin: 0; } h1</em>, <em>h2</em>, <em>h3 { clear: both; margin: 0; padding: 0; } h1 { color: #FE5300; } h2 { color: #004489; } &quot;</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#HTMLFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.HTMLFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a report as HTML.</p>
+<dl class="method">
+<dt id="matgendb.vv.report.HTMLFormatter.format">
+<tt class="descname">format</tt><big>(</big><em>report</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#HTMLFormatter.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.HTMLFormatter.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.Header">
+<em class="property">class </em><tt class="descname">Header</tt><big>(</big><em>title=''</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base header class.</p>
+<dl class="method">
+<dt id="matgendb.vv.report.Header.add">
+<tt class="descname">add</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Header.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Header.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.report.Header.get">
+<tt class="descname">get</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Header.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Header.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.report.Header.to_dict">
+<tt class="descname">to_dict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Header.to_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Header.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.JSONFormatter">
+<em class="property">class </em><tt class="descname">JSONFormatter</tt><big>(</big><em>id_column=0</em>, <em>indent=2</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#JSONFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.JSONFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a report as JSON.</p>
+<dl class="method">
+<dt id="matgendb.vv.report.JSONFormatter.format">
+<tt class="descname">format</tt><big>(</big><em>report</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#JSONFormatter.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.JSONFormatter.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.JSONReportEncoder">
+<em class="property">class </em><tt class="descname">JSONReportEncoder</tt><big>(</big><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>encoding='utf-8'</em>, <em>default=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#JSONReportEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.JSONReportEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">json.encoder.JSONEncoder</span></tt></p>
+<p>Constructor for JSONEncoder, with sensible defaults.</p>
+<p>If skipkeys is false, then it is a TypeError to attempt
+encoding of keys that are not str, int, long, float or None.  If
+skipkeys is True, such items are simply skipped.</p>
+<p>If ensure_ascii is true, the output is guaranteed to be str
+objects with all incoming unicode characters escaped.  If
+ensure_ascii is false, the output will be unicode object.</p>
+<p>If check_circular is true, then lists, dicts, and custom encoded
+objects will be checked for circular references during encoding to
+prevent an infinite recursion (which would cause an OverflowError).
+Otherwise, no such check takes place.</p>
+<p>If allow_nan is true, then NaN, Infinity, and -Infinity will be
+encoded as such.  This behavior is not JSON specification compliant,
+but is consistent with most JavaScript based encoders and decoders.
+Otherwise, it will be a ValueError to encode such floats.</p>
+<p>If sort_keys is true, then the output of dictionaries will be
+sorted by key; this is useful for regression tests to ensure
+that JSON serializations can be compared on a day-to-day basis.</p>
+<p>If indent is a non-negative integer, then JSON array
+elements and object members will be pretty-printed with that
+indent level.  An indent level of 0 will only insert newlines.
+None is the most compact representation.</p>
+<p>If specified, separators should be a (item_separator, key_separator)
+tuple.  The default is (&#8216;, &#8216;, &#8216;: &#8216;).  To get the most compact JSON
+representation you should specify (&#8216;,&#8217;, &#8216;:&#8217;) to eliminate whitespace.</p>
+<p>If specified, default is a function that gets called for objects
+that can&#8217;t otherwise be serialized.  It should return a JSON encodable
+version of the object or raise a <tt class="docutils literal"><span class="pre">TypeError</span></tt>.</p>
+<p>If encoding is not None, then all input strings will be
+transformed into unicode using that encoding prior to JSON-encoding.
+The default is UTF-8.</p>
+<dl class="method">
+<dt id="matgendb.vv.report.JSONReportEncoder.default">
+<tt class="descname">default</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#JSONReportEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.JSONReportEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.MarkdownFormatter">
+<em class="property">class </em><tt class="descname">MarkdownFormatter</tt><big>(</big><em>id_column=0</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#MarkdownFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.MarkdownFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a report as markdown</p>
+<dl class="method">
+<dt id="matgendb.vv.report.MarkdownFormatter.format">
+<tt class="descname">format</tt><big>(</big><em>report</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#MarkdownFormatter.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.MarkdownFormatter.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.Report">
+<em class="property">class </em><tt class="descname">Report</tt><big>(</big><em>header</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create blank report, with a header.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>header</strong> (<em>ReportHeader</em>) &#8211; Report header</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matgendb.vv.report.Report.add_section">
+<tt class="descname">add_section</tt><big>(</big><em>section</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Report.add_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Report.add_section" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.report.Report.header">
+<tt class="descname">header</tt><a class="reference internal" href="_modules/matgendb/vv/report.html#Report.header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Report.header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.report.Report.is_empty">
+<tt class="descname">is_empty</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Report.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Report.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.vv.report.ReportBackupError">
+<em class="property">exception </em><tt class="descname">ReportBackupError</tt><a class="reference internal" href="_modules/matgendb/vv/report.html#ReportBackupError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.ReportBackupError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.ReportHeader">
+<em class="property">class </em><tt class="descname">ReportHeader</tt><big>(</big><em>title=''</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#ReportHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.ReportHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.vv.report.Header" title="matgendb.vv.report.Header"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.vv.report.Header</span></tt></a></p>
+<p>Header for entire report.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.ReportSection">
+<em class="property">class </em><tt class="descname">ReportSection</tt><big>(</big><em>header</em>, <em>body=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#ReportSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.ReportSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.vv.report.Report" title="matgendb.vv.report.Report"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.vv.report.Report</span></tt></a></p>
+<p>Section within a report, with data.</p>
+<p>Create new report section, initialized with header and body.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>header</strong> (<em>SectionHeader</em>) &#8211; The header for the section</li>
+<li><strong>body</strong> (<em>Table</em>) &#8211; The body of the section, or None if this is a container for sub-sections</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.vv.report.ReportSection.body">
+<tt class="descname">body</tt><a class="reference internal" href="_modules/matgendb/vv/report.html#ReportSection.body"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.ReportSection.body" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.SectionHeader">
+<em class="property">class </em><tt class="descname">SectionHeader</tt><big>(</big><em>title=''</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#SectionHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.SectionHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.vv.report.Header" title="matgendb.vv.report.Header"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.vv.report.Header</span></tt></a></p>
+<p>Header for one section of a report.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.Table">
+<em class="property">class </em><tt class="descname">Table</tt><big>(</big><em>colnames</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table of values.</p>
+<dl class="method">
+<dt id="matgendb.vv.report.Table.add">
+<tt class="descname">add</tt><big>(</big><em>values</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Table.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Table.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.report.Table.column_names">
+<tt class="descname">column_names</tt><a class="reference internal" href="_modules/matgendb/vv/report.html#Table.column_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Table.column_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.report.Table.column_widths">
+<tt class="descname">column_widths</tt><a class="reference internal" href="_modules/matgendb/vv/report.html#Table.column_widths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Table.column_widths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.report.Table.ncol">
+<tt class="descname">ncol</tt><a class="reference internal" href="_modules/matgendb/vv/report.html#Table.ncol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Table.ncol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.report.Table.nrow">
+<tt class="descname">nrow</tt><a class="reference internal" href="_modules/matgendb/vv/report.html#Table.nrow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Table.nrow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.report.Table.sortby">
+<tt class="descname">sortby</tt><big>(</big><em>name_or_index</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#Table.sortby"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Table.sortby" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.report.Table.values">
+<tt class="descname">values</tt><a class="reference internal" href="_modules/matgendb/vv/report.html#Table.values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.Table.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.vv.util">
+<span id="util-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">util</span></tt> Module<a class="headerlink" href="#module-matgendb.vv.util" title="Permalink to this headline">¶</a></h2>
+<p>Utility functions and classes for validation.</p>
+<dl class="class">
+<dt id="matgendb.vv.util.DoesLogging">
+<em class="property">class </em><tt class="descname">DoesLogging</tt><big>(</big><em>name=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/util.html#DoesLogging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.util.DoesLogging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mix-in class that creates the attribute &#8216;log&#8217;, setting its qualified
+name to the name of the module and class.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.vv.util.total_size">
+<tt class="descname">total_size</tt><big>(</big><em>o</em>, <em>handlers={}</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/util.html#total_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.util.total_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the approximate memory footprint an object and all of its contents.</p>
+<p>Automatically finds the contents of the following builtin containers and
+their subclasses:  tuple, list, deque, dict, set and frozenset.
+To search other containers, add handlers to iterate over their contents:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>handlers = {SomeContainerClass: iter,</dt>
+<dd>OtherContainerClass: OtherContainerClass.get_elements}</dd>
+</dl>
+</div></blockquote>
+<p>Source: <a class="reference external" href="http://code.activestate.com/recipes/577504/">http://code.activestate.com/recipes/577504/</a> (r3)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.vv.validate">
+<span id="validate-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">validate</span></tt> Module<a class="headerlink" href="#module-matgendb.vv.validate" title="Permalink to this headline">¶</a></h2>
+<p>Collection validator</p>
+<dl class="class">
+<dt id="matgendb.vv.validate.Constraint">
+<em class="property">class </em><tt class="descname">Constraint</tt><big>(</big><em>field</em>, <em>operator</em>, <em>value</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Definition of a single constraint.</p>
+<p>Create constraint on a field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>field</strong> (<em>Field or str</em>) &#8211; A constraint field</li>
+<li><strong>operator</strong> (<em>ConstraintOperator or str</em>) &#8211; A constraint operator</li>
+<li><strong>value</strong> (<em>str, Number</em>) &#8211; Target value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise :</th><td class="field-body"><p class="first last">ValueError if operator/value combination is illegal, or if
+building a Field or ConstraintOperator instance fails.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Constraint.TYPE_MAPPING">
+<tt class="descname">TYPE_MAPPING</tt><em class="property"> = {'boolean': &lt;type 'bool'&gt;, 'bool': &lt;type 'bool'&gt;, 'string': &lt;type 'str'&gt;, 'str': &lt;type 'str'&gt;, 'int': &lt;class 'numbers.Number'&gt;, 'integer': &lt;class 'numbers.Number'&gt;, 'float': &lt;class 'numbers.Number'&gt;, 'number': &lt;class 'numbers.Number'&gt;}</em><a class="headerlink" href="#matgendb.vv.validate.Constraint.TYPE_MAPPING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.Constraint.passes">
+<tt class="descname">passes</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Constraint.passes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Constraint.passes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the given value pass this constraint?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True,None if so; False,&lt;expected&gt; if not</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.ConstraintGroup">
+<em class="property">class </em><tt class="descname">ConstraintGroup</tt><big>(</big><em>field=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Definition of a group of constraints, for a given field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>field</strong> (<em>Field (cannot be None)</em>) &#8211; The field to which all constraints apply</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintGroup.add_constraint">
+<tt class="descname">add_constraint</tt><big>(</big><em>op</em>, <em>val</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintGroup.add_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintGroup.add_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new constraint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>op</strong> (<em>ConstraintOperator</em>) &#8211; Constraint operator</li>
+<li><strong>val</strong> (<em>str,Number</em>) &#8211; Constraint value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise :</th><td class="field-body"><p class="first last">ValueError if combination of constraints is illegal</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintGroup.add_existence">
+<tt class="descname">add_existence</tt><big>(</big><em>rev</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintGroup.add_existence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintGroup.add_existence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add existence constraint for the field.</p>
+<p>This is necessary because the normal meaning of &#8216;x &gt; 0&#8217; is: x &gt; 0 and is present.
+Without the existence constraint, MongoDB will treat &#8216;x &gt; 0&#8217; as: &#8216;x&#8217; &gt; 0 <em>or</em> is absent.
+Of course, if the constraint is already about existence, nothing is done.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintGroup.existence_constraints">
+<tt class="descname">existence_constraints</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintGroup.existence_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintGroup.existence_constraints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintGroup.get_conflicts">
+<tt class="descname">get_conflicts</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintGroup.get_conflicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintGroup.get_conflicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get conflicts in constraints, if any.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Description of each conflict, empty if none.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintGroup.has_array">
+<tt class="descname">has_array</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintGroup.has_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintGroup.has_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.ConstraintOperator">
+<em class="property">class </em><tt class="descname">ConstraintOperator</tt><big>(</big><em>op</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operator in a single constraint.</p>
+<p>Create new operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>op</strong> (<em>str</em>) &#8211; Operator string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise :</th><td class="field-body">ValueError for bad op</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.EXISTS">
+<tt class="descname">EXISTS</tt><em class="property"> = 'exists'</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.EXISTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.OP_NOT">
+<tt class="descname">OP_NOT</tt><em class="property"> = {'size': 'size', '&gt;=': '&lt;', 'exists': 'exists', 'type': 'type', '!=': '=', '&lt;=': '&gt;', '=': '!=', '&lt;': '&gt;=', '&gt;': '&lt;='}</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.OP_NOT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.PY_INEQ">
+<tt class="descname">PY_INEQ</tt><em class="property"> = {'=': '=='}</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.PY_INEQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.SIZE">
+<tt class="descname">SIZE</tt><em class="property"> = 'size'</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.SZ_EQ">
+<tt class="descname">SZ_EQ</tt><em class="property"> = 1</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.SZ_EQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.SZ_GT">
+<tt class="descname">SZ_GT</tt><em class="property"> = 2</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.SZ_GT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.SZ_LT">
+<tt class="descname">SZ_LT</tt><em class="property"> = 3</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.SZ_LT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.SZ_MAPPING">
+<tt class="descname">SZ_MAPPING</tt><em class="property"> = {'$': 4, '&lt;': 3, '&gt;': 2}</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.SZ_MAPPING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.SZ_OPS">
+<tt class="descname">SZ_OPS</tt><em class="property"> = {1: '=', 2: '&gt;', 3: '&lt;', 4: '='}</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.SZ_OPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.SZ_VAR">
+<tt class="descname">SZ_VAR</tt><em class="property"> = 4</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.SZ_VAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.TYPE">
+<tt class="descname">TYPE</tt><em class="property"> = 'type'</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.VALID_OPS">
+<tt class="descname">VALID_OPS</tt><em class="property"> = set(['&gt;=', 'exists', 'size&lt;', 'type', 'size&gt;', '&lt;=', 'size$', '=', '&gt;', '!=', '&lt;', 'size'])</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.VALID_OPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.compare">
+<tt class="descname">compare</tt><big>(</big><em>lhs_value</em>, <em>rhs_value</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare left- and right-size of: value &lt;op&gt; value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lhs_value</strong> &#8211; Value to left of operator</li>
+<li><strong>rhs_value</strong> &#8211; Value to right of operator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the comparison is valid</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_eq">
+<tt class="descname">is_eq</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_eq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_eq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this an equality operation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Whether it is equal</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_equality">
+<tt class="descname">is_equality</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_equality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_equality" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_exists">
+<tt class="descname">is_exists</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get whether this is an existence operator.
+:return: True or False</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_inequality">
+<tt class="descname">is_inequality</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_inequality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_inequality" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_neq">
+<tt class="descname">is_neq</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_neq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_neq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_size">
+<tt class="descname">is_size</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get whether this is a size operator.
+:return: True or False</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_size_eq">
+<tt class="descname">is_size_eq</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_size_eq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_size_eq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this an equality size operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True or False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raise :</th><td class="field-body">ValueError, if not a size operator at all</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_size_gt">
+<tt class="descname">is_size_gt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_size_gt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_size_gt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this a greater-than size operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True or False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raise :</th><td class="field-body">ValueError, if not a size operator at all</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_size_lt">
+<tt class="descname">is_size_lt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_size_lt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_size_lt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this a less-than size operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True or False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raise :</th><td class="field-body">ValueError, if not a size operator at all</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_type">
+<tt class="descname">is_type</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the operator is &#8216;type&#8217;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True or False</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.is_variable">
+<tt class="descname">is_variable</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.is_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.is_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the operator target is a variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True or False</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintOperator.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.reverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.reverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.size_op">
+<tt class="descname">size_op</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintOperator.size_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.size_op" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintOperator.size_sfx">
+<tt class="descname">size_sfx</tt><em class="property"> = '&gt;'</em><a class="headerlink" href="#matgendb.vv.validate.ConstraintOperator.size_sfx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.ConstraintViolation">
+<em class="property">class </em><tt class="descname">ConstraintViolation</tt><big>(</big><em>constraint</em>, <em>value</em>, <em>expected</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintViolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintViolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>A single constraint violation, with no metadata.</p>
+<p>Create new constraint violation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>constraint</strong> (<em>Constraint</em>) &#8211; The constraint that was violated</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintViolation.expected_value">
+<tt class="descname">expected_value</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintViolation.expected_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintViolation.expected_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintViolation.field">
+<tt class="descname">field</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintViolation.field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintViolation.field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintViolation.got_value">
+<tt class="descname">got_value</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintViolation.got_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintViolation.got_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ConstraintViolation.op">
+<tt class="descname">op</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintViolation.op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintViolation.op" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.ConstraintViolationGroup">
+<em class="property">class </em><tt class="descname">ConstraintViolationGroup</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintViolationGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintViolationGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>A group of constraint violations with metadata.</p>
+<p>Create an empty object.</p>
+<dl class="method">
+<dt id="matgendb.vv.validate.ConstraintViolationGroup.add_violations">
+<tt class="descname">add_violations</tt><big>(</big><em>violations</em>, <em>record=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ConstraintViolationGroup.add_violations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ConstraintViolationGroup.add_violations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add constraint violations and associated record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>violations</strong> (<em>list(ConstraintViolation)</em>) &#8211; List of violations</li>
+<li><strong>record</strong> (<em>dict</em>) &#8211; Associated record</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.vv.validate.DBError">
+<em class="property">exception </em><tt class="descname">DBError</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#DBError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.DBError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.Field">
+<em class="property">class </em><tt class="descname">Field</tt><big>(</big><em>name</em>, <em>aliases=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single field in a constraint.</p>
+<p>Create from field name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) &#8211; Field name.</li>
+<li><strong>aliases</strong> (<em>dict</em>) &#8211; Aliases for all fields</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise :</th><td class="field-body"><p class="first last">ValueError for non-string name</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Field.PICK_SEP">
+<tt class="descname">PICK_SEP</tt><em class="property"> = '/'</em><a class="headerlink" href="#matgendb.vv.validate.Field.PICK_SEP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Field.full_name">
+<tt class="descname">full_name</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#Field.full_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Field.full_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.Field.has_subfield">
+<tt class="descname">has_subfield</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Field.has_subfield"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Field.has_subfield" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Field.name">
+<tt class="descname">name</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#Field.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Field.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Field.sub_name">
+<tt class="descname">sub_name</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#Field.sub_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Field.sub_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.MongoClause">
+<em class="property">class </em><tt class="descname">MongoClause</tt><big>(</big><em>constraint</em>, <em>rev=True</em>, <em>exists_main=False</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoClause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoClause" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation of query clause in a MongoDB query.</p>
+<p>Ho! Ho! Ho! Merry Mongxmas!</p>
+<p>Create new clause from a constraint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>constraint</strong> (<em>Constraint</em>) &#8211; The constraint</li>
+<li><strong>rev</strong> &#8211; Whether to reverse the sense of the constraint, i.e. in order</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>to select records that do not meet it.
+:type rev: bool
+:param exists_main: Put exists into main clause
+:type exists_main: bool
+:raise: AssertionError if constraint is None</p>
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.JS_OPS">
+<tt class="descname">JS_OPS</tt><em class="property"> = {'=': '=='}</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.JS_OPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.JS_TYPES">
+<tt class="descname">JS_TYPES</tt><em class="property"> = {&lt;type 'str'&gt;: 'string', &lt;class 'numbers.Number'&gt;: 'number', &lt;type 'bool'&gt;: 'boolean'}</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.JS_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.LOC_MAIN">
+<tt class="descname">LOC_MAIN</tt><em class="property"> = 0</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.LOC_MAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.LOC_MAIN2">
+<tt class="descname">LOC_MAIN2</tt><em class="property"> = 2</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.LOC_MAIN2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.LOC_WHERE">
+<tt class="descname">LOC_WHERE</tt><em class="property"> = 1</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.LOC_WHERE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.MONGO_OPS">
+<tt class="descname">MONGO_OPS</tt><em class="property"> = {'size': '$size', '&gt;=': '$gte', 'exists': '$exists', '=': None, '!=': '$ne', '&lt;=': '$lte', 'type': '$type', '&lt;': '$lt', '&gt;': '$gt'}</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.MONGO_OPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.MONGO_OPS_REV">
+<tt class="descname">MONGO_OPS_REV</tt><em class="property"> = {'$ne': '!=', '$type': 'type', '$size': 'size', '$exists': 'exists', '$gt': '&gt;', '$lt': '&lt;', '$lte': '&lt;=', '$gte': '&gt;='}</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.MONGO_OPS_REV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.constraint">
+<tt class="descname">constraint</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoClause.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoClause.constraint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.expr">
+<tt class="descname">expr</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoClause.expr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoClause.expr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query expression</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoClause.query_loc">
+<tt class="descname">query_loc</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoClause.query_loc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoClause.query_loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Where this clause should go in the query.
+The two possible values are enumerated by variables in this class:</p>
+<blockquote>
+<div>MongoClause.LOC_MAIN
+MongoClause.LOC_WHERE</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Location code</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.MongoQuery">
+<em class="property">class </em><tt class="descname">MongoQuery</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoQuery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>MongoDB query composed of MongoClause objects.</p>
+<p>Create empty query.</p>
+<dl class="method">
+<dt id="matgendb.vv.validate.MongoQuery.add_clause">
+<tt class="descname">add_clause</tt><big>(</big><em>clause</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoQuery.add_clause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoQuery.add_clause" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new clause to the existing query.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>clause</strong> (<em>MongoClause</em>) &#8211; The clause to add</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoQuery.all_clauses">
+<tt class="descname">all_clauses</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoQuery.all_clauses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoQuery.all_clauses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoQuery.clauses">
+<tt class="descname">clauses</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoQuery.clauses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoQuery.clauses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.MongoQuery.to_mongo">
+<tt class="descname">to_mongo</tt><big>(</big><em>disjunction=True</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoQuery.to_mongo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoQuery.to_mongo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create from current state a valid MongoDB query expression.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">MongoDB query expression</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.MongoQuery.where_clauses">
+<tt class="descname">where_clauses</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoQuery.where_clauses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoQuery.where_clauses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.ProgressMeter">
+<em class="property">class </em><tt class="descname">ProgressMeter</tt><big>(</big><em>num</em>, <em>fmt</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ProgressMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ProgressMeter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple progress tracker</p>
+<dl class="attribute">
+<dt id="matgendb.vv.validate.ProgressMeter.count">
+<tt class="descname">count</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#ProgressMeter.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ProgressMeter.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ProgressMeter.set_subject">
+<tt class="descname">set_subject</tt><big>(</big><em>subj</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ProgressMeter.set_subject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ProgressMeter.set_subject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.ProgressMeter.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#ProgressMeter.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.ProgressMeter.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.Projection">
+<em class="property">class </em><tt class="descname">Projection</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#Projection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Projection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fields on which to project the query results.</p>
+<dl class="method">
+<dt id="matgendb.vv.validate.Projection.add">
+<tt class="descname">add</tt><big>(</big><em>field</em>, <em>op=None</em>, <em>val=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Projection.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Projection.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update report fields to include new one, if it doesn&#8217;t already.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>field</strong> (<em>Field</em>) &#8211; The field to include</li>
+<li><strong>op</strong> (<em>ConstraintOperator</em>) &#8211; Operation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.Projection.to_mongo">
+<tt class="descname">to_mongo</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Projection.to_mongo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Projection.to_mongo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate projection to MongoDB query form.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary to put into a MongoDB JSON query</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.Sampler">
+<em class="property">class </em><tt class="descname">Sampler</tt><big>(</big><em>coll=None</em>, <em>min_items=0</em>, <em>max_items=1000000000.0</em>, <em>p=1.0</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Sampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly sample a proportion of the full collection.</p>
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Sampler.is_empty">
+<tt class="descname">is_empty</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#Sampler.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Sampler.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.Sampler.sample">
+<tt class="descname">sample</tt><big>(</big><em>fields=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Sampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Sampler.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract records randomly from the database.
+Continue until the target proportion of the items have been
+extracted, or until <cite>min_items</cite> if this is larger.
+If <cite>max_items</cite> is non-negative, do not extract more than these.</p>
+<p>This function is a generator, yielding items incrementally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fields</strong> (<em>list(str)</em>) &#8211; Fields to extract from each record, for find()</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">yields the zero-based index and value of each item</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">yields (int, int)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise :</th><td class="field-body">ValueError, if max_items is valid and less than <cite>min_items</cite>
+or if target collection is empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.validate.Validator">
+<em class="property">class </em><tt class="descname">Validator</tt><big>(</big><em>max_violations=50</em>, <em>max_dberrors=10</em>, <em>aliases=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Validator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.vv.util.DoesLogging" title="matgendb.vv.util.DoesLogging"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.vv.util.DoesLogging</span></tt></a></p>
+<p>Validate a collection.</p>
+<dl class="method">
+<dt id="matgendb.vv.validate.Validator.num_violations">
+<tt class="descname">num_violations</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Validator.num_violations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Validator.num_violations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.Validator.set_aliases">
+<tt class="descname">set_aliases</tt><big>(</big><em>new_value</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Validator.set_aliases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Validator.set_aliases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set aliases and wrap errors in ValueError</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.Validator.set_progress">
+<tt class="descname">set_progress</tt><big>(</big><em>num</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Validator.set_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Validator.set_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report progress every <cite>num</cite> bad records.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>num</strong> (<em>int</em>) &#8211; Report interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.vv.validate.Validator.validate">
+<tt class="descname">validate</tt><big>(</big><em>coll</em>, <em>constraint_sections</em>, <em>subject='collection'</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Validator.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Validator.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validation of  a collection.
+This is a generator that yields ConstraintViolationGroups.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sets of constraint violation, one for each constraint_section</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ConstraintViolationGroup</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.vv.validate.mongo_get">
+<tt class="descname">mongo_get</tt><big>(</big><em>rec</em>, <em>key</em>, <em>default=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#mongo_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.mongo_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get value from dict using MongoDB dot-separated path semantics.</p>
+<dl class="docutils">
+<dt>For example:</dt>
+<dd>get_mongo({&#8216;a&#8217;:{&#8216;b&#8217;:1}, x:2}, &#8216;a.b&#8217;) -&gt; 1
+get_mongo({&#8216;a&#8217;:{&#8216;b&#8217;:1}, x:2}, &#8216;x&#8217;) -&gt; 2
+get_mongo({&#8216;a&#8217;:{&#8216;b&#8217;:1}, x:2}, &#8216;a.b.c&#8217;) -&gt; None</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rec</strong> &#8211; mongodb document</li>
+<li><strong>key</strong> &#8211; path to mongo value</li>
+<li><strong>default</strong> &#8211; default to return if not found</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">value, potentially nested, or default if not found</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raise :</th><td class="field-body"><p class="first last">ValueError, if record is not a dict or key is invalid.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">vv Package</a><ul>
+<li><a class="reference internal" href="#module-matgendb.vv.report"><tt class="docutils literal"><span class="pre">report</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-matgendb.vv.util"><tt class="docutils literal"><span class="pre">util</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-matgendb.vv.validate"><tt class="docutils literal"><span class="pre">validate</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/matgendb.vv.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">pymatgen-db 0.3.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2011, Shyue Ping Ong.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>
