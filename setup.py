@@ -47,5 +47,6 @@ setup(
         "Topic :: Database",
         "Topic :: Database :: Front-Ends"
     ],
-    scripts=[os.path.join("scripts", f) for f in os.listdir("scripts")]
+    scripts=[os.path.join("scripts", f) for f in os.listdir("scripts")
+             if not os.path.isdir(os.path.join("scripts", f))]
 )
