@@ -8,6 +8,8 @@ __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Dec 1, 2012"
 
+import bson
+import datetime
 import json
 import os
 
@@ -35,3 +37,11 @@ def get_settings(config_file):
             return json.load(f)
     else:
         return dict(DEFAULT_SETTINGS)
+
+class MongoJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, bson.objectid.ObjectId):
+            return str(o)
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()
+        return json.JSONEncoder.default(self, o)

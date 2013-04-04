@@ -49,7 +49,7 @@ class QueryEngine(object):
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
-                 aliases_config=None):
+                 aliases_config=None, default_properties=None):
         """
         Args:
             host:
@@ -95,6 +95,10 @@ class QueryEngine(object):
                 only. Note that defaults do not affect explicitly specified
                 criteria, i.e., if you suppy a query for {"state": "killed"},
                 this will override the default for {"state": "successful"}.
+            default_properties:
+                List of property names (strings) to use by default, if no
+                properties are given to the 'properties' argument of
+                query().
         """
         self.host = host
         self.port = port
@@ -114,6 +118,11 @@ class QueryEngine(object):
         else:
             self.aliases = aliases_config["aliases"]
             self.defaults = aliases_config["defaults"]
+        # set default properties
+        if default_properties is None:
+            self._default_props, self._default_prop_dict = None, None
+        else:
+            self._default_props, self._default_prop_dict = self._parse_properties(default_properties)
 
     def __enter__(self):
         """Allows for use with the 'with' context manager"""
@@ -292,18 +301,9 @@ class QueryEngine(object):
         """
 
         if properties is not None:
-            props = []
-            prop_dict = OrderedDict()
-            for p in properties:
-                if p in self.aliases:
-                    props.append(self.aliases[p])
-                    prop_dict[p] = self.aliases[p].split(".")
-                else:
-                    props.append(p)
-                    prop_dict[p] = p.split(".")
+            props, prop_dict = self._parse_properties(properties)
         else:
-            props = None
-            prop_dict = None
+            props, prop_dict = self._default_props, self._default_prop_dict
 
         crit = self._parse_criteria(criteria) if criteria is not None else {}
         cur = self.collection.find(crit, fields=props,
@@ -313,6 +313,22 @@ class QueryEngine(object):
         else:
             cur.limit(limit)
             return QueryResults(prop_dict, cur)
+
+    def _parse_properties(self, properties):
+        """Make list of properties into 2 things:
+        (1) list of aliased fields for a mongodb query
+        (2) dictionary, keyed by aliased field, for display
+        """
+        props = []
+        prop_dict = OrderedDict()
+        for p in properties:
+            if p in self.aliases:
+                props.append(self.aliases[p])
+                prop_dict[p] = self.aliases[p].split(".")
+            else:
+                props.append(p)
+                prop_dict[p] = p.split(".")
+        return props, prop_dict
 
     def query_one(self, properties=None, criteria=None, index=0):
         """

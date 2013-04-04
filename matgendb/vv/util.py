@@ -9,6 +9,7 @@ __email__ = "dkgunter@lbl.gov"
 __status__ = "Development"
 __date__ = "3/29/13"
 
+import json
 import logging
 from sys import getsizeof, stderr
 from itertools import chain
@@ -72,3 +73,5 @@ def total_size(o, handlers={}, verbose=False):
         return s
 
     return sizeof(o)
+
+

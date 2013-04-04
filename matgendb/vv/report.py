@@ -13,6 +13,7 @@ import smtplib
 
 from pymatgen import PMGJSONEncoder
 from .util import DoesLogging
+from ..util import MongoJSONEncoder
 
 class Report:
     def __init__(self, header):
@@ -272,18 +273,15 @@ class JSONFormatter:
                 for s in report
             ]
         )
-        return json.dumps(obj, indent=self._indent, cls=JSONReportEncoder)
+        return json.dumps(obj, indent=self._indent, cls=MongoJSONEncoder)
 
-
-class JSONReportEncoder(json.JSONEncoder):
+class ReportJSONEncoder(MongoJSONEncoder):
     def default(self, o):
         if isinstance(o, Header):
             return o.to_dict()
         elif isinstance(o, Table):
             return o.values
-        elif isinstance(o, bson.objectid.ObjectId):
-            return str(o)
-        return json.JSONEncoder.default(self, o)
+        return MongoJSONEncoder.default(self, o)
 
 
 class MarkdownFormatter:

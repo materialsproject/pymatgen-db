@@ -1002,22 +1002,32 @@ class Validator(DoesLogging):
         return self.MONGO_RELATIONS[op]
 
 
-
 class Sampler:
     """Randomly sample a proportion of the full collection.
     """
-    def __init__(self, coll=None, min_items=0, max_items=1e9, p=1.0):
-        self.coll = coll
+    DIST_RUNIF = 1
+    DEFAULT_DIST = DIST_RUNIF
+
+    def __init__(self, min_items=0, max_items=1e9, p=1.0, distrib=DEFAULT_DIST):
+        """Create new parameterized sampler.
+
+        :param min_items: Minimum number of items in the sample
+        :param max_items: Maximum number of items in the sample
+        :param p: Probability of selecting an item
+        :param distrib: Probability distribution
+        :type distrib: str
+        """
         self.min_items = min_items
         self.max_items = max_items
         self.p = p
         self._empty = True
+        self._dist = distrib
 
     @property
     def is_empty(self):
         return self._empty
 
-    def sample(self, fields=None):
+    def sample(self, coll=None, fields=None):
         """Extract records randomly from the database.
         Continue until the target proportion of the items have been
         extracted, or until `min_items` if this is larger.
@@ -1032,7 +1042,7 @@ class Sampler:
         :raise: ValueError, if max_items is valid and less than `min_items`
                 or if target collection is empty
         """
-        count = self.coll.count()
+        count = coll.count()
 
         # special case: empty collection
         if count == 0:
@@ -1062,7 +1072,7 @@ class Sampler:
             # skip ahead some random amount
             offs = (offs + random.randrange(0, step)) % count
             # get item
-            item = self.coll.find(skip=offs, limit=1, fields=fields)[0]
+            item = coll.find(skip=offs, limit=1, fields=fields)[0]
             # give item to caller
             yield (offs, item)
             # increment & loop
