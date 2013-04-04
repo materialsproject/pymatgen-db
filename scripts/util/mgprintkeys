@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import pymongo
+import sys
+
+def run(db, coll, user, passwd):
+    cl = pymongo.MongoClient()
+    db = cl[db]
+    ok = db.authenticate(user, passwd)
+    if not ok:
+        print("auth failed")
+        sys.exit(1)
+    c = db[coll]
+    def printkeys(x,pre=''):
+        for k in x:
+            print(pre+k)
+            if isinstance(x[k],dict):
+                printkeys(x[k],pre+k+'.')
+    printkeys(c.find_one())
+
+if __name__ == '__main__':
+    if len(sys.argv) < 5:
+        print("usage: mgprintkeys <db> <collection> <user> <password>")
+        sys.exit(1)
+    db, coll, user, passwd = sys.argv[1:]
+    run(db, coll, user, passwd)

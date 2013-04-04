@@ -23,7 +23,6 @@ import argparse
 
 from pymatgen.apps.borg.queen import BorgQueen
 
-from matgendb.util import get_settings, DEFAULT_SETTINGS
 from matgendb.query_engine import QueryEngine
 from matgendb.creator import VaspToDbTaskDrone
 from matgendb.util import get_settings, DEFAULT_SETTINGS, MongoJSONEncoder
