@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pymatgen-db &mdash; pymatgen-db 0.3.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/proBlue.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="pymatgen-db 0.3.2 documentation" href="#" />
+ 
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">pymatgen-db 0.3.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pymatgen-db">
+<h1>Pymatgen-db<a class="headerlink" href="#pymatgen-db" title="Permalink to this headline">¶</a></h1>
+<p>Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
+materials analysis library. It enables the creation of Materials
+Project-style <a class="reference external" href="http://www.mongodb.org/">MongoDB</a> databases for management of materials data. A query
+engine is also provided to enable the easy translation of MongoDB docs to
+useful pymatgen objects for analysis purposes.</p>
+<p>Pymatgen-db also provides a clean and intuitive web ui (the
+<a class="reference internal" href="#materials-genomics-ui">Materials Genomics UI</a>) for exploring Mongo collections. While the design
+originates for the purpose of exploring collections generated using
+pymatgen-db, it can be used to explore any Mongo database and collection.</p>
+</div>
+<div class="section" id="change-log">
+<h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="version-0-3-2">
+<h2>Version 0.3.2<a class="headerlink" href="#version-0-3-2" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Add option to use the Materials API to obtain stability data during run
+insertion.</li>
+<li>Materials Genomics UI now supports setting a limit on number of results
+returned.</li>
+<li>Improvements to mgdb script to allow setting of hosts, etc.</li>
+</ol>
+</div>
+<div class="section" id="version-0-3-0">
+<h2>Version 0.3.0<a class="headerlink" href="#version-0-3-0" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Significant update to materials genomics ui. Ability to export table data
+to CSV, XLS or PDF.</li>
+<li>First version of RESTful interface implemented.</li>
+</ol>
+<p><a class="reference internal" href="changelog.html"><em>Older versions</em></a></p>
+</div>
+</div>
+<div class="section" id="getting-pymatgen-db">
+<h1>Getting pymatgen-db<a class="headerlink" href="#getting-pymatgen-db" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="stable-version">
+<h2>Stable version<a class="headerlink" href="#stable-version" title="Permalink to this headline">¶</a></h2>
+<p>The version at the Python Package Index (PyPI) is always the latest stable
+release that will be hopefully, be relatively bug-free. The easiest way to
+install pymatgen on any system is to use easy_install or pip, as follows:</p>
+<div class="highlight-python"><pre>easy_install pymatgen-db</pre>
+</div>
+<p>or:</p>
+<div class="highlight-python"><pre>pip install pymatgen-db</pre>
+</div>
+</div>
+<div class="section" id="developmental-version">
+<h2>Developmental version<a class="headerlink" href="#developmental-version" title="Permalink to this headline">¶</a></h2>
+<p>The bleeding edge developmental version is at the pymatgen-db&#8217;s <a class="reference external" href="https://github.com/materialsproject/pymatgen-db">Github repo</a>.
+The developmental version is likely to be more buggy, but may contain new
+features. The Github version include test files as well for complete unit
+testing. After cloning the source, you can type:</p>
+<div class="highlight-python"><pre>python setup.py install</pre>
+</div>
+<p>or to install the package in developmental mode:</p>
+<div class="highlight-python"><pre>python setup.py develop</pre>
+</div>
+</div>
+</div>
+<div class="section" id="requirements">
+<h1>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h1>
+<p>All required python dependencies should be automatically taken care of if you
+install pymatgen-db using easy_install or pip. Otherwise, these packages should
+be available on <a class="reference external" href="http://pypi.python.org">PyPI</a>.</p>
+<ol class="arabic simple">
+<li>Python 2.7+ required. New default modules such as json are used, as well as
+new unittest features in Python 2.7.</li>
+<li>pymatgen 2.5+, including all dependencies associated with it. Please refer
+to the <a class="reference external" href="http://pythonhosted.org//pymatgen">pymatgen docs</a> for detailed
+installation instructions.</li>
+<li>pymongo 2.4+: For interfacing with MongoDb.</li>
+<li>MongoDB 2.2+: Get it at the <a class="reference external" href="http://www.mongodb.org/">MongoDB</a> website.</li>
+</ol>
+</div>
+<div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>A powerful command-line script (mgdb) provides most of the access to many of
+the features in pymatgen-db, including db initialization, insertion of data,
+running the materials genomics ui, etc. To see all options available, type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mgdb</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+<div class="section" id="initial-setup">
+<h2>Initial setup<a class="headerlink" href="#initial-setup" title="Permalink to this headline">¶</a></h2>
+<p>The first step is to install and setup MongoDB on a server of your choice.
+The <a class="reference external" href="http://docs.mongodb.org/manual/">MongoDB manual</a> is an excellent place to start. For the purposes of
+testing out the tools here, you may simply download the binary distributions
+corresponding to your OS from the <a class="reference external" href="http://www.mongodb.org/">MongoDB</a> website, and then running the
+following commands:</p>
+<div class="highlight-python"><pre># For Mac and Linux OS.
+mkdir test_db &amp;&amp; mongod --dbpath test_db</pre>
+</div>
+<p>This will create a test database and start the Mongo daemon. Once you are
+done with testing, you can simply press Ctrl-C to stop the server and delete
+the &#8220;test_db&#8221; folder.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Running a Mongo server this way is insecure as Mongo does not enable
+authentication by default. Please refer to the <a class="reference external" href="http://docs.mongodb.org/manual/">MongoDB manual</a> when
+setting up your production database.</p>
+</div>
+<p>After your server is up, you should create a database config file by running
+the following command:</p>
+<div class="highlight-python"><pre>mgdb init -c db.json</pre>
+</div>
+<p>This will prompt you for a few parameters to create a database config file,
+which will make it much easier to use mgdb in future. Note that the config file
+name can be anything of your choice, but using &#8220;db.json&#8221; will allow you to use
+mgdb without explicitly specifying the filename in future. If you are just
+testing using the test database, simply hit Enter to accept the defaults for
+all settings.</p>
+<p>For more advanced use of the &#8220;db.json&#8221; config file (e.g., specifying aliases,
+defaults, etc., please refer to the following <a class="reference external" href="_static/db.json">sample</a>.</p>
+</div>
+<div class="section" id="inserting-calculations">
+<h2>Inserting calculations<a class="headerlink" href="#inserting-calculations" title="Permalink to this headline">¶</a></h2>
+<p>To insert an entire directory of runs (where the topmost directory is
+&#8220;dir_name&#8221;) into the database, use the following command:</p>
+<div class="highlight-python"><pre># Note that "-c db.json" may be omitted if the config filename is the
+# current directory under the default filename of db.json.
+
+mgdb insert -c db.json dir_name</pre>
+</div>
+<p>A sample run has been provided for <a class="reference external" href="_static/Li2O.zip">download</a> for
+testing purposes. Unzip the file and run the above command in the directory.</p>
+</div>
+<div class="section" id="materials-genomics-ui">
+<h2>Materials Genomics UI<a class="headerlink" href="#materials-genomics-ui" title="Permalink to this headline">¶</a></h2>
+<p>A simple web interface has been provided to assist in the querying and
+viewing of results. This web interface can be started by running:</p>
+<div class="highlight-python"><pre>mgdb runserver -c db.json</pre>
+</div>
+<p>This will run the web server at <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>. Go to this address in
+your browser and you should see something like the figure below. Most queries
+can be performed using the web ui. Two options for presenting results are
+provided - a table format which is easier for comparing data,
+and a tree format which makes it much easier to explore highly nested trees
+of data.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/mgui_dual_demo.png"><img alt="materials genomics ui" src="_images/mgui_dual_demo.png" style="width: 100%;" /></a>
+<p class="caption">materials genomics ui</p>
+</div>
+</div>
+<div class="section" id="materials-genomics-restful-api">
+<h2>Materials Genomics RESTful API<a class="headerlink" href="#materials-genomics-restful-api" title="Permalink to this headline">¶</a></h2>
+<p>The Materials Genomics UI also implements a RESTful interface to the database.
+Two main methods are implemented now. A simple GET request that provides the
+ability to delve into a document. For example:</p>
+<div class="highlight-python"><pre>http://127.0.0.1:8000/rest/14/output</pre>
+</div>
+<p>returns the &#8220;output&#8221; key of task_id 14 as a JSON.</p>
+<p>A more advanced POST request provides the ability to make advanced queries.
+This is the basis upon which the Materials Genomics UI is built. For example,
+posting:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="n">criteria</span><span class="p">:</span> <span class="s">&quot;criteria as json string&quot;</span><span class="p">,</span>
+ <span class="n">properties</span><span class="p">:</span> <span class="s">&quot;list of properties as json string&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>to:</p>
+<div class="highlight-python"><pre>http://127.0.0.1:8000/rest/query</pre>
+</div>
+<p>would return the query as a JSON response.</p>
+</div>
+<div class="section" id="querying-a-database">
+<h2>Querying a database<a class="headerlink" href="#querying-a-database" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes, more fine-grained querying is needed (e.g., for subsequent
+postprocessing and analysis).</p>
+<p>The mgdb script allows you to make simple queries from the command line:</p>
+<div class="highlight-python"><pre># Query for the task id and energy per atom of all calculations with
+# formula Li2O. Note that the criteria has to be specified in the form of
+# a json string. Note that "-c db.json" may be omitted if the config
+# filename is the current directory under the default filename of db.json.
+
+mgdb query -c db.json --crit '{"pretty_formula": "Li2O"}' --props task_id energy_per_atom</pre>
+</div>
+<p>For more advanced queries, you can use the
+<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></tt></a> class for which a default
+alias is provided at the root package. Some examples are as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matgendb</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qe</span> <span class="o">=</span> <span class="n">QueryEngine</span><span class="p">()</span>
+
+<span class="go">#Print the task id and formula of all entries in the database.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">qe</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;pretty_formula&quot;</span><span class="p">,</span> <span class="s">&quot;task_id&quot;</span><span class="p">]):</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&quot;{task_id} - {pretty_formula}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">r</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">12 - Li2O</span>
+
+<span class="go"># Get a pymatgen Structure from the task_id.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">structure</span> <span class="o">=</span> <span class="n">qe</span><span class="o">.</span><span class="n">get_structure_from_id</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="go"># Get pymatgen ComputedEntries using a criteria.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">entries</span> <span class="o">=</span> <span class="n">qe</span><span class="o">.</span><span class="n">get_entries</span><span class="p">({})</span>
+</pre></div>
+</div>
+<p>The language follows very closely to pymongo/MongoDB syntax, except that
+QueryEngine provides useful aliases for commonly used fields as well as
+translation to commonly used pymatgen objects like Structure and
+ComputedEntries.</p>
+</div>
+<div class="section" id="extending-pymatgen-db">
+<h2>Extending pymatgen-db<a class="headerlink" href="#extending-pymatgen-db" title="Permalink to this headline">¶</a></h2>
+<p>Currently, pymatgen-db is written with standard VASP runs in mind. However,
+it is perfectly extensible to any kind of data, e.g., other kinds of VASP runs
+(bandstructure, NEB, etc.) or just any form of data in general. Developers
+looking to adapt pymatgen-db for other purposes should look at the
+<a class="reference internal" href="matgendb.html#matgendb.creator.VaspToDbTaskDrone" title="matgendb.creator.VaspToDbTaskDrone"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.creator.VaspToDbTaskDrone</span></tt></a> class as an example and write
+similar drones for their needs. The
+<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></tt></a> can generally be applied to any
+Mongo collection, with suitable specification of aliases if desired.</p>
+</div>
+</div>
+<div class="section" id="api-reference-docs">
+<h1>API/Reference Docs<a class="headerlink" href="#api-reference-docs" title="Permalink to this headline">¶</a></h1>
+<p>The API docs are generated using Sphinx auto-doc and outlines the purpose of all
+modules and classes, and the expected argument and returned objects for most
+methods. They are available at the link below.</p>
+<p><a class="reference internal" href="modules.html"><em>pymatgen-db API docs</em></a></p>
+</div>
+<div class="section" id="how-to-cite-pymatgen-db">
+<h1>How to cite pymatgen-db<a class="headerlink" href="#how-to-cite-pymatgen-db" title="Permalink to this headline">¶</a></h1>
+<p>If you use pymatgen and pymatgen-db in your research, please consider citing
+the following work:</p>
+<blockquote>
+<div>Shyue Ping Ong, William Davidson Richards, Anubhav Jain, Geoffroy Hautier,
+Michael Kocher, Shreyas Cholia, Dan Gunter, Vincent Chevrier, Kristin A.
+Persson, Gerbrand Ceder. <em>Python Materials Genomics (pymatgen) : A Robust,
+Open-Source Python Library for Materials Analysis.</em> Computational
+Materials Science, 2013, 68, 314-319. <a class="reference external" href="http://dx.doi.org/10.1016/j.commatsci.2012.10.028">doi:10.1016/j.commatsci.2012.10.028</a></div></blockquote>
+</div>
+<div class="section" id="license">
+<h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+<p>Pymatgen-db is released under the MIT License. The terms of the license are as
+follows:</p>
+<div class="highlight-python"><pre>The MIT License (MIT)
+Copyright (c) 2011-2012 MIT &amp; LBNL
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software")
+, to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.</pre>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pymatgen-db</a></li>
+<li><a class="reference internal" href="#change-log">Change Log</a><ul>
+<li><a class="reference internal" href="#version-0-3-2">Version 0.3.2</a></li>
+<li><a class="reference internal" href="#version-0-3-0">Version 0.3.0</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#getting-pymatgen-db">Getting pymatgen-db</a><ul>
+<li><a class="reference internal" href="#stable-version">Stable version</a></li>
+<li><a class="reference internal" href="#developmental-version">Developmental version</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#initial-setup">Initial setup</a></li>
+<li><a class="reference internal" href="#inserting-calculations">Inserting calculations</a></li>
+<li><a class="reference internal" href="#materials-genomics-ui">Materials Genomics UI</a></li>
+<li><a class="reference internal" href="#materials-genomics-restful-api">Materials Genomics RESTful API</a></li>
+<li><a class="reference internal" href="#querying-a-database">Querying a database</a></li>
+<li><a class="reference internal" href="#extending-pymatgen-db">Extending pymatgen-db</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-reference-docs">API/Reference Docs</a></li>
+<li><a class="reference internal" href="#how-to-cite-pymatgen-db">How to cite pymatgen-db</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">pymatgen-db 0.3.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2011, Shyue Ping Ong.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

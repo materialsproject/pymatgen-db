@@ -605,10 +605,11 @@ def get_basic_analysis_and_error_checks(d):
     delta_vol = final_vol - initial_vol
     percent_delta_vol = delta_vol / initial_vol
     coord_num = get_coordination_numbers(d)
-    gap = d["calculations"][-1]["output"]["bandgap"]
-    cbm = d["calculations"][-1]["output"]["cbm"]
-    vbm = d["calculations"][-1]["output"]["vbm"]
-    is_direct = d["calculations"][-1]["output"]["is_gap_direct"]
+    calc = d["calculations"][-1]
+    gap = calc["output"]["bandgap"]
+    cbm = calc["output"]["cbm"]
+    vbm = calc["output"]["vbm"]
+    is_direct = calc["output"]["is_gap_direct"]
 
     if abs(percent_delta_vol) > 0.20:
         warning_msgs = ["Volume change > 20%"]
