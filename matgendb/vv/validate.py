@@ -10,6 +10,7 @@ __status__ = "Development"
 __date__ = "1/31/13"
 
 import copy
+import math
 import pymongo
 import random
 import re
@@ -774,13 +775,12 @@ class ProgressMeter:
         self._count = 0
 
 
-class ConstraintSpec:
+class ConstraintSpec(object):
     """Specification of a set of constraints for a collection.
     """
     FILTER_SECT = 'filter'
     CONSTRAINT_SECT = 'constraints'
-
-    UNSET_VAL = 'not set'
+    SAMPLE_SECT = 'sample'
 
     def __init__(self, spec):
         """Create specification from a configuration.
@@ -792,47 +792,69 @@ class ConstraintSpec:
         self._sections = {}
         for item in spec:
             if isinstance(item, dict):
-                self._add_filtered_section(item)
+                self._add_complex_section(item)
             else:
                 self._add_simple_section(item)
 
-    def _add_filtered_section(self, item):
+    def values(self):
+        """Return a list of the sections.
+
+        :rtype: list(ConstraintSpecSection)
+        """
+        return self._sections.itervalues()
+
+    def _add_complex_section(self, item):
         """Add a section that has a filter and set of constraints
 
         :raise: ValueError if filter or constraints is missing
         """
         # extract filter and constraints
-        cond_raw = self.UNSET_VAL
         try:
-            cond_raw = item[self.FILTER_SECT]
-            constraints = item[self.CONSTRAINT_SECT]
+            fltr = item[self.FILTER_SECT]
         except KeyError:
-            if cond_raw is self.UNSET_VAL:
-                raise ValueError("configuration is missing '{}'".format(self.FILTER_SECT))
-            else:
-                raise ValueError("configuration is missing '{}'".format(self.CONSTRAINT_SECT))
+            raise ValueError("configuration requires '{}'".format(self.FILTER_SECT))
+        sample = item.get(self.SAMPLE_SECT, None)
+        constraints = item.get(self.CONSTRAINT_SECT, None)
 
-        # make condition(s) into a tuple
-        if isinstance(cond_raw, basestring):
-            cond = (cond_raw,)
-        elif cond_raw is None:
-            cond = None
+        section = ConstraintSpecSection(fltr, constraints, sample)
+        key = section.get_key()
+        if key in self._sections:
+            self._sections[key].append(section)
         else:
-            cond = tuple(cond_raw)   # tuples can be used as keys
-            # add
-        if cond in self._sections:
-            self._sections[cond].extend(constraints)
-        else:
-            self._sections[cond] = constraints
+            self._sections[key] = [section]
 
     def _add_simple_section(self, item):
-        self._sections[None] = [item]
+        self._sections[None] = ConstraintSpecSection(None, item, None)
 
-    def __iter__(self):
-        """When invoked as an iterator, return the key, value
-        pairs of the filter and constraints.
-        """
-        return self._sections.iteritems()
+
+class ConstraintSpecSection(object):
+    def __init__(self, fltr, constraints, sample):
+        self._filter, self._constraints, self._sampler = fltr, constraints, sample
+        # make condition(s) into a tuple
+        if isinstance(fltr, basestring):
+            self._key = (fltr,)
+        elif fltr is None:
+            self._key = None
+        else:
+            self._key = tuple(fltr)
+        # parse sample keywords into class, if present
+        if sample:
+            self._sampler = Sampler(**sample)
+
+    def get_key(self):
+        return self._key
+
+    @property
+    def sampler(self):
+        return self._sampler
+
+    @property
+    def filters(self):
+        return self._filter
+
+    @property
+    def constraints(self):
+        return self._constraints
 
 
 class Validator(DoesLogging):
@@ -899,14 +921,15 @@ class Validator(DoesLogging):
         :return: Sets of constraint violation, one for each constraint_section
         :rtype: ConstraintViolationGroup
         """
+        self._spec = constraint_spec
         self._progress.set_subject(subject)
         self._build(constraint_spec)
-        for cond, body in self._sections:
-            cvg = self._validate_section(subject, coll, cond, body)
+        for cond, body, sampler in self._sections:
+            cvg = self._validate_section(subject, coll, cond, body, sampler)
             if cvg is not None:
                 yield cvg
 
-    def _validate_section(self, subject, coll, cond, body):
+    def _validate_section(self, subject, coll, cond, body, sampler):
         """Validate one section of a spec.
 
         :param subject: Name of subject
@@ -917,6 +940,8 @@ class Validator(DoesLogging):
         :type cond: MongoQuery
         :param body: Main set of constraints
         :type body: MongoQuery
+        :param sampler: Sampling class if any
+        :type sampler: Sampler
         :return: Group of constraint violations, if any, otherwise None
         :rtype: ConstraintViolationGroup or None
         """
@@ -929,6 +954,8 @@ class Validator(DoesLogging):
         self._log.debug('Query fields: {}'.format(self._report_fields))
         # Find records that violate 1 or more constraints
         cursor = coll.find(query, fields=self._report_fields, **self._find_kw)
+        if sampler is not None:
+            cursor = sampler.sample(cursor)
         nbytes, num_dberr, num_rec = 0, 0, 0
         while 1:
             try:
@@ -999,10 +1026,10 @@ class Validator(DoesLogging):
         self._sections = []
         self._report_fields = self._base_report_fields
         # loopover each condition on the records
-        for cond_expr_list, expr_list in constraint_spec:
+        for sval in constraint_spec.values():
             #print("@@ CONDS = {}".format(cond_expr_list))
             #print("@@ MAIN = {}".format(expr_list))
-            groups = self._process_constraint_expressions(expr_list)
+            groups = self._process_constraint_expressions(sval.constraints)
             projection = Projection()
             query = MongoQuery()
             for cg in groups.itervalues():
@@ -1014,12 +1041,12 @@ class Validator(DoesLogging):
                         query.add_clause(MongoClause(c, exists_main=True))
             self._report_fields.update(projection.to_mongo())
             cond_query = MongoQuery()
-            if cond_expr_list is not None:
-                cond_groups = self._process_constraint_expressions(cond_expr_list, rev=False)
+            if sval.filters is not None:
+                cond_groups = self._process_constraint_expressions(sval.filters, rev=False)
                 for cg in cond_groups.itervalues():
                     for c in cg:
                         cond_query.add_clause(MongoClause(c, rev=False))
-            self._sections.append((cond_query, query))
+            self._sections.append((cond_query, query, sval.sampler))
 
     def _process_constraint_expressions(self, expr_list, conflict_check=True, rev=True):
         """Create and return constraints from expressions in expr_list.
@@ -1085,32 +1112,56 @@ class Validator(DoesLogging):
         return field, op, val
 
 
-class Sampler:
+class Sampler(object):
     """Randomly sample a proportion of the full collection.
     """
-    DIST_RUNIF = 1
-    DEFAULT_DIST = DIST_RUNIF
 
-    def __init__(self, min_items=0, max_items=1e9, p=1.0, distrib=DEFAULT_DIST):
+    # Random uniform distribution
+    DIST_RUNIF = 1
+    # Default distribution
+    DEFAULT_DIST = DIST_RUNIF
+    # Names of distributions
+    DIST_CODES = {'uniform': DIST_RUNIF}
+
+    def __init__(self, min_items=0, max_items=1e9, p=1.0, distrib=DEFAULT_DIST, **kw):
         """Create new parameterized sampler.
 
         :param min_items: Minimum number of items in the sample
         :param max_items: Maximum number of items in the sample
         :param p: Probability of selecting an item
-        :param distrib: Probability distribution
-        :type distrib: str
+        :param distrib: Probability distribution code, one of DIST_<name> in this class
+        :type distrib: str or int
+        :raise: ValueError, if `distrib` is an unknown code or string
         """
+        # Sanity checks
+        if min_items < 0:
+            raise ValueError('min_items cannot be negative ({:d})'.format(min_items))
+        if (max_items != 0) and (max_items < min_items):
+            raise ValueError('max_items must be zero or >= min_items ({:d} < {:d})'.format(max_items, min_items))
+        if not (0.0 <= p <= 1.0):
+            raise ValueError('probability, p, must be between 0 and 1 ({:f})'.format(p))
         self.min_items = min_items
         self.max_items = max_items
         self.p = p
         self._empty = True
-        self._dist = distrib
+        # Distribution
+        if not isinstance(int, distrib):
+            distrib = self.DIST_CODES.get(str(distrib), None)
+        if distrib == self.DIST_RUNIF:
+            self._skip_fn = self._runif
+        else:
+            raise ValueError("unrecognized distribution: {}".format(distrib))
 
     @property
     def is_empty(self):
         return self._empty
 
-    def sample(self, coll=None, fields=None):
+    def _runif(self, x, alpha):
+        """Skip ahead x +/- alpha steps in a uniform distribution.
+        """
+        return random.uniform(x - alpha, x + alpha)
+
+    def sample(self, cursor):
         """Extract records randomly from the database.
         Continue until the target proportion of the items have been
         extracted, or until `min_items` if this is larger.
@@ -1118,14 +1169,14 @@ class Sampler:
 
         This function is a generator, yielding items incrementally.
 
-        :param fields: Fields to extract from each record, for find()
-        :type fields: list(str)
-        :return: yields the zero-based index and value of each item
-        :rtype: yields (int, int)
+        :param cursor: Cursor to sample
+        :type cursor: pymongo.cursor.Cursor
+        :return: yields each item
+        :rtype: dict
         :raise: ValueError, if max_items is valid and less than `min_items`
                 or if target collection is empty
         """
-        count = coll.count()
+        count = cursor.count()
 
         # special case: empty collection
         if count == 0:
@@ -1134,8 +1185,8 @@ class Sampler:
 
         # special case: entire collection
         if self.p >= 1 and self.max_items <= 0:
-            for offs, item in enumerate(coll.find(fields=fields)):
-                yield (offs, item)
+            for item in cursor:
+                yield item
             return
 
         # calculate target number of items to select
@@ -1150,13 +1201,16 @@ class Sampler:
             raise ValueError("No items requested")
 
         # select `n_target` items
-        n, offs, step = 0, 0, int(3. * count / n_target)
+        mu = 1. * count / n_target     # mean items between results
+        alpha = 0.25 * mu              # +/- slop in items between results
+        n, offs = 0, 0                 # number returned, position in collection
         while n < n_target:
-            # skip ahead some random amount
-            offs = (offs + random.randrange(0, step)) % count
-            # get item
-            item = coll.find(skip=offs, limit=1, fields=fields)[0]
-            # give item to caller
-            yield (offs, item)
-            # increment & loop
+            max_offs = count - (n_target - n)
+            max_skip = max_offs - offs - 1
+            skip = min(max_skip, int(round(self._skip_fn(mu, alpha))))
+            for _ in xrange(skip):
+                cursor.next()
+            # give next item to caller
+            yield cursor.next()
             n += 1
+            offs += skip
