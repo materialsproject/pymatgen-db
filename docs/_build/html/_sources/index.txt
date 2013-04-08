@@ -203,6 +203,8 @@ The mgdb script allows you to make simple queries from the command line::
 
     mgdb query -c db.json --crit '{"pretty_formula": "Li2O"}' --props task_id energy_per_atom
 
+The format of the configuration file `db.json` is given :doc:`on this page <dbconfig>`.
+
 For more advanced queries, you can use the
 :class:`matgendb.query_engine.QueryEngine` class for which a default
 alias is provided at the root package. Some examples are as follows::

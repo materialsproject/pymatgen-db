@@ -40,27 +40,42 @@ The validation constraints could also be configured from a file using the
 Options
 -------
 
-.. option:: -h, --help
+.. option:: --help, -h
 
 show help message and exit
 
-.. option:: -a, --alias
+.. option:: --alias, -a
 
 Value is an alias for a field used in a constraint or condition,
 in form alias=name_in_db. This option is repeatable to allow multiple
 aliases.
 
-.. option:: -C <name>, --collection <name>
+.. option:: --collection, -C <name>
 
-Collection name, needed if the constraints are given on the command-line.
+Name of collection on which to operate.
 
-.. option:: -e <file/spec>, --email <file/spec>
+.. option:: --email, -e <file or spec>
 
-Email report to EMAIL at {from}:{to}[:server].The "from" and "to" are required; default server is localhost. This information can also be in the main config file under the "_email" key, which should be a mapping with keys "from", "to", and "server".
+Email a report.
+The sender, server, and recipients can be specified either in a configuration file, or
+on the command line in the format "{from}:{to}[:server]".
+The "from" and "to" are required; default server is localhost.
+If a file path is given (i.e. the option does not have a ':' in it),
+then the format is JSON/YAML and the specification should be given
+under the "_email" key, which should be a mapping with keys
+ "from", "to", and "server".
+For example the following commandline uses localhost:9101 to send mail::
+
+        mgvv [options] --email dkgunter@lbl.gov:somebody@host.org:localhost:9101
+
+
+See `email-config`_ for an example of the configuration file syntax, which unlike the
+command-line syntax allows for multiple recipients.
 
 .. option:: -f <file>, --file <file>
 
-Main configuration file. Has constraints, and optionally email configuration (see -e/--email option).
+Main configuration file. Has constraints, and optionally email configuration
+(see `--email` option).
 
 .. option:: --limit <num>, -m <num>
 
@@ -73,7 +88,8 @@ Use the specified report type to format and send the validation output.
 Recognized types are:
 
 html
-    A simple HTML report. *Default*
+    A simple HTML report, with some minimal CSS styling. This is
+    arguably the most visually pleasing format. *Default*
 json
     A JSON document (indented).
 md
@@ -101,47 +117,17 @@ the database, and one for the constraints and email.
 Database configuration
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The database connection is configured from a YAML/JSON file.
-It sets the server host and port, as well as authentication parameters
-for the database. If no authentication is given, then it is assumed
-that the "noath" mode of MongoDB is to be used.
-
-Here is an example configuration:
-
-.. code-block:: json
-
-{
-    host: "localhost",
-    port: 27017,
-    database: "vasp",
-    readonly_user: "bigbird",
-    readonly_password: "mr_snuffleupagus"
-    collection: "tasks"
-}
-
-The following keywords are recognized:
-
-host
-    Host name or IP of the database server. Required.
-port
-    Port number for database server. Default is 27017.
-database
-    Database name
-readonly_user
-    Authentication user name, for read-only access.
-readonly_password
-    Authentication password, for read-only access.
-admin_user
-    Authentication user name, for read/write access.
-admin_password
-    Authentication password, for read/write access.
+The database connection uses the same format as the `mgdb` command for
+its :doc:`configuration file <dbconfig>`. The `readonly_user` is preferred over the
+administrative user, if both are present.
 
 .. _email-config:
 
 Email configuration
 ^^^^^^^^^^^^^^^^^^^
 
-Reports can be sent by email. This can be configured on the command-line, or within the main configuration file.
+Reports can be sent by email. This can be configured on the command-line,
+or within the main configuration file.
 
 Here is an example configuration:
 
@@ -154,6 +140,8 @@ Here is an example configuration:
         - othersucker@host.otherorg
 
 The section for email must always be named `_email`.
+The purpose of the `_email` key is to make it easy to embed this information into
+the configuration file used for the constraints (the `--file` option).
 The following keywords are recognized:
 
 from
