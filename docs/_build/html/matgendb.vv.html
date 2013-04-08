@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -13,7 +14,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
+        URL_ROOT:    '',
         VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -149,48 +150,6 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="matgendb.vv.report.JSONReportEncoder">
-<em class="property">class </em><tt class="descname">JSONReportEncoder</tt><big>(</big><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>encoding='utf-8'</em>, <em>default=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#JSONReportEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.JSONReportEncoder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">json.encoder.JSONEncoder</span></tt></p>
-<p>Constructor for JSONEncoder, with sensible defaults.</p>
-<p>If skipkeys is false, then it is a TypeError to attempt
-encoding of keys that are not str, int, long, float or None.  If
-skipkeys is True, such items are simply skipped.</p>
-<p>If ensure_ascii is true, the output is guaranteed to be str
-objects with all incoming unicode characters escaped.  If
-ensure_ascii is false, the output will be unicode object.</p>
-<p>If check_circular is true, then lists, dicts, and custom encoded
-objects will be checked for circular references during encoding to
-prevent an infinite recursion (which would cause an OverflowError).
-Otherwise, no such check takes place.</p>
-<p>If allow_nan is true, then NaN, Infinity, and -Infinity will be
-encoded as such.  This behavior is not JSON specification compliant,
-but is consistent with most JavaScript based encoders and decoders.
-Otherwise, it will be a ValueError to encode such floats.</p>
-<p>If sort_keys is true, then the output of dictionaries will be
-sorted by key; this is useful for regression tests to ensure
-that JSON serializations can be compared on a day-to-day basis.</p>
-<p>If indent is a non-negative integer, then JSON array
-elements and object members will be pretty-printed with that
-indent level.  An indent level of 0 will only insert newlines.
-None is the most compact representation.</p>
-<p>If specified, separators should be a (item_separator, key_separator)
-tuple.  The default is (&#8216;, &#8216;, &#8216;: &#8216;).  To get the most compact JSON
-representation you should specify (&#8216;,&#8217;, &#8216;:&#8217;) to eliminate whitespace.</p>
-<p>If specified, default is a function that gets called for objects
-that can&#8217;t otherwise be serialized.  It should return a JSON encodable
-version of the object or raise a <tt class="docutils literal"><span class="pre">TypeError</span></tt>.</p>
-<p>If encoding is not None, then all input strings will be
-transformed into unicode using that encoding prior to JSON-encoding.
-The default is UTF-8.</p>
-<dl class="method">
-<dt id="matgendb.vv.report.JSONReportEncoder.default">
-<tt class="descname">default</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#JSONReportEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.JSONReportEncoder.default" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="matgendb.vv.report.MarkdownFormatter">
 <em class="property">class </em><tt class="descname">MarkdownFormatter</tt><big>(</big><em>id_column=0</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#MarkdownFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.MarkdownFormatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format a report as markdown</p>
@@ -241,6 +200,48 @@ The default is UTF-8.</p>
 <em class="property">class </em><tt class="descname">ReportHeader</tt><big>(</big><em>title=''</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#ReportHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.ReportHeader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#matgendb.vv.report.Header" title="matgendb.vv.report.Header"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.vv.report.Header</span></tt></a></p>
 <p>Header for entire report.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.vv.report.ReportJSONEncoder">
+<em class="property">class </em><tt class="descname">ReportJSONEncoder</tt><big>(</big><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>encoding='utf-8'</em>, <em>default=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#ReportJSONEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.ReportJSONEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="matgendb.html#matgendb.util.MongoJSONEncoder" title="matgendb.util.MongoJSONEncoder"><tt class="xref py py-class docutils literal"><span class="pre">matgendb.util.MongoJSONEncoder</span></tt></a></p>
+<p>Constructor for JSONEncoder, with sensible defaults.</p>
+<p>If skipkeys is false, then it is a TypeError to attempt
+encoding of keys that are not str, int, long, float or None.  If
+skipkeys is True, such items are simply skipped.</p>
+<p>If ensure_ascii is true, the output is guaranteed to be str
+objects with all incoming unicode characters escaped.  If
+ensure_ascii is false, the output will be unicode object.</p>
+<p>If check_circular is true, then lists, dicts, and custom encoded
+objects will be checked for circular references during encoding to
+prevent an infinite recursion (which would cause an OverflowError).
+Otherwise, no such check takes place.</p>
+<p>If allow_nan is true, then NaN, Infinity, and -Infinity will be
+encoded as such.  This behavior is not JSON specification compliant,
+but is consistent with most JavaScript based encoders and decoders.
+Otherwise, it will be a ValueError to encode such floats.</p>
+<p>If sort_keys is true, then the output of dictionaries will be
+sorted by key; this is useful for regression tests to ensure
+that JSON serializations can be compared on a day-to-day basis.</p>
+<p>If indent is a non-negative integer, then JSON array
+elements and object members will be pretty-printed with that
+indent level.  An indent level of 0 will only insert newlines.
+None is the most compact representation.</p>
+<p>If specified, separators should be a (item_separator, key_separator)
+tuple.  The default is (&#8216;, &#8216;, &#8216;: &#8216;).  To get the most compact JSON
+representation you should specify (&#8216;,&#8217;, &#8216;:&#8217;) to eliminate whitespace.</p>
+<p>If specified, default is a function that gets called for objects
+that can&#8217;t otherwise be serialized.  It should return a JSON encodable
+version of the object or raise a <tt class="docutils literal"><span class="pre">TypeError</span></tt>.</p>
+<p>If encoding is not None, then all input strings will be
+transformed into unicode using that encoding prior to JSON-encoding.
+The default is UTF-8.</p>
+<dl class="method">
+<dt id="matgendb.vv.report.ReportJSONEncoder.default">
+<tt class="descname">default</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/report.html#ReportJSONEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.report.ReportJSONEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -373,6 +374,14 @@ building a Field or ConstraintOperator instance fails.</p>
 <dt id="matgendb.vv.validate.Constraint.TYPE_MAPPING">
 <tt class="descname">TYPE_MAPPING</tt><em class="property"> = {'boolean': &lt;type 'bool'&gt;, 'bool': &lt;type 'bool'&gt;, 'string': &lt;type 'str'&gt;, 'str': &lt;type 'str'&gt;, 'int': &lt;class 'numbers.Number'&gt;, 'integer': &lt;class 'numbers.Number'&gt;, 'float': &lt;class 'numbers.Number'&gt;, 'number': &lt;class 'numbers.Number'&gt;}</em><a class="headerlink" href="#matgendb.vv.validate.Constraint.TYPE_MAPPING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Constraint.op">
+<tt class="descname">op</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#Constraint.op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Constraint.op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constraint operator
+:return: The operator
+:rtype: ConstraintOperator</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="matgendb.vv.validate.Constraint.passes">
@@ -832,8 +841,8 @@ Of course, if the constraint is already about existence, nothing is done.</p>
 <dl class="class">
 <dt id="matgendb.vv.validate.MongoClause">
 <em class="property">class </em><tt class="descname">MongoClause</tt><big>(</big><em>constraint</em>, <em>rev=True</em>, <em>exists_main=False</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoClause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoClause" title="Permalink to this definition">¶</a></dt>
-<dd><p>Representation of query clause in a MongoDB query.</p>
-<p>Ho! Ho! Ho! Merry Mongxmas!</p>
+<dd><p>Representation of query clause in a MongoDB query.
+Ho, Ho, Ho! Merry Mongxmas!</p>
 <p>Create new clause from a constraint.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -859,7 +868,7 @@ Of course, if the constraint is already about existence, nothing is done.</p>
 
 <dl class="attribute">
 <dt id="matgendb.vv.validate.MongoClause.JS_TYPES">
-<tt class="descname">JS_TYPES</tt><em class="property"> = {&lt;type 'str'&gt;: 'string', &lt;class 'numbers.Number'&gt;: 'number', &lt;type 'bool'&gt;: 'boolean'}</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.JS_TYPES" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">JS_TYPES</tt><em class="property"> = {&lt;class 'numbers.Number'&gt;: 'number', &lt;type 'bool'&gt;: 'boolean', &lt;type 'str'&gt;: 'string'}</em><a class="headerlink" href="#matgendb.vv.validate.MongoClause.JS_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -903,9 +912,10 @@ Of course, if the constraint is already about existence, nothing is done.</p>
 <tt class="descname">query_loc</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#MongoClause.query_loc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.MongoClause.query_loc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Where this clause should go in the query.
 The two possible values are enumerated by variables in this class:</p>
-<blockquote>
-<div>MongoClause.LOC_MAIN
-MongoClause.LOC_WHERE</div></blockquote>
+<ul class="simple">
+<li>MongoClause.LOC_MAIN</li>
+<li>MongoClause.LOC_WHERE</li>
+</ul>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1040,8 +1050,33 @@ MongoClause.LOC_WHERE</div></blockquote>
 
 <dl class="class">
 <dt id="matgendb.vv.validate.Sampler">
-<em class="property">class </em><tt class="descname">Sampler</tt><big>(</big><em>coll=None</em>, <em>min_items=0</em>, <em>max_items=1000000000.0</em>, <em>p=1.0</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Sampler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descname">Sampler</tt><big>(</big><em>min_items=0</em>, <em>max_items=1000000000.0</em>, <em>p=1.0</em>, <em>distrib=1</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Sampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly sample a proportion of the full collection.</p>
+<p>Create new parameterized sampler.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>min_items</strong> &#8211; Minimum number of items in the sample</li>
+<li><strong>max_items</strong> &#8211; Maximum number of items in the sample</li>
+<li><strong>p</strong> &#8211; Probability of selecting an item</li>
+<li><strong>distrib</strong> (<em>str</em>) &#8211; Probability distribution</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Sampler.DEFAULT_DIST">
+<tt class="descname">DEFAULT_DIST</tt><em class="property"> = 1</em><a class="headerlink" href="#matgendb.vv.validate.Sampler.DEFAULT_DIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.vv.validate.Sampler.DIST_RUNIF">
+<tt class="descname">DIST_RUNIF</tt><em class="property"> = 1</em><a class="headerlink" href="#matgendb.vv.validate.Sampler.DIST_RUNIF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="matgendb.vv.validate.Sampler.is_empty">
 <tt class="descname">is_empty</tt><a class="reference internal" href="_modules/matgendb/vv/validate.html#Sampler.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Sampler.is_empty" title="Permalink to this definition">¶</a></dt>
@@ -1049,7 +1084,7 @@ MongoClause.LOC_WHERE</div></blockquote>
 
 <dl class="method">
 <dt id="matgendb.vv.validate.Sampler.sample">
-<tt class="descname">sample</tt><big>(</big><em>fields=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Sampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Sampler.sample" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">sample</tt><big>(</big><em>coll=None</em>, <em>fields=None</em><big>)</big><a class="reference internal" href="_modules/matgendb/vv/validate.html#Sampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.vv.validate.Sampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract records randomly from the database.
 Continue until the target proportion of the items have been
 extracted, or until <cite>min_items</cite> if this is larger.
@@ -1212,7 +1247,7 @@ get_mongo({&#8216;a&#8217;:{&#8216;b&#8217;:1}, x:2}, &#8216;a.b.c&#8217;) -&gt;
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

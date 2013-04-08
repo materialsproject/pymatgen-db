@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -101,7 +102,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">rec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">key_part</span> <span class="ow">in</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">rec</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">key_part</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key_part</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">default</span>
         <span class="n">rec</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">key_part</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">rec</span>
@@ -357,10 +358,10 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
             <span class="n">field</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="n">field</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">operator</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">is_inequality</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_op</span> <span class="o">=</span> <span class="n">operator</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">is_inequality</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;inequality with non-numeric value: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">is_type</span><span class="p">():</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">is_type</span><span class="p">():</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPE_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -376,15 +377,24 @@
 <span class="sd">        :rtype: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">None</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 </div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Constraint.op"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Constraint.op">[docs]</a>    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constraint operator</span>
+<span class="sd">        :return: The operator</span>
+<span class="sd">        :rtype: ConstraintOperator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span>
+</div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;{} {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;{} {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op</span><span class="p">)</span>
+
 </div>
 <div class="viewcode-block" id="ConstraintGroup"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ConstraintGroup">[docs]</a><span class="k">class</span> <span class="nc">ConstraintGroup</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Definition of a group of constraints, for a given field.</span>
@@ -449,8 +459,9 @@
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="c"># both &#39;exists&#39; and strict equality don&#39;t require the extra clause</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">is_exists</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">is_equality</span><span class="p">()):</span>
+                <span class="c"># both &#39;exists&#39; and strict equality don&#39;t require the extra clause</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">is_exists</span><span class="p">()</span> <span class="ow">or</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">is_equality</span><span class="p">()):</span>
             <span class="k">return</span>
         <span class="n">value</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">rev</span>   <span class="c"># value is False if reversed, otherwise True</span>
         <span class="n">constraint</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_field</span><span class="p">,</span> <span class="n">ConstraintOperator</span><span class="o">.</span><span class="n">EXISTS</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
@@ -466,8 +477,7 @@
 </div>
 <div class="viewcode-block" id="MongoClause"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.MongoClause">[docs]</a><span class="k">class</span> <span class="nc">MongoClause</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Representation of query clause in a MongoDB query.</span>
-
-<span class="sd">    Ho! Ho! Ho! Merry Mongxmas!</span>
+<span class="sd">       Ho, Ho, Ho! Merry Mongxmas!</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c"># Target location, main part of query or where-clauses</span>
     <span class="n">LOC_MAIN</span><span class="p">,</span> <span class="n">LOC_WHERE</span><span class="p">,</span> <span class="n">LOC_MAIN2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
@@ -478,7 +488,8 @@
                  <span class="n">ConstraintOperator</span><span class="o">.</span><span class="n">EXISTS</span><span class="p">:</span> <span class="s">&#39;$exists&#39;</span><span class="p">,</span>
                  <span class="n">ConstraintOperator</span><span class="o">.</span><span class="n">SIZE</span><span class="p">:</span> <span class="s">&#39;$size&#39;</span><span class="p">,</span>
                  <span class="n">ConstraintOperator</span><span class="o">.</span><span class="n">TYPE</span><span class="p">:</span> <span class="s">&#39;$type&#39;</span><span class="p">,</span>
-                 <span class="s">&#39;!=&#39;</span><span class="p">:</span> <span class="s">&#39;$ne&#39;</span><span class="p">,</span> <span class="s">&#39;=&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">}</span>
+                 <span class="s">&#39;!=&#39;</span><span class="p">:</span> <span class="s">&#39;$ne&#39;</span><span class="p">,</span> <span class="s">&#39;=&#39;</span><span class="p">:</span> <span class="bp">None</span>
+    <span class="p">}</span>
 
     <span class="c"># Javascript version of operations, for $where clauses</span>
     <span class="n">JS_OPS</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;=&#39;</span><span class="p">:</span> <span class="s">&#39;==&#39;</span><span class="p">}</span>  <span class="c"># only different ones need to be here</span>
@@ -501,6 +512,7 @@
 <span class="sd">        :param exists_main: Put exists into main clause</span>
 <span class="sd">        :type exists_main: bool</span>
 <span class="sd">        :raise: AssertionError if constraint is None</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">constraint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rev</span> <span class="o">=</span> <span class="n">rev</span>
@@ -511,8 +523,9 @@
 <div class="viewcode-block" id="MongoClause.query_loc"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.MongoClause.query_loc">[docs]</a>    <span class="k">def</span> <span class="nf">query_loc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Where this clause should go in the query.</span>
 <span class="sd">        The two possible values are enumerated by variables in this class:</span>
-<span class="sd">           MongoClause.LOC_MAIN</span>
-<span class="sd">           MongoClause.LOC_WHERE</span>
+
+<span class="sd">        - MongoClause.LOC_MAIN</span>
+<span class="sd">        - MongoClause.LOC_WHERE</span>
 
 <span class="sd">        :return: Location code</span>
 <span class="sd">        :rtype: int</span>
@@ -789,6 +802,7 @@
 </div>
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_viol</span><span class="p">)</span>
+
 </div>
 <div class="viewcode-block" id="ProgressMeter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ProgressMeter">[docs]</a><span class="k">class</span> <span class="nc">ProgressMeter</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Simple progress tracker</span>
@@ -816,6 +830,7 @@
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
+
 </div></div>
 <div class="viewcode-block" id="Validator"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Validator">[docs]</a><span class="k">class</span> <span class="nc">Validator</span><span class="p">(</span><span class="n">DoesLogging</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Validate a collection.</span>
@@ -912,7 +927,7 @@
                 <span class="n">num_rec</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;collection {}: {:d} records, {:d} bytes, {:d} db-errors&quot;</span>
-                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">num_rec</span><span class="p">,</span> <span class="n">nbytes</span><span class="p">,</span> <span class="n">num_dberr</span><span class="p">))</span>
+                               <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">num_rec</span><span class="p">,</span> <span class="n">nbytes</span><span class="p">,</span> <span class="n">num_dberr</span><span class="p">))</span>
                 <span class="k">break</span>
             <span class="k">except</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">PyMongoError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
                 <span class="n">num_dberr</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -949,7 +964,7 @@
                 <span class="n">varname</span> <span class="o">=</span> <span class="n">fval</span>
                 <span class="n">fval</span> <span class="o">=</span> <span class="n">mongo_get</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">varname</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">fval</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="n">reasons</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">op</span><span class="p">),</span> <span class="s">&#39;missing&#39;</span><span class="p">,</span> <span class="n">expected</span><span class="o">=</span><span class="n">varname</span><span class="p">)</span>
+                    <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ConstraintViolation</span><span class="p">(</span><span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="p">,</span> <span class="s">&#39;missing&#39;</span><span class="p">,</span> <span class="n">varname</span><span class="p">))</span>
                     <span class="k">continue</span>
             <span class="c"># take length for size</span>
             <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_size</span><span class="p">():</span>
@@ -1047,7 +1062,7 @@
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c"># Boolean</span>
-                    <span class="n">val</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;true&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s">&#39;false&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">}[</span><span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;true&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s">&#39;false&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}[</span><span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                     <span class="c"># String</span>
                     <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;&quot;.*&quot;|</span><span class="se">\&#39;</span><span class="s">.*</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
@@ -1055,26 +1070,33 @@
                         <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">field</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">val</span>
 
-    <span class="k">def</span> <span class="nf">_get_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">MONGO_RELATIONS</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
-
-
 </div>
 <div class="viewcode-block" id="Sampler"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Sampler">[docs]</a><span class="k">class</span> <span class="nc">Sampler</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Randomly sample a proportion of the full collection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coll</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">min_items</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="n">coll</span>
+    <span class="n">DIST_RUNIF</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">DEFAULT_DIST</span> <span class="o">=</span> <span class="n">DIST_RUNIF</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_items</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">distrib</span><span class="o">=</span><span class="n">DEFAULT_DIST</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create new parameterized sampler.</span>
+
+<span class="sd">        :param min_items: Minimum number of items in the sample</span>
+<span class="sd">        :param max_items: Maximum number of items in the sample</span>
+<span class="sd">        :param p: Probability of selecting an item</span>
+<span class="sd">        :param distrib: Probability distribution</span>
+<span class="sd">        :type distrib: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_items</span> <span class="o">=</span> <span class="n">min_items</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_items</span> <span class="o">=</span> <span class="n">max_items</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_empty</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dist</span> <span class="o">=</span> <span class="n">distrib</span>
 
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Sampler.is_empty"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Sampler.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty</span>
 </div>
-<div class="viewcode-block" id="Sampler.sample"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Sampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Sampler.sample"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Sampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coll</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extract records randomly from the database.</span>
 <span class="sd">        Continue until the target proportion of the items have been</span>
 <span class="sd">        extracted, or until `min_items` if this is larger.</span>
@@ -1089,7 +1111,7 @@
 <span class="sd">        :raise: ValueError, if max_items is valid and less than `min_items`</span>
 <span class="sd">                or if target collection is empty</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
         <span class="c"># special case: empty collection</span>
         <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1098,7 +1120,7 @@
 
         <span class="c"># special case: entire collection</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_items</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">offs</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="n">fields</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">offs</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="n">fields</span><span class="p">)):</span>
                 <span class="k">yield</span> <span class="p">(</span><span class="n">offs</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
             <span class="k">return</span>
 
@@ -1119,7 +1141,7 @@
             <span class="c"># skip ahead some random amount</span>
             <span class="n">offs</span> <span class="o">=</span> <span class="p">(</span><span class="n">offs</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">step</span><span class="p">))</span> <span class="o">%</span> <span class="n">count</span>
             <span class="c"># get item</span>
-            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="n">offs</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">fields</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="n">offs</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">fields</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="c"># give item to caller</span>
             <span class="k">yield</span> <span class="p">(</span><span class="n">offs</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
             <span class="c"># increment &amp; loop</span>
@@ -1164,7 +1186,7 @@
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

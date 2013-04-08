@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -106,7 +107,7 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">27017</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s">&quot;vasp&quot;</span><span class="p">,</span>
                  <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s">&quot;tasks&quot;</span><span class="p">,</span>
-                 <span class="n">aliases_config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">aliases_config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">default_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            host:</span>
@@ -152,6 +153,10 @@
 <span class="sd">                only. Note that defaults do not affect explicitly specified</span>
 <span class="sd">                criteria, i.e., if you suppy a query for {&quot;state&quot;: &quot;killed&quot;},</span>
 <span class="sd">                this will override the default for {&quot;state&quot;: &quot;successful&quot;}.</span>
+<span class="sd">            default_properties:</span>
+<span class="sd">                List of property names (strings) to use by default, if no</span>
+<span class="sd">                properties are given to the &#39;properties&#39; argument of</span>
+<span class="sd">                query().</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
@@ -171,6 +176,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span> <span class="o">=</span> <span class="n">aliases_config</span><span class="p">[</span><span class="s">&quot;aliases&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="n">aliases_config</span><span class="p">[</span><span class="s">&quot;defaults&quot;</span><span class="p">]</span>
+        <span class="c"># set default properties</span>
+        <span class="k">if</span> <span class="n">default_properties</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_default_props</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_prop_dict</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_default_props</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_prop_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_properties</span><span class="p">(</span><span class="n">default_properties</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Allows for use with the &#39;with&#39; context manager&quot;&quot;&quot;</span>
@@ -349,18 +359,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">properties</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">prop_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
-                    <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">p</span><span class="p">])</span>
-                    <span class="n">prop_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-                    <span class="n">prop_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">props</span> <span class="o">=</span> <span class="bp">None</span>
-            <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_props</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_prop_dict</span>
 
         <span class="n">crit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_criteria</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span> <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">{}</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">crit</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">props</span><span class="p">,</span>
@@ -371,6 +372,22 @@
             <span class="n">cur</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="n">prop_dict</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
 </div>
+    <span class="k">def</span> <span class="nf">_parse_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make list of properties into 2 things:</span>
+<span class="sd">        (1) list of aliased fields for a mongodb query</span>
+<span class="sd">        (2) dictionary, keyed by aliased field, for display</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">prop_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
+                <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">p</span><span class="p">])</span>
+                <span class="n">prop_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">prop_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span>
+
 <div class="viewcode-block" id="QueryEngine.query_one"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.query_one">[docs]</a>    <span class="k">def</span> <span class="nf">query_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Just like query, but return a single doc.</span>
@@ -553,7 +570,7 @@
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

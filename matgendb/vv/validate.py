@@ -44,7 +44,7 @@ def mongo_get(rec, key, default=None):
     if not '.' in key:
         return rec.get(key, default)
     for key_part in key.split('.'):
-        if not rec.has_key(key_part):
+        if not key_part in rec:
             return default
         rec = rec[key_part]
     return rec
@@ -300,10 +300,10 @@ class Constraint:
         if not isinstance(field, Field):
             field = Field(field)
         self.field = field
-        self.op = operator
-        if self.op.is_inequality() and not isinstance(value, Number):
+        self._op = operator
+        if self._op.is_inequality() and not isinstance(value, Number):
             raise ValueError('inequality with non-numeric value: {}'.format(value))
-        elif self.op.is_type():
+        elif self._op.is_type():
             value = value.lower()
             t = self.TYPE_MAPPING.get(value, None)
             if t is None:
@@ -319,15 +319,24 @@ class Constraint:
         :rtype: tuple
         """
         try:
-            if self.op.compare(value, self.value):
+            if self._op.compare(value, self.value):
                 return True, None
             else:
                 return False, self.value
         except ValueError, err:
             return False, str(err)
 
+    @property
+    def op(self):
+        """Constraint operator
+        :return: The operator
+        :rtype: ConstraintOperator
+        """
+        return self._op
+
     def __str__(self):
-        return '{} {}'.format(self.field.name, self.op)
+        return '{} {}'.format(self.field.name, self._op)
+
 
 class ConstraintGroup:
     """Definition of a group of constraints, for a given field.
@@ -392,8 +401,9 @@ class ConstraintGroup:
         :rtype: None
         """
         if len(self.constraints) == 1 and (
-            # both 'exists' and strict equality don't require the extra clause
-            self.constraints[0].op.is_exists() or self.constraints[0].op.is_equality()):
+                # both 'exists' and strict equality don't require the extra clause
+                self.constraints[0].op.is_exists() or
+                self.constraints[0].op.is_equality()):
             return
         value = not rev   # value is False if reversed, otherwise True
         constraint = Constraint(self._field, ConstraintOperator.EXISTS, value)
@@ -409,8 +419,7 @@ class ConstraintGroup:
 
 class MongoClause:
     """Representation of query clause in a MongoDB query.
-
-    Ho! Ho! Ho! Merry Mongxmas!
+       Ho, Ho, Ho! Merry Mongxmas!
     """
     # Target location, main part of query or where-clauses
     LOC_MAIN, LOC_WHERE, LOC_MAIN2 = 0, 1, 2
@@ -421,7 +430,8 @@ class MongoClause:
                  ConstraintOperator.EXISTS: '$exists',
                  ConstraintOperator.SIZE: '$size',
                  ConstraintOperator.TYPE: '$type',
-                 '!=': '$ne', '=': None}
+                 '!=': '$ne', '=': None
+    }
 
     # Javascript version of operations, for $where clauses
     JS_OPS = {'=': '=='}  # only different ones need to be here
@@ -444,6 +454,7 @@ class MongoClause:
         :param exists_main: Put exists into main clause
         :type exists_main: bool
         :raise: AssertionError if constraint is None
+
         """
         assert constraint is not None
         self._rev = rev
@@ -454,8 +465,9 @@ class MongoClause:
     def query_loc(self):
         """Where this clause should go in the query.
         The two possible values are enumerated by variables in this class:
-           MongoClause.LOC_MAIN
-           MongoClause.LOC_WHERE
+
+        - MongoClause.LOC_MAIN
+        - MongoClause.LOC_WHERE
 
         :return: Location code
         :rtype: int
@@ -733,6 +745,7 @@ class ConstraintViolationGroup:
     def __iter__(self):
         return iter(self._viol)
 
+
 class ProgressMeter:
     """Simple progress tracker
     """
@@ -759,6 +772,7 @@ class ProgressMeter:
         sys.stderr.write('\n')
         sys.stderr.flush()
         self._count = 0
+
 
 class Validator(DoesLogging):
     """Validate a collection.
@@ -855,7 +869,7 @@ class Validator(DoesLogging):
                 num_rec += 1
             except StopIteration:
                 self._log.info("collection {}: {:d} records, {:d} bytes, {:d} db-errors"
-                                .format(subject, num_rec, nbytes, num_dberr))
+                               .format(subject, num_rec, nbytes, num_dberr))
                 break
             except pymongo.errors.PyMongoError, err:
                 num_dberr += 1
@@ -892,7 +906,7 @@ class Validator(DoesLogging):
                 varname = fval
                 fval = mongo_get(record, varname)
                 if fval is None:
-                    reasons.add(key, str(op), 'missing', expected=varname)
+                    reasons.append(ConstraintViolation(clause.constraint, 'missing', varname))
                     continue
             # take length for size
             if op.is_size():
@@ -990,16 +1004,13 @@ class Validator(DoesLogging):
             except ValueError:
                 try:
                     # Boolean
-                    val = {'true':True, 'false':False}[val.lower()]
+                    val = {'true': True, 'false': False}[val.lower()]
                 except KeyError:
                     # String
                     if re.match(r'".*"|\'.*\'', val):
                         # strip quotes from strings
                         val = val[1:-1]
         return field, op, val
-
-    def _get_op(self, op):
-        return self.MONGO_RELATIONS[op]
 
 
 class Sampler:
@@ -1051,7 +1062,7 @@ class Sampler:
 
         # special case: entire collection
         if self.p >= 1 and self.max_items <= 0:
-            for offs, item in enumerate(self.coll.find(fields=fields)):
+            for offs, item in enumerate(coll.find(fields=fields)):
                 yield (offs, item)
             return
 

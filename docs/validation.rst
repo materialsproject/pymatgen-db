@@ -5,24 +5,39 @@
 Validation tools
 ****************
 
+The validation tools are accessible primarily through the command-line program, `mgvv`_.
+This page documents the invocation and configuration of this program to perform
+a variety of validation tasks.
+
+
+
 mgvv
 ====
 
 .. program:: mgvv
 
-Run validation tests of MongoDB databases.
-Database connections are configured from a file
-and the patterns to validate against can come from a file or the command-line.
+The `mgvv` program provides a convenient command-line interface to run
+validation tests of MongoDB databases.
+Database connections are configured from a file, exactly as for `mgdb`/
+The patterns to validate against can come from a file or the command-line.
 
-arguments
+Arguments
 ---------
 
-The validation constraints can be configured from a file using the
-:option:`mgvv --file` option, or using arguments on the command line.
-For the latter, each argument is taken as a single constraint. The syntax of
-the constraints is the same as in the configuration file, see :ref:`constraint-syntax`.
+Constraints can be provided on the command line.
+The syntax of each constraint is given in :ref:`constraint-syntax`.
+It is usually wise to quote the constraints so that the operators are not
+interpreted by the Unix shell. The constraints can be listed as separate quoted arguments
+or a single quoted argument using commas. For example, the following two command-lines are
+equivalent::
 
-options
+        mgvv [options] 'nelements > 1' 'e_above_hull >= 0'
+        mgvv [options] 'nelements > 1, e_above_hull >= 0'
+
+The validation constraints could also be configured from a file using the
+`--file` option, as described below.
+
+Options
 -------
 
 .. option:: -h, --help
@@ -75,7 +90,7 @@ Increase log message verbosity. Repeatable. Messages are logged to standard erro
 
 .. _configuration-files:
 
-configuration files
+Configuration files
 -------------------
 
 You can use up to two configuration files: one for constraints (and aliases), one for
@@ -83,7 +98,7 @@ the database, and one for the constraints and email.
 
 .. _db-config:
 
-database configuration
+Database configuration
 ^^^^^^^^^^^^^^^^^^^^^^
 
 The database connection is configured from a YAML/JSON file.
@@ -123,7 +138,7 @@ admin_password
 
 .. _email-config:
 
-email configuration
+Email configuration
 ^^^^^^^^^^^^^^^^^^^
 
 Reports can be sent by email. This can be configured on the command-line, or within the main configuration file.
@@ -152,7 +167,7 @@ port
 
 .. _constraint-config:
 
-constraint configuration
+Constraint configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 The constraints are configured from a YAML file.
