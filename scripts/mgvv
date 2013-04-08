@@ -25,7 +25,7 @@ import urlparse
 import yaml
 # local module
 from matgendb.util import get_settings
-from matgendb.vv.validate import Validator, DBError
+from matgendb.vv.validate import ConstraintSpec, Validator, DBError
 from matgendb.vv import report
 
 # Initialize module logging
@@ -165,6 +165,9 @@ def parse_mongo_url(url):
 
 def get_constraint_sections(spec):
     """Parse out sections within a collection.
+
+    :return: Dictionary keyed by the 'filter' of the 'constraints'
+    :rtype: dict
     """
     sections = {}
     for item in spec:
@@ -218,6 +221,8 @@ def main(cmdline=None):
                              'The "from" and "to" are required; default server is localhost. '
                              'This information can also be in the main config file under the "_email" key, '
                              'which should be a mapping with keys "from", "to", and "server".')
+    parser.add_argument('--exonly', dest='must_exist', action='store_true', default=False,
+                        help='Only show results where all fields in the constraints are also present in the record')
     parser.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
                         help='Main configuration file. Has constraints, and optionally email info.')
     parser.add_argument('--format', '-F', dest='report_format', metavar='FORMAT', default='html',
@@ -267,6 +272,11 @@ def main(cmdline=None):
             parser.error('Cannot authenticate to database as user {}'.format(user))
     else:
         _log.info('Connecting to DB "{}" without authentication'.format(config[db_key]))
+    # get collection name if given
+    if 'collection' in config:
+        db_coll_name = config['collection']
+    else:
+        db_coll_name = None
 
     # Init constraints from file or command-line
     constraints_from_file = args.constfile is not None
@@ -275,14 +285,18 @@ def main(cmdline=None):
         with Timing('load.yaml', file=f.name):
             constraints = yaml.safe_load(f)
     else:
-        if args.coll is None:
-            parser.error('collection name required for command-line constraints')
+        coll_name = args.coll
+        if coll_name is None:
+            if db_coll_name is None:
+                parser.error('collection name not found')
+            else:
+                coll_name = db_coll_name
         if not args.constraint:
             parser.error('at least one constraint is required')
         # re-split command-line arguments on commas (not whitespace)
         plist = ' '.join(args.constraint).split(',')
         # make dict(key=collection) of list of the constraints, just like YAML config file
-        constraints = {args.coll: plist}
+        constraints = {coll_name: plist}
 
     # Init aliases from file or command-line
     if constraints_from_file:
@@ -321,19 +335,24 @@ def main(cmdline=None):
                     .format(fmt, textlist(formatters.keys())))
 
     # Run validation for each collection
-    validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=10)
+    validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=10, add_exists=args.must_exist)
     if args.progress > 0:
         validator.set_progress(args.progress)
     with Timing("validate"):
-        for coll_name, constraint_spec in constraints.iteritems():
+        for coll_name, constraint_spec_cfg in constraints.iteritems():
             sect_hdr = report.SectionHeader(title="Collection {}".format(coll_name))
             rpt_sect = report.ReportSection(sect_hdr)
             if coll_name.startswith(PATTERN_KEY_PREFIX_IGNORE):
                 continue
             coll = db[coll_name]
             try:
-                sect = get_constraint_sections(constraint_spec)
-                for vnum, vgroup in enumerate(validator.validate(coll, sect, subject=coll_name)):
+                try:
+                    cspec = ConstraintSpec(constraint_spec_cfg)
+                except ValueError, err:
+                    _log.error('processing constraints for {}: {}'.format(coll_name, err))
+                    break
+                #sect = get_constraint_sections(constraint_spec)
+                for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
                     sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
                     sect_hdr.add('Condition', str(vgroup.condition))
                     table = report.Table(colnames=('Id', 'TaskId', 'Field', 'Constraint', 'Value'))

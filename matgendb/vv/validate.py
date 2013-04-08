@@ -261,7 +261,7 @@ class ConstraintOperator:
             raise RuntimeError('unexpected size operator: {}'.format(self._op))
         if self.is_inequality():
             if not isinstance(lhs_value, Number):
-                raise ValueError('Number required for inequality')
+                return False
             py_op = self.PY_INEQ.get(self._op, self._op)
             return eval('{} {} {}'.format(lhs_value, py_op, rhs_value))
         if self.is_type():
@@ -774,6 +774,65 @@ class ProgressMeter:
         self._count = 0
 
 
+class ConstraintSpec:
+    """Specification of a set of constraints for a collection.
+    """
+    FILTER_SECT = 'filter'
+    CONSTRAINT_SECT = 'constraints'
+
+    def __init__(self, spec):
+        """Create specification from a configuration.
+
+        :param spec: Configuration for a single collection
+        :type spec: dict
+        :raise: ValueError if specification is wrong
+        """
+        self._sections = {}
+        for item in spec:
+            if isinstance(item, dict):
+                self._add_filtered_section(item)
+            else:
+                self._add_simple_section(item)
+
+    def _add_filtered_section(self, item):
+        """Add a section that has a filter and set of constraints
+
+        :raise: ValueError if filter or constraints is missing
+        """
+        # extract filter and constraints
+        cond_raw, constraints = None, None
+        try:
+            cond_raw = item[self.FILTER_SECT]
+            constraints = item[self.CONSTRAINT_SECT]
+        except KeyError:
+            if cond_raw is None:
+                raise ValueError("configuration is missing '{}'".format(self.FILTER_SECT))
+            else:
+                raise ValueError("configuration is missing '{}'".format(self.CONSTRAINT_SECT))
+
+        # make condition(s) into a tuple
+        if isinstance(cond_raw, basestring):
+            cond = (cond_raw,)
+        elif cond_raw is None:
+            cond = None
+        else:
+            cond = tuple(cond_raw)   # tuples can be used as keys
+            # add
+        if cond in self._sections:
+            self._sections[cond].extend(constraints)
+        else:
+            self._sections[cond] = constraints
+
+    def _add_simple_section(self, item):
+        self._sections[None] = [item]
+
+    def __iter__(self):
+        """When invoked as an iterator, return the key, value
+        pairs of the filter and constraints.
+        """
+        return self._sections.iteritems()
+
+
 class Validator(DoesLogging):
     """Validate a collection.
     """
@@ -792,7 +851,7 @@ class Validator(DoesLogging):
         )
         \s*''', re.VERBOSE)
 
-    def __init__(self, max_violations=50, max_dberrors=10, aliases=None):
+    def __init__(self, max_violations=50, max_dberrors=10, aliases=None, add_exists=False):
         DoesLogging.__init__(self, name='mg.validator')
         self.set_progress(0)
         self._aliases = aliases if aliases else {}
@@ -803,6 +862,7 @@ class Validator(DoesLogging):
             self._find_kw = {}
         self._max_dberr = max_dberrors
         self._base_report_fields = {'_id': 1, 'task_id': 1}
+        self._add_exists = add_exists
 
     def set_aliases(self, a):
         """Set aliases.
@@ -824,15 +884,21 @@ class Validator(DoesLogging):
             return 0
         return self._progress._count
 
-    def validate(self, coll, constraint_sections, subject='collection'):
+    def validate(self, coll, constraint_spec, subject='collection'):
         """Validation of  a collection.
         This is a generator that yields ConstraintViolationGroups.
 
+        :param coll: Mongo collection
+        :type coll: pymongo.Collection
+        :param constraint_spec: Constraint specification
+        :type constraint_spec: ConstraintSpec
+        :param subject: Name of the thing being validated
+        :type subject: str
         :return: Sets of constraint violation, one for each constraint_section
         :rtype: ConstraintViolationGroup
         """
         self._progress.set_subject(subject)
-        self._build(constraint_sections)
+        self._build(constraint_spec)
         for cond, body in self._sections:
             cvg = self._validate_section(subject, coll, cond, body)
             if cvg is not None:
@@ -919,16 +985,19 @@ class Validator(DoesLogging):
                 reasons.append(ConstraintViolation(clause.constraint, fval, expected))
         return reasons
 
-    def _build(self, constraint_sections):
+    def _build(self, constraint_spec):
         """Generate queries to execute.
 
         Sets instance variables so that Mongo query strings, etc. can now
         be extracted from the object.
+
+        :param constraint_spec: Constraint specification
+        :type constraint_spec: ConstraintSpec
         """
         self._sections = []
         self._report_fields = self._base_report_fields
         # loopover each condition on the records
-        for cond_expr_list, expr_list in constraint_sections.iteritems():
+        for cond_expr_list, expr_list in constraint_spec:
             #print("@@ CONDS = {}".format(cond_expr_list))
             #print("@@ MAIN = {}".format(expr_list))
             groups = self._process_constraint_expressions(expr_list)
@@ -938,8 +1007,9 @@ class Validator(DoesLogging):
                 for c in cg:
                     projection.add(c.field, c.op, c.value)
                     query.add_clause(MongoClause(c))
-                for c in cg.existence_constraints:
-                    query.add_clause(MongoClause(c, exists_main=True))
+                if self._add_exists:
+                    for c in cg.existence_constraints:
+                        query.add_clause(MongoClause(c, exists_main=True))
             self._report_fields.update(projection.to_mongo())
             cond_query = MongoQuery()
             if cond_expr_list is not None:
