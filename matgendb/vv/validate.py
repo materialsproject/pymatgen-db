@@ -780,6 +780,8 @@ class ConstraintSpec:
     FILTER_SECT = 'filter'
     CONSTRAINT_SECT = 'constraints'
 
+    UNSET_VAL = 'not set'
+
     def __init__(self, spec):
         """Create specification from a configuration.
 
@@ -800,12 +802,12 @@ class ConstraintSpec:
         :raise: ValueError if filter or constraints is missing
         """
         # extract filter and constraints
-        cond_raw, constraints = None, None
+        cond_raw = self.UNSET_VAL
         try:
             cond_raw = item[self.FILTER_SECT]
             constraints = item[self.CONSTRAINT_SECT]
         except KeyError:
-            if cond_raw is None:
+            if cond_raw is self.UNSET_VAL:
                 raise ValueError("configuration is missing '{}'".format(self.FILTER_SECT))
             else:
                 raise ValueError("configuration is missing '{}'".format(self.CONSTRAINT_SECT))
