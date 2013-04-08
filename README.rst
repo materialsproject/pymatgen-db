@@ -129,7 +129,7 @@ provided - a table format which is easier for comparing data,
 and a tree format which makes it much easier to explore highly nested trees
 of data.
 
-.. figure:: http://pythonhosted.org/pymatgen-db/images/mgui_dual_demo.png
+.. figure:: http://pythonhosted.org/pymatgen-db/_images/mgui_dual_demo.png
     :width: 100%
     :alt: materials genomics ui
     :align: center
