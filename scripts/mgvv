@@ -162,34 +162,6 @@ def parse_mongo_url(url):
     d['db'] = parts[2][1:]
     return d
 
-
-def get_constraint_sections(spec):
-    """Parse out sections within a collection.
-
-    :return: Dictionary keyed by the 'filter' of the 'constraints'
-    :rtype: dict
-    """
-    sections = {}
-    for item in spec:
-        if isinstance(item, dict):
-            cond_raw, constraints = item['filter'], item['constraints']
-            # make condition(s) into a tuple
-            if isinstance(cond_raw, basestring):
-                cond = (cond_raw,)
-            elif cond_raw is None:
-                cond = None
-            else:
-                cond = tuple(cond_raw)   # tuples can be used as keys
-            # add
-            if cond in sections:
-                sections[cond].extend(constraints)
-            else:
-                sections[cond] = constraints
-        else:
-            sections[None] = [item]
-    return sections
-
-
 def main(cmdline=None):
     """Main program entry point.
 
