@@ -5,10 +5,18 @@
 Validation tools
 ****************
 
-The validation tools are accessible primarily through the command-line program, `mgvv`_.
-This page documents the invocation and configuration of this program to perform
-a variety of validation tasks.
+There are four modules to validation, which will be applied in this order to a given collection:
 
+#.  Filter records on a set of criteria (conjunction)
+#.  Apply simple constraints and find records that do not match any given constraint (disjunction)
+#.  Sub-sample results of 1. and 2. (which may be empty, i.e. the whole collection)
+#.  Apply arbitrary Python functions to the entire result-set of 1 through 3, each function getting its own virtual copy of the result set and optionally other parameters allowing, e.g., queries to other collections in the database.
+
+*Status*: Numbers 1 and 2 above are complete. Number 3 is nearly complete, for number 4 there are a couple of existing
+functions but they need to be integrated into this framework.
+
+All of these modules can be invoked through APIs, eventually, but the current primary interface is the
+command-line program, `mgvv`_. The rest of this page describes the usage of this program.
 
 
 mgvv
