@@ -789,19 +789,17 @@ class ConstraintSpec(object):
         :type spec: dict
         :raise: ValueError if specification is wrong
         """
-        self._sections = {}
+        self._sections = []
         for item in spec:
             if isinstance(item, dict):
                 self._add_complex_section(item)
             else:
                 self._add_simple_section(item)
 
-    def values(self):
-        """Return a list of the sections.
-
-        :rtype: list(ConstraintSpecSection)
+    def __iter__(self):
+        """Return an iterator over the sections.
         """
-        return self._sections.itervalues()
+        return iter(self._sections)
 
     def _add_complex_section(self, item):
         """Add a section that has a filter and set of constraints
@@ -809,22 +807,23 @@ class ConstraintSpec(object):
         :raise: ValueError if filter or constraints is missing
         """
         # extract filter and constraints
-        try:
-            fltr = item[self.FILTER_SECT]
-        except KeyError:
-            raise ValueError("configuration requires '{}'".format(self.FILTER_SECT))
+        fltr = item.get(self.FILTER_SECT, [])
+        constraints = item.get(self.CONSTRAINT_SECT, [])
         sample = item.get(self.SAMPLE_SECT, None)
-        constraints = item.get(self.CONSTRAINT_SECT, None)
+        if not fltr and not constraints and not sample:
+            raise ValueError("configuration is empty")
 
         section = ConstraintSpecSection(fltr, constraints, sample)
-        key = section.get_key()
-        if key in self._sections:
-            self._sections[key].append(section)
-        else:
-            self._sections[key] = [section]
+        self._sections.append(section)
+        #key = section.get_key()
+        #if key in self._sections:
+        #    self._sections[key].append(section)
+        #else:
+        #    self._sections[key] = [section]
 
     def _add_simple_section(self, item):
-        self._sections[None] = ConstraintSpecSection(None, item, None)
+        #self._sections[None] = ConstraintSpecSection(None, item, None)
+        self._sections.append(ConstraintSpecSection(None, item, None))
 
 
 class ConstraintSpecSection(object):
@@ -955,6 +954,7 @@ class Validator(DoesLogging):
         # Find records that violate 1 or more constraints
         cursor = coll.find(query, fields=self._report_fields, **self._find_kw)
         if sampler is not None:
+            self._log.debug('Wrap with sampler: {}'.format(sampler))
             cursor = sampler.sample(cursor)
         nbytes, num_dberr, num_rec = 0, 0, 0
         while 1:
@@ -1026,7 +1026,7 @@ class Validator(DoesLogging):
         self._sections = []
         self._report_fields = self._base_report_fields
         # loopover each condition on the records
-        for sval in constraint_spec.values():
+        for sval in constraint_spec:
             #print("@@ CONDS = {}".format(cond_expr_list))
             #print("@@ MAIN = {}".format(expr_list))
             groups = self._process_constraint_expressions(sval.constraints)
@@ -1112,7 +1112,7 @@ class Validator(DoesLogging):
         return field, op, val
 
 
-class Sampler(object):
+class Sampler(DoesLogging):
     """Randomly sample a proportion of the full collection.
     """
 
@@ -1133,6 +1133,7 @@ class Sampler(object):
         :type distrib: str or int
         :raise: ValueError, if `distrib` is an unknown code or string
         """
+        DoesLogging.__init__(self, 'mg.sampler')
         # Sanity checks
         if min_items < 0:
             raise ValueError('min_items cannot be negative ({:d})'.format(min_items))
@@ -1145,12 +1146,17 @@ class Sampler(object):
         self.p = p
         self._empty = True
         # Distribution
-        if not isinstance(int, distrib):
+        if not isinstance(distrib, int):
             distrib = self.DIST_CODES.get(str(distrib), None)
         if distrib == self.DIST_RUNIF:
             self._skip_fn = self._runif
         else:
             raise ValueError("unrecognized distribution: {}".format(distrib))
+        self._distrib_code = distrib
+
+    def __str__(self):
+        s = 'p={:f} min={:d} max={:d}'.format(self.p, self.min_items, self.max_items)
+        return(s)
 
     @property
     def is_empty(self):
@@ -1177,7 +1183,8 @@ class Sampler(object):
                 or if target collection is empty
         """
         count = cursor.count()
-
+        self._log.debug("sampling from {:d} items".format(count))
+        cursor.limit(0)
         # special case: empty collection
         if count == 0:
             self._empty = True
@@ -1200,6 +1207,7 @@ class Sampler(object):
         if n_target == 0:
             raise ValueError("No items requested")
 
+        self._log.debug("sample n_target={:d}".format(n_target))
         # select `n_target` items
         mu = 1. * count / n_target     # mean items between results
         alpha = 0.25 * mu              # +/- slop in items between results
