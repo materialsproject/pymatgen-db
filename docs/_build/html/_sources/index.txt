@@ -19,6 +19,11 @@ check a variety of constraints on Mongo collections.
 Change Log
 ==========
 
+Version 0.3.3
+-------------
+
+1. Minor bug fix release.
+
 Version 0.3.2
 -------------
 
