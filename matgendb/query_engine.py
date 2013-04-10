@@ -303,7 +303,7 @@ class QueryEngine(object):
         if properties is not None:
             props, prop_dict = self._parse_properties(properties)
         else:
-            props, prop_dict = self._default_props, self._default_prop_dict
+            props, prop_dict = [], {} #self._default_props, self._default_prop_dict
 
         crit = self._parse_criteria(criteria) if criteria is not None else {}
         cur = self.collection.find(crit, fields=props,
