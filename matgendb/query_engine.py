@@ -122,7 +122,8 @@ class QueryEngine(object):
         if default_properties is None:
             self._default_props, self._default_prop_dict = None, None
         else:
-            self._default_props, self._default_prop_dict = self._parse_properties(default_properties)
+            self._default_props, self._default_prop_dict = \
+                self._parse_properties(default_properties)
 
     def __enter__(self):
         """Allows for use with the 'with' context manager"""
@@ -303,7 +304,7 @@ class QueryEngine(object):
         if properties is not None:
             props, prop_dict = self._parse_properties(properties)
         else:
-            props, prop_dict = None, None #self._default_props, self._default_prop_dict
+            props, prop_dict = None, None
 
         crit = self._parse_criteria(criteria) if criteria is not None else {}
         cur = self.collection.find(crit, fields=props,
