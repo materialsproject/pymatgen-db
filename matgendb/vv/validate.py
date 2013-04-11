@@ -789,7 +789,7 @@ class ConstraintSpec(object):
         :type spec: dict
         :raise: ValueError if specification is wrong
         """
-        self._sections = {}
+        self._sections, _slist = {}, []
         for item in spec:
             if isinstance(item, dict):
                 self._add_complex_section(item)
@@ -797,11 +797,16 @@ class ConstraintSpec(object):
                 self._add_simple_section(item)
 
     def values(self):
-        """Return a list of the sections.
+        """Return a list of all the sections.
 
         :rtype: list(ConstraintSpecSection)
         """
-        return self._sections.itervalues()
+        sect = []
+        # simple 1-level flatten operation
+        for values in self._sections.itervalues():
+            for v in values:
+                sect.append(v)
+        return sect
 
     def _add_complex_section(self, item):
         """Add a section that has a filter and set of constraints
