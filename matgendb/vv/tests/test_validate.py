@@ -116,7 +116,7 @@ class TestCollectionFilter(unittest.TestCase):
         # a field with variable size
         szop = vv.ConstraintOperator(vv.ConstraintOperator.SIZE + '$')
         p.add(vv.Field('two'), szop, 'foo')
-        expect.update({'two': 1})
+        expect.update({'two': 1, 'foo':1})
         self.failUnlessEqual(p.to_mongo(), expect)
         # subfields
         p = vv.Projection()

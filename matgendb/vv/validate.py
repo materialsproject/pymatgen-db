@@ -686,7 +686,7 @@ class Projection:
             # get minimal part of array with slicing,
             # but cannot use slice with variables
             self._slices[field.name] = val + 1
-        if op.is_variable():
+        if op and op.is_variable():
             # add the variable too
             self._fields[val] = 1
 
