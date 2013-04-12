@@ -253,7 +253,13 @@ def main(cmdline=None):
     # Init constraints from file or command-line
     constraints_from_file = args.constfile is not None
     if constraints_from_file:
-        f = open(args.constfile, 'rb')
+        try:
+            f = open(args.constfile, 'rb')
+        except IOError:
+            if not os.path.exists(args.constfile):
+                parser.error('constraints file "{}" not found'.format(args.constfile))
+            else:
+                parser.error('constraints file "{}" found, but unreadable'.format(args.constfile))
         with Timing('load.yaml', file=f.name):
             constraints = yaml.safe_load(f)
     else:
@@ -277,6 +283,9 @@ def main(cmdline=None):
             aliases = dict(map(nvpstr, astr))
         except ValueError, err:
             parser.error('aliases should be list of name=value, got "{}": {}'.format(astr, err))
+        except AttributeError:
+            if constraints is None:
+                parser.error('constraints file "{}" is empty'.format(args.constfile))
     elif len(args.aliases) > 0:
         aliases = dict(args.aliases)
     else:
