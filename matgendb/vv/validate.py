@@ -10,7 +10,7 @@ __status__ = "Development"
 __date__ = "1/31/13"
 
 import copy
-import math
+import logging
 import pymongo
 import random
 import re
@@ -719,6 +719,13 @@ class ConstraintViolation:
         return self._expected
 
 
+class NullConstraintViolation(ConstraintViolation):
+    """Empty constraint violation, for when there are no constraints.
+    """
+    def __init__(self):
+        ConstraintViolation.__init__(self, Constraint('NA', '=', 'NA'), 'NA', 'NA')
+
+
 class ConstraintViolationGroup:
     """A group of constraint violations with metadata.
     """
@@ -796,7 +803,7 @@ class ConstraintSpec(object):
             else:
                 self._add_simple_section(item)
 
-    def values(self):
+    def __iter__(self):
         """Return a list of all the sections.
 
         :rtype: list(ConstraintSpecSection)
@@ -806,7 +813,7 @@ class ConstraintSpec(object):
         for values in self._sections.itervalues():
             for v in values:
                 sect.append(v)
-        return sect
+        return iter(sect)
 
     def _add_complex_section(self, item):
         """Add a section that has a filter and set of constraints
@@ -880,6 +887,25 @@ class Validator(DoesLogging):
         )
         \s*''', re.VERBOSE)
 
+    class SectionParts:
+        """Encapsulate the tuple of information for each section of filters, constraints,
+         etc. within a collection.
+        """
+        def __init__(self, cond, body, sampler, report_fields):
+            """Create new initialized set of parts.
+
+            :param cond: Condition to filter records
+            :type cond: MongoQuery
+            :param body: Main set of constraints
+            :type body: MongoQuery
+            :param sampler: Sampling class if any
+            :type sampler: Sampler
+            :param report_fields: Fields to report on
+            :type report_fields: list
+            """
+            self.cond, self.body, self.sampler, self.report_fields = \
+                cond, body, sampler, report_fields
+
     def __init__(self, max_violations=50, max_dberrors=10, aliases=None, add_exists=False):
         DoesLogging.__init__(self, name='mg.validator')
         self.set_progress(0)
@@ -929,38 +955,34 @@ class Validator(DoesLogging):
         self._spec = constraint_spec
         self._progress.set_subject(subject)
         self._build(constraint_spec)
-        for cond, body, sampler in self._sections:
-            cvg = self._validate_section(subject, coll, cond, body, sampler)
+        for sect_parts in self._sections:
+            cvg = self._validate_section(subject, coll, sect_parts)
             if cvg is not None:
                 yield cvg
 
-    def _validate_section(self, subject, coll, cond, body, sampler):
+    def _validate_section(self, subject, coll, parts):
         """Validate one section of a spec.
 
         :param subject: Name of subject
         :type subject: str
         :param coll: The collection to validate
         :type coll: pymongo.Collection
-        :param cond: Condition to filter records
-        :type cond: MongoQuery
-        :param body: Main set of constraints
-        :type body: MongoQuery
-        :param sampler: Sampling class if any
-        :type sampler: Sampler
+        :param parts: Section parts
+        :type parts: Validator.SectionParts
         :return: Group of constraint violations, if any, otherwise None
         :rtype: ConstraintViolationGroup or None
         """
-        query = cond.to_mongo(disjunction=False)
-        query.update(body.to_mongo())
+        query = parts.cond.to_mongo(disjunction=False)
+        query.update(parts.body.to_mongo())
         cvgroup = ConstraintViolationGroup()
         cvgroup.subject = subject
-        cvgroup.condition = cond.to_mongo(disjunction=False)
+        cvgroup.condition = parts.cond.to_mongo(disjunction=False)
         self._log.debug('Query spec: {}'.format(query))
-        self._log.debug('Query fields: {}'.format(self._report_fields))
+        self._log.debug('Query fields: {}'.format(parts.report_fields))
         # Find records that violate 1 or more constraints
-        cursor = coll.find(query, fields=self._report_fields, **self._find_kw)
-        if sampler is not None:
-            cursor = sampler.sample(cursor)
+        cursor = coll.find(query, fields=parts.report_fields, **self._find_kw)
+        if parts.sampler is not None:
+            cursor = parts.sampler.sample(cursor)
         nbytes, num_dberr, num_rec = 0, 0, 0
         while 1:
             try:
@@ -982,7 +1004,7 @@ class Validator(DoesLogging):
             if self._progress:
                 self._progress.update(num_dberr, nbytes)
             # get reasons for badness
-            violations = self._get_violations(body, record)
+            violations = self._get_violations(parts.body, record)
             cvgroup.add_violations(violations, record)
         return None if nbytes == 0 else cvgroup
 
@@ -996,6 +1018,10 @@ class Validator(DoesLogging):
         :return: Reasons why bad
         :rtype: list(ConstraintViolation)
         """
+        # special case, when no constraints are given
+        if len(query.all_clauses) == 0:
+            return [NullConstraintViolation()]
+        # normal case, check all the constraints
         reasons = []
         for clause in query.all_clauses:
             key = clause.constraint.field.name
@@ -1029,29 +1055,30 @@ class Validator(DoesLogging):
         :type constraint_spec: ConstraintSpec
         """
         self._sections = []
-        self._report_fields = self._base_report_fields
         # loopover each condition on the records
-        for sval in constraint_spec.values():
-            #print("@@ CONDS = {}".format(cond_expr_list))
-            #print("@@ MAIN = {}".format(expr_list))
-            groups = self._process_constraint_expressions(sval.constraints)
-            projection = Projection()
+        for sval in constraint_spec:
+            report_fields = self._base_report_fields.copy()
+            #print("@@ CONDS = {}".format(sval.filters))
+            #print("@@ MAIN = {}".format(sval.constraints))
             query = MongoQuery()
-            for cg in groups.itervalues():
-                for c in cg:
-                    projection.add(c.field, c.op, c.value)
-                    query.add_clause(MongoClause(c))
-                if self._add_exists:
-                    for c in cg.existence_constraints:
-                        query.add_clause(MongoClause(c, exists_main=True))
-            self._report_fields.update(projection.to_mongo())
+            if sval.constraints is not None:
+                groups = self._process_constraint_expressions(sval.constraints)
+                projection = Projection()
+                for cg in groups.itervalues():
+                    for c in cg:
+                        projection.add(c.field, c.op, c.value)
+                        query.add_clause(MongoClause(c))
+                    if self._add_exists:
+                        for c in cg.existence_constraints:
+                            query.add_clause(MongoClause(c, exists_main=True))
+                report_fields.update(projection.to_mongo())
             cond_query = MongoQuery()
             if sval.filters is not None:
                 cond_groups = self._process_constraint_expressions(sval.filters, rev=False)
                 for cg in cond_groups.itervalues():
                     for c in cg:
                         cond_query.add_clause(MongoClause(c, rev=False))
-            self._sections.append((cond_query, query, sval.sampler))
+            self._sections.append(self.SectionParts(cond_query, query, sval.sampler, report_fields))
 
     def _process_constraint_expressions(self, expr_list, conflict_check=True, rev=True):
         """Create and return constraints from expressions in expr_list.
@@ -1117,7 +1144,7 @@ class Validator(DoesLogging):
         return field, op, val
 
 
-class Sampler(object):
+class Sampler(DoesLogging):
     """Randomly sample a proportion of the full collection.
     """
 
@@ -1138,6 +1165,7 @@ class Sampler(object):
         :type distrib: str or int
         :raise: ValueError, if `distrib` is an unknown code or string
         """
+        DoesLogging.__init__(self, 'mg.sampler')
         # Sanity checks
         if min_items < 0:
             raise ValueError('min_items cannot be negative ({:d})'.format(min_items))
@@ -1150,10 +1178,10 @@ class Sampler(object):
         self.p = p
         self._empty = True
         # Distribution
-        if not isinstance(int, distrib):
+        if not isinstance(distrib, int):
             distrib = self.DIST_CODES.get(str(distrib), None)
         if distrib == self.DIST_RUNIF:
-            self._skip_fn = self._runif
+            self._keep = self._keep_runif
         else:
             raise ValueError("unrecognized distribution: {}".format(distrib))
 
@@ -1161,10 +1189,8 @@ class Sampler(object):
     def is_empty(self):
         return self._empty
 
-    def _runif(self, x, alpha):
-        """Skip ahead x +/- alpha steps in a uniform distribution.
-        """
-        return random.uniform(x - alpha, x + alpha)
+    def _keep_runif(self):
+        return self.p >= random.uniform(0, 1)
 
     def sample(self, cursor):
         """Extract records randomly from the database.
@@ -1205,17 +1231,19 @@ class Sampler(object):
         if n_target == 0:
             raise ValueError("No items requested")
 
-        # select `n_target` items
-        mu = 1. * count / n_target     # mean items between results
-        alpha = 0.25 * mu              # +/- slop in items between results
-        n, offs = 0, 0                 # number returned, position in collection
+        # select first `n_target` items that pop up with
+        # probability self.p
+        # This is actually biased to items at the beginning
+        # of the file if n_target is smaller than (p * count),
+        n = 0
         while n < n_target:
-            max_offs = count - (n_target - n)
-            max_skip = max_offs - offs - 1
-            skip = min(max_skip, int(round(self._skip_fn(mu, alpha))))
-            for _ in xrange(skip):
-                cursor.next()
-            # give next item to caller
-            yield cursor.next()
-            n += 1
-            offs += skip
+            try:
+                item = cursor.next()
+            except StopIteration:
+                # need to keep looping through data until
+                # we get all our items!
+                cursor.rewind()
+                item = cursor.next()
+            if self._keep():
+                yield item
+                n += 1
