@@ -1042,7 +1042,8 @@ class Validator(DoesLogging):
             op = clause.constraint.op
             fval = mongo_get(record, key)
             if fval is None:
-                reasons.append(ConstraintViolation(clause.constraint, 'missing', key))
+                expected = clause.constraint.value
+                reasons.append(ConstraintViolation(clause.constraint, 'missing', expected))
                 continue
             if op.is_variable():
                 # retrieve value for variable

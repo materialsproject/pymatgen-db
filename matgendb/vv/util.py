@@ -9,7 +9,7 @@ __email__ = "dkgunter@lbl.gov"
 __status__ = "Development"
 __date__ = "3/29/13"
 
-import json
+import time
 import logging
 from sys import getsizeof, stderr
 from itertools import chain
@@ -74,4 +74,30 @@ def total_size(o, handlers={}, verbose=False):
 
     return sizeof(o)
 
+class ElapsedTime(object):
+    def __init__(self):
+        self.value = -1
 
+class Timing(object):
+    """Perform and report timings using the 'with' keyword.
+
+    For example:
+        with Timing('foo', info='bar'):
+            do_foo1()
+            do_foo2()
+    """
+    def __init__(self, name="event", elapsed=None, log=None, level=logging.DEBUG, **kwargs):
+        self.name, self.kw, self.level = name, kwargs, level
+        self.elapsed = elapsed
+        self._log = log
+
+    def __enter__(self):
+        self.begin = time.time()
+
+    def __exit__(self, type, value, tb):
+        elapsed = time.time() - self.begin
+        if self._log is not None:
+            nvp = ', '.join(['{}={}'.format(k, v) for k, v in self.kw.iteritems()])
+            self._log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
+        if self.elapsed:
+            self.elapsed.value = elapsed

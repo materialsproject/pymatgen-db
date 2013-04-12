@@ -27,6 +27,7 @@ import yaml
 from matgendb.util import get_settings
 from matgendb.vv.validate import ConstraintSpec, Validator, DBError
 from matgendb.vv import report
+from matgendb.vv.util import Timing, ElapsedTime
 
 # Initialize module logging
 _log_name = 'mg'
@@ -119,24 +120,6 @@ def _config_email(fname):
     if 'server' in info:
         d['server'] = info['server']
     return d
-
-
-class Timing:
-    """Perform and report timings using the 'with' keyword.
-
-    For example:
-        with Timing('foo', info='bar'):
-            do_foo1()
-            do_foo2()
-    """
-    def __init__(self, name, level=logging.DEBUG, **kwargs):
-        self.name, self.kw, self.level = name, kwargs, level
-    def __enter__(self):
-        self.begin = time.time()
-    def __exit__(self, type, value, tb):
-        elapsed = time.time() - self.begin
-        nvp = ', '.join(['{}={}'.format(k,v) for k,v in self.kw.iteritems()])
-        _log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
 
 
 def parse_mongo_url(url):
@@ -302,9 +285,13 @@ def main(cmdline=None):
         emailer = report.Emailer(subject="Materials Project Validation Report", **email_kw)
 
     # Initialize report
+    try:
+        user_name = os.getlogin()
+    except OSError:
+        user_name = args.user or 'unknown'
     rpt_hdr = report.ReportHeader("Materials Project Validation Report")
     rpt_hdr.add('Report time', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()))
-    rpt_hdr.add('Report user',  os.getlogin())
+    rpt_hdr.add('Report user',  user_name)
     rpt_hdr.add('Report host', socket.gethostname())
     rpt_hdr.add('Limit', args.limit)
     rpt = report.Report(rpt_hdr)
@@ -319,7 +306,8 @@ def main(cmdline=None):
     validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=10, add_exists=args.must_exist)
     if args.progress > 0:
         validator.set_progress(args.progress)
-    with Timing("validate"):
+    elapsed = ElapsedTime()
+    with Timing("validate", log=_log, elapsed=elapsed):
         for coll_name, constraint_spec_cfg in constraints.iteritems():
             sect_hdr = report.SectionHeader(title="Collection {}".format(coll_name))
             rpt_sect = report.ReportSection(sect_hdr)
@@ -354,7 +342,7 @@ def main(cmdline=None):
                 _log.error('validating collecton {}: {}'.format(coll_name, err))
                 break
             rpt.add_section(rpt_sect)
-
+    rpt_hdr.add('Elapsed time (sec)', elapsed.value)
     # Report results
     if rpt.is_empty():
         _log.warn("Report is empty, skipping output")

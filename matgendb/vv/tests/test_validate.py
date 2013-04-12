@@ -9,10 +9,29 @@ __email__ = "dkgunter@lbl.gov"
 __status__ = "Development"
 __date__ = "1/31/13"
 
+import time
 import unittest
 import matgendb.vv.validate as vv
+import matgendb.vv.util as vu
 
 class TestCollectionFilter(unittest.TestCase):
+
+    def test_Timing(self):
+        e = vu.ElapsedTime()
+        with vu.Timing(elapsed=e):
+           time.sleep(0.2)
+        self.assertAlmostEqual(e.value, 0.2, places=1)
+        # test some other modes of invocation
+        with vu.Timing() as t:
+            x = 1
+        loglvl = 10
+        class FakeLog:
+            def __init__(self, testclass):
+                self.tc = testclass
+            def log(self, lvl, msg):
+                self.tc.assertEqual(lvl, loglvl)
+        with vu.Timing(log=FakeLog(self), level=loglvl):
+            x = 1
 
     def test_ConstraintOperator_base(self):
         "Test the ConstraintOperator class."
