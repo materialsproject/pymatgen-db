@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -179,8 +180,7 @@
         <span class="k">if</span> <span class="n">default_properties</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_default_props</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_prop_dict</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_default_props</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_prop_dict</span> <span class="o">=</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">_parse_properties</span><span class="p">(</span><span class="n">default_properties</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_default_props</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_prop_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_properties</span><span class="p">(</span><span class="n">default_properties</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Allows for use with the &#39;with&#39; context manager&quot;&quot;&quot;</span>
@@ -361,7 +361,7 @@
         <span class="k">if</span> <span class="n">properties</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+            <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_props</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_prop_dict</span>
 
         <span class="n">crit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_criteria</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span> <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">{}</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">crit</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">props</span><span class="p">,</span>
@@ -570,7 +570,7 @@
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

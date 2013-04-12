@@ -33,7 +33,13 @@ class Report:
         return self._hdr
 
     def is_empty(self):
-        return len(self._sections) == 0
+        if len(self._sections) == 0:
+            return True
+        total_rows = 0
+        for sect in self._sections:
+            if sect.body is not None:
+                total_rows += sect.body.nrow
+        return total_rows == 0
 
     def __iter__(self):
         return iter(self._sections)

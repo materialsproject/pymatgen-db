@@ -176,6 +176,8 @@ def main(cmdline=None):
                              'The "from" and "to" are required; default server is localhost. '
                              'This information can also be in the main config file under the "_email" key, '
                              'which should be a mapping with keys "from", "to", and "server".')
+    parser.add_argument('--empty', dest='send_on_empty', action='store_true',
+                        help="Send a report, even if it is empty (default=print warning and don't send)")
     parser.add_argument('--exonly', dest='must_exist', action='store_true', default=False,
                         help='Only show results where all fields in the constraints are also present in the record')
     parser.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
@@ -342,9 +344,9 @@ def main(cmdline=None):
                 _log.error('validating collecton {}: {}'.format(coll_name, err))
                 break
             rpt.add_section(rpt_sect)
-    rpt_hdr.add('Elapsed time (sec)', elapsed.value)
+    rpt.header.add('Elapsed time', '{:.2f}s'.format(elapsed.value))
     # Report results
-    if rpt.is_empty():
+    if not args.send_on_empty and rpt.is_empty():
         _log.warn("Report is empty, skipping output")
         retcode = 1
     else:
