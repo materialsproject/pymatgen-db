@@ -205,6 +205,16 @@ class ConstraintOperator:
         self._check_size()
         return self._size_code == self.SZ_GT
 
+    def is_size_var(self):
+        """Is this a variable-equality size operator.
+
+        :return: True or False
+        :rtype: bool
+        :raise: ValueError, if not a size operator at all
+        """
+        self._check_size()
+        return self._size_code == self.SZ_VAR
+
     def is_type(self):
         """Whether the operator is 'type'
 
@@ -253,7 +263,7 @@ class ConstraintOperator:
             else:
                 return lhs_value is None
         if self.is_size():
-            if self.is_size_eq():
+            if self.is_size_eq() or self.is_size_var():
                 return lhs_value == rhs_value
             if self.is_size_gt():
                 return lhs_value > rhs_value
@@ -676,6 +686,9 @@ class Projection:
             # get minimal part of array with slicing,
             # but cannot use slice with variables
             self._slices[field.name] = val + 1
+        if op.is_variable():
+            # add the variable too
+            self._fields[val] = 1
 
     def to_mongo(self):
         """Translate projection to MongoDB query form.
@@ -1024,25 +1037,34 @@ class Validator(DoesLogging):
         # normal case, check all the constraints
         reasons = []
         for clause in query.all_clauses:
+            var_name = None
             key = clause.constraint.field.name
             op = clause.constraint.op
             fval = mongo_get(record, key)
-            # retrieve value of variable
+            if fval is None:
+                reasons.append(ConstraintViolation(clause.constraint, 'missing', key))
+                continue
             if op.is_variable():
-                varname = fval
-                fval = mongo_get(record, varname)
-                if fval is None:
-                    reasons.append(ConstraintViolation(clause.constraint, 'missing', varname))
+                # retrieve value for variable
+                var_name = clause.constraint.value
+                value = mongo_get(record, var_name, default=None)
+                if value is None:
+                    reasons.append(ConstraintViolation(clause.constraint, 'missing', var_name))
                     continue
+                clause.constraint.value = value         # swap out value, temporarily
             # take length for size
             if op.is_size():
                 if isinstance(fval, basestring) or not hasattr(fval, '__len__'):
                     reasons.append(ConstraintViolation(clause.constraint, type(fval), 'sequence'))
+                    if op.is_variable():
+                        clause.constraint.value = var_name      # put original value back
                     continue
                 fval = len(fval)
             ok, expected = clause.constraint.passes(fval)
             if not ok:
                 reasons.append(ConstraintViolation(clause.constraint, fval, expected))
+            if op.is_variable():
+                clause.constraint.value = var_name      # put original value back
         return reasons
 
     def _build(self, constraint_spec):
