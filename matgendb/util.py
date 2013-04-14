@@ -38,6 +38,7 @@ def get_settings(config_file):
     else:
         return dict(DEFAULT_SETTINGS)
 
+
 class MongoJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, bson.objectid.ObjectId):

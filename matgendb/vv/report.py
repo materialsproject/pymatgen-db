@@ -5,15 +5,14 @@ __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '2/21/13'
 
 
-import bson
 from email.mime.text import MIMEText
 import json
 from operator import itemgetter
 import smtplib
 
-from pymatgen import PMGJSONEncoder
 from .util import DoesLogging
 from ..util import MongoJSONEncoder
+
 
 class Report:
     def __init__(self, header):
@@ -156,7 +155,8 @@ class Table:
 
 ## Exceptions
 
-class ReportBackupError(Exception): pass
+class ReportBackupError(Exception):
+    pass
 
 ## Formatting
 
