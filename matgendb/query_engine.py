@@ -380,7 +380,7 @@ class QueryEngine(object):
                                               self.database_name)
 
     @staticmethod
-    def from_config(config_file):
+    def from_config(config_file, use_admin=False):
         """
         Initialize a QueryEngine from a JSON config file generated using mgdb
         init.
@@ -388,16 +388,22 @@ class QueryEngine(object):
         Args:
             config_file:
                 Filename of config file.
+            use_admin:
+                If True, the admin user and password in the config file is
+                used. Otherwise, the readonly_user and password is used.
+                Defaults to False.
 
         Returns:
             QueryEngine
         """
         with open(config_file) as f:
             d = json.load(f)
+            user = d["admin_user"] if use_admin else d["readonly_user"]
+            password = d["admin_password"] if use_admin \
+                else d["readonly_password"]
             return QueryEngine(
                 host=d["host"], port=d["port"], database=d["database"],
-                user=d["readonly_user"], password=d["readonly_password"],
-                collection=d["collection"],
+                user=user, password=password, collection=d["collection"],
                 aliases_config=d.get("aliases_config", None))
 
 
