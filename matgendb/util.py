@@ -24,7 +24,8 @@ DEFAULT_SETTINGS = [
     ("readonly_user", None),
     ("readonly_password", None),
     ("collection", "tasks"),
-    ("aliases_config", None)
+    ("aliases_config", None),
+    ("mapi_key", None)
 ]
 
 
