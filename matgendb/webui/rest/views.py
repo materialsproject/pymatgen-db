@@ -75,7 +75,7 @@ def query(request):
                     criteria.append({"pretty_formula": {"$in": formulas}})
                 if chemsys:
                     criteria.append({"chemsys": {"$in": chemsys}})
-                criteria = {"$or": criteria} if len(criteria)> 1 else \
+                criteria = {"$or": criteria} if len(criteria) > 1 else \
                     criteria[0]
             properties = request.POST["properties"]
             if properties == "*":

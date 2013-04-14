@@ -22,4 +22,3 @@ def index(request):
     d["ndocs"] = qe.collection.count()
     return render_to_response("home/templates/index.html",
                               RequestContext(request, d))
-
