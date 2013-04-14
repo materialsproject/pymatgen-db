@@ -19,6 +19,10 @@ check a variety of constraints on Mongo collections.
 Change Log
 ==========
 
+Version 0.3.4
+-------------
+1. MAPI_KEY is now a db config file variable.
+
 Version 0.3.3
 -------------
 
