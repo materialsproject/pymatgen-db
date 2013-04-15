@@ -19,7 +19,7 @@ class Report:
         """Create blank report, with a header.
 
         :param header: Report header
-        :type header: ReportHeader
+        :type header: Header
         """
         self._hdr = header
         self._sections = []
@@ -62,6 +62,7 @@ class ReportSection(Report):
     def body(self):
         return self._body
 
+
 class Header:
     """Base header class.
     """
@@ -79,7 +80,8 @@ class Header:
         return iter(self._kv)
 
     def to_dict(self):
-        return {k:v for k, v in self._kv}
+        return {k: v for k, v in self._kv}
+
 
 class ReportHeader(Header):
     """Header for entire report.
@@ -269,17 +271,18 @@ class JSONFormatter:
             sections=[
                 dict(title=s.header.title,
                      info=s.header,
-                     conditions=[
-                        dict(title=cs.header.title,
-                             info=cs.header,
-                             violations=cs.body)
-                        for cs in s
+                     conditions=[dict(
+                         title=cs.header.title,
+                         info=cs.header,
+                         violations=cs.body)
+                         for cs in s
                      ]
                 )
                 for s in report
             ]
         )
         return json.dumps(obj, indent=self._indent, cls=MongoJSONEncoder)
+
 
 class ReportJSONEncoder(MongoJSONEncoder):
     def default(self, o):
@@ -300,8 +303,8 @@ class MarkdownFormatter:
         return ', '.join((('{}={}'.format(k, v) for k, v in d.iteritems())))
 
     def _fixed_width(self, values, widths):
-        s = ''.join(["{{:{:d}s}}".format(w+1).format(str(v))
-                       for w, v in zip(widths, values)])
+        s = ''.join(["{{:{:d}s}}".format(w + 1).format(str(v))
+                    for w, v in zip(widths, values)])
         return s
 
     def format(self, report):
