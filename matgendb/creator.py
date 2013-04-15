@@ -351,13 +351,16 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         # Parse OUTCAR for additional information and run stats that are
         # generally not in vasprun.xml.
-        run_stats = {}
-        for filename in glob.glob(os.path.join(fullpath, "OUTCAR*")):
-            outcar = Outcar(filename)
-            i = 1 if re.search("relax2", filename) else 0
-            taskname = "relax2" if re.search("relax2", filename) else "relax1"
-            d["calculations"][i]["output"]["outcar"] = outcar.to_dict
-            run_stats[taskname] = outcar.run_stats
+        try:
+            run_stats = {}
+            for filename in glob.glob(os.path.join(fullpath, "OUTCAR*")):
+                outcar = Outcar(filename)
+                i = 1 if re.search("relax2", filename) else 0
+                taskname = "relax2" if re.search("relax2", filename) else "relax1"
+                d["calculations"][i]["output"]["outcar"] = outcar.to_dict
+                run_stats[taskname] = outcar.run_stats
+        except:
+            logger.error("Bad OUTCAR for {}.".format(fullpath))
 
         try:
             overall_run_stats = {}
