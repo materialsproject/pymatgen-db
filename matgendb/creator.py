@@ -539,6 +539,11 @@ class VaspToDbTaskDrone(AbstractDrone):
                     else "unsuccessful"
             else:
                 d["state"] = "stopped"
+
+            s = Structure.from_dict(d2["output"]["crystal"])
+            if not s.is_valid():
+                d["state"] = "errored_bad_structure"
+
             d["analysis"] = get_basic_analysis_and_error_checks(d)
 
             sg = SymmetryFinder(Structure.from_dict(d["output"]["crystal"]),
