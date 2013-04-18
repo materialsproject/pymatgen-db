@@ -1,0 +1,138 @@
+#!/usr/bin/env python
+
+"""
+Tool to combine/composite multiple task collections to build a hybrid/sandbox 
+material (etc) collection from.  Assumes the same mongodb server, but can work 
+across multiple databases.
+
+The target db (ie: the -T flag) will be considered to be a 'sandbox' db that 
+contains a collection of sandbox ids.  If this collection exists, it will be 
+possible to 'composite' the task ids of the non-core task collection.  If the 
+format of the target collection is something like 'dahn.materials.tasks,' 
+(ie: ends with the suffix .tasks) the sandbox id collection will be checked 
+for the presence of a 'dahn.materials' entry.
+
+If the entry exists, the user will have the option to differentiate the task 
+ids when writing to the target collection by changing them to the format 
+'sandbox_id-task_id' (nn-nnnnn).  This is so a given sandbox will have a 
+unique set of task ids that is different from the core material data.  This 
+can be invoked by using the boolean -c flag.
+
+The user does NOT want to apply this composite treatment to the core tasks.  
+Those task ids should be left as-is.  However, even if the task ids are not 
+composited, they will still be converted from numbers to strings by this tool.
+"""
+
+import os
+import sys
+
+from optparse import OptionParser
+
+import pymongo
+from pymongo.errors import ConnectionFailure
+
+class ConnectionException(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+def _connection(host, db_name, user, password):
+    try:
+        conn = pymongo.Connection(host=host)
+    except ConnectionFailure:
+        raise ConnectionException("Couldn't connect to DB "
+                            "at {host}".format(host=host))
+
+    db = conn[db_name]
+
+    if user:
+        success = db.authenticate(user, password)
+        if not success:
+            raise ConnectionException("Could not authenticate to "
+                    "database {db} as user {user}".format(user=user, db=db_name))
+
+    return db
+
+
+def main():
+    usage = '%prog [ -S source_db | -T target_db | -s source_db | -t target_collection | -h host | -u user | -p pass | -c ]'
+    parser = OptionParser(usage=usage)
+    parser.add_option('-S', '--source_db', metavar='SOURCE_DB',
+            type='string', dest='source_db', 
+            help='Source mongo database.')
+    parser.add_option('-T', '--target_db', metavar='TARGET_DB',
+            type='string', dest='target_db', 
+            help='Target mongo database.')
+    parser.add_option('-s', '--source_collection', metavar='SOURCE_COLLECTION',
+            type='string', dest='source_collection', 
+            help='Source collection.')
+    parser.add_option('-t', '--target_collection', metavar='TARGET_COLLECTION',
+            type='string', dest='target_collection', 
+            help='Target collection.')
+    parser.add_option('-H', '--host', metavar='HOST',
+            type='string', dest='host', default='localhost',
+            help='Mongo hostname (default localhost).')
+    parser.add_option('-u', '--user', metavar='USER',
+            type='string', dest='user', 
+            help='Mongo username.')
+    parser.add_option('-p', '--password', metavar='PASSWORD',
+            type='string', dest='password', 
+            help='Mongo password.')
+    parser.add_option('-c', '--composite',
+            dest='composite', action='store_true', default=False,
+            help='Rewrite task ids to create a composite task collection.')
+    options, args = parser.parse_args()
+
+    for arg in ['source_db', 'target_db', 'source_collection', 'target_collection']:
+        if not getattr(options, '{0}'.format(arg)):
+            parser.print_help()
+            parser.error('All source/target args required.')
+
+    source_db = _connection(options.host, options.source_db, options.user, options.password)
+    target_db = _connection(options.host, options.target_db, options.user, options.password)
+
+    source_collection = source_db[options.source_collection]
+    target_collection = target_db[options.target_collection]
+
+    composite_id_prefix = None
+
+    if options.composite:
+        sbox_coll = 'sandbox_ids'
+        if not sbox_coll in target_db.collection_names():
+            parser.error('Composite copy requested but no "{0}" collection in target db "{1}".'.format(sbox_coll, options.target_db))
+        if not options.target_collection.endswith('.tasks'):
+            parser.error('Composite copy requested but target collection "{0}" not suffixed with ".tasks."'.format(options.target_collection))
+
+        sandbox_name = options.target_collection.replace('.tasks', '')
+        sandbox_info = target_db[sbox_coll].find_one({'sandbox_name': sandbox_name})
+        if not sandbox_info:
+            parser.error('Composite copy requested but no sandbox name found for "{0}".'.format(sandbox_name))
+
+        prompt = raw_input('Prefix ids in task collection "{0}" with sandbox id "{1}" during copy?\n[y/n] : '.format(options.source_collection, sandbox_info.get('sandbox_id', None)))
+        if not prompt.lower() == 'y':
+            print 'Cancelling composite copy.'
+            sys.exit(-1)
+        else:
+            print 'Commencing composite copy.'
+            composite_id_prefix = sandbox_info.get('sandbox_id', None)
+
+    # Final sanity check
+    prompt = raw_input('Copy/append source\n {source}\nTo target\n {target}?\n[y/n] : '.format(
+        source=source_collection, target=target_collection))
+    
+    if prompt.lower() == 'y':
+        print 'Commencing copy/append...'
+        ret = source_collection.find({})
+
+        for doc in ret:
+            doc['task_id'] = str(doc['task_id'])
+            if composite_id_prefix:
+                doc['task_id'] = '{0}-{1}'.format(composite_id_prefix, doc['task_id'])
+            target_collection.insert(doc)
+
+
+    
+
+if __name__ == '__main__':
+    main()
