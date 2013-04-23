@@ -34,11 +34,16 @@ class Report:
     def is_empty(self):
         if len(self._sections) == 0:
             return True
-        total_rows = 0
+        self._total_rows = 0
         for sect in self._sections:
-            if sect.body is not None:
-                total_rows += sect.body.nrow
-        return total_rows == 0
+            self._count_rows(sect)
+        return self._total_rows == 0
+
+    def _count_rows(self, sect):
+        if sect.body is not None:
+            self._total_rows += sect.body.nrow
+        for subsect in sect._sections:
+            self._count_rows(subsect)
 
     def __iter__(self):
         return iter(self._sections)

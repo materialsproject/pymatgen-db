@@ -188,6 +188,8 @@ def main(cmdline=None):
                         help='Limit number of displayed constraint violations per-collection 0=no limit (50)')
     parser.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
                         help='Report progress every NUM invalid records found')
+    parser.add_argument('--user', '-u', dest='user', metavar='NAME', default=None,
+                        help='User name, for the report')
     parser.add_argument('-v', '--verbose', dest='vb', action='count', help='Log message verbosity')
 
     args = parser.parse_args(cmdline)
@@ -259,7 +261,8 @@ def main(cmdline=None):
         # re-split command-line arguments on commas (not whitespace)
         plist = ' '.join(args.constraint).split(',')
         # make dict(key=collection) of list of the constraints, just like YAML config file
-        constraints = {coll_name: plist}
+        constraints = {coll_name: [plist]}
+	_log.debug("command-line constraints dump: {}".format(constraints))
 
     # Init aliases from file or command-line
     if constraints_from_file:
@@ -311,6 +314,7 @@ def main(cmdline=None):
     elapsed = ElapsedTime()
     with Timing("validate", log=_log, elapsed=elapsed):
         for coll_name, constraint_spec_cfg in constraints.iteritems():
+	    _log.debug("validate {}".format(coll_name))
             sect_hdr = report.SectionHeader(title="Collection {}".format(coll_name))
             rpt_sect = report.ReportSection(sect_hdr)
             if coll_name.startswith(PATTERN_KEY_PREFIX_IGNORE):
@@ -325,6 +329,7 @@ def main(cmdline=None):
                 #sect = get_constraint_sections(constraint_spec)
                 for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
                     sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
+		    _log.debug('Collection {}: {:d} violations'.format(coll_name, len(vgroup)))
                     sect_hdr.add('Condition', str(vgroup.condition))
                     table = report.Table(colnames=('Id', 'TaskId', 'Field', 'Constraint', 'Value'))
                     for viol, vrec in vgroup:
@@ -345,6 +350,7 @@ def main(cmdline=None):
                 break
             rpt.add_section(rpt_sect)
     rpt.header.add('Elapsed time', '{:.2f}s'.format(elapsed.value))
+    _log.debug('Run time: {:.2f}'.format(elapsed.value))
     # Report results
     if not args.send_on_empty and rpt.is_empty():
         _log.warn("Report is empty, skipping output")

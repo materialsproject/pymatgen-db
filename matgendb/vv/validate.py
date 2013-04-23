@@ -51,7 +51,7 @@ def mongo_get(rec, key, default=None):
     return rec
 
 
-class Field:
+class Field(object):
     """Single field in a constraint.
     """
 
@@ -92,7 +92,7 @@ class Field:
         return self._subname
 
 
-class ConstraintOperator:
+class ConstraintOperator(object):
     """Operator in a single constraint.
     """
     SIZE = 'size'
@@ -286,7 +286,7 @@ class ConstraintOperator:
             return False
 
 
-class Constraint:
+class Constraint(object):
     """Definition of a single constraint.
     """
 
@@ -349,7 +349,7 @@ class Constraint:
         return '{} {}'.format(self.field.name, self._op)
 
 
-class ConstraintGroup:
+class ConstraintGroup(object):
     """Definition of a group of constraints, for a given field.
     """
     def __init__(self, field=None):
@@ -428,7 +428,7 @@ class ConstraintGroup:
         return iter(self.constraints)
 
 
-class MongoClause:
+class MongoClause(object):
     """Representation of query clause in a MongoDB query.
        Ho, Ho, Ho! Merry Mongxmas!
     """
@@ -586,7 +586,7 @@ class MongoClause:
         return self.JS_OPS.get(str(op), op)
 
 
-class MongoQuery:
+class MongoQuery(object):
     """MongoDB query composed of MongoClause objects.
     """
     def __init__(self):
@@ -662,7 +662,7 @@ class MongoQuery:
         return self._main + self._where
 
 
-class Projection:
+class Projection(object):
     """Fields on which to project the query results.
     """
     def __init__(self):
@@ -702,7 +702,7 @@ class Projection:
         return d
 
 
-class ConstraintViolation:
+class ConstraintViolation(object):
     """A single constraint violation, with no metadata.
     """
     def __init__(self, constraint, value, expected):
@@ -739,7 +739,7 @@ class NullConstraintViolation(ConstraintViolation):
         ConstraintViolation.__init__(self, Constraint('NA', '=', 'NA'), 'NA', 'NA')
 
 
-class ConstraintViolationGroup:
+class ConstraintViolationGroup(object):
     """A group of constraint violations with metadata.
     """
     def __init__(self):
@@ -766,8 +766,11 @@ class ConstraintViolationGroup:
     def __iter__(self):
         return iter(self._viol)
 
+    def __len__(self):
+        return len(self._viol)
 
-class ProgressMeter:
+
+class ProgressMeter(object):
     """Simple progress tracker
     """
     def __init__(self, num, fmt):
@@ -795,7 +798,7 @@ class ProgressMeter:
         self._count = 0
 
 
-class ConstraintSpec(object):
+class ConstraintSpec(DoesLogging):
     """Specification of a set of constraints for a collection.
     """
     FILTER_SECT = 'filter'
@@ -809,8 +812,10 @@ class ConstraintSpec(object):
         :type spec: dict
         :raise: ValueError if specification is wrong
         """
+        DoesLogging.__init__(self, name='mg.ConstraintSpec')
         self._sections, _slist = {}, []
         for item in spec:
+            self._log.debug("build constraint from: {}".format(item))
             if isinstance(item, dict):
                 self._add_complex_section(item)
             else:
@@ -849,7 +854,7 @@ class ConstraintSpec(object):
             self._sections[key] = [section]
 
     def _add_simple_section(self, item):
-        self._sections[None] = ConstraintSpecSection(None, item, None)
+        self._sections[None] = [ConstraintSpecSection(None, item, None)]
 
 
 class ConstraintSpecSection(object):
