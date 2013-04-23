@@ -75,7 +75,7 @@ def _parse_email(s):
     Keys:
     - sender
     - recipients
-    - server
+    - host
     - port
 
     :return: Parsed email information
@@ -93,9 +93,12 @@ def _parse_email(s):
     if len(items) > 2:
         d['server'] = items[2]
     if len(items) > 3:
+	if '/' in items[3]:
+	    p1, p2 = items[3].split('/')
+        d['port'], d['subject'] = int(p1), p2
+    else:
         d['port'] = int(items[3])
     return d
-
 
 def _config_email(fname):
     d = {}
@@ -117,8 +120,10 @@ def _config_email(fname):
                          .format(fname))
     if 'port' in info:
         d['port'] = int(info['port'])
-    if 'server' in info:
-        d['server'] = info['server']
+    if 'host' in info:
+        d['host'] = info['host']
+    if 'subject' in info:
+        d['subject'] = info['subject']
     return d
 
 
@@ -172,10 +177,10 @@ def main(cmdline=None):
     parser.add_argument('--collection', '-C', dest='coll', metavar='NAME', default=None,
                         help='Collection name for constraints given on command-line')
     parser.add_argument('--email', '-e', dest='email', default=None,
-                        help='Email report to EMAIL at {from}:{to}[:server].'
-                             'The "from" and "to" are required; default server is localhost. '
+		    help='Email report to EMAIL at {from}:{to}[:host[:port[/subject]]].'
+                             'The "from" and "to" are required; default host is localhost. '
                              'This information can also be in the main config file under the "_email" key, '
-                             'which should be a mapping with keys "from", "to", and "server".')
+			     'which should be a mapping with keys "from", "to", "host", "port", and "subject".')
     parser.add_argument('--empty', dest='send_on_empty', action='store_true',
                         help="Send a report, even if it is empty (default=print warning and don't send)")
     parser.add_argument('--exonly', dest='must_exist', action='store_true', default=False,
@@ -286,8 +291,10 @@ def main(cmdline=None):
     elif args.constfile:
         email_kw = _config_email(args.constfile)
     if email_kw is not None:
-        _log.info("Will email report to: {}".format(mapdump(email_kw)))
-        emailer = report.Emailer(subject="Materials Project Validation Report", **email_kw)
+        _kwd = {'subject':'MP Validation Report'}
+        _kwd.update(email_kw)
+        _log.info("Will email report to: {}".format(mapdump(_kwd)))
+        emailer = report.Emailer(**_kwd)
 
     # Initialize report
     try:
