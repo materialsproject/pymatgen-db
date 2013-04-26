@@ -1,4 +1,4 @@
-pymatgen>=2.6.3
+pymatgen>=2.6.6
 pymongo>=2.4
 prettytable>=0.7
 django>=1.5
