@@ -42,12 +42,12 @@ class QeTransmuterTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         try:
-            drone = VaspToDbTaskDrone(database="creator_unittest")
+            drone = VaspToDbTaskDrone(database="qetransmuter_unittest")
             queen = BorgQueen(drone)
             queen.serial_assimilate(os.path.join(test_dir, 'db_test',
                                                  'success_mp_aflow'))
             cls.conn = MongoClient()
-            cls.qe = QueryEngine(database="creator_unittest")
+            cls.qe = QueryEngine(database="qetransmuter_unittest")
         except ConnectionFailure:
             cls.qe = None
             cls.conn = None
@@ -73,7 +73,7 @@ class QeTransmuterTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         if cls.conn is not None:
-            cls.conn.drop_database("creator_unittest")
+            cls.conn.drop_database("qetransmuter_unittest")
 
 
 if __name__ == "__main__":
