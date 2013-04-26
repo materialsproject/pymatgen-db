@@ -130,7 +130,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.update_duplicates = update_duplicates
         self.mapi_key = mapi_key
         if not simulate_mode:
-            conn = MongoClient(self.host, self.port)
+            conn = MongoClient(self.host, self.port, j=True)
             db = conn[self.database]
             if self.user:
                 db.authenticate(self.user, self.password)
