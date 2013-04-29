@@ -255,13 +255,10 @@ class VaspToDbTaskDrone(AbstractDrone):
                     for calc in d["calculations"]:
                         if "dos" in calc:
                             dos = json.dumps(calc["dos"])
-                            if not self.simulate:
-                                fs = gridfs.GridFS(db, "dos_fs")
-                                dosid = fs.put(dos)
-                                calc["dos_fs_id"] = dosid
-                                del calc["dos"]
-                            else:
-                                logger.info("Simulated Insert DOS into db.")
+                            fs = gridfs.GridFS(db, "dos_fs")
+                            dosid = fs.put(dos)
+                            calc["dos_fs_id"] = dosid
+                            del calc["dos"]
 
                 d["last_updated"] = datetime.datetime.today()
                 if result is None:
@@ -283,7 +280,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 logger.info("Skipping duplicate {}".format(d["dir_name"]))
         else:
             d["task_id"] = 0
-            logger.info("Simulated Insert into database for {} with task_id {}"
+            logger.info("Simulated insert into database for {} with task_id {}"
                         .format(d["dir_name"], d["task_id"]))
             return d
 
@@ -356,7 +353,8 @@ class VaspToDbTaskDrone(AbstractDrone):
             for filename in glob.glob(os.path.join(fullpath, "OUTCAR*")):
                 outcar = Outcar(filename)
                 i = 1 if re.search("relax2", filename) else 0
-                taskname = "relax2" if re.search("relax2", filename) else "relax1"
+                taskname = "relax2" if re.search("relax2", filename) else \
+                    "relax1"
                 d["calculations"][i]["output"]["outcar"] = outcar.to_dict
                 run_stats[taskname] = outcar.run_stats
         except:
