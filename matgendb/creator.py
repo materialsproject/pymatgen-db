@@ -22,6 +22,7 @@ import datetime
 import string
 import json
 import socket
+import numpy as np
 from fnmatch import fnmatch
 from collections import OrderedDict
 
@@ -538,10 +539,6 @@ class VaspToDbTaskDrone(AbstractDrone):
             else:
                 d["state"] = "stopped"
 
-            s = Structure.from_dict(d2["output"]["crystal"])
-            if not s.is_valid():
-                d["state"] = "errored_bad_structure"
-
             d["analysis"] = get_basic_analysis_and_error_checks(d)
 
             sg = SymmetryFinder(Structure.from_dict(d["output"]["crystal"]),
@@ -605,7 +602,9 @@ class VaspToDbTaskDrone(AbstractDrone):
         return output
 
 
-def get_basic_analysis_and_error_checks(d):
+def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5,
+                                        volume_change_threshold=0.2):
+
     initial_vol = d["input"]["crystal"]["lattice"]["volume"]
     final_vol = d["output"]["crystal"]["lattice"]["volume"]
     delta_vol = final_vol - initial_vol
@@ -617,10 +616,12 @@ def get_basic_analysis_and_error_checks(d):
     vbm = calc["output"]["vbm"]
     is_direct = calc["output"]["is_gap_direct"]
 
-    if abs(percent_delta_vol) > 0.20:
-        warning_msgs = ["Volume change > 20%"]
-    else:
-        warning_msgs = []
+    warning_msgs = []
+    error_msgs = []
+
+    if abs(percent_delta_vol) > volume_change_threshold:
+        warning_msgs.append("Volume change > {}%"
+                            .format(volume_change_threshold * 100))
 
     bv_struct = Structure.from_dict(d["output"]["crystal"])
     try:
@@ -632,9 +633,28 @@ def get_basic_analysis_and_error_checks(d):
     except Exception as ex:
         logger.error("BVAnalyzer error {e}.".format(e=str(ex)))
 
+    if d["state"] == "successful":
+        # handle the max force and max force error
+        max_force = max([np.linalg.norm(a)
+                        for a in d["calculations"][-1]["output"]
+                        ["ionic_steps"][-1]["forces"]])
+        d["analysis"]["max_force"] = max_force
+
+        if max_force > max_force_threshold:
+            error_msgs.append("Final max force exceeds {} eV"
+                              .format(max_force_threshold))
+            d["state"] = "error"
+
+        s = Structure.from_dict(d[-1]["output"]["crystal"])
+        if not s.is_valid():
+            error_msgs.append("Bad structure (atoms are too close!)")
+            d["state"] = "error"
+
     return {"delta_volume": delta_vol,
             "percent_delta_volume": percent_delta_vol,
-            "warnings": warning_msgs, "coordination_numbers": coord_num,
+            "warnings": warning_msgs,
+            "errors": error_msgs,
+            "coordination_numbers": coord_num,
             "bandgap": gap, "cbm": cbm, "vbm": vbm,
             "is_gap_direct": is_direct,
             "bv_structure": bv_struct.to_dict}
