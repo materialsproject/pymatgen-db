@@ -633,24 +633,25 @@ def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5,
     except Exception as ex:
         logger.error("BVAnalyzer error {e}.".format(e=str(ex)))
 
+    max_force = None
     if d["state"] == "successful":
         # handle the max force and max force error
         max_force = max([np.linalg.norm(a)
                         for a in d["calculations"][-1]["output"]
                         ["ionic_steps"][-1]["forces"]])
-        d["analysis"]["max_force"] = max_force
 
         if max_force > max_force_threshold:
             error_msgs.append("Final max force exceeds {} eV"
                               .format(max_force_threshold))
             d["state"] = "error"
 
-        s = Structure.from_dict(d[-1]["output"]["crystal"])
+        s = Structure.from_dict(d["output"]["crystal"])
         if not s.is_valid():
             error_msgs.append("Bad structure (atoms are too close!)")
             d["state"] = "error"
 
     return {"delta_volume": delta_vol,
+            "max_force": max_force,
             "percent_delta_volume": percent_delta_vol,
             "warnings": warning_msgs,
             "errors": error_msgs,
