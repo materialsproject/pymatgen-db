@@ -270,12 +270,13 @@ class VaspToDbTaskDrone(AbstractDrone):
                         )["c"]
                     logger.info("Inserting {} with taskid = {}"
                                 .format(d["dir_name"], d["task_id"]))
-                    coll.insert(d, safe=True)
                 elif self.update_duplicates:
                     d["task_id"] = result["task_id"]
                     logger.info("Updating {} with taskid = {}"
                                 .format(d["dir_name"], d["task_id"]))
-                    coll.update({"dir_name": d["dir_name"]}, {"$set": d})
+
+                coll.update({"dir_name": d["dir_name"]}, {"$set": d},
+                            upsert=True)
                 return d["task_id"]
             else:
                 logger.info("Skipping duplicate {}".format(d["dir_name"]))
