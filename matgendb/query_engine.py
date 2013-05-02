@@ -108,6 +108,12 @@ class QueryEngine(object):
         self.db = self.connection[database]
         if user:
             self.db.authenticate(user, password)
+        self.set_collection(collection=collection,
+                            aliases_config=aliases_config,
+                            default_properties=default_properties)
+
+    def set_collection(self, collection="tasks",
+                       aliases_config=None, default_properties=None):
         self.collection = self.db[collection]
         if aliases_config is None:
             with open(os.path.join(os.path.dirname(__file__),
