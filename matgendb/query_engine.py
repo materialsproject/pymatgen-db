@@ -25,8 +25,10 @@ from pymongo import MongoClient
 from pymatgen import Structure, Composition
 from pymatgen.entries.computed_entries import ComputedEntry,\
     ComputedStructureEntry
+from pymatgen.util.decorators import cached_class
 
 
+@cached_class
 class QueryEngine(object):
     """
     This class defines a QueryEngine interface to a Mongo Collection based on
@@ -465,17 +467,6 @@ class QueryResults(Iterable):
 
 class QueryError(Exception):
     """
-    Exception class for QueryEngine. Allows more information exception messages
-    to cover situations not covered by standard exception classes.
+    Exception class for errors occuring during queries.
     """
-
-    def __init__(self, msg):
-        """
-        Args:
-            msg:
-                Message for the error.
-        """
-        self.msg = msg
-
-    def __str__(self):
-        return "Query Error : " + self.msg
+    pass
