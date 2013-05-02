@@ -41,7 +41,7 @@ def _connection(host, db_name, user, password):
 
 
 def main():
-    usage = '%prog [ -S source_db | -T target_db | -s source_db | -t target_collection | -h host | -u user | -p pass]'
+    usage = '%prog [ -S source_db | -T target_db | -s source_collection | -t target_collection | -h host | -u user | -p pass]'
     parser = OptionParser(usage=usage)
     parser.add_option('-S', '--source_db', metavar='SOURCE_DB',
             type='string', dest='source_db', 
