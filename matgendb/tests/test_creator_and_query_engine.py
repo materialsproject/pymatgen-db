@@ -126,7 +126,6 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             self.assertIsInstance(s, Structure)
             self.assertEqual(s.formula, "Li2 O1")
 
-
     @classmethod
     def tearDownClass(cls):
         if cls.conn is not None:

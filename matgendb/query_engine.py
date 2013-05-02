@@ -25,10 +25,8 @@ from pymongo import MongoClient
 from pymatgen import Structure, Composition
 from pymatgen.entries.computed_entries import ComputedEntry,\
     ComputedStructureEntry
-from pymatgen.util.decorators import cached_class
 
 
-@cached_class
 class QueryEngine(object):
     """
     This class defines a QueryEngine interface to a Mongo Collection based on
