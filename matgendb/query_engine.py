@@ -108,13 +108,38 @@ class QueryEngine(object):
         self.db = self.connection[database]
         if user:
             self.db.authenticate(user, password)
-        self.set_collection(collection=collection,
-                            aliases_config=aliases_config,
-                            default_properties=default_properties)
+        self.set_collection(collection=collection)
+        self.set_aliases_and_defaults(aliases_config=aliases_config,
+                                      default_properties=default_properties)
 
-    def set_collection(self, collection="tasks",
-                       aliases_config=None, default_properties=None):
+    def set_collection(self, collection):
+        """
+        Switch to another collection. Note that you may have to set the
+        aliases and default properties via set_aliases_and_defaults if the
+        schema of the new collection differs from the current collection.
+
+        Args:
+            collection:
+                Name of collection.
+        """
         self.collection = self.db[collection]
+
+    def set_aliases_and_defaults(self, aliases_config=None,
+                                 default_properties=None):
+        """
+        Set the alias config and defaults to use. Typically used when
+        switching to a collection with a different schema.
+
+        Args:
+            aliases_config:
+                An alias dict to use. Defaults to None, which means the default
+                aliases defined in "aliases.json" is used. See constructor
+                for format.
+            default_properties:
+                List of property names (strings) to use by default, if no
+                properties are given to the 'properties' argument of
+                query().
+        """
         if aliases_config is None:
             with open(os.path.join(os.path.dirname(__file__),
                                    "aliases.json")) as f:
