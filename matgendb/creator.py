@@ -584,9 +584,9 @@ class VaspToDbTaskDrone(AbstractDrone):
     def __str__(self):
         return "VaspToDbDictDrone"
 
-    @staticmethod
-    def from_dict(d):
-        return VaspToDbTaskDrone(**d["init_args"])
+    @classmethod
+    def from_dict(cls, d):
+        return cls(**d["init_args"])
 
     @property
     def to_dict(self):
@@ -635,7 +635,8 @@ def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5,
         logger.error("BVAnalyzer error {e}.".format(e=str(ex)))
 
     max_force = None
-    if d["state"] == "successful":
+    if d["state"] == "successful" and \
+            d["calculations"][0]["input"]["parameters"].get("NSW", 0) > 0:
         # handle the max force and max force error
         max_force = max([np.linalg.norm(a)
                         for a in d["calculations"][-1]["output"]
