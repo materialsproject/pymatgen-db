@@ -544,7 +544,8 @@ class VaspToDbTaskDrone(AbstractDrone):
 
             sg = SymmetryFinder(Structure.from_dict(d["output"]["crystal"]),
                                 0.1)
-            d["spacegroup"] = {"symbol": sg.get_spacegroup_symbol(),
+            d["spacegroup"] = {"symbol": unicode(sg.get_spacegroup_symbol(),
+                                                 errors="ignore"),
                                "number": sg.get_spacegroup_number(),
                                "point_group": unicode(sg.get_point_group(),
                                                       errors="ignore"),
