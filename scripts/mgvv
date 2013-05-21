@@ -336,14 +336,14 @@ def main(cmdline=None):
                 #sect = get_constraint_sections(constraint_spec)
                 for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
                     sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
-		    _log.debug('Collection {}: {:d} violations'.format(coll_name, len(vgroup)))
+                    _log.debug('Collection {}: {:d} violations'.format(coll_name, len(vgroup)))
                     sect_hdr.add('Condition', str(vgroup.condition))
                     table = report.Table(colnames=('Id', 'TaskId', 'Field', 'Constraint', 'Value'))
                     for viol, vrec in vgroup:
                         rec_id = vrec['_id']
                         task_id = vrec['task_id']
                         if isinstance(viol.expected_value, type):
-                           viol.expected_value = viol.expected_value.__name__
+                            viol.expected_value = viol.expected_value.__name__
                         table.add((rec_id, task_id, viol.field,
                                    '{} {}'.format(viol.op, viol.expected_value),
                                    viol.got_value))

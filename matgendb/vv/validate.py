@@ -731,6 +731,9 @@ class ConstraintViolation(object):
     def expected_value(self):
         return self._expected
 
+    @expected_value.setter
+    def expected_value(self, value):
+        self._expected = value
 
 class NullConstraintViolation(ConstraintViolation):
     """Empty constraint violation, for when there are no constraints.
