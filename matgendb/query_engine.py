@@ -437,6 +437,12 @@ class QueryEngine(object):
                 user=user, password=password, collection=d["collection"],
                 aliases_config=d.get("aliases_config", None))
 
+    def __getitem__(self, item):
+        """Support pymongo.Database syntax db['collection'] to access collections.
+        Simply delegate this to the pymongo.Database instance, so behavior is the same.
+        """
+        return self.db[item]
+
 
 class QueryResults(Iterable):
     """
