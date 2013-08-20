@@ -12,10 +12,14 @@ Pymatgen-db also provides a clean and intuitive web ui (the
 originates for the purpose of exploring collections generated using
 pymatgen-db, it can be used to explore any Mongo database and collection.
 
+Tools:
 
-There are also :doc:`validation tools <validation>` that can quickly and flexibly
-check a variety of constraints on Mongo collections.
-
+.. toctree::
+    :maxdepth: 1
+    
+    Validation tools <validation>
+    Database builders <mgbuild>
+    
 Change Log
 ==========
 

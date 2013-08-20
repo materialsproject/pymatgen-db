@@ -27,7 +27,7 @@ import yaml
 from matgendb.util import get_settings
 from matgendb.vv.validate import ConstraintSpec, Validator, DBError
 from matgendb.vv import report
-from matgendb.vv.util import Timing, ElapsedTime
+from matgendb.vv.util import Timing, ElapsedTime, letter_num
 
 # Initialize module logging
 _log_name = 'mg'
@@ -322,7 +322,7 @@ def main(cmdline=None):
     with Timing("validate", log=_log, elapsed=elapsed):
         for coll_name, constraint_spec_cfg in constraints.iteritems():
 	    _log.debug("validate {}".format(coll_name))
-            sect_hdr = report.SectionHeader(title="Collection {}".format(coll_name))
+            sect_hdr = report.SectionHeader(title='Collection "{}"'.format(coll_name))
             rpt_sect = report.ReportSection(sect_hdr)
             if coll_name.startswith(PATTERN_KEY_PREFIX_IGNORE):
                 continue
@@ -334,9 +334,14 @@ def main(cmdline=None):
                     _log.error('processing constraints for {}: {}'.format(coll_name, err))
                     break
                 #sect = get_constraint_sections(constraint_spec)
+                vsect = 0
                 for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
-                    sect_hdr = report.SectionHeader(title='Violations {:d}'.format(vnum + 1))
-                    _log.debug('Collection {}: {:d} violations'.format(coll_name, len(vgroup)))
+                    if len(vgroup) == 0:
+                        continue
+                    vsect += 1
+                    vletter = letter_num(vsect)
+                    sect_hdr = report.SectionHeader(title='Constraint Violations {}'.format(vletter))
+                    _log.debug('Collection "{}": {:d} violations'.format(coll_name, len(vgroup)))
                     sect_hdr.add('Condition', str(vgroup.condition))
                     table = report.Table(colnames=('Id', 'TaskId', 'Field', 'Constraint', 'Value'))
                     for viol, vrec in vgroup:

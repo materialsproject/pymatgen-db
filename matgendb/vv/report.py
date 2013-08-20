@@ -314,23 +314,36 @@ class MarkdownFormatter:
 
     def format(self, report):
         lines = []
-        lines.append('# {} #\n'.format(report.header.title))
-        lines.append('Info: {}'.format(self._mapdump(report.header.to_dict())))
+        self._append_heading(lines, 1, report.header.title)
+        self._append_info_section(lines, report.header)
         for section in report:
-            lines.append('\n## {} ##\n'.format(section.header.title))
-            if section.header:
-                lines.append('Info: {}'.format(self._mapdump(section.header.to_dict())))
+            self._append_heading(lines, 2, section.header.title)
+            self._append_info_section(lines, section.header)
             for cond in section:
-                lines.append('\n### {} ###\n'.format(cond.header.title))
-                if cond.header:
-                    lines.append('Info: {}'.format(self._mapdump(cond.header.to_dict())))
-                lines.append('\nViolations:\n')
-                indent = '    '
-                tbl = cond.body
-                lines.append(indent + self._fixed_width(tbl.column_names, tbl.column_widths))
-                for row in tbl:
-                    lines.append(indent + self._fixed_width(row, tbl.column_widths))
+                self._append_heading(lines, 3, cond.header.title)
+                self._append_info_section(lines, cond.header)
+                self._append_violations(lines, cond.body)
         return '\n'.join(lines)
+
+    def _append_info_section(self, lines, info):
+        if not info:
+            return
+        infodict = info.to_dict()
+        if infodict:
+            text = 'Info: {}'.format(self._mapdump(infodict))
+            lines.append(text)
+
+    def _append_heading(self, lines, level, title):
+        hashes = '#' * level
+        text = '\n{} {} {}\n'.format(hashes, title, hashes)
+        lines.append(text)
+
+    def _append_violations(self, lines, data):
+        lines.append('\nViolations:\n')
+        indent = '    '
+        lines.append(indent + self._fixed_width(data.column_names, data.column_widths))
+        for row in data:
+            lines.append(indent + self._fixed_width(row, data.column_widths))
 
 
 class Emailer(DoesLogging):

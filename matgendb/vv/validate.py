@@ -132,7 +132,15 @@ class ConstraintOperator(object):
             self._op = self.SIZE
 
     def __str__(self):
-        return self._op
+       return self._op
+
+    @property
+    def display_op(self):
+        if self.is_size():
+            s = self._op + ' ' + self.size_op
+        else:
+            s = self._op
+        return s
 
     def is_exists(self):
         """Get whether this is an existence operator.
@@ -721,7 +729,8 @@ class ConstraintViolation(object):
 
     @property
     def op(self):
-        return str(self._constraint.op)
+        #return str(self._constraint.op)
+        return self._constraint.op.display_op
 
     @property
     def got_value(self):

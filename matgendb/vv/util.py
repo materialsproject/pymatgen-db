@@ -35,7 +35,7 @@ class DoesLogging:
         self._trace = self._log.isEnabledFor(TRACE)
 
 
-def total_size(o, handlers={}, verbose=False):
+def total_size(o, handlers={}, verbose=False, count=False):
     """Returns the approximate memory footprint an object and all of its contents.
 
     Automatically finds the contents of the following builtin containers and
@@ -64,7 +64,10 @@ def total_size(o, handlers={}, verbose=False):
         if id(o) in seen:             # do not double count the same object
             return 0
         seen.add(id(o))
-        s = getsizeof(o, default_size)
+        if count:
+            s = 1
+        else:
+            s = getsizeof(o, default_size)
         # If `o` is iterable, add size of its members
         for typ, handler in all_handlers.items():
             if isinstance(o, typ):
@@ -101,3 +104,11 @@ class Timing(object):
             self._log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
         if self.elapsed:
             self.elapsed.value = elapsed
+
+
+def letter_num(x, letter='A'):
+    s, a0 = '', ord(letter) - 1
+    while x > 0:
+        s = chr(a0 + x % 26) + s
+        x /= 26
+    return s
