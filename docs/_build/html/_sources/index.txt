@@ -1,11 +1,11 @@
 Pymatgen-db
 ===========
 
-Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
-materials analysis library. It enables the creation of Materials
-Project-style `MongoDB`_ databases for management of materials data. A query
-engine is also provided to enable the easy translation of MongoDB docs to
-useful pymatgen objects for analysis purposes.
+Pymatgen-db is a database add-on for the `Python Materials Genomics
+(pymatgen) <http://pymatgen.org>`_ materials analysis library. It enables
+the creation of Materials Project-style `MongoDB`_ databases for management
+of materials data. A query engine is also provided to enable the easy
+translation of MongoDB docs to useful pymatgen objects for analysis purposes.
 
 Pymatgen-db also provides a clean and intuitive web ui (the
 `Materials Genomics UI`_) for exploring Mongo collections. While the design
@@ -16,10 +16,10 @@ Tools:
 
 .. toctree::
     :maxdepth: 1
-    
+
     Validation tools <validation>
     Database builders <mgbuild>
-    
+
 Change Log
 ==========
 
@@ -90,7 +90,7 @@ be available on `PyPI <http://pypi.python.org>`_.
 1. Python 2.7+ required. New default modules such as json are used, as well as
    new unittest features in Python 2.7.
 2. pymatgen 2.5+, including all dependencies associated with it. Please refer
-   to the `pymatgen docs <http://pythonhosted.org//pymatgen>`_ for detailed
+   to the `pymatgen docs <http://pymatgen.org>`_ for detailed
    installation instructions.
 3. pymongo 2.4+: For interfacing with MongoDb.
 4. MongoDB 2.2+: Get it at the `MongoDB`_ website.
