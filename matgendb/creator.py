@@ -399,9 +399,9 @@ class VaspToDbTaskDrone(AbstractDrone):
                     d["incar"] = incar.to_dict
                     d["is_hubbard"] = incar.get("LDAU", False)
                     if d["is_hubbard"]:
-                        us = incar.get("LDAUU", [])
-                        js = incar.get("LDAUJ", [])
-                        if sum(us) == 0 and sum(js) == 0:
+                        us = np.array(incar.get("LDAUU", []))
+                        js = np.array(incar.get("LDAUJ", []))
+                        if sum(us - js) == 0:
                             d["is_hubbard"] = False
                             d["hubbards"] = {}
                     else:
