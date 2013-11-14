@@ -19,7 +19,7 @@ setup(
     name="pymatgen-db",
     packages=find_packages(),
     version="0.3.5",
-    install_requires=["pymatgen>=2.6.6", "pymongo>=2.4", "prettytable>=0.7",
+    install_requires=["pymatgen>=2.8.8", "pymongo>=2.4", "prettytable>=0.7",
                       "django>=1.5"],
     package_data={"matgendb": ["*.json"],
                   "matgendb.webui.home": ["templates/*"],

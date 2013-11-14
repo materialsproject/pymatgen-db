@@ -443,9 +443,10 @@ class VaspToDbTaskDrone(AbstractDrone):
             elif fnmatch(f, "POTCAR*"):
                 try:
                     potcar = Potcar.from_file(filename)
-                    d["pseudo_potential"] = {"functional": "pbe",
-                                             "pot_type": "paw",
-                                             "labels": potcar.symbols}
+                    d["pseudo_potential"] = {
+                        "functional": potcar.functional.lower(),
+                        "pot_type": "paw",
+                        "labels": potcar.symbols}
                 except:
                     logger.error("Unable to parse POTCAR for killed run in {}."
                                  .format(dir_name))
@@ -530,9 +531,12 @@ class VaspToDbTaskDrone(AbstractDrone):
                 "final_energy": d2["output"]["final_energy"],
                 "final_energy_per_atom": d2["output"]["final_energy_per_atom"]}
             d["name"] = "aflow"
-            d["pseudo_potential"] = {"functional": "pbe", "pot_type": "paw",
+            p = d2["input"]["potcar_type"][0].split("_")
+            pot_type = p[0]
+            functional = "lda" if len(pot_type) == 1 else "_".join(p[1:])
+            d["pseudo_potential"] = {"functional": functional.lower(),
+                                     "pot_type": pot_type.lower(),
                                      "labels": d2["input"]["potcar"]}
-
             if len(d["calculations"]) == 2 or \
                     vasprun_files.keys()[0] != "relax1":
                 d["state"] = "successful" if d2["has_vasp_completed"] \
