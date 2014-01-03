@@ -1,5 +1,4 @@
-include *.rst LICENSE *.cfg
-include distribute_setup.py
+include *.rst LICENSE *.cfg ez_setup.py
 recursive-include matgendb *
 recursive-include scripts *
 prune */*/tests
