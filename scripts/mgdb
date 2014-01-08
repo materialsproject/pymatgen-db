@@ -21,6 +21,8 @@ import webbrowser
 import time
 import argparse
 
+from pymongo import Connection, ASCENDING
+
 from pymatgen.apps.borg.queen import BorgQueen
 
 from matgendb.query_engine import QueryEngine
@@ -69,6 +71,24 @@ def update_db(args):
     tids = map(int, filter(lambda x: x, queen.get_data()))
     logger.info("Db upate completed at {}.".format(datetime.datetime.now()))
     logger.info("{} new task ids inserted.".format(len(tids)))
+
+
+def optimize_indexes(args):
+    d = get_settings(args.config_file)
+    c = Connection(d["host"], d["port"])
+    db = c[d["database"]]
+    db.authenticate(d["admin_user"], d["admin_password"])
+    coll = db[d["collection"]]
+    coll.drop_indexes()
+    coll.ensure_index('task_id', unique=True)
+    for key in ['unit_cell_formula', 'reduced_cell_formula', 'chemsys',
+                'nsites', 'pretty_formula', 'analysis.e_above_hull',
+                "icsd_ids"]:
+        print "Building {} index".format(key)
+        coll.ensure_index(key)
+    print "Building nelements and elements compound index"
+    compound_index = [('nelements', ASCENDING), ('elements', ASCENDING)]
+    coll.ensure_index(compound_index)
 
 
 def query_db(args):
@@ -140,6 +160,14 @@ if __name__ == "__main__":
                        help="Creates an db config file for the database. "
                             "Default filename is db.json.")
     pinit.set_defaults(func=init_db)
+
+    popt = subparsers.add_parser("optimize", help="Optimization tools.")
+
+    popt.add_argument("-c", "--config", dest="config_file", type=str,
+                       nargs='?', default="db.json",
+                       help="Creates an db config file for the database. "
+                            "Default filename is db.json.")
+    popt.set_defaults(func=optimize_indexes)
 
     pinsert = subparsers.add_parser("insert", help="Insert vasp runs.")
 
