@@ -72,7 +72,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                  user=None, password=None,  collection="tasks",
                  parse_dos=False, simulate_mode=False,
                  additional_fields=None, update_duplicates=True,
-                 mapi_key=None):
+                 mapi_key=None, use_full_uri=True):
         """
         Args:
             host:
@@ -117,6 +117,10 @@ class VaspToDbTaskDrone(AbstractDrone):
 
                 Go to www.materialsproject.org/profile to generate or obtain
                 your API key.
+            use_full_uri:
+                Whether to use full uri path (including hostname) for the
+                directory name. Defaults to True. If False, only the abs
+                path will be used.
         """
         self.host = host
         self.database = database
@@ -130,6 +134,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             else additional_fields
         self.update_duplicates = update_duplicates
         self.mapi_key = mapi_key
+        self.use_full_uri = use_full_uri
         if not simulate_mode:
             conn = MongoClient(self.host, self.port, j=True)
             db = conn[self.database]
@@ -149,7 +154,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         """
         try:
             d = self.get_task_doc(path, self.parse_dos,
-                                  self.additional_fields)
+                                  self.additional_fields, self.use_full_uri)
             if self.mapi_key is not None and d["state"] == "successful":
                 self.calculate_stability(d)
             tid = self._insert_doc(d)
@@ -174,7 +179,8 @@ class VaspToDbTaskDrone(AbstractDrone):
             d["analysis"][k] = data[k]
 
     @classmethod
-    def get_task_doc(cls, path, parse_dos=False, additional_fields=None):
+    def get_task_doc(cls, path, parse_dos=False, additional_fields=None,
+                     use_full_uri=True):
         """
         Get the entire task doc for a path, including any post-processing.
         """
@@ -225,13 +231,13 @@ class VaspToDbTaskDrone(AbstractDrone):
                                  additional_fields)
             if not d:
                 d = cls.process_killed_run(path)
-            cls.post_process(path, d)
+            cls.post_process(path, d, use_full_uri)
         elif (not (path.endswith("relax1") or
               path.endswith("relax2"))) and contains_vasp_input(path):
             #If not Materials Project style, process as a killed run.
             logger.warning(path + " contains killed run")
             d = cls.process_killed_run(path)
-            cls.post_process(path, d)
+            cls.post_process(path, d, use_full_uri)
 
         return d
 
@@ -287,7 +293,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             return d
 
     @classmethod
-    def post_process(cls, dir_name, d):
+    def post_process(cls, dir_name, d, use_full_uri=True):
         """
         Simple post-processing for various files other than the vasprun.xml.
         Called by generate_task_doc. Modify this if your runs have other
@@ -375,7 +381,8 @@ class VaspToDbTaskDrone(AbstractDrone):
         d["run_stats"] = run_stats
 
         #Convert to full uri path.
-        d["dir_name"] = get_uri(dir_name)
+        if use_full_uri:
+            d["dir_name"] = get_uri(dir_name)
 
         if new_tags:
             d["tags"] = new_tags
@@ -443,9 +450,10 @@ class VaspToDbTaskDrone(AbstractDrone):
             elif fnmatch(f, "POTCAR*"):
                 try:
                     potcar = Potcar.from_file(filename)
-                    d["pseudo_potential"] = {"functional": "pbe",
-                                             "pot_type": "paw",
-                                             "labels": potcar.symbols}
+                    d["pseudo_potential"] = {
+                        "functional": potcar.functional.lower(),
+                        "pot_type": "paw",
+                        "labels": potcar.symbols}
                 except:
                     logger.error("Unable to parse POTCAR for killed run in {}."
                                  .format(dir_name))
@@ -530,9 +538,12 @@ class VaspToDbTaskDrone(AbstractDrone):
                 "final_energy": d2["output"]["final_energy"],
                 "final_energy_per_atom": d2["output"]["final_energy_per_atom"]}
             d["name"] = "aflow"
-            d["pseudo_potential"] = {"functional": "pbe", "pot_type": "paw",
+            p = d2["input"]["potcar_type"][0].split("_")
+            pot_type = p[0]
+            functional = "lda" if len(pot_type) == 1 else "_".join(p[1:])
+            d["pseudo_potential"] = {"functional": functional.lower(),
+                                     "pot_type": pot_type.lower(),
                                      "labels": d2["input"]["potcar"]}
-
             if len(d["calculations"]) == 2 or \
                     vasprun_files.keys()[0] != "relax1":
                 d["state"] = "successful" if d2["has_vasp_completed"] \
