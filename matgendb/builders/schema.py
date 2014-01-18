@@ -19,8 +19,9 @@ SPECIAL = '__'
 SPECIAL_LEN = len(SPECIAL)
 
 # Regex for values
-VALUE_RE = re.compile("{spec}([a-zA-Z]+){spec}\s*(.*)"
-.format(spec=SPECIAL))
+# Note that the special prefix/suffix is optional
+VALUE_RE = re.compile("(?:{spec})?([a-zA-Z]+)(?:{spec})?\s*(.*)"
+                      .format(spec=SPECIAL))
 
 
 class SchemaError(Exception):
@@ -97,6 +98,7 @@ class Schema(HasMeta):
         HasMeta.__init__(self, meta)
         self.is_optional = optional
         self._schema = self._parse(schema)
+        self._json_schema = None
 
     def validate(self, doc, path="(root)"):
         t = self._whatis(doc)
@@ -125,6 +127,49 @@ class Schema(HasMeta):
             if not self._schema.check(doc):
                 return self._vresult(path, "bad value '{}' for type {}",
                                      doc, self._schema)
+
+    @property
+    def json_schema(self):
+        """Convert our compact schema representation to the standard, but more verbose,
+        JSON Schema standard.
+
+        Example JSON schema: http://json-schema.org/examples.html
+        Core standard: http://json-schema.org/latest/json-schema-core.html
+        """
+        if self._json_schema is None:
+            self._json_schema = self._build_schema(self._schema)
+        return self._json_schema
+
+    def _build_schema(self, s):
+        """Recursive schema builder, called by `json_schema`.
+        """
+        w = self._whatis(s)
+        if w == self.IS_LIST:
+            w0 = self._whatis(s[0])
+            js = {"type": "array",
+                  "items": {"type": self._jstype(w0, s[0])}}
+        elif w == self.IS_DICT:
+            js = {"type": "object",
+                  "properties": {key: self._build_schema(val) for key, val in s.iteritems()}}
+            req = [key for key, val in s.iteritems() if not val.is_optional]
+            if req:
+                js["required"] = req
+        else:
+            js = {"type": self._jstype(w, s)}
+        return js
+
+    def _jstype(self, stype, sval):
+        """Get JavaScript name for given data type, called by `_build_schema`.
+        """
+        if stype == self.IS_LIST:
+            return "array"
+        if stype == self.IS_DICT:
+            return "object"
+        if isinstance(sval, Scalar):
+            return sval.jstype
+        # it is a Schema, so return type of contents
+        v = sval._schema
+        return self._jstype(self._whatis(v), v)
 
     def _vresult(self, path, fmt, *args):
         meta_info = ''
@@ -211,6 +256,21 @@ class Scalar(HasMeta):
             self.check = self.TYPES[typecode]
         except KeyError:
             raise SchemaTypeError(typecode)
+
+    JSTYPES = {
+        "datetime": "string", "date": "string",
+        "string": "string",
+        "bool": "boolean",
+        "int": "integer",
+        "float": "number",
+        "null": "null"
+    }
+
+    @property
+    def jstype(self):
+        """Return JavaScript type.
+        """
+        return self.JSTYPES[self._type]
 
     def __str__(self):
         return self._type
