@@ -1,5 +1,6 @@
 """
-Parse and transform a simplified MongoDB query syntax.
+Parse and transform a simplified query syntax into
+MongoDB queries.
 """
 __author__ = "Dan Gunter"
 __copyright__ = "Copyright 2012-2013, The Materials Project"
@@ -15,51 +16,108 @@ import re
 
 
 class BadExpression(Exception):
-    def __init__(self, expr):
+    """Raised by `query()` if the input is not understood.
+    """
+    def __init__(self, expr, details=""):
         self.expr = expr
+        self.details = details
         Exception.__init__(self, "Bad expression")
 
 
+# or/and tokens
+_TOK_OR = " or "
+_TOK_AND = " and "
+
+
 def query(qry):
-    """Transform a simple query string with filter expressions
-    into MongoDB query syntax.
+    """Transform a simple query with one or more filter expressions
+    into a MongoDB query expression.
 
-    For example:
+    :param qry: Filter expression(s). Filter expressions are all
+                of the form: field operator value.
 
-    >>> query('a > 3, b = "hello"')
-    {'a': {'$gt': 3}, 'b': 'hello'}
-    >>> query(['a.field <= 10', 'another.field exists true'])
-    {'a.field': {'$lte': 10}, 'another.field': {'$exists': True}}
+                - `field` is the name of a field in the
+                - `value` is the value to compare against:
+                    * numeric
+                    * string, you MUST use 'single' or "double" quotes
+                    * boolean: true, false
+                - `operator` is a comparison operator:
+                    * inequalities: >, <, =, <=, >=, !=
+                    * data type: int, float, string, or bool
+                    * exists: boolean (true/false) whether field exists in record
+                    * size: for array fields, an inequality for the array size, given as
+                      a suffix to the operator: size>, size<
 
-    :param qry: Simple query string, or list of strings. The string can have
-                multiple expressions separated by a comma.
-    :type qry: str or list
+                There are two basic forms accepted for the query, either
+                a string with "and" joining expressions and "or" joining
+                groups of expressions, or a list version of this same thing, where
+                the inner list is the "and"ed expressions and an optional outer
+                list "or"s them together.
+
+                In the string form, parentheses before or after the "or"ed expression
+                groups [note: even non-sensical ones like '((('], are ignored.
+                So these can be used to clarify the groupings.
+    :type qry: str, list
     :return: MongoDB query
     :rtype: dict
     :raises: BadExpression, if one of the input expressions cannot be parsed
+
+    Examples::
+
+    >>> query('(a > 3 and b = "hello") or (c > 1 and d = "goodbye")')
+    {'$or': [{'a': {'$gt': 3}, 'b': 'hello'}, {'c': {'$gt': 1}, 'd': 'goodbye'}]}
+    >>> # same, without parentheses
+    >>> query('a > 3 and b = "hello" or c > 1 and d = "goodbye"')
+    {'$or': [{'a': {'$gt': 3}, 'b': 'hello'}, {'c': {'$gt': 1}, 'd': 'goodbye'}]}
+    >>> # same, using list syntax
+    >>> query([['a > 3', 'b = "hello"'], ['c > 1', 'd = "goodbye"']])
+    {'$or': [{'a': {'$gt': 3}, 'b': 'hello'}, {'c': {'$gt': 1}, 'd': 'goodbye'}]}
     """
-    mq = MongoQuery()
-    exprs = qry.split(",") if isinstance(qry, basestring) else qry
-    for e in exprs:
-        try:
-            constraint = Constraint(*parse_expr(e))
-        except ValueError:
-            raise BadExpression(e)
-        clause = MongoClause(constraint, rev=False)
-        mq.add_clause(clause)
-    return mq.to_mongo(False)
+    rev = False     # filters, not constraints
+    # break input into groups of filters
+    unpar = lambda s: s.strip().strip('()')
+    if isinstance(qry, basestring):
+        groups = []
+        if _TOK_OR in qry:
+            groups = [unpar(g).split(_TOK_AND) for g in qry.split(_TOK_OR)]
+        else:
+            groups = [unpar(qry).split(_TOK_AND)]
+    else:
+        if isinstance(qry[0], list) or isinstance(qry[0], tuple):
+            groups = qry
+        else:
+            groups = [qry]
+    # generate mongodb queries for each filter group
+    filters = []
+    for filter_exprs in groups:
+        mq = MongoQuery()
+        for e in filter_exprs:
+            e = unpar(e)
+            try:
+                constraint = Constraint(*parse_expr(e))
+            except ValueError, err:
+                raise BadExpression(e, err)
+            clause = MongoClause(constraint, rev=rev)
+            mq.add_clause(clause)
+        filters.append(mq.to_mongo(rev))
+    # combine together filters, or strip down the one filter
+    if len(filters) > 1:
+        result = {'$or': filters}
+    else:
+        result = filters[0]
+    return result
 
 # To parse a single constraint expression
 relation_re = re.compile(r'''\s*
-    ([a-zA-Z_.0-9]+(?:/[a-zA-Z_.0-9]+)?)\s*         # Identifier
-    (<=?|>=?|!?=|exists|        # Operator (1)
-    type|                       # Operator (1a)
-    size[><$]?)\s*              # operator (2)
-    ([-]?\d+(?:\.\d+)?|         # Value: number
-        \'[^\']+\'|             #   single-quoted string
-        \"[^"]+\"|              #   double-quoted string
-        [Tt]rue|[Ff]alse|       #   boolean
-        [a-zA-Z_][a-zA-Z_.0-9]* # variable name
+    ([a-zA-Z_.0-9]+(?:/[a-zA-Z_.0-9]+)?)\s*     # Identifier
+(<=?|>=?|!?=|exists|                            # Operator (1)
+    type|                                       # Operator (1a)
+    size[><$]?)\s*                              # operator (2)
+    ([-]?\d+(?:\.\d+)?|                         # Value: number
+        \'[^\']+\'|                             #   single-quoted string
+        \"[^"]+\"|                              #   double-quoted string
+        [Tt]rue|[Ff]alse|                       #   boolean
+        [a-zA-Z_][a-zA-Z_.0-9]*                 # variable name
     )
     \s*''', re.VERBOSE)
 
@@ -644,6 +702,9 @@ class MongoClause(object):
         """
         return self.JS_OPS.get(str(op), op)
 
+    @property
+    def is_reversed(self):
+        return self._rev
 
 class MongoQuery(object):
     """MongoDB query composed of MongoClause objects.
@@ -690,7 +751,7 @@ class MongoQuery(object):
             else:
                 for c in clauses:
                     q.update(c)
-                    # add all the main2 clauses; these are not or'ed
+        # add all the main2 clauses; these are not or'ed
         for c in (e.expr for e in self._main2):
             # add to existing stuff for the field
             for field in c:
@@ -698,9 +759,10 @@ class MongoQuery(object):
                     q[field].update(c[field])
                 else:
                     q.update(c)
-                    # add where clauses, if any, to `q`
+        # add where clauses, if any, to `q`
         if self._where:
-            where_clause = ' || '.join([w.expr for w in self._where])
+            wsep = ' || ' if self._where[0].is_reversed else ' && '
+            where_clause = wsep.join([w.expr for w in self._where])
             if disjunction:
                 if not '$or' in q:
                     q['$or'] = []
@@ -722,7 +784,10 @@ class MongoQuery(object):
         return self._main + self._where
 
 
-if __name__ == '__main__':
+def main():
+    """Run an interactive CLI program that
+    prints the output of running query() on the input string.
+    """
     import sys, signal
 
     def _exit():
@@ -732,7 +797,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, lambda s, f: sys.stdout.write("\n") or _exit())
 
     while 1:
-        expr = raw_input("Enter constraints: ").strip()
+        expr = raw_input("Enter query: ").strip()
         if not expr:
             break
         try:
@@ -741,4 +806,8 @@ if __name__ == '__main__':
             print("Error! Cannot parse '{}'".format(e.expr))
             continue
         print("Result: {}".format(q))
-    _exit()
+    _exit(0)
+
+if __name__ == '__main__':
+    main()
+
