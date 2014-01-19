@@ -12,7 +12,7 @@ import bson
 import datetime
 import json
 import os
-from pymongo import Connection
+from pymongo.mongo_client import MongoClient
 
 
 DEFAULT_PORT = 27017
@@ -42,9 +42,9 @@ def get_settings(config_file):
         return dict(DEFAULT_SETTINGS)
 
 
-def get_database(config_file, admin=False):
-    d = get_settings(config_file)
-    conn = Connection(d["host"], d["port"])
+def get_database(config_file=None, settings=None, admin=False):
+    d = get_settings(config_file) if settings is None else settings
+    conn = MongoClient(host=d["host"], port=d["port"])
     db = conn[d["database"]]
     user = d["admin_user"] if admin else d["readonly_user"]
     passwd = d["admin_password"] if admin else d["readonly_password"]
@@ -52,8 +52,9 @@ def get_database(config_file, admin=False):
     return db
 
 
-def get_collection(config_file, admin=False):
-    db = get_database(config_file, admin=admin)
+def get_collection(config_file, **kw):
+    d = get_settings(config_file)
+    db = get_database(settings=d, **kw)
     return db[d["collection"]]
 
 

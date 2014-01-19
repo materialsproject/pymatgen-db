@@ -10,13 +10,16 @@ __date__ = '5/29/13'
 
 ## Imports
 
+# system
+from abc import ABCMeta, abstractmethod
 import copy
 import logging
 import Queue
 import threading
 import multiprocessing
-
-from pymatpro.db import schema
+# local
+from matgendb.builders import schema
+from matgendb import util as dbutil
 
 ## Logging
 
@@ -220,21 +223,81 @@ class HasExamples(object):
 
 
 class Builder(object):
-    def run(self):
-        """This method should:
-        (1) put work in the queue with add_item()
-        (2) call run_parallel() to do the work
+    """Abstract base class for all builders
 
-        :return: Status code, 0 for OK
-        :rtype: int
+    Basic usage::
+
+        class MyBuilder(Builder):
+            def setup(self, n):
+                '''
+                :param n: Number of items
+                :type n: int
+                '''
+                return list(range(n))
+
+            def process_item(self, item):
+                print("processing item: {}".format(item))
+
+        b = MyBuilder(ncores=1)
+        b.run()
+    """
+    __metaclass__ = ABCMeta
+
+    def __init__(self, ncores=0, threads=False, config=None):
+        """Create new builder for threaded or multiprocess execution.
+
+        :param ncores: Desired number of threads or processes to run
+        :type ncores: int
+        :param threads: Use threads (True) or processes (False)
+        :type threads: bool
+        :param config: If given, automatically connect to database using `connect` method.
+                       You can access the connection with the attribute 'conn'.
+        :type config: None, str, dict
+        :raise: ValueError for bad 'config' arg
         """
-        raise NotImplementedError()
+        self._ncores = ncores if ncores else 15
+        self._threaded = threads
+        if threads:
+            self._queue = Queue.Queue()
+            self._states_lock = threading.Lock()
+            self._run_parallel_fn = self._run_parallel_threaded
+        else:
+            self._queue = multiprocessing.Queue()
+            self._run_parallel_fn = self._run_parallel_multiprocess
+        self._status = BuilderStatus(ncores, is_threaded=threads)
+        # connect, if config is given
+        self.conn = self.connect(config) if config else None
 
-    def add_item(self, item):
-        """Add an item of work to be performed.
+    # ----------------------------
+    # Override these in subclasses
+    # ----------------------------
+
+    @abstractmethod
+    def setup(self):
+        """Perform one-time setup at the top of a run, returning
+        an iterator on items to use as input.
+
+        The parameters for this method are translated into command-line options
+        for the command-line driver program (mgbuild). These parameters *must* be documented
+        in special form in the 'docstring' at the top of the function. For example::
+
+            class MyBuilder(Builder):
+                def setup(self, source, target):
+                '''
+                :param source: The input porous materials collection
+                :type source: QueryEngine
+                :param target: The output materials collection
+                :type target: QueryEngine
+                '''
+
+        If the type of the argument is 'QueryEngine', then the driver program will
+        add options for, and create, a matgendb.query_engine.QueryEngine instance.
+
+        :return: iterator
         """
-        raise NotImplementedError()
+        return [{"Hello": "World"}]
 
+    @abstractmethod
     def process_item(self, item):
         """Implement the analysis for each item of work here.
 
@@ -243,114 +306,88 @@ class Builder(object):
         :return: Status code, 0 for OK
         :rtype: int
         """
-        raise NotImplementedError()
+        return 0
 
-    def combine_status(self, codes):
-        """Combine integer status codes.
+    # -----------------------------
 
-        :return: -1 if any is nonzero, else 0
+    def run(self, setup_kw=None, build_kw=None):
+        """Run the builder.
+
+        :param setup_kw dict: keywords to pass to `setup` method
+        :param build_kw dict: keywords to pass to `build` method
+        :return: Status code, 0 for OK
+        :rtype: int
         """
-        return (-1, 0)[not filter(None, codes)]
+        setup_kw = {} if setup_kw is None else setup_kw
+        build_kw = {} if build_kw is None else build_kw
+        self._build(self.setup(**setup_kw), **build_kw)
+        return 0
 
-    def __str__(self):
-        return self.__class__.__name__
-
-
-class ParallelBuilder(Builder, HasExamples):
-    """Parallel builder base class.
-        All the builder classes should inherit from this.
-
-    Subclasses should define two methods:
-
-    `run` - Do any serial tasks, then put all objects that must 
-    be operated on in parallel into the queue, one at a time,
-    by calling `add_item`. Then call `run_parallel`. The return value of this function
-    is a list of status codes, one per thread/process. 
-    You can join the status codes with `combine_status`.
-
-    process_item(item) - Do the work for one item. Return integer status
-            code, 0 for OK and non-zero for failure.
-    """
-    def __init__(self, ncores=0, threads=False, combine_status=False):
-        """Create new builder for threaded or multiprocess execution.
-
-        :param ncores: Desired number of threads/processes to run
-        :type ncores: int
-        :param threads: Use threads (True) or processes (False)
-        :type threads: bool
-        :param combine_status: Flag to combine status codes into 1 code
-        :type combine_status: bool
+    def connect(self, config):
+        """Connect to database with given configuration, which may be a dict or
+        a path to a pymatgen-db configuration.
         """
-        self._ncores = ncores if ncores else 15
-        self._threaded = threads
-        if threads:
-            self._queue = Queue.Queue()
-            self._states_lock = threading.Lock()
-            self._run_parallel_mode = self._run_parallel_threaded
+        if isinstance(config, str):
+            conn = dbutil.get_database(config_file=config)
+        elif isinstance(config, dict):
+            conn = dbutil.get_database(settings=config)
         else:
-            self._queue = multiprocessing.Queue()
-            self._run_parallel_mode = self._run_parallel_multiprocess
-        self._states = []
-        self._combine = combine_status
+            raise ValueError("Configuration, '{}',  must be a path to config file or dict"
+                             .format(config))
+        return conn
 
-    def add_item(self, item):
-        """Put an item of work in the queue.
-        Subclasses do not need to modify this.
+    # -----------------------------
+
+    def _build(self, items, chunk_size=1000):
+        """Build the output, in chunks.
         """
-        self._queue.put(item)
-
-    def run_parallel(self):
-        """Called to run threads, once queue is filled.
-
-        :return: Multiple integer status codes, 1 per thread
-        :rtype: list(int)
-        """
-        result = self._run_parallel_mode()
-        if self._combine:
-            result = self.combine_status(result)
-        return result
+        for i, item in enumerate(items):
+            if 0 == (i+1) % chunk_size:
+                self._run_parallel_fn()  # process the chunk
+                if self._status.has_failures():
+                    break
+            self._queue.put(item)
 
     def _run_parallel_threaded(self):
-        """Called to run threads, once queue is filled.
-
-        :return: array of integer status codes, 1 per thread
+        """Run threads from queue
         """
         _log.debug("run.parallel.threaded.start")
         threads = []
         for i in xrange(self._ncores):
-            thr = threading.Thread(target=self._run)
+            thr = threading.Thread(target=self._run, args=(i,))
+            self._status.running(i)
             thr.start()
             threads.append(thr)
         for i in xrange(self._ncores):
             threads[i].join()
             if threads[i].isAlive():    # timed out
                 _log.warn("run.parallel.threaded: timeout for thread={:d}".format(i))
-        _log.debug("run.parallel.threaded.end states={}".format(self._set_status()))
-        return self._set_status()
+        _log.debug("run.parallel.threaded.end states={}".format(self._status))
 
     def _run_parallel_multiprocess(self):
-        """Called to run processes, once queue is filled.
-
-        :return: array of integer status codes, 1 per thread
+        """Run processes from queue
         """
         _log.debug("run.parallel.multiprocess.start")
         processes = []
         ProcRunner.instance = self
         for i in xrange(self._ncores):
-            proc = multiprocessing.Process(target=ProcRunner.run)
+            self._status.running(i)
+            proc = multiprocessing.Process(target=ProcRunner.run, args=(i,))
             proc.start()
             processes.append(proc)
-        states = []
         for i in xrange(self._ncores):
             processes[i].join()
-            states.append(processes[i].exitcode)
-        _log.debug("run.parallel.multiprocess.end states={}".format(','.join(map(str, states))))
-        return states
+            code = processes[i].exitcode
+            self._status.success(i) if 0 == code else self._status.fail(i)
+        _log.debug("run.parallel.multiprocess.end states={}".format(self._status))
 
-    def _run(self):
+    def _run(self, index):
         """Run method for one thread or process
         Just pull an item off the queue and process it,
         until the queue is empty.
+
+        :param index: Sequential index of this process or thread
+        :type index: int
         """
         while 1:
             try:
@@ -360,21 +397,74 @@ class ParallelBuilder(Builder, HasExamples):
                 break
             except Exception, err:
                 _log.error("Processing exception: {}".format(err))
-                self._set_status(-1)
+                self._status.fail(index)
                 raise
-        self._set_status(0)
+        self._status.success(index)
 
-    def _set_status(self, value=None):
+    def __str__(self):
+        return self.__class__.__name__
+
+
+class BuilderStatus(object):
+    """Status of a Builder object run.
+    """
+    # States
+    WAIT, RUNNING, SUCCESS, FAILURE = 0, 1, 2, -1
+    # For printing.
+    _NAMES = {WAIT: "wait", RUNNING: "run", SUCCESS: "ok", FAILURE: "fail"}
+
+    def __init__(self, num, is_threaded=False):
+        self._states = [self.WAIT] * num
+        self._threaded = is_threaded
         if self._threaded:
-            self._states_lock.acquire()
-            if value is not None:
-                self._states.append(value)
-            result = self._states[:]
-            self._states_lock.release()
-            return result
-        else:
-            return value
+            self._lock = threading.Lock()
 
+    def running(self, i):
+        """Set state of a single process or thread to 'running'.
+
+        :param i: Index of process or thread.
+        :return: None
+        """
+        self._set(i, self.RUNNING)
+
+    def success(self, i):
+        """Set state of a single process or thread to 'success'.
+
+        :param i: Index of process or thread.
+        :return: None
+        """
+        self._set(i, self.SUCCESS)
+
+    def fail(self, i):
+        """Set state of a single process or thread to 'failure'.
+
+        :param i: Index of process or thread.
+        :return: None
+        """
+        self._set(i, self.FAILURE)
+
+    def has_failures(self):
+        """Whether there are any failures in the states.
+        """
+        return self.FAILURE in self._states
+
+    def _set(self, index, value):
+        if self._threaded:
+            self._lock.acquire()
+        self._states[index] = value
+        if self._threaded:
+            self._lock.release()
+
+    def __getitem__(self, index):
+        if self._threaded:
+            self._lock.acquire()
+        value = self._states[index]
+        if self._threaded:
+            self._lock.release()
+        return value
+
+    def __str__(self):
+        return ",".join([self._NAMES[state] for state in self._states])
 
 class ProcRunner:
     """This is a work-around to the limitation of multiprocessing that the
@@ -385,8 +475,8 @@ class ProcRunner:
     instance = None
 
     @classmethod
-    def run(cls):
-        cls.instance._run()
+    def run(cls, index):
+        cls.instance._run(index)
 
 
 

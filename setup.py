@@ -12,6 +12,7 @@ for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
                                                 "static")):
     for f in files:
         if not f.endswith(".psd"):
+            print("Adding {} to static_data".format(f))
             static_data.append(os.path.join(parent.lstrip("matgendb/webui/"),
                                             f))
 
