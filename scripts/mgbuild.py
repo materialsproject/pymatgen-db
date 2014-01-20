@@ -13,7 +13,6 @@ __date__ = '5/22/13'
 
 # System
 import argparse
-import glob
 import imp
 import json
 import logging
@@ -24,7 +23,6 @@ import traceback
 # Third-party
 import pymongo
 # Builders
-#from matgendb.builders.mp import vasp
 # Other local stuff
 from matgendb.builders import core
 from matgendb.query_engine import QueryEngine
@@ -38,22 +36,39 @@ MERGED_SUFFIX = "merged"
 
 ## Exceptions
 
+class BuilderError(Exception):
+    pass
 
-class ConfigurationError(Exception):
+class ConfigurationError(BuilderError):
     def __init__(self, where, why):
         Exception.__init__(self, "Failed to load configuration {}: {}".format(where, why))
 
+class BuilderNotFoundError(Exception):
+    pass
 
 ## Build functions
 
-def build_sandbox(args, core_collections):
+
+def build_sandbox(args):
     """Merge tasks from a sandbox and core db.
     """
+    # Check args.
     if not args.sandbox_file:
         raise ConfigurationError("In sandbox mode, -s/--sandbox is required")
 
-    # setup
+    # Connect to "core" collections.
+    try:
+        settings = get_settings(args.config_file)
+    except ConfigurationError, err:
+        p.error(str(err))
+    core_db = QueryEngine(**settings)
+    if hasattr(args, 'merged_tasks') and args.merged_tasks:
+        suffix = MERGED_SUFFIX
+    else:
+        suffix = None
+    core_collections = core.Collections(core_db, task_suffix=suffix)
 
+    # Setup.
     sandbox_settings = get_settings(args.sandbox_file)
     sandbox_db = QueryEngine(**sandbox_settings)
     sdb = sandbox_settings['database']
@@ -72,8 +87,7 @@ def build_sandbox(args, core_collections):
     else:
         target = "tasks.{}".format(MERGED_SUFFIX)
 
-    # perform the merge
-
+    # Perform the merge.
     _log.debug("sandbox.merge.begin: sandbox={}".format(sdb))
     t0 = time.time()
     try:
@@ -162,7 +176,7 @@ def get_builder(module):
     moduleobj = load_module(module)
     for name in dir(moduleobj):
         obj = getattr(moduleobj, name)
-        _log.debug("examine {}.{}".format(module, name))
+        #_log.debug("examine {}.{}".format(module, name))
         try:
             if issubclass(obj, core.Builder) and not obj == core.Builder:
                 _log.debug("{}.{} is a Builder".format(module, name))
@@ -199,57 +213,147 @@ def list_builders(args):
 def show_builder(b):
     """Print a formatted version of builder info to the console.
     """
-    print("    - {name}: {desc}".format(name=b.__name__, desc=b.__doc__.strip()))
+    indent = " " * 4
+    modname = b.__module__.split(".")[-1]
+    print("{i}Module: {m}".format(i=indent, m=modname))
+    print("{i}{name}: {desc}".format(i=indent, name=b.__name__, desc=b.__doc__.strip()))
+    params = {}
+    setup_doc = b.setup.__doc__.split("\n")
+    for line in setup_doc:
+        s = line.strip()
+        if s.startswith(":"):
+            words = s.split()
+            param_name = words[1].split(":")[0]
+            param_desc = ' '.join(words[2:])
+            if s.startswith(":param"):
+                params[param_name] = [param_desc, None]  # desc goes first
+            else:
+                params[param_name][1] = param_desc  # type goes second
+    print("{i}{i}Keywords:".format(i=indent))
+    for key, value in params.iteritems():
+        desc, type_ = value
+        print("{i}{i}{i}{name} = ({type}) {desc}".format(i=indent, name=key, type=type_,
+                                                    desc=desc))
 
 
-    ## -- MAIN --
+def run_builder(args):
+    """Run builder, invoked from 'build' sub-command
+    """
+    # Get builder in module.
+    full_mod_path = "{}.{}".format(args.mod_path, args.builder)
+    builder_class = get_builder(full_mod_path)
+    if builder_class is None:
+        raise BuilderNotFoundError("{}".format(full_mod_path))
 
-def _add_common(p):
-    p.add_argument('--verbose', '-v', dest='vb', action="count", default=0,
-                   help="Print more verbose messages to standard error. Repeatable. (default=ERROR)")
+    # Get keywords from args.
+    args_kw = {}
+    for kwd in args.keywords:
+        try:
+            key, value = kwd.split('=', 1)
+        except ValueError:
+            raise ValueError("Bad key=value pair: {}".format(kwd))
+        args_kw[key] = value
+
+    # Get database settings and connect.
+    _log.info("load DB configuration from '{}'".format(args.config_file))
+    db_settings = get_settings(args.config_file)
+    builder_db_settings = db_settings.copy()  # keep orig. settings for builder_class.__init__()
+
+    # Normalize user/password from readonly and admin prefixes.
+    for pfx in 'readonly', 'admin':  # in reverse order of priority, to overwrite
+        if (pfx + '_user') in db_settings and (pfx + '_password') in db_settings:
+            builder_db_settings['user'] = builder_db_settings[pfx + '_user']
+            builder_db_settings['password'] = builder_db_settings[pfx + '_password']
+            del builder_db_settings[pfx + '_user']
+            del builder_db_settings[pfx + '_password']
+
+    # Parse builder's setup() method docstring.
+    _log.debug("parse builder docstring")
+    params, returnval = core.parse_fn_docstring(builder_class.setup)
+    for name, info in params.iteritems():
+        try:
+            value = args_kw[name]
+        except KeyError:
+            raise ValueError("Key '{}' not found in {}.setup()"
+                             .format(name, full_mod_path))
+        # take special action for some types
+        if is_mqe(info['type']):  # QueryEngine
+            # connect to DB as configured
+            builder_db_settings['collection'] = value
+            # replace value with MQE obj
+            try:
+                args_kw[name] = QueryEngine(**builder_db_settings)
+            except pymongo.errors.ConnectionFailure as err:
+                raise BuilderError("Cannot connect from settings in '{}': {}"
+                                   .format(args.config_file, err))
+            _log.info("Configured query engine {}: {}".format(name, builder_db_settings))
+
+    # Run builder.
+    _log.info("run builder")
+    builder = builder_class(ncores=args.num_cores, config=db_settings)
+    count = builder.run(setup_kw=args_kw)
+    if count < 1:
+        _log.warn("Processed {:d} items".format(count))
+    else:
+        _log.info("Processed {:d} items".format(count))
+    result = 0
+
+    return result
+
+## -- MAIN --
 
 def main():
     global _log
 
+    # Configure parent parser for shared args.
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('--verbose', '-v', dest='vb', action="count", default=0,
+                               help="Print more verbose messages to standard error. Repeatable. (default=ERROR)")
     # Set up argument parsing.
     p = argparse.ArgumentParser(description="Build databases")
     subparsers = p.add_subparsers(description="Actions")
 
     # Merge action.
-    subp = subparsers.add_parser("merge", help="Merge sandbox and core database")
+    subp = subparsers.add_parser("merge", help="Merge sandbox and core database",
+                                 parents=[parent_parser])
     subp.set_defaults(func=build_sandbox)
-    _add_common(subp)
     subp.add_argument("-c", "--config", dest="config_file", type=str, metavar='FILE', default="db.json",
-                        help="Configure database connection from FILE (%(default)s)")
+                      help="Configure database connection from FILE (%(default)s)")
     subp.add_argument("-n", "--name", dest="sandbox_name", type=str, metavar="NAME", default=None,
                       help="Sandbox name, for prefixing merged task IDs. "
                            "If not given, try to use -p/--prefix, then default (sandbox)")
     subp.add_argument("-p", "--prefix", dest="coll_prefix", type=str, metavar='PREFIX', default=None,
-                        help="Collection name prefix for input (and possibly output) collections")
+                      help="Collection name prefix for input (and possibly output) collections")
     subp.add_argument("-s", "--sandbox", dest="sandbox_file", type=str, metavar='FILE', default=None,
                       help="Configure sandbox database from FILE (required)")
     subp.add_argument("-W", "--wipe", dest="wipe_target", action="store_true",
                       help="Wipe target collection, removing all data in it, before merge")
 
     # List builders action.
-    subp = subparsers.add_parser("list", help="list builders")
+    subp = subparsers.add_parser("list", help="list builders",
+                                 parents=[parent_parser])
     subp.set_defaults(func=list_builders)
-    _add_common(subp)
     subp.add_argument("-m", "--module", dest="mod_path", type=str, metavar="MODULE",
                       default="matgendb.builders",
                       help="Find builder modules under MODULE (default=matgendb.builders)")
 
     # Build action.
-    subp = subparsers.add_parser("build", help="run a builder")
-    subp.set_defaults(func='build')
-    subp.add_argument("-b", "--builder", dest="builder", type=str, metavar="MODULE", default="",
-                      help="Run builder MODULE, which is relative to the module path in -m/--module")
+    subp = subparsers.add_parser("build", help="run a builder",
+                                 parents=[parent_parser])
+    subp.set_defaults(func=run_builder)
+    subp.add_argument("-b", "--builder", dest="builder", type=str, metavar="NAME", default="",
+                      help="Run builder NAME, which is relative to the module path in -m/--module")
+    subp.add_argument("-c", "--config", dest="config_file", type=str, metavar='FILE', default="db.json",
+                      help="Configure database connection from FILE (%(default)s)")
+    subp.add_argument("-k", "--kvp", dest="keywords", action="append", default=[],
+                      help="Key/value pairs, in format <key>=<value>, passed to builder function")
     subp.add_argument("-m", "--module", dest="mod_path", type=str, metavar="MODULE",
                       default="matgendb.builders",
                       help="Find builder modules under MODULE (default=matgendb.builders)")
-    subp.add_argument('-n', '--ncores', dest="num_cores", type=int, default=16,
-                        help="Number of cores or processes to run in parallel (%(default)d)")
-
+    subp.add_argument("-n", "--ncores", dest="num_cores", type=int, default=16,
+                      help="Number of cores or processes to run in parallel (%(default)d)")
+    subp.add_argument("-p", "--prefix", dest="coll_prefix", type=str, metavar='PREFIX', default=None,
+                      help="Collection name prefix for input (and possibly output) collections")
     # Parse arguments.
     args = p.parse_args()
 
@@ -272,50 +376,25 @@ def main():
     # Run function.
     if args.func is None:
         p.error("No action given")
-    return args.func(args)
-
-    # Configure core database
-
-    # try:
-    #     settings = get_settings(args.config_file)
-    # except ConfigurationError, err:
-    #     p.error(str(err))
-    # core_db = QueryEngine(**settings)
-    # if hasattr(args, 'merged_tasks') and args.merged_tasks:
-    #     suffix = MERGED_SUFFIX
-    # else:
-    #     suffix = None
-    # collections = core.Collections(core_db, task_suffix=suffix)
-
-    # Run
-
-    status = 0
-    _log.info("run.start")
-    if args.func_name == 'sandbox':
-        try:
-            status = build_sandbox(args, collections)
-        except ConfigurationError, err:
-            status = -1
-            p.error(str(err))
-    elif args.func_name == 'other':
-        try:
-            status = build_other(args, sub=args.func_subname, params=args.func_params,
-                                 builder_class=args.func_builder, db_settings=settings)
-        except Exception, err:
-            tb = traceback.format_exc()
-            _log.error("Failed to run '{}': {}".format(args.func_subname, tb))
-            status = -1
-    else:
-        # Build derived collection
-        try:
-            status = args.func(collections, args)
-        except Exception, err:
-            tb = traceback.format_exc()
-            _log.error("Failed to run '{}': {}".format(args.func_name, tb))
-            status = -1
-    _log.info("run.end status={}".format(status))
-    return status
-
+    try:
+        result = args.func(args)
+    except ConfigurationError as err:
+        _log.error("Configuration error: {}".format(err))
+        result = -1
+    except BuilderNotFoundError as err:
+        _log.error("Builder not found: {}".format(err))
+        result = -1
+    except BuilderError as err:
+        _log.error("{}".format(err))
+        result = -1
+    except Exception as err:
+        if _log.getEffectiveLevel() <= logging.INFO:
+            print("{}".format(traceback.format_exc()))
+        p.error("{} error: {}".format(args.func.__name__, err))
+        result = -2
+    if result < 0:
+        _log.error("Failure: {:d}".format(result))
+    return result
 
 if __name__ == '__main__':
     sys.exit(main())

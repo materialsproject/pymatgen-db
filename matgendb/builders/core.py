@@ -292,6 +292,7 @@ class Builder(object):
 
         If the type of the argument is 'QueryEngine', then the driver program will
         add options for, and create, a matgendb.query_engine.QueryEngine instance.
+        The value given for this argument will be interpreted as the MongoDB collection name.
 
         :return: iterator
         """
@@ -313,15 +314,15 @@ class Builder(object):
     def run(self, setup_kw=None, build_kw=None):
         """Run the builder.
 
-        :param setup_kw dict: keywords to pass to `setup` method
-        :param build_kw dict: keywords to pass to `build` method
-        :return: Status code, 0 for OK
+        :param setup_kw dict: keywords to pass to `setup()` method
+        :param build_kw dict: keywords to pass to `_build()` method
+        :return: Number of items processed
         :rtype: int
         """
         setup_kw = {} if setup_kw is None else setup_kw
         build_kw = {} if build_kw is None else build_kw
-        self._build(self.setup(**setup_kw), **build_kw)
-        return 0
+        n = self._build(self.setup(**setup_kw), **build_kw)
+        return n
 
     def connect(self, config):
         """Connect to database with given configuration, which may be a dict or
@@ -340,13 +341,19 @@ class Builder(object):
 
     def _build(self, items, chunk_size=1000):
         """Build the output, in chunks.
+
+        :return: Number of items processed
+        :rtype: int
         """
+        n = 0
         for i, item in enumerate(items):
             if 0 == (i+1) % chunk_size:
                 self._run_parallel_fn()  # process the chunk
                 if self._status.has_failures():
                     break
+                n = i + 1
             self._queue.put(item)
+        return n
 
     def _run_parallel_threaded(self):
         """Run threads from queue

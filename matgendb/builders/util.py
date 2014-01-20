@@ -5,18 +5,16 @@ __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '11/4/13'
 
 ## Imports
-
+import matgendb
 # Stdlib
 import os
-# Package
-import pymatpro
 
 ## Globals
 
 ## Functions and Classes
 
 
-_pymatpro_dir = os.path.dirname(os.path.abspath(pymatpro.__file__))
+_top_dir = os.path.dirname(os.path.abspath(matgendb.__file__))
 
 
 def get_test_dir(name=None):
@@ -29,7 +27,7 @@ def get_test_dir(name=None):
     """
 
     subdir = name + '_test'
-    return os.path.join(_pymatpro_dir, '..', 'test_files', subdir)
+    return os.path.join(_top_dir, '..', 'test_files', subdir)
 
 
 def get_schema_dir(db_version=1):
@@ -41,7 +39,7 @@ def get_schema_dir(db_version=1):
     :rtype: str
     """
     v = str(db_version)
-    return os.path.join(_pymatpro_dir, '..', 'schemata', 'versions', v)
+    return os.path.join(_top_dir, '..', 'schemata', 'versions', v)
 
 
 def get_schema_file(db_version=1, db="mg_core", collection="materials"):
