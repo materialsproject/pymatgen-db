@@ -11,7 +11,10 @@ and 'vasp' for building the derived collections.
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '5/22/13'
 
-# System
+# Imports
+# -------
+
+# System imports.
 import argparse
 import imp
 import json
@@ -20,12 +23,15 @@ import os
 import sys
 import time
 import traceback
-# Third-party
+
+# Third-party imports.
 import pymongo
-# Builders
-# Other local stuff
+
+# Local imports.
 from matgendb.builders import core
 from matgendb.query_engine import QueryEngine
+
+# Global variables.
 
 _log = None     # configured in main()
 
@@ -34,23 +40,32 @@ DEFAULT_CONFIG_FILE = "db.json"
 # Suffix for merged tasks collection
 MERGED_SUFFIX = "merged"
 
-## Exceptions
+# Exceptions
+# ----------
+
 
 class BuilderError(Exception):
     pass
+
 
 class ConfigurationError(BuilderError):
     def __init__(self, where, why):
         Exception.__init__(self, "Failed to load configuration {}: {}".format(where, why))
 
+
 class BuilderNotFoundError(Exception):
     pass
 
-## Build functions
+# Commands
+# --------
 
 
-def build_sandbox(args):
-    """Merge tasks from a sandbox and core db.
+def command_merge(args):
+    """Command: Merge tasks from two collections.
+    Intended for merging a sandbox and core db.
+
+    :param args: Command-line arguments
+    :type args: list
     """
     # Check args.
     if not args.sandbox_file:
@@ -102,31 +117,128 @@ def build_sandbox(args):
     return 0
 
 
-def build_other(args, sub=None, params=None, builder_class=None, db_settings=None):
-    """Build using a class discovered at runtime.
+def command_list(args):
+    """Command: List all the builders in a given module dir.
+
+    :param args: Command-line arguments
+    :type args: list
+    :return: Number of builders shown
     """
-    _log.debug("Run plug-in builder <{}> with params: ".format(sub, params))
-    # Build up arguments to constructor
-    kwargs = {}
+    # Load parent module.
+    module = load_module(args.mod_path)
+    # Get all Python modules in directory.
+    path = os.path.dirname(module.__file__)
+    pyfiles = [f for f in os.listdir(path) if f.endswith('.py') and not f.startswith('__')]
+    # Convert back to full module paths.
+    pymods = ["{}.{}".format(args.mod_path, os.path.splitext(f)[0]) for f in pyfiles]
+    # Find and show builders in the module paths.
+    builders = filter(None, [get_builder(m) for m in pymods])
+    n = len(builders)
+    if n > 0:
+        print("Found {:d} builder{}:".format(n, 's' if n > 1 else ''))
+        map(_show_builder, builders)
+    else:
+        print("No builders found in module {}".format(args.mod_path))
+    return n
+
+
+def _show_builder(b):
+    """Print a formatted version of builder info to the console.
+    """
+    indent = " " * 4
+    modname = b.__module__.split(".")[-1]
+    print("{i}Module: {m}".format(i=indent, m=modname))
+    print("{i}{name}: {desc}".format(i=indent, name=b.__name__, desc=b.__doc__.strip()))
+    params = {}
+    setup_doc = b.setup.__doc__.split("\n")
+    for line in setup_doc:
+        s = line.strip()
+        if s.startswith(":"):
+            words = s.split()
+            param_name = words[1].split(":")[0]
+            param_desc = ' '.join(words[2:])
+            if s.startswith(":param"):
+                params[param_name] = [param_desc, None]  # desc goes first
+            else:
+                params[param_name][1] = param_desc  # type goes second
+    print("{i}{i}Keywords:".format(i=indent))
+    for key, value in params.iteritems():
+        desc, type_ = value
+        print("{i}{i}{i}{name} = ({type}) {desc}".format(i=indent, name=key, type=type_,
+                                                         desc=desc))
+
+
+def command_build(args):
+    """Command: Run builder, invoked from 'build' sub-command
+
+    :param args: Command-line arguments
+    :type args: list
+    """
+    # Get builder in module.
+    full_mod_path = "{}.{}".format(args.mod_path, args.builder)
+    builder_class = get_builder(full_mod_path)
+    if builder_class is None:
+        raise BuilderNotFoundError("{}".format(full_mod_path))
+
+    # Get keywords from args.
+    args_kw = {}
+    for kwd in args.keywords:
+        try:
+            key, value = kwd.split('=', 1)
+        except ValueError:
+            raise ValueError("Bad key=value pair: {}".format(kwd))
+        args_kw[key] = value
+
+    # Get database settings and connect.
+    _log.info("load DB configuration from '{}'".format(args.config_file))
+    db_settings = get_settings(args.config_file)
+    builder_db_settings = db_settings.copy()  # keep orig. settings for builder_class.__init__()
+
+    # Normalize user/password from readonly and admin prefixes.
+    for pfx in 'readonly', 'admin':  # in reverse order of priority, to overwrite
+        if (pfx + '_user') in db_settings and (pfx + '_password') in db_settings:
+            builder_db_settings['user'] = builder_db_settings[pfx + '_user']
+            builder_db_settings['password'] = builder_db_settings[pfx + '_password']
+            del builder_db_settings[pfx + '_user']
+            del builder_db_settings[pfx + '_password']
+
+    # Parse builder's setup() method docstring.
+    _log.debug("parse builder docstring")
+    params, returnval = core.parse_fn_docstring(builder_class.setup)
     for name, info in params.iteritems():
-        value = getattr(args, "{}_{}".format(sub, name))
-        # take special action for some types
-        if is_mqe(info['type']):  # QueryEngin
+        try:
+            value = args_kw[name]
+        except KeyError:
+            raise ValueError("Key '{}' not found in {}.setup()"
+            .format(name, full_mod_path))
+            # take special action for some types
+        if is_mqe(info['type']):  # QueryEngine
             # connect to DB as configured
-            db_settings['collection'] = value
+            builder_db_settings['collection'] = value
             # replace value with MQE obj
-            value = QueryEngine(**db_settings)
+            try:
+                args_kw[name] = QueryEngine(**builder_db_settings)
+            except pymongo.errors.ConnectionFailure as err:
+                raise BuilderError("Cannot connect from settings in '{}': {}"
+                .format(args.config_file, err))
+            _log.info("Configured query engine {}: {}".format(name, builder_db_settings))
 
-        kwargs[name] = value
-    # Create builder class
-    _log.debug("Create builder with kwargs: {}".format(kwargs))
-    bld = builder_class(**kwargs)
-    # Run builder
-    status = bld.run()
-    return status
+    # Run builder.
+    _log.info("run builder")
+    builder = builder_class(ncores=args.num_cores, config=db_settings)
+    count = builder.run(setup_kw=args_kw)
+    if count < 1:
+        _log.warn("Processed {:d} items".format(count))
+    else:
+        _log.info("Processed {:d} items".format(count))
+    result = 0
+
+    return result
 
 
-## -- util --
+# Utility functions
+# -----------------
+
 
 def tell_user(message):
     "Flexible way to control output for the user."
@@ -187,120 +299,8 @@ def get_builder(module):
     return result
 
 
-def list_builders(args):
-    """List all the builders in a given module dir.
-
-    :return: Number of builders shown
-    """
-    # Load parent module.
-    module = load_module(args.mod_path)
-    # Get all Python modules in directory.
-    path = os.path.dirname(module.__file__)
-    pyfiles = [f for f in os.listdir(path) if f.endswith('.py') and not f.startswith('__')]
-    # Convert back to full module paths.
-    pymods = ["{}.{}".format(args.mod_path, os.path.splitext(f)[0]) for f in pyfiles]
-    # Find and show builders in the module paths.
-    builders = filter(None, [get_builder(m) for m in pymods])
-    n = len(builders)
-    if n > 0:
-        print("Found {:d} builder{}:".format(n, 's' if n > 1 else ''))
-        map(show_builder, builders)
-    else:
-        print("No builders found in module {}".format(args.mod_path))
-    return n
-
-
-def show_builder(b):
-    """Print a formatted version of builder info to the console.
-    """
-    indent = " " * 4
-    modname = b.__module__.split(".")[-1]
-    print("{i}Module: {m}".format(i=indent, m=modname))
-    print("{i}{name}: {desc}".format(i=indent, name=b.__name__, desc=b.__doc__.strip()))
-    params = {}
-    setup_doc = b.setup.__doc__.split("\n")
-    for line in setup_doc:
-        s = line.strip()
-        if s.startswith(":"):
-            words = s.split()
-            param_name = words[1].split(":")[0]
-            param_desc = ' '.join(words[2:])
-            if s.startswith(":param"):
-                params[param_name] = [param_desc, None]  # desc goes first
-            else:
-                params[param_name][1] = param_desc  # type goes second
-    print("{i}{i}Keywords:".format(i=indent))
-    for key, value in params.iteritems():
-        desc, type_ = value
-        print("{i}{i}{i}{name} = ({type}) {desc}".format(i=indent, name=key, type=type_,
-                                                    desc=desc))
-
-
-def run_builder(args):
-    """Run builder, invoked from 'build' sub-command
-    """
-    # Get builder in module.
-    full_mod_path = "{}.{}".format(args.mod_path, args.builder)
-    builder_class = get_builder(full_mod_path)
-    if builder_class is None:
-        raise BuilderNotFoundError("{}".format(full_mod_path))
-
-    # Get keywords from args.
-    args_kw = {}
-    for kwd in args.keywords:
-        try:
-            key, value = kwd.split('=', 1)
-        except ValueError:
-            raise ValueError("Bad key=value pair: {}".format(kwd))
-        args_kw[key] = value
-
-    # Get database settings and connect.
-    _log.info("load DB configuration from '{}'".format(args.config_file))
-    db_settings = get_settings(args.config_file)
-    builder_db_settings = db_settings.copy()  # keep orig. settings for builder_class.__init__()
-
-    # Normalize user/password from readonly and admin prefixes.
-    for pfx in 'readonly', 'admin':  # in reverse order of priority, to overwrite
-        if (pfx + '_user') in db_settings and (pfx + '_password') in db_settings:
-            builder_db_settings['user'] = builder_db_settings[pfx + '_user']
-            builder_db_settings['password'] = builder_db_settings[pfx + '_password']
-            del builder_db_settings[pfx + '_user']
-            del builder_db_settings[pfx + '_password']
-
-    # Parse builder's setup() method docstring.
-    _log.debug("parse builder docstring")
-    params, returnval = core.parse_fn_docstring(builder_class.setup)
-    for name, info in params.iteritems():
-        try:
-            value = args_kw[name]
-        except KeyError:
-            raise ValueError("Key '{}' not found in {}.setup()"
-                             .format(name, full_mod_path))
-        # take special action for some types
-        if is_mqe(info['type']):  # QueryEngine
-            # connect to DB as configured
-            builder_db_settings['collection'] = value
-            # replace value with MQE obj
-            try:
-                args_kw[name] = QueryEngine(**builder_db_settings)
-            except pymongo.errors.ConnectionFailure as err:
-                raise BuilderError("Cannot connect from settings in '{}': {}"
-                                   .format(args.config_file, err))
-            _log.info("Configured query engine {}: {}".format(name, builder_db_settings))
-
-    # Run builder.
-    _log.info("run builder")
-    builder = builder_class(ncores=args.num_cores, config=db_settings)
-    count = builder.run(setup_kw=args_kw)
-    if count < 1:
-        _log.warn("Processed {:d} items".format(count))
-    else:
-        _log.info("Processed {:d} items".format(count))
-    result = 0
-
-    return result
-
-## -- MAIN --
+# Main program
+# ------------
 
 def main():
     global _log
@@ -316,7 +316,7 @@ def main():
     # Merge action.
     subp = subparsers.add_parser("merge", help="Merge sandbox and core database",
                                  parents=[parent_parser])
-    subp.set_defaults(func=build_sandbox)
+    subp.set_defaults(func=command_merge)
     subp.add_argument("-c", "--config", dest="config_file", type=str, metavar='FILE', default="db.json",
                       help="Configure database connection from FILE (%(default)s)")
     subp.add_argument("-n", "--name", dest="sandbox_name", type=str, metavar="NAME", default=None,
@@ -332,7 +332,7 @@ def main():
     # List builders action.
     subp = subparsers.add_parser("list", help="list builders",
                                  parents=[parent_parser])
-    subp.set_defaults(func=list_builders)
+    subp.set_defaults(func=command_list)
     subp.add_argument("-m", "--module", dest="mod_path", type=str, metavar="MODULE",
                       default="matgendb.builders",
                       help="Find builder modules under MODULE (default=matgendb.builders)")
@@ -340,7 +340,7 @@ def main():
     # Build action.
     subp = subparsers.add_parser("build", help="run a builder",
                                  parents=[parent_parser])
-    subp.set_defaults(func=run_builder)
+    subp.set_defaults(func=command_build)
     subp.add_argument("-b", "--builder", dest="builder", type=str, metavar="NAME", default="",
                       help="Run builder NAME, which is relative to the module path in -m/--module")
     subp.add_argument("-c", "--config", dest="config_file", type=str, metavar='FILE', default="db.json",

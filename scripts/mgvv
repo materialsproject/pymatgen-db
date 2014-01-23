@@ -5,13 +5,8 @@ Run validation tests of (MongoDB) databases.
 Database connections are configured from a file
 and the constraints to validate against can come from a file or the command-line.
 """
-__author__ = "Dan Gunter"
-__copyright__ = "Copyright 2012-2013, The Materials Project"
-__version__ = "1.0"
-__maintainer__ = "Dan Gunter"
-__email__ = "dkgunter@lbl.gov"
-__status__ = "Development"
-__date__ = "3/29/13"
+__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
+__date__ = '3/29/13'
 
 import argparse
 import logging
@@ -28,6 +23,7 @@ from matgendb.util import get_settings
 from matgendb.vv.validate import ConstraintSpec, Validator, DBError
 from matgendb.vv import report
 from matgendb.vv.util import Timing, ElapsedTime, letter_num
+from matgendb.vv import diff
 
 # Initialize module logging
 _log_name = 'mg'
@@ -150,6 +146,41 @@ def parse_mongo_url(url):
     d['db'] = parts[2][1:]
     return d
 
+
+def command_diff(args):
+    """Sub-command to calculate the difference of 2 collections.
+    """
+    # Parse info arg.
+    info = []
+    if args.info is not None:
+        info = [s.strip() for s in args.info.split(',')]
+
+    # Instantiate main class.
+    df = diff.Differ(key=args.key, info=info)
+    df.get_fields_early = not args.keysonly
+
+    # Run diff.
+    r = df.diff(args.old, args.new, only_missing=args.missonly)
+
+    # Report results.
+    for section in r.keys():
+        print(section.title())
+        indent = " " * 4
+        if len(r[section]) == 0:
+            print("{}EMPTY".format(indent))
+        else:
+            for v in r[section]:
+                print("{}{}".format(indent, _rformat(v)))
+    return 0
+
+
+def _rformat(rec):
+    """Format diff record.
+    """
+    fields = ['{}: {}'.format(k, v) for k, v in rec.iteritems()]
+    return '{' + ', '.join(fields) + '}'
+
+
 def main(cmdline=None):
     """Main program entry point.
 
@@ -164,7 +195,14 @@ def main(cmdline=None):
     desc = ' '.join(__doc__.split())
     formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter,
                       md=report.MarkdownFormatter)
-    parser = argparse.ArgumentParser(description=desc)
+
+    # Configure parent parser for shared args.
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('--verbose', '-v', dest='vb', action="count", default=0,
+                               help="Print more verbose messages to standard error. Repeatable. (default=ERROR)")
+
+    # Options for main command.
+    parser = argparse.ArgumentParser(description=desc, parents=[parent_parser])
     parser.add_argument('constraint', nargs='*')
     parser.add_argument('--alias', '-a', dest='aliases', action='append', type=nvpstr, metavar="ALIAS", default=[],
                         help='Alias for a field used in a constraint or condition, in form alias=name_in_db')
@@ -177,10 +215,10 @@ def main(cmdline=None):
     parser.add_argument('--collection', '-C', dest='coll', metavar='NAME', default=None,
                         help='Collection name for constraints given on command-line')
     parser.add_argument('--email', '-e', dest='email', default=None,
-		    help='Email report to EMAIL at {from}:{to}[:host[:port[/subject]]].'
-                             'The "from" and "to" are required; default host is localhost. '
-                             'This information can also be in the main config file under the "_email" key, '
-			     'which should be a mapping with keys "from", "to", "host", "port", and "subject".')
+                        help='Email report to EMAIL at {from}:{to}[:host[:port[/subject]]].'
+                        'The "from" and "to" are required; default host is localhost. '
+                        'This information can also be in the main config file under the "_email" key, '
+                        'which should be a mapping with keys "from", "to", "host", "port", and "subject".')
     parser.add_argument('--empty', dest='send_on_empty', action='store_true',
                         help="Send a report, even if it is empty (default=print warning and don't send)")
     parser.add_argument('--exonly', dest='must_exist', action='store_true', default=False,
@@ -195,17 +233,31 @@ def main(cmdline=None):
                         help='Report progress every NUM invalid records found')
     parser.add_argument('--user', '-u', dest='user', metavar='NAME', default=None,
                         help='User name, for the report')
-    parser.add_argument('-v', '--verbose', dest='vb', action='count', help='Log message verbosity')
+
+    # Diff command.
+    subparsers = parser.add_subparsers(description="Other actions")
+    subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
+    subp.set_defaults(func=command_diff)
+    subp.add_argument("-k", "--key", help="Key for matching records", dest="key", required=True)
+    subp.add_argument("-i", "--info", help="Extra fields for records, as comma-separated list"
+                      ", e.g 'extra,fields,to_include'", dest="info", default=None)
+    subp.add_argument("-m", "--missing", help="Only report keys that are in the 'old' collection, but "
+                      "not in the 'new' collection", action="store_true", dest="missonly")
+    subp.add_argument('--keysonly', action='store_true', dest='keysonly', help="Instead of getting "
+                      "all fields during the initial query, get just the keys, then query again for "
+                      "-i/--info fields only for missing or new records. This could speed up some "
+                      "use-cases.")
+    subp.add_argument("old", help="pymatgen-db JSON config file for the 'old' collection")
+    subp.add_argument("new", help="pymatgen-db JSON config file for the 'new' collection")
 
     args = parser.parse_args(cmdline)
 
-    # Set logging level from --verbose option
-    if args.vb > 1:
-        _log.setLevel(logging.DEBUG)
-    elif args.vb > 0:
-        _log.setLevel(logging.INFO)
-    else:
-        _log.setLevel(logging.WARN)
+    # Set logging level.
+    _log.setLevel((logging.DEBUG, logging.WARN, logging.INFO)[min(args.vb, 2)])
+
+    # Handle sub-commands.
+    if hasattr(args, 'func'):
+        return args.func(args)
 
     # Connect and authenticate
     conn, config = None, None
@@ -267,7 +319,7 @@ def main(cmdline=None):
         plist = ' '.join(args.constraint).split(',')
         # make dict(key=collection) of list of the constraints, just like YAML config file
         constraints = {coll_name: [plist]}
-	_log.debug("command-line constraints dump: {}".format(constraints))
+        _log.debug("command-line constraints dump: {}".format(constraints))
 
     # Init aliases from file or command-line
     if constraints_from_file:
@@ -321,7 +373,7 @@ def main(cmdline=None):
     elapsed = ElapsedTime()
     with Timing("validate", log=_log, elapsed=elapsed):
         for coll_name, constraint_spec_cfg in constraints.iteritems():
-	    _log.debug("validate {}".format(coll_name))
+            _log.debug("validate {}".format(coll_name))
             sect_hdr = report.SectionHeader(title='Collection "{}"'.format(coll_name))
             rpt_sect = report.ReportSection(sect_hdr)
             if coll_name.startswith(PATTERN_KEY_PREFIX_IGNORE):

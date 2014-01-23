@@ -11,9 +11,12 @@ __date__ = "Dec 1, 2012"
 import bson
 import datetime
 import json
+import logging
 import os
 from pymongo.mongo_client import MongoClient
 
+
+_log = logging.getLogger("mg.util")
 
 DEFAULT_PORT = 27017
 
@@ -46,9 +49,13 @@ def get_database(config_file=None, settings=None, admin=False):
     d = get_settings(config_file) if settings is None else settings
     conn = MongoClient(host=d["host"], port=d["port"])
     db = conn[d["database"]]
-    user = d["admin_user"] if admin else d["readonly_user"]
-    passwd = d["admin_password"] if admin else d["readonly_password"]
-    db.authenticate(user, passwd)
+    try:
+        user = d["admin_user"] if admin else d["readonly_user"]
+        passwd = d["admin_password"] if admin else d["readonly_password"]
+        db.authenticate(user, passwd)
+    except KeyError, err:
+        _log.warn("No {admin,readonly}_user/password found in config. file, "
+                  "accessing DB without authentication")
     return db
 
 

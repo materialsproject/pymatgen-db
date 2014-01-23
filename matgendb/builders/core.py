@@ -2,8 +2,7 @@
 Shared code for builders.
 
 For developers implementing a new builder,
-you should inherit from `ParallelBuilder`. See the
-documentation of this class for details.
+you should inherit from :class:`Builder`.
 """
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '5/29/13'
@@ -188,7 +187,7 @@ def merge_tasks(core_collections, sandbox_collections, id_prefix, new_tasks, bat
 class HasExamples(object):
     """Mix-in class for checking the output of a builder.
 
-    This is a way to get some `static` checking of the schema of inserted documents,
+    This is a way to get some static checking of the schema of inserted documents,
     without imposing the burden of schema-checking every single document.
     The check is static in the sense that it will only be run by the unit tests.
 
@@ -225,18 +224,31 @@ class HasExamples(object):
 class Builder(object):
     """Abstract base class for all builders
 
-    Basic usage::
+    To implement a new builder, inherit from this class and
+    define the :meth:`setup` and :meth:`process_item` methods.
+    It is important to add special "docstring" comments in the :meth:`setup`
+    method, so the command-line program "mgbuild" can allow users to set them.
+    See the documentation of the methods for more details.
+
+    Here is a trivial example::
 
         class MyBuilder(Builder):
             def setup(self, n):
-                '''
+                '''My setup.
+
                 :param n: Number of items
                 :type n: int
                 '''
                 return list(range(n))
 
             def process_item(self, item):
+                '''Process an item.
+                '''
                 print("processing item: {}".format(item))
+
+
+    Although you will most likely not need to run these builders programmatically,
+    if you do then this is an example of how to create and run::
 
         b = MyBuilder(ncores=1)
         b.run()
@@ -296,13 +308,14 @@ class Builder(object):
 
         :return: iterator
         """
-        return [{"Hello": "World"}]
+        return [{"Hello": 1}, {"World": 2}]
 
     @abstractmethod
     def process_item(self, item):
         """Implement the analysis for each item of work here.
 
-        :param item: One item of work from the queue
+        :param item: One item of work from the queue (i.e., one item from the iterator that
+                     was returned by the `setup` method).
         :type item: object
         :return: Status code, 0 for OK
         :rtype: int
@@ -473,6 +486,7 @@ class BuilderStatus(object):
     def __str__(self):
         return ",".join([self._NAMES[state] for state in self._states])
 
+
 class ProcRunner:
     """This is a work-around to the limitation of multiprocessing that the
     function executed in the new module cannot be a method of a class.
@@ -484,7 +498,6 @@ class ProcRunner:
     @classmethod
     def run(cls, index):
         cls.instance._run(index)
-
 
 
 def alphadump(d, indent=2, depth=0):
