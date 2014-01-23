@@ -46,6 +46,11 @@ def get_settings(config_file):
     # Read settings from input file.
     if infile:
         config_settings = json.load(open(infile))
+        # Allow some aliases
+        for alias, real in (("user", "readonly_user"), ("password", "readonly_password")):
+            if alias in config_settings:
+                config_settings[real] = config_settings[alias]
+                del config_settings[alias]
     else:
         config_settings = {}
 
