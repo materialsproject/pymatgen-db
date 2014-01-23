@@ -19,30 +19,41 @@ from pymongo.mongo_client import MongoClient
 _log = logging.getLogger("mg.util")
 
 DEFAULT_PORT = 27017
+DEFAULT_CONFIG_FILE = "db.json"
 
 DEFAULT_SETTINGS = [
     ("host", "localhost"),
     ("port", DEFAULT_PORT),
     ("database", "vasp"),
-    ("admin_user", None),
-    ("admin_password", None),
-    ("readonly_user", None),
-    ("readonly_password", None),
-    ("collection", "tasks"),
-    ("aliases_config", None),
-    ("mapi_key", None)
+    # ("admin_user", None),
+    # ("admin_password", None),
+    # ("readonly_user", None),
+    # ("readonly_password", None),
+    # ("collection", "tasks"),
+    # ("aliases_config", None),
+    # ("mapi_key", None)
 ]
 
 
 def get_settings(config_file):
+    # Get input file.
+    infile = None
     if config_file:
-        with open(config_file) as f:
-            return json.load(f)
-    elif os.path.exists("db.json"):
-        with open("db.json") as f:
-            return json.load(f)
+        infile = config_file
+    elif os.path.exists(DEFAULT_CONFIG_FILE):
+        infile = DEFAULT_CONFIG_FILE
+
+    # Read settings from input file.
+    if infile:
+        config_settings = json.load(open(infile))
     else:
-        return dict(DEFAULT_SETTINGS)
+        config_settings = {}
+
+    # Merge input file settings and defaults.
+    settings = dict(DEFAULT_SETTINGS)
+    settings.update(config_settings)
+
+    return settings
 
 
 def get_database(config_file=None, settings=None, admin=False):
@@ -53,7 +64,7 @@ def get_database(config_file=None, settings=None, admin=False):
         user = d["admin_user"] if admin else d["readonly_user"]
         passwd = d["admin_password"] if admin else d["readonly_password"]
         db.authenticate(user, passwd)
-    except KeyError, err:
+    except KeyError:
         _log.warn("No {admin,readonly}_user/password found in config. file, "
                   "accessing DB without authentication")
     return db
