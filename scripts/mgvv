@@ -253,7 +253,7 @@ def main(cmdline=None):
     args = parser.parse_args(cmdline)
 
     # Set logging level.
-    _log.setLevel((logging.DEBUG, logging.WARN, logging.INFO)[min(args.vb, 2)])
+    _log.setLevel((logging.ERROR, logging.INFO, logging.DEBUG)[min(args.vb, 2)])
 
     # Handle sub-commands.
     if hasattr(args, 'func'):
