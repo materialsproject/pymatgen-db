@@ -54,7 +54,8 @@ def get_database(config_file, admin=False):
 
 def get_collection(config_file, admin=False):
     db = get_database(config_file, admin=admin)
-    return db[d["collection"]]
+    settings = get_settings(config_file)
+    return db[settings["collection"]]
 
 
 class MongoJSONEncoder(json.JSONEncoder):
