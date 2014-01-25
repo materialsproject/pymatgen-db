@@ -169,31 +169,20 @@ class ReportBackupError(Exception):
 
 # CSS for HTML report output
 DEFAULT_CSS = """
-html {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-body {
-    margin: 2em;
-}
-table { margin-top: 1em; clear: both; border: 1px solid grey; }
+html { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+body { margin: 2em;}
+table { margin-top: 1em; clear: both; border: 0;}
 dl, dt, dd { float: left; }
 dl, dt { clear: both; }
 dt { width: 8em; font-weight: 700; }
 dd { width: 32em; }
-tr.even { background-color: #F2F2FF; }
-tr.odd { background-color: white; }
-th, td {
-    padding: 0.2em 0.5em;
-}
-th {
-    text-align: left;
-    color: #000066;
-    border-bottom: 1px solid #000066;
-    margin: 0;
-}
+tr:nth-child(even) { background-color: #E9E9E9; }
+tr:nth-child(odd) { background-color: #F1F1F1; }
+th, td {padding: 0.2em 0.5em;}
+th { text-align: left; color: #000066; margin: 0;}
 h1, h2, h3 { clear: both; margin: 0; padding: 0; }
-h1 { color: #FE5300; }
-h2 { color: #004489; }
+h1 { font-size: 18; color: rgb(44, 62, 80); }
+h2 { font-size: 14; color: black; }
 """.replace('\n', ' ').replace('  ', ' ')
 
 
@@ -395,3 +384,70 @@ class Emailer(DoesLogging):
             self._log.error("connection to SMTP server failed: {}".format(err))
             n_recip = 0
         return n_recip
+
+
+# Diff formatting
+
+DIFF_CSS = DEFAULT_CSS + """
+.header {background-color: #96D8D3; padding: 5px; margin: 0;}
+.content {background-color: #96D8D3; padding: 10px; margin: 0;}
+.content h1 {color: #2C3E50;}
+.empty { font-size: 14px; font-style: italic;}
+.section {padding: 5px; margin: 10px; background-color: #D9D9D9;}
+.section div {margin-left: 10px;}
+.section table {margin-left: 5px;}
+"""
+
+
+def diff_format_html(result):
+    """Generate HTML report.
+    """
+    return "<html><head><style>{css}</style><body>{header}{body}</body></html>" \
+        .format(css=DIFF_CSS, header=diff_html_header(), body=diff_html_body(result))
+
+
+def diff_html_header():
+    return "<div class='header'><h1>Materials Project Database Diff Report</h1></div>"
+
+
+def diff_html_body(result):
+    body = ["<div class='content'>"]
+    for section in "additional", "missing", "different":
+        body.append("<div class='section'><h2>{}</h2>".format(section.title()))
+        if len(result[section]) == 0:
+            body.append("<div class='empty'>Empty</div>")
+        else:
+            body.extend(diff_html_table(result[section]))
+        body.append("</div>")
+    body.append("</div>")
+    return ''.join(body)
+
+
+def diff_html_table(rows):
+    table = ["<table>"]
+    cols = sorted(rows[0].keys())
+    table.extend(["<tr>"] + ["<th>{}</th>".format(c) for c in cols] + ["</tr>"])
+    for r in rows:
+        table.extend(["<tr>"] + ["<td>{}</td>".format(r[c]) for c in cols] + ["</tr>"])
+    table.append("</table>")
+    return table
+
+
+def diff_format_text(result):
+    """Generate plain text report.
+    """
+    lines = []
+    for section in result.keys():
+        lines.append(section.title())
+        indent = " " * 4
+        if len(result[section]) == 0:
+            lines.append("{}EMPTY".format(indent))
+        else:
+            for v in result[section]:
+                lines.append("{}{}".format(indent, _rformat(v)))
+    return '\n'.join(lines)
+
+
+def _rformat(rec):
+    fields = ['{}: {}'.format(k, v) for k, v in rec.iteritems()]
+    return '{' + ', '.join(fields) + '}'

@@ -13,6 +13,7 @@ import logging
 import os
 import pymongo
 import re
+import smtplib
 import socket
 import sys
 import time
@@ -65,14 +66,15 @@ def nvpstr(s):
     #print("NVP: {}".format(nvp))
     return nvp
 
+
 def _parse_email(s):
     """Parse an email specification into component parts.
 
     Keys:
-    - sender
-    - recipients
-    - host
-    - port
+        - sender
+        - recipients
+        - host
+        - port
 
     :return: Parsed email information
     :rtype: dict
@@ -89,14 +91,20 @@ def _parse_email(s):
     if len(items) > 2:
         d['server'] = items[2]
     if len(items) > 3:
-	if '/' in items[3]:
-	    p1, p2 = items[3].split('/')
-        d['port'], d['subject'] = int(p1), p2
-    else:
-        d['port'] = int(items[3])
+        if '/' in items[3]:
+            p1, p2 = items[3].split('/')
+            d['port'], d['subject'] = int(p1), p2
+        else:
+            d['port'] = int(items[3])
     return d
 
+
 def _config_email(fname):
+    """Get an email spec. from a config file.
+
+    :return: Parsed email information
+    :rtype: dict
+    """
     d = {}
     try:
         f = open(fname)
@@ -123,28 +131,26 @@ def _config_email(fname):
     return d
 
 
-def parse_mongo_url(url):
-    """Parse mongodb:// URL, return dict of information
+# --------
+# Commands
+# --------
 
-    XXX: Not used right now.
-    """
-    parts = urlparse.urlsplit(url)
-    netloc = parts[1]
-    urlexpr = '''
-            (?P<user>\w+)           # user
-            :(?P<password>\S+)      # password
-            @(?P<host>[a-zA-Z.]+)   # host
-            (?::(?P<port>\d+))?     # optional port'''
-    m = re.match(urlexpr, netloc, flags=re.X)
-    if m is None:
-        raise ValueError("bad format: {}".format(url))
-    g = m.groupdict()
-    d = {'host':g['host'], 'user_name':g['user'],
-         'password':g['password']}
-    if g['port'] is not None:
-        d['port'] = int(g['port'])
-    d['db'] = parts[2][1:]
-    return d
+def _splitup(s, sep, n1, n2):
+    parts = s.split(sep)
+    n = len(parts)
+    if not (n1 <= n <= n2):
+        raise ValueError("Wrong number of '{}'-separated parts: {:d}".format(sep, n))
+    return parts
+
+
+def parse_email_args(msg, server):
+    mp = _splitup(msg, '/', 2, 3)
+    sp = _splitup(server, ':', 1, 2)
+    return {"sender": mp[0],
+            "recipients": [x.strip() for x in mp[1].split(',')],
+            "subject": "" if len(mp) < 3 else mp[2],
+            "host": sp[0],
+            "port": int(sp[1]) if len(sp) > 1 else smtplib.SMTP_PORT}
 
 
 def command_diff(args):
@@ -163,23 +169,28 @@ def command_diff(args):
     # Run diff.
     r = df.diff(args.old, args.new, only_missing=args.missonly)
 
-    # Report results.
-    for section in r.keys():
-        print(section.title())
-        indent = " " * 4
-        if len(r[section]) == 0:
-            print("{}EMPTY".format(indent))
-        else:
-            for v in r[section]:
-                print("{}{}".format(indent, _rformat(v)))
+    # Build report.
+    if args.format is None:
+        args.format = ("text", "html")[bool(args.email)]
+    as_html = args.format == "html"
+    if as_html:
+        text = report.diff_format_html(r)
+    else:
+        text = report.diff_format_text(r)
+
+    # Print or send report.
+    if args.email:
+        kw = parse_email_args(args.email, args.email_server)
+        emailer = report.Emailer(**kw)
+        emailer.send(text, ("text/plain", "text/html")[as_html])
+    else:
+        print(text)
+
     return 0
 
-
-def _rformat(rec):
-    """Format diff record.
-    """
-    fields = ['{}: {}'.format(k, v) for k, v in rec.iteritems()]
-    return '{' + ', '.join(fields) + '}'
+# ------------
+# Main program
+# ------------
 
 
 def main(cmdline=None):
@@ -239,9 +250,16 @@ def main(cmdline=None):
     subparsers = parser.add_subparsers(description="Other actions")
     subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
     subp.set_defaults(func=command_diff)
-    subp.add_argument("-k", "--key", help="Key for matching records", dest="key", required=True)
+    subp.add_argument("-e", "--email", dest='email', default=None, metavar="ADDR",
+                      help="Email report, instead of printing it to standard output. "
+                           "ADDR is of the form: sender/receiver,[receiver2...][/subject].")
+    subp.add_argument("-f", "--format", dest="format", metavar="FORMAT", default=None,
+                      help="Report format: 'text' (default for screen) or 'html' (default for email)")
+    subp.add_argument("-s", "--email-server", dest="email_server", default="localhost", metavar="HOST",
+                      help="Server HOST for an email report, in form hostname[:port]. Default is localhost")
     subp.add_argument("-i", "--info", help="Extra fields for records, as comma-separated list"
                       ", e.g 'extra,fields,to_include'", dest="info", default=None)
+    subp.add_argument("-k", "--key", help="Key for matching records", dest="key", required=True)
     subp.add_argument("-m", "--missing", help="Only report keys that are in the 'old' collection, but "
                       "not in the 'new' collection", action="store_true", dest="missonly")
     subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
@@ -342,7 +360,7 @@ def main(cmdline=None):
     elif args.constfile:
         email_kw = _config_email(args.constfile)
     if email_kw is not None:
-        _kwd = {'subject':'MP Validation Report'}
+        _kwd = {'subject': 'MP Validation Report'}
         _kwd.update(email_kw)
         _log.info("Will email report to: {}".format(mapdump(_kwd)))
         emailer = report.Emailer(**_kwd)
