@@ -154,10 +154,11 @@ def command_diff(args):
     info = []
     if args.info is not None:
         info = [s.strip() for s in args.info.split(',')]
+    if args.props is not None:
+        props = [s.strip() for s in args.props.split(',')]
 
     # Instantiate main class.
-    df = diff.Differ(key=args.key, info=info)
-    df.get_fields_early = not args.keysonly
+    df = diff.Differ(key=args.key, info=info, props=props)
 
     # Run diff.
     r = df.diff(args.old, args.new, only_missing=args.missonly)
@@ -243,10 +244,8 @@ def main(cmdline=None):
                       ", e.g 'extra,fields,to_include'", dest="info", default=None)
     subp.add_argument("-m", "--missing", help="Only report keys that are in the 'old' collection, but "
                       "not in the 'new' collection", action="store_true", dest="missonly")
-    subp.add_argument('--keysonly', action='store_true', dest='keysonly', help="Instead of getting "
-                      "all fields during the initial query, get just the keys, then query again for "
-                      "-i/--info fields only for missing or new records. This could speed up some "
-                      "use-cases.")
+    subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
+                                           ", e.g 'these_must,match'", dest="props", default=None)
     subp.add_argument("old", help="pymatgen-db JSON config file for the 'old' collection")
     subp.add_argument("new", help="pymatgen-db JSON config file for the 'new' collection")
 
