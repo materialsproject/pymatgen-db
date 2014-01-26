@@ -38,7 +38,7 @@ from pymatgen.io.vaspio import Vasprun, Incar, Kpoints, Potcar, Poscar, \
 from pymatgen.io.cifio import CifWriter
 from pymatgen.symmetry.finder import SymmetryFinder
 from pymatgen.analysis.bond_valence import BVAnalyzer
-from pymatgen.util.io_utils import zopen
+from monty.io import zopen
 from pymatgen.matproj.rest import MPRester
 from pymatgen.entries.computed_entries import ComputedEntry
 
