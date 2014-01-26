@@ -393,7 +393,7 @@ DIFF_CSS = DEFAULT_CSS + """
 .content {background-color: #96D8D3; padding: 10px; margin: 0;}
 .content h1 {color: #2C3E50;}
 .empty { font-size: 14px; font-style: italic;}
-.section {padding: 5px; margin: 10px; background-color: #D9D9D9;}
+.section {padding: 5px; margin: 10px; background-color: #D9D9D9; border-radius: 15px;}
 .section div {margin-left: 10px;}
 .section table {margin-left: 5px;}
 """
