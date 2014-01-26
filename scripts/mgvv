@@ -12,12 +12,10 @@ import argparse
 import logging
 import os
 import pymongo
-import re
 import smtplib
 import socket
 import sys
 import time
-import urlparse
 import yaml
 # local module
 from matgendb.util import get_settings
@@ -153,6 +151,10 @@ def parse_email_args(msg, server):
             "port": int(sp[1]) if len(sp) > 1 else smtplib.SMTP_PORT}
 
 
+def _dbinfo(cfg):
+    return "{host}/{collection}.{database}".format(**cfg)
+
+
 def command_diff(args):
     """Sub-command to calculate the difference of 2 collections.
     """
@@ -167,16 +169,23 @@ def command_diff(args):
     df = diff.Differ(key=args.key, info=info, props=props)
 
     # Run diff.
+    t0 = time.time()
     r = df.diff(args.old, args.new, only_missing=args.missonly)
+    t1 = time.time()
 
     # Build report.
+    stime = lambda t: time.strftime("%Y-%m-%d %H:%M", time.localtime(t))
+    meta = {'start_time': stime(t0), 'end_time': stime(t1),
+            'elapsed': t1 - t0,
+            'db1': _dbinfo(get_settings(args.old)),
+            'db2': _dbinfo(get_settings(args.new))}
     if args.format is None:
         args.format = ("text", "html")[bool(args.email)]
     as_html = args.format == "html"
     if as_html:
-        text = report.diff_format_html(r)
+        text = report.diff_format_html(r, meta)
     else:
-        text = report.diff_format_text(r)
+        text = report.diff_format_text(r, meta)
 
     # Print or send report.
     if args.email:

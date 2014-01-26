@@ -177,9 +177,9 @@ dl, dt { clear: both; }
 dt { width: 8em; font-weight: 700; }
 dd { width: 32em; }
 tr:nth-child(even) { background-color: #E9E9E9; }
-tr:nth-child(odd) { background-color: #F1F1F1; }
+tr:nth-child(odd) { background-color: #E9E9E9; }
 th, td {padding: 0.2em 0.5em;}
-th { text-align: left; color: #000066; margin: 0;}
+th { text-align: left;  color: black; margin: 0; font-weight: 300;}
 h1, h2, h3 { clear: both; margin: 0; padding: 0; }
 h1 { font-size: 18; color: rgb(44, 62, 80); }
 h2 { font-size: 14; color: black; }
@@ -386,28 +386,44 @@ class Emailer(DoesLogging):
         return n_recip
 
 
+# ---------------
 # Diff formatting
+# ---------------
 
 DIFF_CSS = DEFAULT_CSS + """
-.header {background-color: #96D8D3; padding: 5px; margin: 0;}
-.content {background-color: #96D8D3; padding: 10px; margin: 0;}
-.content h1 {color: #2C3E50;}
+body {background-color: #F3F3F3; margin: 1em;}
+.header {padding: 5px; margin: 0 5px;}
+.header h1 {color: #165F4B; font-size: 20; text-align: left; margin-left: 20px;}
+.header p {color: #666666; margin-left: 20px; height: 12px;}
+.header p em {color: #4169E1; font-style: normal;}
+.content {padding: 15px; padding-top: 0px; margin: 0;}
+.content h2 {color: #2C3E50; font-size: 16px;}
 .empty { font-size: 14px; font-style: italic;}
-.section {padding: 5px; margin: 10px; background-color: #D9D9D9; border-radius: 15px;}
+.section {padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px;}
 .section div {margin-left: 10px;}
 .section table {margin-left: 5px;}
+tr:nth-child(even) { background-color: white; }
+tr:nth-child(odd) { background-color: #F5F5F5; }
+tr:nth-child(1) { background-color: #778899; font-weight: 500;}
+th, td {padding: 0.2em 0.5em;}
+th { text-align: left;  color: white; margin: 0;}
 """
 
+DIFF_TITLE = "Materials Project Database Diff Report"
 
-def diff_format_html(result):
+
+def diff_format_html(result, meta):
     """Generate HTML report.
     """
     return "<html><head><style>{css}</style><body>{header}{body}</body></html>" \
-        .format(css=DIFF_CSS, header=diff_html_header(), body=diff_html_body(result))
+        .format(css=DIFF_CSS, header=diff_html_header(meta), body=diff_html_body(result))
 
 
-def diff_html_header():
-    return "<div class='header'><h1>Materials Project Database Diff Report</h1></div>"
+def diff_html_header(meta):
+    s = "<div class='header'><h1>{}</h1>".format(DIFF_TITLE)
+    s += "<p>Compared <em>{db1}</em> with <em>{db2}</em></p>"
+    s += "<p>Run time: <em>{start_time}</em> to <em>{end_time}</em> (<em>{elapsed:.1f}</em> sec)</p>"
+    return (s + "</div>").format(**meta)
 
 
 def diff_html_body(result):
@@ -433,12 +449,17 @@ def diff_html_table(rows):
     return table
 
 
-def diff_format_text(result):
+def diff_format_text(result, meta):
     """Generate plain text report.
     """
-    lines = []
+    lines = ['-' * len(DIFF_TITLE),
+             DIFF_TITLE,
+             '-' * len(DIFF_TITLE),
+             "Compared: {db1} <-> {db2}".format(**meta),
+             "Run time: {start_time} -- {end_time} ({elapsed:.1f} sec)".format(**meta),
+             ""]
     for section in result.keys():
-        lines.append(section.title())
+        lines.append("* " + section.title())
         indent = " " * 4
         if len(result[section]) == 0:
             lines.append("{}EMPTY".format(indent))
