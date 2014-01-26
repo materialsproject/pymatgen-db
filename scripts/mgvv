@@ -182,10 +182,8 @@ def command_diff(args):
     if args.format is None:
         args.format = ("text", "html")[bool(args.email)]
     as_html = args.format == "html"
-    if as_html:
-        text = report.diff_format_html(r, meta)
-    else:
-        text = report.diff_format_text(r, meta)
+    fmt_class = getattr(report, ("DiffTextFormatter", "DiffHtmlFormatter")[as_html])
+    text = fmt_class(meta).format(r)
 
     # Print or send report.
     if args.email:
@@ -263,7 +261,8 @@ def main(cmdline=None):
                       help="Email report, instead of printing it to standard output. "
                            "ADDR is of the form: sender/receiver,[receiver2...][/subject].")
     subp.add_argument("-f", "--format", dest="format", metavar="FORMAT", default=None,
-                      help="Report format: 'text' (default for screen) or 'html' (default for email)")
+                      help="Report format: 'text' (default for screen) or 'html' (default for email)",
+                      choices=["text", "html"])
     subp.add_argument("-s", "--email-server", dest="email_server", default="localhost", metavar="HOST",
                       help="Server HOST for an email report, in form hostname[:port]. Default is localhost")
     subp.add_argument("-i", "--info", help="Extra fields for records, as comma-separated list"

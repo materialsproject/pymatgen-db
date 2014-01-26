@@ -167,8 +167,12 @@ class ReportBackupError(Exception):
 
 ## Formatting
 
+
+def css_minify(s):
+    return s.replace('\n', ' ').replace('  ', ' ')
+
 # CSS for HTML report output
-DEFAULT_CSS = """
+DEFAULT_CSS = css_minify("""
 html { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 body { margin: 2em;}
 table { margin-top: 1em; clear: both; border: 0;}
@@ -183,7 +187,7 @@ th { text-align: left;  color: black; margin: 0; font-weight: 300;}
 h1, h2, h3 { clear: both; margin: 0; padding: 0; }
 h1 { font-size: 18; color: rgb(44, 62, 80); }
 h2 { font-size: 14; color: black; }
-""".replace('\n', ' ').replace('  ', ' ')
+""")
 
 
 class HTMLFormatter:
@@ -390,85 +394,121 @@ class Emailer(DoesLogging):
 # Diff formatting
 # ---------------
 
-DIFF_CSS = DEFAULT_CSS + """
-body {background-color: #F3F3F3; margin: 1em;}
-.header {padding: 5px; margin: 0 5px;}
-.header h1 {color: #165F4B; font-size: 20; text-align: left; margin-left: 20px;}
-.header p {color: #666666; margin-left: 20px; height: 12px;}
-.header p em {color: #4169E1; font-style: normal;}
-.content {padding: 15px; padding-top: 0px; margin: 0;}
-.content h2 {color: #2C3E50; font-size: 16px;}
-.empty { font-size: 14px; font-style: italic;}
-.section {padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px;}
-.section div {margin-left: 10px;}
-.section table {margin-left: 5px;}
-tr:nth-child(even) { background-color: white; }
-tr:nth-child(odd) { background-color: #F5F5F5; }
-tr:nth-child(1) { background-color: #778899; font-weight: 500;}
-th, td {padding: 0.2em 0.5em;}
-th { text-align: left;  color: white; margin: 0;}
-"""
-
-DIFF_TITLE = "Materials Project Database Diff Report"
-
-
-def diff_format_html(result, meta):
-    """Generate HTML report.
+class DiffFormatter(object):
+    """Base class for formatting a 'diff' report.
     """
-    return "<html><head><style>{css}</style><body>{header}{body}</body></html>" \
-        .format(css=DIFF_CSS, header=diff_html_header(meta), body=diff_html_body(result))
+
+    TITLE = "Materials Project Database Diff Report"
+
+    def __init__(self, meta, title=TITLE):
+        """Constructor.
+
+        :param meta: Report metadata, must have the following keys:
+                     - start_time, end_time: string repr of report gen. times
+                     - elapsed: float #sec for end_time - start_time
+                     - db1, db2: string repr of 2 input database/collections.
+        :type meta: dict
+        """
+        self.meta = meta
+
+    def format(self, result):
+        """Format a report from a result object.
+
+        :return: Report body
+        :rtype: str
+        """
+        raise NotImplementedError()
 
 
-def diff_html_header(meta):
-    s = "<div class='header'><h1>{}</h1>".format(DIFF_TITLE)
-    s += "<p>Compared <em>{db1}</em> with <em>{db2}</em></p>"
-    s += "<p>Run time: <em>{start_time}</em> to <em>{end_time}</em> (<em>{elapsed:.1f}</em> sec)</p>"
-    return (s + "</div>").format(**meta)
+class DiffHtmlFormatter(DiffFormatter):
+    """Format an HTML diff report.
+    """
 
+    CSS = DEFAULT_CSS + css_minify("""
+    body {background-color: #F3F3F3; margin: 1em;}
+    .header {padding: 5px; margin: 0 5px;}
+    .header h1 {color: #165F4B; font-size: 20; text-align: left; margin-left: 20px;}
+    .header p {color: #666666; margin-left: 20px; height: 12px;}
+    .header p em {color: #4169E1; font-style: normal;}
+    .content {padding: 15px; padding-top: 0px; margin: 0;}
+    .content h2 {color: #2C3E50; font-size: 16px;}
+    .empty { font-size: 14px; font-style: italic;}
+    .section {padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px;}
+    .section div {margin-left: 10px;}
+    .section table {margin-left: 5px;}
+    tr:nth-child(even) { background-color: white; }
+    tr:nth-child(odd) { background-color: #F5F5F5; }
+    tr:nth-child(1) { background-color: #778899; font-weight: 500;}
+    th, td {padding: 0.2em 0.5em;}
+    th { text-align: left;  color: white; margin: 0;}
+    """)
 
-def diff_html_body(result):
-    body = ["<div class='content'>"]
-    for section in "additional", "missing", "different":
-        body.append("<div class='section'><h2>{}</h2>".format(section.title()))
-        if len(result[section]) == 0:
-            body.append("<div class='empty'>Empty</div>")
-        else:
-            body.extend(diff_html_table(result[section]))
+    def format(self, result):
+        """Generate HTML report.
+
+        :return: Report body
+        :rtype: str
+        """
+        return ("<html><head><style>{css}</style><body>{header}{body}</body></html>"
+                .format(css=self.CSS, header=self._header(),
+                body=self._body(result)))
+
+    def _header(self):
+        s = "<div class='header'><h1>{}</h1>".format(self.TITLE)
+        s += "<p>Compared <em>{db1}</em> with <em>{db2}</em></p>"
+        s += "<p>Run time: <em>{start_time}</em> to <em>{end_time}</em> "
+        s += "(<em>{elapsed:.1f}</em> sec)</p>"
+        return (s + "</div>").format(**self.meta)
+
+    def _body(self, result):
+        body = ["<div class='content'>"]
+        for section in "additional", "missing", "different":
+            body.append("<div class='section'><h2>{}</h2>".format(section.title()))
+            if len(result[section]) == 0:
+                body.append("<div class='empty'>Empty</div>")
+            else:
+                body.extend(self._table(result[section]))
+            body.append("</div>")
         body.append("</div>")
-    body.append("</div>")
-    return ''.join(body)
+        return ''.join(body)
+
+    def _table(self, rows):
+        table = ["<table>"]
+        cols = sorted(rows[0].keys())
+        table.extend(["<tr>"] + ["<th>{}</th>".format(c) for c in cols] + ["</tr>"])
+        for r in rows:
+            table.extend(["<tr>"] + ["<td>{}</td>".format(r[c]) for c in cols] + ["</tr>"])
+        table.append("</table>")
+        return table
 
 
-def diff_html_table(rows):
-    table = ["<table>"]
-    cols = sorted(rows[0].keys())
-    table.extend(["<tr>"] + ["<th>{}</th>".format(c) for c in cols] + ["</tr>"])
-    for r in rows:
-        table.extend(["<tr>"] + ["<td>{}</td>".format(r[c]) for c in cols] + ["</tr>"])
-    table.append("</table>")
-    return table
-
-
-def diff_format_text(result, meta):
-    """Generate plain text report.
+class DiffTextFormatter(DiffFormatter):
+    """Format a plain-text diff report.
     """
-    lines = ['-' * len(DIFF_TITLE),
-             DIFF_TITLE,
-             '-' * len(DIFF_TITLE),
-             "Compared: {db1} <-> {db2}".format(**meta),
-             "Run time: {start_time} -- {end_time} ({elapsed:.1f} sec)".format(**meta),
-             ""]
-    for section in result.keys():
-        lines.append("* " + section.title())
-        indent = " " * 4
-        if len(result[section]) == 0:
-            lines.append("{}EMPTY".format(indent))
-        else:
-            for v in result[section]:
-                lines.append("{}{}".format(indent, _rformat(v)))
-    return '\n'.join(lines)
 
+    def format(self, result):
+        """Generate plain text report.
 
-def _rformat(rec):
-    fields = ['{}: {}'.format(k, v) for k, v in rec.iteritems()]
-    return '{' + ', '.join(fields) + '}'
+        :return: Report body
+        :rtype: str
+        """
+        m = self.meta
+        lines = ['-' * len(self.TITLE),
+                 self.TITLE,
+                 '-' * len(self.TITLE),
+                 "Compared: {db1} <-> {db2}".format(**m),
+                 "Run time: {start_time} -- {end_time} ({elapsed:.1f} sec)".format(**m),
+                 ""]
+        for section in result.keys():
+            lines.append("* " + section.title())
+            indent = " " * 4
+            if len(result[section]) == 0:
+                lines.append("{}EMPTY".format(indent))
+            else:
+                for v in result[section]:
+                    lines.append("{}{}".format(indent, self._record(v)))
+        return '\n'.join(lines)
+
+    def _record(self, rec):
+        fields = ['{}: {}'.format(k, v) for k, v in rec.iteritems()]
+        return '{' + ', '.join(fields) + '}'
