@@ -9,6 +9,14 @@ vv Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`diff` Module
+--------------------
+
+.. automodule:: matgendb.vv.diff
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`report` Module
 --------------------
 

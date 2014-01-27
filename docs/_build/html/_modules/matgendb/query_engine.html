@@ -165,7 +165,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">[</span><span class="n">database</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_collection</span><span class="p">(</span><span class="n">collection</span><span class="o">=</span><span class="n">collection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_aliases_and_defaults</span><span class="p">(</span><span class="n">aliases_config</span><span class="o">=</span><span class="n">aliases_config</span><span class="p">,</span>
+                                      <span class="n">default_properties</span><span class="o">=</span><span class="n">default_properties</span><span class="p">)</span>
+
+<div class="viewcode-block" id="QueryEngine.set_collection"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.set_collection">[docs]</a>    <span class="k">def</span> <span class="nf">set_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Switch to another collection. Note that you may have to set the</span>
+<span class="sd">        aliases and default properties via set_aliases_and_defaults if the</span>
+<span class="sd">        schema of the new collection differs from the current collection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            collection:</span>
+<span class="sd">                Name of collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="QueryEngine.set_aliases_and_defaults"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.set_aliases_and_defaults">[docs]</a>    <span class="k">def</span> <span class="nf">set_aliases_and_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aliases_config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                 <span class="n">default_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the alias config and defaults to use. Typically used when</span>
+<span class="sd">        switching to a collection with a different schema.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            aliases_config:</span>
+<span class="sd">                An alias dict to use. Defaults to None, which means the default</span>
+<span class="sd">                aliases defined in &quot;aliases.json&quot; is used. See constructor</span>
+<span class="sd">                for format.</span>
+<span class="sd">            default_properties:</span>
+<span class="sd">                List of property names (strings) to use by default, if no</span>
+<span class="sd">                properties are given to the &#39;properties&#39; argument of</span>
+<span class="sd">                query().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">aliases_config</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span>
                                    <span class="s">&quot;aliases.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -181,7 +212,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_default_props</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_prop_dict</span> <span class="o">=</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">_parse_properties</span><span class="p">(</span><span class="n">default_properties</span><span class="p">)</span>
-
+</div>
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Allows for use with the &#39;with&#39; context manager&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span>
@@ -437,7 +468,7 @@
                                               <span class="bp">self</span><span class="o">.</span><span class="n">database_name</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="QueryEngine.from_config"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.from_config">[docs]</a>    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+<div class="viewcode-block" id="QueryEngine.from_config"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.from_config">[docs]</a>    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">use_admin</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a QueryEngine from a JSON config file generated using mgdb</span>
 <span class="sd">        init.</span>
@@ -445,19 +476,31 @@
 <span class="sd">        Args:</span>
 <span class="sd">            config_file:</span>
 <span class="sd">                Filename of config file.</span>
+<span class="sd">            use_admin:</span>
+<span class="sd">                If True, the admin user and password in the config file is</span>
+<span class="sd">                used. Otherwise, the readonly_user and password is used.</span>
+<span class="sd">                Defaults to False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            QueryEngine</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;admin_user&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">use_admin</span> <span class="k">else</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;readonly_user&quot;</span><span class="p">]</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;admin_password&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">use_admin</span> \
+                <span class="k">else</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;readonly_password&quot;</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">QueryEngine</span><span class="p">(</span>
                 <span class="n">host</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;host&quot;</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;port&quot;</span><span class="p">],</span> <span class="n">database</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;database&quot;</span><span class="p">],</span>
-                <span class="n">user</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;readonly_user&quot;</span><span class="p">],</span> <span class="n">password</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;readonly_password&quot;</span><span class="p">],</span>
-                <span class="n">collection</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;collection&quot;</span><span class="p">],</span>
+                <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;collection&quot;</span><span class="p">],</span>
                 <span class="n">aliases_config</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;aliases_config&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Support pymongo.Database syntax db[&#39;collection&#39;] to access collections.</span>
+<span class="sd">        Simply delegate this to the pymongo.Database instance, so behavior is the same.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 
-</div></div>
+</div>
 <div class="viewcode-block" id="QueryResults"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryResults">[docs]</a><span class="k">class</span> <span class="nc">QueryResults</span><span class="p">(</span><span class="n">Iterable</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Iterable wrapper for results from QueryEngine.</span>
@@ -516,20 +559,9 @@
 </div>
 <div class="viewcode-block" id="QueryError"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryError">[docs]</a><span class="k">class</span> <span class="nc">QueryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Exception class for QueryEngine. Allows more information exception messages</span>
-<span class="sd">    to cover situations not covered by standard exception classes.</span>
+<span class="sd">    Exception class for errors occuring during queries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            msg:</span>
-<span class="sd">                Message for the error.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
-
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;Query Error : &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span></div>
+    <span class="k">pass</span></div>
 </pre></div>
 
           </div>
@@ -570,7 +602,7 @@
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

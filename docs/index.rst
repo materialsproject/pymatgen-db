@@ -12,16 +12,17 @@ Pymatgen-db also provides a clean and intuitive web ui (the
 originates for the purpose of exploring collections generated using
 pymatgen-db, it can be used to explore any Mongo database and collection.
 
-Tools:
-
-.. toctree::
-    :maxdepth: 1
-
-    Validation tools <validation>
-    Database builders <mgbuild>
-
 Change Log
 ==========
+
+Version 0.3.7
+-------------
+
+#. New package maintainer, Dan Gunter <dkgunter@lbl.gov>
+#. Added new `builders` package, ported from Materials Project, and cleaned up and simplified to allow pluggable construction of MongoDB databases either from existing MongoDB collections or external files.
+#. Added `vv.diff` package and associated `mgvv diff` subcommand, for taking the difference of two arbitrary MongoDB collections.
+#. Some cleanup and simplification of config files. `user` and `password` are accepted as aliases for `readonly_user` and `readonly_password`.
+
 
 Version 0.3.4
 -------------
@@ -103,6 +104,16 @@ the features in pymatgen-db, including db initialization, insertion of data,
 running the materials genomics ui, etc. To see all options available, type::
 
     mgdb --help
+
+Validation and derived-database creation each use their own scripts, which
+are called mgvv and mgbuild respectively. Follow the links below for more
+details on how to use and extend these programs:
+
+.. toctree::
+    :maxdepth: 1
+
+    Database validation (mgvv) <mgvv>
+    Database and sandbox creation (mgbuild) <mgbuild>
 
 Initial setup
 -------------
