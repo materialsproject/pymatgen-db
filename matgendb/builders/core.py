@@ -366,6 +366,10 @@ class Builder(object):
                     break
                 n = i + 1
             self._queue.put(item)
+        # process final chunk
+        self._run_parallel_fn()
+        if not self._status.has_failures():
+            n = len(items)
         return n
 
     def _run_parallel_threaded(self):
