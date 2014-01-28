@@ -22,7 +22,7 @@ setup(
     version="0.3.7",
     install_requires=["pymatgen>=2.8.8", "monty>=0.1.0",
                       "pymongo>=2.4", "prettytable>=0.7",
-                      "django>=1.5"],
+                      "django>=1.5", "mongomock>=1.2.0"],
     package_data={"matgendb": ["*.json"],
                   "matgendb.webui.home": ["templates/*"],
                   "matgendb.webui": static_data},

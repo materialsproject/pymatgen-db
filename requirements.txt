@@ -3,3 +3,4 @@ monty>=0.1.0
 pymongo>=2.4
 prettytable>=0.7
 django>=1.5
+mongomock>=1.2.0
