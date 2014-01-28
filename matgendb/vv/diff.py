@@ -19,8 +19,11 @@ class Differ(object):
     all the keys in memory in order to do a "set difference" using Python sets.
     """
 
-    # Keys in result dictionary.
+    #: Keys in result dictionary.
     MISSING, NEW, CHANGED = 'missing', 'additional', 'different'
+
+    #: for missing property
+    NO_PROPERTY = "__MISSING__"
 
     def __init__(self, key='_id', props=None, info=None, fltr=None):
         """Constructor.
@@ -69,7 +72,9 @@ class Differ(object):
         t0 = time.time()
         for i, coll in enumerate(collections):
             _log.debug("collection {:d}".format(i))
+            count, missing_props = 0, 0
             for rec in coll.find(self._filter, fields=fields):
+                count += 1
                 key = rec[self._key]
                 if not allow_dup and key in keys[i]:
                     raise ValueError("Duplicate key: {}".format(key))
@@ -81,10 +86,21 @@ class Differ(object):
                     return {}
                 if has_props:
                     # Extract properties, and index by key.
-                    propval = tuple([(p, str(rec[p])) for p in self._props])
+                    try:
+                        propval = tuple([(p, str(rec[p])) for p in self._props])
+                    except KeyError:
+                        missing_props += 1
+                        continue
                     props[i][key] = propval
                 if i == 0 and has_info:
                     data[key] = rec
+            if missing_props == count:
+                _log.critical("Missing one or more properties on all {:d} records"
+                        .format(count))
+                return {}
+            elif missing_props > 0:
+                _log.warn("Missing one or more properties for {:d}/{:d} records"
+                        .format(missing_props, count))
         t1 = time.time()
         _log.info("query.end sec={:f}".format(t1 - t0))
 
