@@ -1,0 +1,13 @@
+#!/bin/bash
+######################################################
+# Run mgbuild.py in same directory
+# using the libtbx.python that should be installed
+# in order for cctbx to work. See README.builders for more
+# details.
+#
+# Author: Dan Gunter <dkgunter@lbl.gov>
+# Created: 31 May 2013
+#
+######################################################
+ABSPATH=$(cd "$(dirname $0)"; pwd)
+libtbx.python ${ABSPATH}/mgbuild.py $*
