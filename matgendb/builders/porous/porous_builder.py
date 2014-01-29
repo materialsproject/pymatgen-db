@@ -51,6 +51,9 @@ class PorousMaterialsBuilder(Builder):
         item = self._reformat(item)
         self._tgt.collection.insert(item)
 
+    def finalize(self, errs):
+        return True
+
     def _parsedt(self, s):
         return datetime.datetime.strptime(s[:s.find('.')], "%Y-%m-%d %H:%M:%S")
 

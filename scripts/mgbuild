@@ -126,6 +126,9 @@ def command_list(args):
     """
     # Load parent module.
     module = load_module(args.mod_path)
+    if module is None:
+        print("Error loading module {}. Abort.".format(args.mod_path))
+        return 0
     # Get all Python modules in directory.
     path = os.path.dirname(module.__file__)
     pyfiles = [f for f in os.listdir(path) if f.endswith('.py') and not f.startswith('__')]
@@ -147,7 +150,7 @@ def _show_builder(b):
     """
     indent = " " * 4
     modname = b.__module__.split(".")[-1]
-    print("{i}Module: {m}".format(i=indent, m=modname))
+    print("\n{m}".format(m=modname))
     print("{i}{name}: {desc}".format(i=indent, name=b.__name__, desc=b.__doc__.strip()))
     params = {}
     setup_doc = b.setup.__doc__.split("\n")
@@ -186,42 +189,40 @@ def command_build(args):
         try:
             key, value = kwd.split('=', 1)
         except ValueError:
-            raise ValueError("Bad key=value pair: {}".format(kwd))
+            raise ConfigurationError("for builder '{}'".format(args.builder),
+                                     "Bad key=value pair: {}".format(kwd))
         args_kw[key] = value
 
-    # Get database settings and connect.
-    _log.info("load DB configuration from '{}'".format(args.config_file))
-    db_settings = get_settings(args.config_file)
-    builder_db_settings = db_settings.copy()  # keep orig. settings for builder_class.__init__()
-
-    # Normalize user/password from readonly and admin prefixes.
-    for pfx in 'readonly', 'admin':  # in reverse order of priority, to overwrite
-        if (pfx + '_user') in db_settings and (pfx + '_password') in db_settings:
-            builder_db_settings['user'] = builder_db_settings[pfx + '_user']
-            builder_db_settings['password'] = builder_db_settings[pfx + '_password']
-            del builder_db_settings[pfx + '_user']
-            del builder_db_settings[pfx + '_password']
+    # Get default database settings, if given.
 
     # Parse builder's setup() method docstring.
     _log.debug("parse builder docstring")
     params, returnval = core.parse_fn_docstring(builder_class.setup)
     for name, info in params.iteritems():
+        if not 'type' in info:
+            raise ConfigurationError("for builder '{}'".format(args.builder),
+                                     "Missing ':type {}: <type>' in docstring".format(name))
         try:
             value = args_kw[name]
         except KeyError:
-            raise ValueError("Key '{}' not found in {}.setup()"
-            .format(name, full_mod_path))
-            # take special action for some types
+            if is_mqe(info['type']):
+                value = name  # for collection foo, default to 'foo.json' config
+            else:
+                raise ConfigurationError("for builder '{}'".format(args.builder),
+                                         "Missing value for parameter '{}' in {}".format(name, full_mod_path))
+        # take special action for some types
         if is_mqe(info['type']):  # QueryEngine
-            # connect to DB as configured
-            builder_db_settings['collection'] = value
+            # configure new DB connection
+            config_file = os.path.join(args.config_path, value + ".json")
+            _log.info("load DB configuration for '{}' from '{}'".format(name, config_file))
+            db_settings = get_settings(config_file)
             # replace value with MQE obj
             try:
-                args_kw[name] = QueryEngine(**builder_db_settings)
+                args_kw[name] = QueryEngine(**db_settings)
             except pymongo.errors.ConnectionFailure as err:
                 raise BuilderError("Cannot connect from settings in '{}': {}"
-                .format(args.config_file, err))
-            _log.info("Configured query engine {}: {}".format(name, builder_db_settings))
+                                   .format(args.config_file, err))
+            _log.debug("Configured query engine {}: {}".format(name, db_settings))
 
     # Run builder.
     _log.info("run builder")
@@ -245,19 +246,20 @@ def tell_user(message):
     print(message)
 
 
-def get_settings(config_file):
+def get_settings(config_file, allow_default=True):
     """Read settings from a configuration file.
     """
     try:
         if config_file:
-            return json.load(open(config_file))
-        elif os.path.exists(DEFAULT_CONFIG_FILE):
-            return json.load(open(DEFAULT_CONFIG_FILE))
+            cfg = json.load(open(config_file))
+        elif allow_default and os.path.exists(DEFAULT_CONFIG_FILE):
+            cfg = json.load(open(DEFAULT_CONFIG_FILE))
         else:
             raise ValueError("Default configuration '{}' not found".format(DEFAULT_CONFIG_FILE))
     except Exception, err:
         raise ConfigurationError(config_file, err)
-
+    normalize_userpass(cfg)
+    return cfg
 
 def is_mqe(type_name):
     """Whether this type name is a QueryEngine.
@@ -268,6 +270,7 @@ def is_mqe(type_name):
 def load_module(module):
     """Extend imp to handle dotted module paths.
     """
+    _log.debug("Loading module: {}".format(module))
     parts = module.split('.')
     path, m = None, None
     # navigate packages
@@ -278,7 +281,12 @@ def load_module(module):
     # load module
     p = parts[-1]
     loc = imp.find_module(p, path)
-    return imp.load_module(p, *loc)
+    try:
+        mod = imp.load_module(p, *loc)
+    except (ValueError, ImportError) as err:
+        _log.warn("Skipping module {} on error: {}".format(module, err))
+        mod = None
+    return mod
 
 
 def get_builder(module):
@@ -299,6 +307,18 @@ def get_builder(module):
     return result
 
 
+def normalize_userpass(cfg):
+    """In DB conn. config, normalize user/password from readonly and admin prefixes.
+    In the end, there will be only keys 'user' and 'password'.
+    """
+    for pfx in 'readonly', 'admin':  # in reverse order of priority, to overwrite
+        if (pfx + '_user') in cfg and (pfx + '_password') in cfg:
+            cfg['user'] = cfg[pfx + '_user']
+            cfg['password'] = cfg[pfx + '_password']
+            del cfg[pfx + '_user']
+            del cfg[pfx + '_password']
+
+
 # Main program
 # ------------
 
@@ -307,6 +327,8 @@ def main():
 
     # Configure parent parser for shared args.
     parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('--quiet', '-q', dest='quiet', action="store_true", default=False,
+                               help="Minimal verbosity.")
     parent_parser.add_argument('--verbose', '-v', dest='vb', action="count", default=0,
                                help="Print more verbose messages to standard error. Repeatable. (default=ERROR)")
     # Set up argument parsing.
@@ -343,10 +365,13 @@ def main():
     subp.set_defaults(func=command_build)
     subp.add_argument("-b", "--builder", dest="builder", type=str, metavar="NAME", default="",
                       help="Run builder NAME, which is relative to the module path in -m/--module")
-    subp.add_argument("-c", "--config", dest="config_file", type=str, metavar='FILE', default="db.json",
-                      help="Configure database connection from FILE (%(default)s)")
+    subp.add_argument("-C", "--config-path", dest="config_path", type=str, metavar='DIR', default=".",
+                      help="Configure database connection from .json files in DIR (default=%(default)s)")
     subp.add_argument("-k", "--kvp", dest="keywords", action="append", default=[],
-                      help="Key/value pairs, in format <key>=<value>, passed to builder function")
+                      help="Key/value pairs, in format <key>=<value>, passed to builder function. "
+                           "For QueryEngine arguments, the value should be the name of a DB configuration file, "
+                           "relative to the path given by -C/--config-path, without the '.json' suffix; if not given, "
+                           "a configuration file '<key>.json' will be assumed.")
     subp.add_argument("-m", "--module", dest="mod_path", type=str, metavar="MODULE",
                       default="matgendb.builders",
                       help="Find builder modules under MODULE (default=matgendb.builders)")
@@ -363,12 +388,15 @@ def main():
     hndlr = logging.StreamHandler()
     hndlr.setFormatter(logging.Formatter("[%(levelname)-6s] %(asctime)s %(name)s :: %(message)s"))
     _log.addHandler(hndlr)
-    if args.vb > 1:
-        lvl = logging.DEBUG
-    elif args.vb > 0:
-        lvl = logging.INFO
+    if args.quiet:
+        lvl = logging.CRITICAL
     else:
-        lvl = logging.WARN
+        if args.vb > 1:
+            lvl = logging.DEBUG
+        elif args.vb > 0:
+            lvl = logging.INFO
+        else:
+            lvl = logging.WARN
     _log.setLevel(lvl)
     _log = logging.getLogger("mg.build")
     # don't send logs up

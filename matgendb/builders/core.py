@@ -323,19 +323,34 @@ class Builder(object):
         """
         return 0
 
+    @abstractmethod
+    def finalize(self, had_errors):
+        """Perform any cleanup actions after all items have been processed.
+
+        :param had_errors: True if the run itself had errors.
+        :type had_errors: bool
+        :return: True if nothing went wrong, else False
+        """
+        return True
+
     # -----------------------------
 
     def run(self, setup_kw=None, build_kw=None):
         """Run the builder.
 
-        :param setup_kw dict: keywords to pass to `setup()` method
-        :param build_kw dict: keywords to pass to `_build()` method
+        :param setup_kw: keywords to pass to `setup()` method
+        :type setup_kw: dict
+        :param build_kw: keywords to pass to `_build()` method
+        :type build_kw: dict
         :return: Number of items processed
         :rtype: int
         """
         setup_kw = {} if setup_kw is None else setup_kw
         build_kw = {} if build_kw is None else build_kw
         n = self._build(self.setup(**setup_kw), **build_kw)
+        finalized = self.finalize(self._status.has_failures())
+        if not finalized:
+            _log.error("Finalization failed")
         return n
 
     def connect(self, config):
