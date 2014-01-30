@@ -17,14 +17,15 @@ __date__ = "Mar 2 2013"
 
 import json
 import itertools
+import logging
 import os
 from collections import OrderedDict, Iterable
-
 from pymongo import MongoClient
-
 from pymatgen import Structure, Composition
 from pymatgen.entries.computed_entries import ComputedEntry,\
     ComputedStructureEntry
+
+_log = logging.getLogger('mg.' + __name__)
 
 
 class QueryEngine(object):
@@ -46,6 +47,15 @@ class QueryEngine(object):
     QueryEngine.query(properties=["a.b"], you will obtain a result that can be
     accessed simply as doc["a.b"].
     """
+
+    # avoid hard-coding these in other places
+    ALIASES_CONFIG_KEY = 'aliases_config'
+    COLLECTION_KEY = 'collection'
+    HOST_KEY = 'host'
+    PORT_KEY = 'port'
+    DB_KEY = 'database'
+    USER_KEY = 'user'
+    PASSWORD_KEY = 'password'
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
@@ -292,7 +302,12 @@ class QueryEngine(object):
                 parsed_crit[self.aliases.get(key, key)] = crit
         return parsed_crit
 
-    def query(self, properties=None, criteria=None, index=0, limit=None):
+    def ensure_index(self, key, unique=False):
+        """Wrapper for pymongo.Collection.ensure_index
+        """
+        return self.collection.ensure_index(key, unique=unique)
+
+    def query(self, properties=None, criteria=None, index=0, limit=None, distinct_key=None):
         """
         Convenience method for database access.  All properties and criteria
         can be specified using simplified names defined in Aliases.  You can
@@ -314,24 +329,16 @@ class QueryEngine(object):
         returned as r['analysis'] and then the subkeys can be accessed in the
         usual form, i.e., r['analysis']['e_above_hull']
 
-        Args:
-            properties:
-                Properties to query for. Defaults to None which means all
-                supported properties.
-            criteria:
-                Criteria to query for as a dict.
-            index:
-                Similar definition to pymongo.collection.find method.
-            limit:
-                Similar definition to pymongo.collection.find method.
-
-        Returns:
-            An QueryResults Iterable, which is somewhat like pymongo's
+        :param properties: Properties to query for. Defaults to None which means all supported properties.
+        :param criteria: Criteria to query for as a dict.
+        :parm index: Similar definition to pymongo.collection.find method.
+        :param limit: Similar definition to pymongo.collection.find method.
+        :param distinct_key: If not None, the key for which to get distinct results
+        :return: A QueryResults Iterable, which is somewhat like pymongo's
             cursor except that it performs mapping. In general, the dev does
             not need to concern himself with the form. It is sufficient to know
             that the results are in the form of an iterable of dicts.
         """
-
         if properties is not None:
             props, prop_dict = self._parse_properties(properties)
         else:
@@ -340,6 +347,8 @@ class QueryEngine(object):
         crit = self._parse_criteria(criteria) if criteria is not None else {}
         cur = self.collection.find(crit, fields=props,
                                    timeout=False).skip(index)
+        if distinct_key is not None:
+            cur = cur.distinct(distinct_key)
         if limit is None:
             return QueryResults(prop_dict, cur)
         else:
@@ -362,25 +371,10 @@ class QueryEngine(object):
                 prop_dict[p] = p.split(".")
         return props, prop_dict
 
-    def query_one(self, properties=None, criteria=None, index=0):
+    def query_one(self, *args, **kwargs):
+        """Return first document from :meth:`query`, with same parameters.
         """
-        Just like query, but return a single doc.
-
-        Args:
-            properties:
-                Properties to query for. Defaults to None which means all
-                supported properties.
-            criteria:
-                Criteria to query for as a dict.
-            index:
-                Similar definition to pymongo.collection.find method.
-
-        Returns:
-            A single dict containing the result.
-        """
-
-        for r in self.query(properties=properties, criteria=criteria,
-                            index=index, limit=1):
+        for r in self.query(*args, **kwargs):
             return r
         return None
 

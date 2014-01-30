@@ -217,6 +217,7 @@ def command_build(args):
             _log.info("load DB configuration for '{}' from '{}'".format(name, config_file))
             db_settings = get_settings(config_file)
             # replace value with MQE obj
+            _log.debug("QueryEngine.create settings={}".format(db_settings))
             try:
                 args_kw[name] = QueryEngine(**db_settings)
             except pymongo.errors.ConnectionFailure as err:
@@ -259,7 +260,9 @@ def get_settings(config_file, allow_default=True):
     except Exception, err:
         raise ConfigurationError(config_file, err)
     normalize_userpass(cfg)
+    normalize_aliases(cfg)
     return cfg
+
 
 def is_mqe(type_name):
     """Whether this type name is a QueryEngine.
@@ -313,11 +316,29 @@ def normalize_userpass(cfg):
     """
     for pfx in 'readonly', 'admin':  # in reverse order of priority, to overwrite
         if (pfx + '_user') in cfg and (pfx + '_password') in cfg:
-            cfg['user'] = cfg[pfx + '_user']
-            cfg['password'] = cfg[pfx + '_password']
+            cfg[QueryEngine.USER_KEY] = cfg[pfx + '_user']
+            cfg[QueryEngine.PASSWORD_KEY] = cfg[pfx + '_password']
             del cfg[pfx + '_user']
             del cfg[pfx + '_password']
 
+
+def normalize_aliases(cfg):
+    """Normalize the 'aliases_config' used by the QueryEngine class.
+    If the user sets something, leave it alone.
+    But if there is nothing, use the name of the collection to decide whether
+    to let the QueryEngine use its defaults or empty it out.
+
+    :param cfg: Configuration read from JSON
+    :type cfg: dict
+    :return: None (cfg is modified in-place)
+    """
+    if QueryEngine.ALIASES_CONFIG_KEY in cfg:
+        return  # explicitly set by user, so do nothing
+    if cfg[QueryEngine.COLLECTION_KEY] in ('materials',):
+        pass  # let the defaults for QueryEngine proceed
+    else:
+        # explicitly put empty aliases, to override QueryEngine defaults
+        cfg[QueryEngine.ALIASES_CONFIG_KEY] = {'aliases':{}, 'defaults':{}}
 
 # Main program
 # ------------
