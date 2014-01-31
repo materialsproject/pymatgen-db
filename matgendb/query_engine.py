@@ -347,12 +347,12 @@ class QueryEngine(object):
         crit = self._parse_criteria(criteria) if criteria is not None else {}
         cur = self.collection.find(crit, fields=props,
                                    timeout=False).skip(index)
+        if limit is not None:
+            cur.limit(limit)
         if distinct_key is not None:
             cur = cur.distinct(distinct_key)
-        if limit is None:
-            return QueryResults(prop_dict, cur)
+            return QueryListResults(prop_dict, cur)
         else:
-            cur.limit(limit)
             return QueryResults(prop_dict, cur)
 
     def _parse_properties(self, properties):
@@ -492,6 +492,17 @@ class QueryResults(Iterable):
     def _result_generator(self):
         for r in self._results:
             yield self._mapped_result(r)
+
+
+class QueryListResults(QueryResults):
+    """Set of QueryResults on a list instead of a MongoDB cursor.
+    """
+
+    def clone(self):
+        return QueryResults(self._prop_dict, self._results[:])
+
+    def __len__(self):
+        return len(self._results)
 
 
 class QueryError(Exception):
