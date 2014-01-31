@@ -208,8 +208,12 @@ def command_build(args):
             if is_mqe(info['type']):
                 value = name  # for collection foo, default to 'foo.json' config
             else:
-                raise ConfigurationError("for builder '{}'".format(args.builder),
-                                         "Missing value for parameter '{}' in {}".format(name, full_mod_path))
+                if '(optional)' in info['desc']:
+                    _log.info("Use default value for parameter '{}'".format(name))
+                    continue
+                else:
+                    raise ConfigurationError("for builder '{}'".format(args.builder),
+                                             "Missing value for parameter '{}' in {}".format(name, full_mod_path))
         # take special action for some types
         if is_mqe(info['type']):  # QueryEngine
             # configure new DB connection
@@ -222,7 +226,7 @@ def command_build(args):
                 args_kw[name] = QueryEngine(**db_settings)
             except pymongo.errors.ConnectionFailure as err:
                 raise BuilderError("Cannot connect from settings in '{}': {}"
-                                   .format(args.config_file, err))
+                                   .format(config_file, err))
             _log.debug("Configured query engine {}: {}".format(name, db_settings))
 
     # Run builder.
@@ -334,11 +338,11 @@ def normalize_aliases(cfg):
     """
     if QueryEngine.ALIASES_CONFIG_KEY in cfg:
         return  # explicitly set by user, so do nothing
-    if cfg[QueryEngine.COLLECTION_KEY] in ('materials',):
+    if cfg[QueryEngine.COLLECTION_KEY] in ('materials', 'tasks'):
         pass  # let the defaults for QueryEngine proceed
     else:
         # explicitly put empty aliases, to override QueryEngine defaults
-        cfg[QueryEngine.ALIASES_CONFIG_KEY] = {'aliases':{}, 'defaults':{}}
+        cfg[QueryEngine.ALIASES_CONFIG_KEY] = {'aliases': {}, 'defaults': {}}
 
 # Main program
 # ------------

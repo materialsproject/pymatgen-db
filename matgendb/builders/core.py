@@ -323,9 +323,9 @@ class Builder(object):
         """
         return 0
 
-    @abstractmethod
     def finalize(self, had_errors):
         """Perform any cleanup actions after all items have been processed.
+        Subclasses may choose not to implement this, in which case it is a no-op.
 
         :param had_errors: True if the run itself had errors.
         :type had_errors: bool
@@ -374,7 +374,7 @@ class Builder(object):
         :return: Number of items processed
         :rtype: int
         """
-        n = 0
+        n, i = 0, 0
         for i, item in enumerate(items):
             if 0 == (i+1) % chunk_size:
                 self._run_parallel_fn()  # process the chunk
@@ -383,10 +383,9 @@ class Builder(object):
                 n = i + 1
             self._queue.put(item)
         # process final chunk
-        final_n = self._queue.qsize()
         self._run_parallel_fn()
         if not self._status.has_failures():
-            n += final_n
+            n = i + 1
         return n
 
     def _run_parallel_threaded(self):
