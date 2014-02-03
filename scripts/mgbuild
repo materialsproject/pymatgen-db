@@ -1,12 +1,14 @@
 """
 Run derived collection builder.
 
-This should be run from the "mgbuild" shell script in this directory.
-See mgbuild and README-builders.md for details.
-
 See the -h option for details on the options.
-Can run in two modes, 'merge' for building sandbox+core task collections,
-and 'vasp' for building the derived collections.
+
+Subcommands:
+
+* merge - Merge two collections, e.g., a "sandbox" and core DB.
+* list - List builder commands.
+* build - Run a builder command.
+
 """
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '5/22/13'
@@ -69,13 +71,15 @@ def command_merge(args):
     """
     # Check args.
     if not args.sandbox_file:
-        raise ConfigurationError("In sandbox mode, -s/--sandbox is required")
+        raise ConfigurationError("sandbox filename",
+                                 "In sandbox mode, -s/--sandbox is required")
 
     # Connect to "core" collections.
     try:
         settings = get_settings(args.config_file)
     except ConfigurationError, err:
-        p.error(str(err))
+        _log.error("command_merge.configuration")
+        raise
     core_db = QueryEngine(**settings)
     if hasattr(args, 'merged_tasks') and args.merged_tasks:
         suffix = MERGED_SUFFIX
@@ -193,7 +197,7 @@ def command_build(args):
                                      "Bad key=value pair: {}".format(kwd))
         args_kw[key] = value
 
-    # Get default database settings, if given.
+    db_settings = {}
 
     # Parse builder's setup() method docstring.
     _log.debug("parse builder docstring")
@@ -247,7 +251,8 @@ def command_build(args):
 
 
 def tell_user(message):
-    "Flexible way to control output for the user."
+    """Print something to the user.
+    """
     print(message)
 
 
@@ -346,6 +351,7 @@ def normalize_aliases(cfg):
 
 # Main program
 # ------------
+
 
 def main():
     global _log
