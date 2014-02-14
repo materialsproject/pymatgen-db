@@ -159,7 +159,7 @@ def command_diff(args):
     """Sub-command to calculate the difference of 2 collections.
     """
     # Parse info arg.
-    info = []
+    info, props = [], []
     if args.info is not None:
         info = [s.strip() for s in args.info.split(',')]
     if args.props is not None:
