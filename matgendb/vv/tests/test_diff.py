@@ -38,13 +38,17 @@ class MyTestCase(unittest.TestCase):
 
     def setUp(self):
         self.collections, self.engines = ['diff1', 'diff2'], []
+        self.colors = [[None, None] for i in xrange(self.NUM_RECORDS)]
         for c in self.collections:
             # Create mock query engine.
             self.engines.append(MockQueryEngine(collection=c, **db_config))
-        for engine in self.engines:
+        for ei, engine in enumerate(self.engines):
             engine.collection.remove({})
             for i in xrange(self.NUM_RECORDS):
-                engine.collection.insert(create_record(i))
+                rec = create_record(i)
+                engine.collection.insert(rec)
+                # save color for easy double-checking
+                self.colors[i][ei] = rec['color']
 
     def test_key_same(self):
         """Keys only and all keys are the same.
@@ -79,6 +83,17 @@ class MyTestCase(unittest.TestCase):
         d = df.diff(*self.engines)
         # Check results.
         self.assertEqual(len(d[Differ.CHANGED]), 0)
+
+    def test_props_same(self):
+        """Keys and props, some props different.
+        """
+        # Perform diff.
+        df = Differ(key='name', props=['color'])
+        d = df.diff(*self.engines)
+        # Calculate expected results.
+        changed = sum((int(c[0] != c[1]) for c in self.colors))
+        # Check results.
+        self.assertEqual(len(d[Differ.CHANGED]), changed)
 
 if __name__ == '__main__':
     unittest.main()
