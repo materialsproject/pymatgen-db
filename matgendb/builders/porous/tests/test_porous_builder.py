@@ -8,7 +8,7 @@ __date__ = '10/29/13'
 import logging
 import unittest
 
-from matgendb.builders.tests.common import MockQueryEngine
+from matgendb.tests.common import MockQueryEngine
 from matgendb.builders.porous import porous_builder as pb
 
 

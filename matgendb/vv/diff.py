@@ -7,6 +7,7 @@ __date__ = '3/29/13'
 import logging
 import time
 from matgendb import util
+from matgendb.query_engine import QueryEngine
 
 _log = logging.getLogger("mg.vv.diff")
 
@@ -45,8 +46,10 @@ class Differ(object):
 
         Note: this is not 'big data'-ready; we assume all the records can fit in memory.
 
-        :param c1: Collection (1) config file
-        :param c2: Collection (2) config file
+        :param c1: Collection (1) config file, or QueryEngine object
+        :type c1: str or QueryEngine
+        :param c2: Collection (2) config file, or QueryEngine object
+        :type c2: str or QueryEngine
         :param only_missing: Only find and return self.MISSING; ignore 'new' keys
         :param allow_dup: Allow duplicate keys, otherwise fail with ValueError
         :return: dict with keys self.MISSING, self.NEW (unless only_missing is True), & self.CHANGED,
@@ -58,7 +61,11 @@ class Differ(object):
         """
         # Connect.
         _log.info("connect.start")
-        collections = map(util.get_collection, (c1, c2))
+        if isinstance(c1, QueryEngine):
+            # assume
+            collections = [c.collection for c in c1, c2]
+        else:
+            collections = map(util.get_collection, (c1, c2))
         _log.info("connect.end")
 
         # Query DB.
