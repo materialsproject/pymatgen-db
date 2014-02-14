@@ -236,53 +236,10 @@ Note that this only applies to constraints that use the 'size' family of array o
 
 .. _constraint-syntax:
 
-constraint syntax
+Constraint syntax
 -----------------
 
-The general syntax of a constraint is three whitespace-separated tokens: `field.name operator value`.
-
-field.name
-    This is a path to the field in a document, using the MongoDB convention of using the "." character
-    to indicate hierarchy. For example, in the following document the field containing the names of
-    some famous jazz saxophonists would be named `musicians.jazz.sax`::
-
-        { 'musicians' :
-            { 'jazz' :
-                { 'sax' :
-                   [ "John Coltrane", "Charlie Parker", "Coleman Hawkins" ]
-                }
-            }
-        }
-
-operator
-    The following operators are supported:
-
-    - `<`, `<=`, `>`, `>=`, `=`, `!=`: Constrain numeric values, with their usual meanings. The '=' and '!=' operators can also test the value of string or boolean values.
-    - `exists`: Is the field present (true) or not present (false) in the document
-    - `size`: Match the size (integer) of the array. This operator also takes a one-character suffix:
-        - `size<`: size is less than the (integer) value
-        - `size>`: size is greater than the (integer) value
-        - `size$`: size is equal to the value of the variable named by the (string) value
-    - `type`: the datatype of the field must match the given value, which can be either "number" or "string".
-
-value
-    The value can be numeric (integer or floating-point), a string, an identifier, or boolean value.
-    An identifier is a restricted class of string that starts with a letter, has no spaces, and has only
-    letters, digits, underscores and dots. All other strings must be quoted with single or double quotes.
-    Boolean values are either `true` or `false` (case-insensitive, so TRUE would
-    also work).
-
-Below are some example constraints::
-
-    weight < 200
-    prefs.color = 'puce'
-    prefs.food.dessert exists true       # must be present
-    prefs.food.salted_fish exists false  # must not be present
-    my.array size 0                      # array is present, but empty
-    your.array size> 1                   # array must have more than one element
-    their.array size$ foo.bar            # array size must be the same as value of foo.bar element
-    weight type number                   # weight must be a number
-    prefs.food.dessert type string       # must be a string
+The constraint syntax is taken from the "smoqe" package. See http://pythonhosted.org/smoqe/ .
 
 .. _mgvv diff:
 
@@ -308,7 +265,7 @@ Two positional arguments are required, to set the two collections.
 These are called the 'old' and 'new' collections, and both
 are configured using a pymatgen-db JSON config file.
 
-For an unauthenticated database, they only need 3 keys::
+For an unauthenticated database, we only need 3 keys::
 
     {
         "host" : "myhost",
@@ -376,6 +333,11 @@ Only report keys that are in the 'old' collection, but not in the 'new' collecti
 .. option:: -p PROPS, --prop PROPS
 
 Fields with properties that must match, as comma-separated list , e.g '``these_must,match``'.
+
+.. option:: -q EXPR, --query EXPR
+
+Query to filter records before diff. Uses simplified constraint syntax, from smoqe package, e.g.,
+'name = "oscar" and grouchiness > 3'
 
 .. _mgvv diff examples:
 

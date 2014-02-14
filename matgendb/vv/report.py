@@ -441,6 +441,7 @@ class DiffHtmlFormatter(DiffFormatter):
     tr:nth-child(1) { background-color: #778899; font-weight: 500;}
     th, td {padding: 0.2em 0.5em;}
     th { text-align: left;  color: white; margin: 0;}
+    .fixed { font-family: Consolas, monaco, monospace; }
     """)
 
     def format(self, result):
@@ -456,6 +457,7 @@ class DiffHtmlFormatter(DiffFormatter):
     def _header(self):
         s = "<div class='header'><h1>{}</h1>".format(self.TITLE)
         s += "<p>Compared <em>{db1}</em> with <em>{db2}</em></p>"
+        s += "<p>Filter: <span class='fixed'>{filter}</span></p>"
         s += "<p>Run time: <em>{start_time}</em> to <em>{end_time}</em> "
         s += "(<em>{elapsed:.1f}</em> sec)</p>"
         return (s + "</div>").format(**self.meta)
@@ -497,6 +499,7 @@ class DiffTextFormatter(DiffFormatter):
                  self.TITLE,
                  '-' * len(self.TITLE),
                  "Compared: {db1} <-> {db2}".format(**m),
+                 "Filter: {filter}".format(**m),
                  "Run time: {start_time} -- {end_time} ({elapsed:.1f} sec)".format(**m),
                  ""]
         for section in result.keys():

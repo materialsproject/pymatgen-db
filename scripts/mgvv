@@ -23,7 +23,8 @@ from matgendb.vv.validate import ConstraintSpec, Validator, DBError
 from matgendb.vv import report
 from matgendb.vv.util import Timing, ElapsedTime, letter_num
 from matgendb.vv import diff
-from matgendb.vv import mquery
+#from matgendb.vv import mquery
+from smoqe.query import to_mongo, BadExpression
 
 # Initialize module logging
 _log_name = 'mg'
@@ -178,11 +179,11 @@ def command_diff(args):
     fltr = {}
     if args.fltr is not None:
         try:
-            fltr = mquery.query(args.fltr)
-        except mquery.BadExpression as err:
+            fltr = to_mongo(args.fltr)
+        except BadExpression as err:
             raise FunctionError("In 'diff' command: filter={} error={}"
                                 .format(err.expr, err.details))
-
+        _log.info("Filter (original => mongo): {} => {}".format(args.fltr, fltr))
     # Instantiate main class.
     df = diff.Differ(key=args.key, info=info, props=props, fltr=fltr)
 
@@ -195,6 +196,7 @@ def command_diff(args):
     stime = lambda t: time.strftime("%Y-%m-%d %H:%M", time.localtime(t))
     meta = {'start_time': stime(t0), 'end_time': stime(t1),
             'elapsed': t1 - t0,
+            'filter': fltr,
             'db1': _dbinfo(get_settings(args.old)),
             'db2': _dbinfo(get_settings(args.new))}
     if args.format is None:
@@ -290,7 +292,9 @@ def main(cmdline=None):
                       "not in the 'new' collection", action="store_true", dest="missonly")
     subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
                                            ", e.g 'these_must,match'", dest="props", default=None)
-    subp.add_argument("-q", "--query", help="Query to filter records before diff. Uses simplified validation syntax",
+    subp.add_argument("-q", "--query", metavar="EXPR", help="Expression to filter records before diff. "
+                                            "Uses simplified constraint syntax, e.g., "
+                                            "'name = \"oscar\" and grouchiness > 3'",
                       dest="fltr")
     subp.add_argument("old", help="pymatgen-db JSON config file for the 'old' collection")
     subp.add_argument("new", help="pymatgen-db JSON config file for the 'new' collection")

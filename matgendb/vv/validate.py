@@ -14,7 +14,8 @@ import random
 import sys
 
 from .util import DoesLogging, total_size
-from .mquery import *
+#from .mquery import *
+from smoqe.query import *
 
 
 class DBError(Exception):
