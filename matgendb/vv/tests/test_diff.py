@@ -71,5 +71,14 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(d[Differ.NEW]), 1)
         self.assertEqual(d[Differ.NEW][0]['name'], recname(self.NUM_RECORDS + 2))
 
+    def test_props_same(self):
+        """Keys and props, all are the same.
+        """
+        # Perform diff.
+        df = Differ(key='name', props=['same'])
+        d = df.diff(*self.engines)
+        # Check results.
+        self.assertEqual(len(d[Differ.CHANGED]), 0)
+
 if __name__ == '__main__':
     unittest.main()
