@@ -23,6 +23,7 @@ from matgendb.vv.validate import ConstraintSpec, Validator, DBError
 from matgendb.vv import report
 from matgendb.vv.util import Timing, ElapsedTime, letter_num
 from matgendb.vv import diff
+from matgendb.vv import mquery
 
 # Initialize module logging
 _log_name = 'mg'
@@ -37,6 +38,14 @@ DB_KEY = '_db'              # in YAML file
 ALIASES_KEY = '_aliases'    # in YAML file
 
 PATTERN_KEY_PREFIX_IGNORE = '_'
+
+## Exceptions
+
+
+class FunctionError(Exception):
+    """Error with a top-level function.
+    """
+    pass
 
 ## Functions
 
@@ -165,8 +174,17 @@ def command_diff(args):
     if args.props is not None:
         props = [s.strip() for s in args.props.split(',')]
 
+    # Parse query/filter, if provided
+    fltr = {}
+    if args.fltr is not None:
+        try:
+            fltr = mquery.query(args.fltr)
+        except mquery.BadExpression as err:
+            raise FunctionError("In 'diff' command: filter={} error={}"
+                                .format(err.expr, err.details))
+
     # Instantiate main class.
-    df = diff.Differ(key=args.key, info=info, props=props)
+    df = diff.Differ(key=args.key, info=info, props=props, fltr=fltr)
 
     # Run diff.
     t0 = time.time()
@@ -272,6 +290,8 @@ def main(cmdline=None):
                       "not in the 'new' collection", action="store_true", dest="missonly")
     subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
                                            ", e.g 'these_must,match'", dest="props", default=None)
+    subp.add_argument("-q", "--query", help="Query to filter records before diff. Uses simplified validation syntax",
+                      dest="fltr")
     subp.add_argument("old", help="pymatgen-db JSON config file for the 'old' collection")
     subp.add_argument("new", help="pymatgen-db JSON config file for the 'new' collection")
 
@@ -282,7 +302,11 @@ def main(cmdline=None):
 
     # Handle sub-commands.
     if hasattr(args, 'func'):
-        return args.func(args)
+        try:
+            return args.func(args)
+        except FunctionError as err:
+            _log.critical("Function {} failed: {}".format(args.func.__name__, err))
+            return -1
 
     # Connect and authenticate
     conn, config = None, None
