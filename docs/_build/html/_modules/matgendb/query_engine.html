@@ -74,14 +74,15 @@
 
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">Iterable</span>
-
 <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
-
 <span class="kn">from</span> <span class="nn">pymatgen</span> <span class="kn">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Composition</span>
 <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span><span class="p">,</span>\
     <span class="n">ComputedStructureEntry</span>
+
+<span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;mg.&#39;</span> <span class="o">+</span> <span class="n">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="QueryEngine"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine">[docs]</a><span class="k">class</span> <span class="nc">QueryEngine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -103,6 +104,15 @@
 <span class="sd">    QueryEngine.query(properties=[&quot;a.b&quot;], you will obtain a result that can be</span>
 <span class="sd">    accessed simply as doc[&quot;a.b&quot;].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># avoid hard-coding these in other places</span>
+    <span class="n">ALIASES_CONFIG_KEY</span> <span class="o">=</span> <span class="s">&#39;aliases_config&#39;</span>
+    <span class="n">COLLECTION_KEY</span> <span class="o">=</span> <span class="s">&#39;collection&#39;</span>
+    <span class="n">HOST_KEY</span> <span class="o">=</span> <span class="s">&#39;host&#39;</span>
+    <span class="n">PORT_KEY</span> <span class="o">=</span> <span class="s">&#39;port&#39;</span>
+    <span class="n">DB_KEY</span> <span class="o">=</span> <span class="s">&#39;database&#39;</span>
+    <span class="n">USER_KEY</span> <span class="o">=</span> <span class="s">&#39;user&#39;</span>
+    <span class="n">PASSWORD_KEY</span> <span class="o">=</span> <span class="s">&#39;password&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">27017</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s">&quot;vasp&quot;</span><span class="p">,</span>
                  <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s">&quot;tasks&quot;</span><span class="p">,</span>
@@ -349,7 +359,12 @@
                 <span class="n">parsed_crit</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">crit</span>
         <span class="k">return</span> <span class="n">parsed_crit</span>
 
-<div class="viewcode-block" id="QueryEngine.query"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="QueryEngine.ensure_index"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.ensure_index">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wrapper for pymongo.Collection.ensure_index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="n">unique</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="QueryEngine.query"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">distinct_key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience method for database access.  All properties and criteria</span>
 <span class="sd">        can be specified using simplified names defined in Aliases.  You can</span>
@@ -371,24 +386,16 @@
 <span class="sd">        returned as r[&#39;analysis&#39;] and then the subkeys can be accessed in the</span>
 <span class="sd">        usual form, i.e., r[&#39;analysis&#39;][&#39;e_above_hull&#39;]</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            properties:</span>
-<span class="sd">                Properties to query for. Defaults to None which means all</span>
-<span class="sd">                supported properties.</span>
-<span class="sd">            criteria:</span>
-<span class="sd">                Criteria to query for as a dict.</span>
-<span class="sd">            index:</span>
-<span class="sd">                Similar definition to pymongo.collection.find method.</span>
-<span class="sd">            limit:</span>
-<span class="sd">                Similar definition to pymongo.collection.find method.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            An QueryResults Iterable, which is somewhat like pymongo&#39;s</span>
+<span class="sd">        :param properties: Properties to query for. Defaults to None which means all supported properties.</span>
+<span class="sd">        :param criteria: Criteria to query for as a dict.</span>
+<span class="sd">        :parm index: Similar definition to pymongo.collection.find method.</span>
+<span class="sd">        :param limit: Similar definition to pymongo.collection.find method.</span>
+<span class="sd">        :param distinct_key: If not None, the key for which to get distinct results</span>
+<span class="sd">        :return: A QueryResults Iterable, which is somewhat like pymongo&#39;s</span>
 <span class="sd">            cursor except that it performs mapping. In general, the dev does</span>
 <span class="sd">            not need to concern himself with the form. It is sufficient to know</span>
 <span class="sd">            that the results are in the form of an iterable of dicts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">properties</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -397,10 +404,12 @@
         <span class="n">crit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_criteria</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span> <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">{}</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">crit</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">props</span><span class="p">,</span>
                                    <span class="n">timeout</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="n">prop_dict</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">cur</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">distinct_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="n">distinct_key</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">QueryListResults</span><span class="p">(</span><span class="n">prop_dict</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="n">prop_dict</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span>
 </div>
     <span class="k">def</span> <span class="nf">_parse_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
@@ -419,25 +428,10 @@
                 <span class="n">prop_dict</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span>
 
-<div class="viewcode-block" id="QueryEngine.query_one"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.query_one">[docs]</a>    <span class="k">def</span> <span class="nf">query_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Just like query, but return a single doc.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            properties:</span>
-<span class="sd">                Properties to query for. Defaults to None which means all</span>
-<span class="sd">                supported properties.</span>
-<span class="sd">            criteria:</span>
-<span class="sd">                Criteria to query for as a dict.</span>
-<span class="sd">            index:</span>
-<span class="sd">                Similar definition to pymongo.collection.find method.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            A single dict containing the result.</span>
+<div class="viewcode-block" id="QueryEngine.query_one"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.query_one">[docs]</a>    <span class="k">def</span> <span class="nf">query_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return first document from :meth:`query`, with same parameters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">properties</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
-                            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">r</span>
         <span class="k">return</span> <span class="bp">None</span>
 </div>
@@ -555,6 +549,17 @@
     <span class="k">def</span> <span class="nf">_result_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapped_result</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="QueryListResults"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryListResults">[docs]</a><span class="k">class</span> <span class="nc">QueryListResults</span><span class="p">(</span><span class="n">QueryResults</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set of QueryResults on a list instead of a MongoDB cursor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="QueryListResults.clone"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryListResults.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:])</span>
+</div>
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="QueryError"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryError">[docs]</a><span class="k">class</span> <span class="nc">QueryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>

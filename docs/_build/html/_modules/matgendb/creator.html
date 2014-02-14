@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -96,7 +95,7 @@
 <span class="kn">from</span> <span class="nn">pymatgen.io.cifio</span> <span class="kn">import</span> <span class="n">CifWriter</span>
 <span class="kn">from</span> <span class="nn">pymatgen.symmetry.finder</span> <span class="kn">import</span> <span class="n">SymmetryFinder</span>
 <span class="kn">from</span> <span class="nn">pymatgen.analysis.bond_valence</span> <span class="kn">import</span> <span class="n">BVAnalyzer</span>
-<span class="kn">from</span> <span class="nn">pymatgen.util.io_utils</span> <span class="kn">import</span> <span class="n">zopen</span>
+<span class="kn">from</span> <span class="nn">monty.io</span> <span class="kn">import</span> <span class="n">zopen</span>
 <span class="kn">from</span> <span class="nn">pymatgen.matproj.rest</span> <span class="kn">import</span> <span class="n">MPRester</span>
 <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span>
 
@@ -130,7 +129,7 @@
                  <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>  <span class="n">collection</span><span class="o">=</span><span class="s">&quot;tasks&quot;</span><span class="p">,</span>
                  <span class="n">parse_dos</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">simulate_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                  <span class="n">additional_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">update_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">mapi_key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">mapi_key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_full_uri</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            host:</span>
@@ -175,6 +174,10 @@
 
 <span class="sd">                Go to www.materialsproject.org/profile to generate or obtain</span>
 <span class="sd">                your API key.</span>
+<span class="sd">            use_full_uri:</span>
+<span class="sd">                Whether to use full uri path (including hostname) for the</span>
+<span class="sd">                directory name. Defaults to True. If False, only the abs</span>
+<span class="sd">                path will be used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
@@ -188,6 +191,7 @@
             <span class="k">else</span> <span class="n">additional_fields</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_duplicates</span> <span class="o">=</span> <span class="n">update_duplicates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mapi_key</span> <span class="o">=</span> <span class="n">mapi_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_full_uri</span> <span class="o">=</span> <span class="n">use_full_uri</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">simulate_mode</span><span class="p">:</span>
             <span class="n">conn</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
             <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">]</span>
@@ -207,7 +211,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_task_doc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">additional_fields</span><span class="p">)</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">additional_fields</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_full_uri</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapi_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;successful&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">calculate_stability</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="n">tid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_insert_doc</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
@@ -232,7 +236,8 @@
             <span class="n">d</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 </div>
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="VaspToDbTaskDrone.get_task_doc"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.get_task_doc">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_doc</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parse_dos</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">additional_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="VaspToDbTaskDrone.get_task_doc"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.get_task_doc">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_doc</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parse_dos</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">additional_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                     <span class="n">use_full_uri</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the entire task doc for a path, including any post-processing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -283,13 +288,13 @@
                                  <span class="n">additional_fields</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">:</span>
                 <span class="n">d</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">process_killed_run</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="n">cls</span><span class="o">.</span><span class="n">post_process</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">post_process</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">use_full_uri</span><span class="p">)</span>
         <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;relax1&quot;</span><span class="p">)</span> <span class="ow">or</span>
               <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;relax2&quot;</span><span class="p">)))</span> <span class="ow">and</span> <span class="n">contains_vasp_input</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
             <span class="c">#If not Materials Project style, process as a killed run.</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s">&quot; contains killed run&quot;</span><span class="p">)</span>
             <span class="n">d</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">process_killed_run</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="n">cls</span><span class="o">.</span><span class="n">post_process</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">post_process</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">use_full_uri</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">d</span>
 </div>
@@ -345,7 +350,7 @@
             <span class="k">return</span> <span class="n">d</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="VaspToDbTaskDrone.post_process"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.post_process">[docs]</a>    <span class="k">def</span> <span class="nf">post_process</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+<div class="viewcode-block" id="VaspToDbTaskDrone.post_process"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.post_process">[docs]</a>    <span class="k">def</span> <span class="nf">post_process</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">use_full_uri</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simple post-processing for various files other than the vasprun.xml.</span>
 <span class="sd">        Called by generate_task_doc. Modify this if your runs have other</span>
@@ -433,7 +438,8 @@
         <span class="n">d</span><span class="p">[</span><span class="s">&quot;run_stats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_stats</span>
 
         <span class="c">#Convert to full uri path.</span>
-        <span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_uri</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_full_uri</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_uri</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">new_tags</span><span class="p">:</span>
             <span class="n">d</span><span class="p">[</span><span class="s">&quot;tags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_tags</span>
@@ -457,9 +463,9 @@
                     <span class="n">d</span><span class="p">[</span><span class="s">&quot;incar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">to_dict</span>
                     <span class="n">d</span><span class="p">[</span><span class="s">&quot;is_hubbard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LDAU&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;is_hubbard&quot;</span><span class="p">]:</span>
-                        <span class="n">us</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LDAUU&quot;</span><span class="p">,</span> <span class="p">[])</span>
-                        <span class="n">js</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LDAUJ&quot;</span><span class="p">,</span> <span class="p">[])</span>
-                        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">us</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">sum</span><span class="p">(</span><span class="n">js</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">us</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LDAUU&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+                        <span class="n">js</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LDAUJ&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+                        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">us</span> <span class="o">-</span> <span class="n">js</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">d</span><span class="p">[</span><span class="s">&quot;is_hubbard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
                             <span class="n">d</span><span class="p">[</span><span class="s">&quot;hubbards&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -501,9 +507,10 @@
             <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;POTCAR*&quot;</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">potcar</span> <span class="o">=</span> <span class="n">Potcar</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;pseudo_potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;functional&quot;</span><span class="p">:</span> <span class="s">&quot;pbe&quot;</span><span class="p">,</span>
-                                             <span class="s">&quot;pot_type&quot;</span><span class="p">:</span> <span class="s">&quot;paw&quot;</span><span class="p">,</span>
-                                             <span class="s">&quot;labels&quot;</span><span class="p">:</span> <span class="n">potcar</span><span class="o">.</span><span class="n">symbols</span><span class="p">}</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;pseudo_potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s">&quot;functional&quot;</span><span class="p">:</span> <span class="n">potcar</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                        <span class="s">&quot;pot_type&quot;</span><span class="p">:</span> <span class="s">&quot;paw&quot;</span><span class="p">,</span>
+                        <span class="s">&quot;labels&quot;</span><span class="p">:</span> <span class="n">potcar</span><span class="o">.</span><span class="n">symbols</span><span class="p">}</span>
                 <span class="k">except</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to parse POTCAR for killed run in {}.&quot;</span>
                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
@@ -588,9 +595,12 @@
                 <span class="s">&quot;final_energy&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;final_energy&quot;</span><span class="p">],</span>
                 <span class="s">&quot;final_energy_per_atom&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;final_energy_per_atom&quot;</span><span class="p">]}</span>
             <span class="n">d</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;aflow&quot;</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;pseudo_potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;functional&quot;</span><span class="p">:</span> <span class="s">&quot;pbe&quot;</span><span class="p">,</span> <span class="s">&quot;pot_type&quot;</span><span class="p">:</span> <span class="s">&quot;paw&quot;</span><span class="p">,</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;potcar_type&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;_&quot;</span><span class="p">)</span>
+            <span class="n">pot_type</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">functional</span> <span class="o">=</span> <span class="s">&quot;lda&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pot_type</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">d</span><span class="p">[</span><span class="s">&quot;pseudo_potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;functional&quot;</span><span class="p">:</span> <span class="n">functional</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                                     <span class="s">&quot;pot_type&quot;</span><span class="p">:</span> <span class="n">pot_type</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
                                      <span class="s">&quot;labels&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;potcar&quot;</span><span class="p">]}</span>
-
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> \
                     <span class="n">vasprun_files</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;relax1&quot;</span><span class="p">:</span>
                 <span class="n">d</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;successful&quot;</span> <span class="k">if</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;has_vasp_completed&quot;</span><span class="p">]</span> \
@@ -825,7 +835,7 @@
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

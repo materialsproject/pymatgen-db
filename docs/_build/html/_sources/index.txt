@@ -19,7 +19,6 @@ Version 0.3.7
 -------------
 
 #. New package maintainer, Dan Gunter <dkgunter@lbl.gov>
-#. Added new `builders` package, ported from Materials Project, and cleaned up and simplified to allow pluggable construction of MongoDB databases either from existing MongoDB collections or external files.
 #. Added `vv.diff` package and associated `mgvv diff` subcommand, for taking the difference of two arbitrary MongoDB collections.
 #. Some cleanup and simplification of config files. `user` and `password` are accepted as aliases for `readonly_user` and `readonly_password`.
 
