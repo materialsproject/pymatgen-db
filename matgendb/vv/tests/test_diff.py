@@ -84,7 +84,7 @@ class MyTestCase(unittest.TestCase):
         # Check results.
         self.assertEqual(len(d[Differ.CHANGED]), 0)
 
-    def test_props_same(self):
+    def test_props_different(self):
         """Keys and props, some props different.
         """
         # Perform diff.
