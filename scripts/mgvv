@@ -277,6 +277,12 @@ def main(cmdline=None):
     subparsers = parser.add_subparsers(description="Other actions")
     subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
     subp.set_defaults(func=command_diff)
+    subp.add_argument("-c", "--change", dest='delta', default=[], action="append", metavar="EXPR",
+                      help="An expression for a change in a value to report (repeatable). "
+                           "Notated as '<name>=<op>[<val>[%]]'. "
+                           "<name> is a field name, <op> is '+', '-', '+-', or '!-' (sign), <val> is a numeric value "
+                           "indicating an absolute delta, except if it ends in '%' it is a relative percentage.")
+
     subp.add_argument("-e", "--email", dest='email', default=None, metavar="ADDR",
                       help="Email report, instead of printing it to standard output. "
                            "ADDR is of the form: sender/receiver,[receiver2...][/subject].")

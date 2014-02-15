@@ -5,6 +5,7 @@ __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '3/29/13'
 
 import logging
+import re
 import time
 from matgendb import util
 from matgendb.query_engine import QueryEngine
@@ -25,6 +26,8 @@ class Differ(object):
 
     #: for missing property
     NO_PROPERTY = "__MISSING__"
+
+    _delta_expr = re.compile('(?P<name>\S+)=(?P<op>\+|-|\+-|!-)(?P<val>\d+(\.\d+)(%)?)?')
 
     def __init__(self, key='_id', props=None, info=None, fltr=None):
         """Constructor.
@@ -146,3 +149,6 @@ class Differ(object):
         _log.debug("build_result.end")
 
         return result
+
+    def _parse_delta_expr(self, expr):
+        pass
