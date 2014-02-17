@@ -41,6 +41,8 @@ class Differ(object):
         self._props = [] if props is None else props
         self._info = [] if info is None else info
         self._filter = fltr if fltr else {}
+        # TODO: Build this from some input list of string expressions
+        self._prop_deltas = {}  # delta expr. by property name
 
     def diff(self, c1, c2, only_missing=False, allow_dup=False):
         """Perform a difference between the 2 collections.
@@ -125,8 +127,9 @@ class Differ(object):
         changed = []
         if has_props:
             for key in keys[0].intersection(keys[1]):
-                if props[0][key] != props[1][key]:
-                    crec = {self._key: key, 'old': props[0][key], 'new': props[1][key]}
+                matched, mtype = self._prop_match(key, props[0][key], props[1][key])
+                if not matched:
+                    crec = {self._key: key, 'old': props[0][key], 'new': props[1][key], 'match_type': mtype}
                     if has_info:
                         drec = data[key]
                         crec.update({k: drec[k] for k in self._info})
@@ -150,5 +153,13 @@ class Differ(object):
 
         return result
 
+    def _prop_match(self, k, v1, v2):
+        if k in self._prop_deltas:
+            matched, mtype = True, ""  # TODO: Compute delta
+        else:
+            mtype, matched = "exact", (v1 == v2)
+        return matched, mtype
+
     def _parse_delta_expr(self, expr):
         pass
+
