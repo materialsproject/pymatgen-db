@@ -27,22 +27,33 @@ class Differ(object):
     #: for missing property
     NO_PROPERTY = "__MISSING__"
 
-    _delta_expr = re.compile('(?P<name>\S+)=(?P<op>\+|-|\+-|!-)(?P<val>\d+(\.\d+)(%)?)?')
-
-    def __init__(self, key='_id', props=None, info=None, fltr=None):
+    def __init__(self, key='_id', props=None, info=None, fltr=None, deltas=None):
         """Constructor.
 
         :param key: Field to use for identifying records
         :param props: List of fields to use for matching records
         :param info: List of extra fields to retrieve from (and show) for each record.
         :param fltr: Filter for records, a MongoDB query expression
+        :param deltas: {prop: delta} to check ('delta' is a string parsed by :class:Delta).
+                       Any key for 'prop' not in parameter 'props' will get added.
+        :type deltas: dict
+        :raise: ValueError if some delta does not parse.
         """
         self._key = key
         self._props = [] if props is None else props
+        self._all_props = self._props[:]
         self._info = [] if info is None else info
         self._filter = fltr if fltr else {}
-        # TODO: Build this from some input list of string expressions
-        self._prop_deltas = {}  # delta expr. by property name
+        self._prop_deltas = {}
+        if deltas:
+            for p, dt in deltas.iteritems():
+                if p not in self._props:
+                    _log.warn("Adding delta property '{}' to properties".format(p))
+                    self._all_props.append(p)
+                try:
+                    self._prop_deltas[p] = Delta(dt)
+                except ValueError as err:
+                    raise ValueError("Delta for property '{}': {}".format(p, err))
 
     def diff(self, c1, c2, only_missing=False, allow_dup=False):
         """Perform a difference between the 2 collections.
@@ -75,13 +86,22 @@ class Differ(object):
 
         # Query DB.
         keys = [set(), set()]
-        props = [{}, {}]
-        fields = dict.fromkeys(self._info + self._props + [self._key], True)
+        eqprops = [{}, {}]
+        numprops = [{}, {}]
+
+        # Build query fields.
+        fields = dict.fromkeys(self._info + self._all_props + [self._key], True)
         if not '_id' in fields:  # explicitly remove _id if not given
             fields['_id'] = False
-        data, has_info, has_props = {}, bool(self._info), bool(self._props)
+
+        # Initialize for query loop.
+        info = {}  # per-key information
+        has_info, has_props = bool(self._info), bool(self._all_props)
+        has_numprops, has_eqprops = bool(self._prop_deltas), bool(self._props)
         _log.info("query.start")
         t0 = time.time()
+
+        # Main query loop.
         for i, coll in enumerate(collections):
             _log.debug("collection {:d}".format(i))
             count, missing_props = 0, 0
@@ -96,23 +116,41 @@ class Differ(object):
                     _log.critical("Key '{}' not found in record: {}. Abort.".format(
                                   self._key, rec))
                     return {}
-                if has_props:
-                    # Extract properties, and index by key.
+                # Extract numeric properties.
+                if has_numprops:
+                    pvals = {}
+                    for pkey in self._prop_deltas.iterkeys():
+                        try:
+                            pvals[pkey] = float(rec[pkey])
+                        except KeyError:
+                            missing_props += 1
+                            continue
+                        except ValueError:
+                            raise ValueError("Not a number: collection={c} key={k} {p}='{v}'"
+                                             .format(k=key, c=("old", "new")[i], p=pkey, v=rec[pkey]))
+                    numprops[i][key] = pvals
+                    # Extract properties for exact match.
+                if has_eqprops:
                     try:
                         propval = tuple([(p, str(rec[p])) for p in self._props])
                     except KeyError:
                         missing_props += 1
                         continue
-                    props[i][key] = propval
+                    eqprops[i][key] = propval
+
+                # Extract informational fields.
                 if i == 0 and has_info:
-                    data[key] = rec
+                    info[key] = {k: rec[k] for k in self._info}
+
+            # Stop if we don't have properties on any record at all
             if missing_props == count:
                 _log.critical("Missing one or more properties on all {:d} records"
-                        .format(count))
+                              .format(count))
                 return {}
+            # ..but only issue a warning for partially missing properties.
             elif missing_props > 0:
                 _log.warn("Missing one or more properties for {:d}/{:d} records"
-                        .format(missing_props, count))
+                          .format(missing_props, count))
         t1 = time.time()
         _log.info("query.end sec={:f}".format(t1 - t0))
 
@@ -126,14 +164,23 @@ class Differ(object):
         # Compute mis-matched properties.
         changed = []
         if has_props:
+            _up = lambda d, v: d.update(v) or d   # functional dict.update()
             for key in keys[0].intersection(keys[1]):
-                matched, mtype = self._prop_match(key, props[0][key], props[1][key])
-                if not matched:
-                    crec = {self._key: key, 'old': props[0][key], 'new': props[1][key], 'match_type': mtype}
-                    if has_info:
-                        drec = data[key]
-                        crec.update({k: drec[k] for k in self._info})
-                    changed.append(crec)
+                # Numeric property comparisons.
+                if has_numprops:
+                    for pkey in self._prop_deltas:
+                        oldval, newval = numprops[0][key][pkey], numprops[1][key][pkey]
+                        if not self._prop_deltas[pkey].cmp(oldval, newval):
+                            change = {"match_type": "delta", self._key: key, "property": pkey,
+                                      "old": "{:f}".format(oldval), "new": "{:f}".format(newval),
+                                      "rule": self._prop_deltas[pkey]}
+                            changed.append(_up(change, info[key]) if has_info else change)
+                # Exact property comparison.
+                if has_eqprops:
+                    if not eqprops[0][key] == eqprops[1][key]:
+                        change = {"match_type": "exact", self._key: key,
+                                  "old": eqprops[0][key], "new": eqprops[1][key]}
+                        changed.append(_up(change, info[key]) if has_info else change)
 
         # Build result.
         _log.debug("build_result.begin")
@@ -141,9 +188,9 @@ class Differ(object):
         if not only_missing:
             result[self.NEW] = []
         if has_info:
-            result[self.MISSING] = [data[key] for key in missing]
+            result[self.MISSING] = [info[key] for key in missing]
             if not only_missing:
-                result[self.NEW] = [data[key] for key in new]
+                result[self.NEW] = [info[key] for key in new]
         else:
             result[self.MISSING] = [{self._key: key} for key in missing]
             if not only_missing:
@@ -153,13 +200,91 @@ class Differ(object):
 
         return result
 
-    def _prop_match(self, k, v1, v2):
-        if k in self._prop_deltas:
-            matched, mtype = True, ""  # TODO: Compute delta
+
+class Delta(object):
+    """Delta between two properties.
+
+    Syntax:
+        +-       Change in sign
+        +-X      abs(new - old) > X
+        +X-Y     (new - old) > X or (old - new) > Y
+        +-X=     abs(new - old) >= X
+        +X-Y=    (new - old) >= X or (old - new) >= Y
+        ...%     Instead of (v2 - v1), use 100*(v2 - v1)/v1
+    """
+    _num = "\d+(\.\d+)?"
+    _expr = re.compile("\+(?P<X>{n})?-(?P<Y>{n})?(?P<eq>=)?(?P<pct>%)?".format(n=_num))
+
+    def __init__(self, s):
+        """Constructor.
+
+        :param s: Expression string
+        :type s: str
+        :raises: ValueError if it doesn't match the syntax
+        """
+        # Match expression.
+        m = self._expr.match(s)
+        if m is None:
+            raise ValueError("Bad syntax for delta '{}'".format(s))
+
+        # Initialize parsed values.
+        self._sign = False
+        self._dx, self._dy = 0, 0
+        self._pct = False           # %change
+        self._eq = False            # >=,<= instead of >, <
+
+        # Set parsed values.
+        d = m.groupdict()
+        #print("@@ expr :: {}".format(d))
+        if d['X'] is None and d['Y'] is None:
+            # Change in sign only
+            self._sign = True
+        elif d['X'] is not None and d['Y'] is None:
+            raise ValueError("Bad syntax for delta '{}': +X-".format(s))
         else:
-            mtype, matched = "exact", (v1 == v2)
-        return matched, mtype
+            # Main branch for +-XY
+            self._dy = -float(d['Y'])
+            self._dx = float(d['X'] or d['Y'])
+            self._eq = d['eq'] is not None
+            self._pct = d['pct'] is not None
+            #print("@@ dx,dy eq,pct = {},{}  {},{}".format(self._dx, self._dy, self._eq, self._pct))
 
-    def _parse_delta_expr(self, expr):
-        pass
+        # Pre-calculate comparison function.
+        if self._sign:
+            self._cmp = self._cmp_sign
+        elif self._pct:
+            self._cmp = self._cmp_val_pct
+        else:
+            self._cmp = self._cmp_val
 
+    def cmp(self, old, new):
+        """Compare numeric values with parsed expr.
+
+        Delta is computed as (new - old)
+
+        :param old: Old value
+        :type old: float
+        :param new: New value
+        :type new: float
+        :return: True if delta between old and new is large enough, False otherwise
+        :rtype: bool
+        """
+        return self._cmp(old, new)
+
+    def _cmp_sign(self, a, b):
+        return (a < 0 < b) or (a > 0 > b)
+
+    def _cmp_val(self, a, b):
+        delta = b - a
+        #print("@@ val cmp {:f}".format(delta))
+        if self._eq:
+            return delta >= self._dx or delta <= self._dy
+        return delta > self._dx or delta < self._dy
+
+    def _cmp_val_pct(self, a, b):
+        if a == 0:
+            return False
+        delta = 100.0 * (b - a) / a
+        if self._eq:
+            return delta >= self._dx or delta <= self._dy
+        return delta > self._dx or delta < self._dy

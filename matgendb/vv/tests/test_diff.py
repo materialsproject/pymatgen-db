@@ -7,7 +7,7 @@ import random
 import tempfile
 
 from matgendb.tests.common import MockQueryEngine
-from matgendb.vv.diff import Differ
+from matgendb.vv.diff import Differ, Delta
 
 #
 
@@ -94,6 +94,69 @@ class MyTestCase(unittest.TestCase):
         changed = sum((int(c[0] != c[1]) for c in self.colors))
         # Check results.
         self.assertEqual(len(d[Differ.CHANGED]), changed)
+
+    def test_delta(self):
+        """Delta class parsing.
+        """
+        self.failUnlessRaises(ValueError, Delta, "foo")
+
+    def test_delta_sign(self):
+        """Delta class sign.
+        """
+        d = Delta("+-")
+        self.assertEquals(d.cmp(0, 1), False)
+        self.assertEquals(d.cmp(-1, 0), False)
+        self.assertEquals(d.cmp(-1, 1), True)
+
+    def test_delta_val(self):
+        """Delta class value, same absolute.
+        """
+        d = Delta("+-3")
+        self.assertEquals(d.cmp(0, 1), False)
+        self.assertEquals(d.cmp(1, 4), False)
+        self.assertEquals(d.cmp(1, 5), True)
+
+    def test_delta_val(self):
+        """Delta class value, different absolute.
+        """
+        d = Delta("+2.5-1.5")
+        self.assertEquals(d.cmp(0, 1), False)
+        self.assertEquals(d.cmp(1, 3), False)
+        self.assertEquals(d.cmp(3, 1), True)
+
+    def test_delta_val(self):
+        """Delta class value, same absolute equality.
+        """
+        d = Delta("+-3.0=")
+        self.assertEquals(d.cmp(0, 1), False)
+        self.assertEquals(d.cmp(1, 4), True)
+        self.assertEquals(d.cmp(4, 1), True)
+
+    def test_delta_val(self):
+        """Delta class value, same percentage.
+        """
+        d = Delta("+-25%")
+        self.assertEquals(d.cmp(0, 1), False)
+        self.assertEquals(d.cmp(8, 4), True)
+        self.assertEquals(d.cmp(8, 6), False)
+
+    def test_delta_val(self):
+        """Delta class value, same percentage equality.
+        """
+        d = Delta("+-25=%")
+        self.assertEquals(d.cmp(0, 1), False)
+        self.assertEquals(d.cmp(8, 4), True)
+        self.assertEquals(d.cmp(8, 6), True)
+
+    def test_delta_val(self):
+        """Delta class value, different percentage equality.
+        """
+        d = Delta("+50-25=%")
+        self.assertEquals(d.cmp(0, 1), False)
+        self.assertEquals(d.cmp(8, 4), True)
+        self.assertEquals(d.cmp(8, 6), True)
+        self.assertEquals(d.cmp(6, 8), False)
+        self.assertEquals(d.cmp(6, 9), True)
 
 if __name__ == '__main__':
     unittest.main()
