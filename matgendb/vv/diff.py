@@ -129,7 +129,7 @@ class Differ(object):
                             raise ValueError("Not a number: collection={c} key={k} {p}='{v}'"
                                              .format(k=key, c=("old", "new")[i], p=pkey, v=rec[pkey]))
                     numprops[i][key] = pvals
-                    # Extract properties for exact match.
+                # Extract properties for exact match.
                 if has_eqprops:
                     try:
                         propval = tuple([(p, str(rec[p])) for p in self._props])
@@ -162,25 +162,11 @@ class Differ(object):
         _log.debug("compute_difference.end")
 
         # Compute mis-matched properties.
-        changed = []
         if has_props:
-            _up = lambda d, v: d.update(v) or d   # functional dict.update()
-            for key in keys[0].intersection(keys[1]):
-                # Numeric property comparisons.
-                if has_numprops:
-                    for pkey in self._prop_deltas:
-                        oldval, newval = numprops[0][key][pkey], numprops[1][key][pkey]
-                        if not self._prop_deltas[pkey].cmp(oldval, newval):
-                            change = {"match_type": "delta", self._key: key, "property": pkey,
-                                      "old": "{:f}".format(oldval), "new": "{:f}".format(newval),
-                                      "rule": self._prop_deltas[pkey]}
-                            changed.append(_up(change, info[key]) if has_info else change)
-                # Exact property comparison.
-                if has_eqprops:
-                    if not eqprops[0][key] == eqprops[1][key]:
-                        change = {"match_type": "exact", self._key: key,
-                                  "old": eqprops[0][key], "new": eqprops[1][key]}
-                        changed.append(_up(change, info[key]) if has_info else change)
+            changed = self._changed_props(keys, eqprops, numprops, info,
+                                          has_eqprops=has_eqprops, has_numprops=has_numprops)
+        else:
+            changed = []
 
         # Build result.
         _log.debug("build_result.begin")
@@ -199,6 +185,28 @@ class Differ(object):
         _log.debug("build_result.end")
 
         return result
+
+    def _changed_props(self, keys=None, eqprops=None, numprops=None, info=None,
+                       has_numprops=False, has_eqprops=False):
+        changed = []
+        _up = lambda d, v: d.update(v) or d   # functional dict.update()
+        for key in keys[0].intersection(keys[1]):
+            # Numeric property comparisons.
+            if has_numprops:
+                for pkey in self._prop_deltas:
+                    oldval, newval = numprops[0][key][pkey], numprops[1][key][pkey]
+                    if self._prop_deltas[pkey].cmp(oldval, newval):
+                        change = {"match_type": "delta", self._key: key, "property": pkey,
+                                  "old": "{:f}".format(oldval), "new": "{:f}".format(newval),
+                                  "rule": self._prop_deltas[pkey]}
+                        changed.append(_up(change, info[key]) if info else change)
+                        # Exact property comparison.
+            if has_eqprops:
+                if not eqprops[0][key] == eqprops[1][key]:
+                    change = {"match_type": "exact", self._key: key,
+                              "old": eqprops[0][key], "new": eqprops[1][key]}
+                    changed.append(_up(change, info[key]) if info else change)
+        return changed
 
 
 class Delta(object):
@@ -258,9 +266,11 @@ class Delta(object):
             self._cmp = self._cmp_val
 
     def cmp(self, old, new):
-        """Compare numeric values with parsed expr.
+        """Compare numeric values with delta expression.
 
-        Delta is computed as (new - old)
+        Returns True if delta matches (is as large or larger than) this class' expression.
+
+        Delta is computed as (new - old).
 
         :param old: Old value
         :type old: float
