@@ -121,7 +121,7 @@ class Differ(object):
                         try:
                             pvals[pkey] = float(rec[pkey])
                         except KeyError:
-                            print("@@ missing {} on {}".format(pkey, rec))
+                            #print("@@ missing {} on {}".format(pkey, rec))
                             missing_props += 1
                             continue
                         except (TypeError, ValueError):
@@ -134,13 +134,16 @@ class Differ(object):
                         propval = tuple([(p, str(rec[p])) for p in self._props])
                     except KeyError:
                         missing_props += 1
-                        print("@@ missing {} on {}".format(pkey, rec))
+                        #print("@@ missing {} on {}".format(pkey, rec))
                         continue
                     eqprops[i][key] = propval
 
                 # Extract informational fields.
-                if i == 0 and has_info:
-                    info[key] = {k: rec[k] for k in self._info}
+                if has_info:
+		    if key not in info:
+		        info[key] = {}
+                    for k in self._info:
+                        info[key][k] = rec[k]
 
             # Stop if we don't have properties on any record at all
             if 0 < count == missing_props:
@@ -170,17 +173,20 @@ class Differ(object):
 
         # Build result.
         _log.debug("build_result.begin")
-        result = {self.MISSING: []}
+        result = {}
+        result[self.MISSING] = []
+        for key in missing:
+	    rec = {self._key_field: key}
+            if has_info:
+                rec.update(info.get(key, {}))
+	    result[self.MISSING].append(rec)
         if not only_missing:
             result[self.NEW] = []
-        if has_info:
-            result[self.MISSING] = [info[key] for key in missing]
-            if not only_missing:
-                result[self.NEW] = [info[key] for key in new]
-        else:
-            result[self.MISSING] = [{self._key_field: key} for key in missing]
-            if not only_missing:
-                result[self.NEW] = [{self._key_field: key} for key in new]
+            for key in new:
+	        rec = {self._key_field: key}
+                if has_info:
+		    rec.update(info.get(key,{}))
+                result[self.NEW].append(rec)
         result[self.CHANGED] = changed
         _log.debug("build_result.end")
 
