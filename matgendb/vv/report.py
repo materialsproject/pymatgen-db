@@ -508,8 +508,26 @@ class DiffTextFormatter(DiffFormatter):
             if len(result[section]) == 0:
                 lines.append("{}EMPTY".format(indent))
             else:
-                for v in result[section]:
-                    lines.append("{}{}".format(indent, self._record(v)))
+                rs, keyset, maxwid = result[section], set(), {}
+                for r in rs:
+                    key = tuple(sorted(r.keys()))
+                    keyset.add(key)
+                    if key not in maxwid:
+                        maxwid[key] = [len(k) for k in key]
+                    for i, k in enumerate(key):
+                        strlen = len("{}".format(r[k]))
+                        maxwid[key][i] = max(maxwid[key][i], strlen)
+                for columns in keyset:
+                    mw = maxwid[columns]
+                    fmt = '  '.join(["{{:{:d}s}}".format(mw[i]) for i in xrange(len(columns))])
+                    lines.append("")
+                    lines.append(indent + fmt.format(*columns))
+                    lines.append(indent + '-_' * (sum(mw)/2 + len(columns)))
+                    for r in rs:
+                        key = tuple(sorted(r.keys()))
+                        if key == columns:
+                            values = [r[k] for k in columns]
+                            lines.append(indent + fmt.format(*values))
         return '\n'.join(lines)
 
     def _record(self, rec):
