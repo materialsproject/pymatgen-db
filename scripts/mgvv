@@ -194,7 +194,8 @@ def command_diff(args):
 
     # Parse numeric change fields, if given
     deltas = {}
-    for np in args.numprops:
+    numprops = [e.strip() for e in args.numprops.split(",")]
+    for np in numprops:
         try:
             field, expr = np.split("=", 1)
         except ValueError:
@@ -304,13 +305,6 @@ def main(cmdline=None):
     subparsers = parser.add_subparsers(description="Other actions")
     subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
     subp.set_defaults(func=command_diff)
-    subp.add_argument("-c", "--change", dest="numprops", default=[], action="append", metavar="EXPR",
-                      help="An expression for a change in a value to report (repeatable). "
-                           "Notated as '<name>=<expr>[=,%%]'. "
-                           "<name> is a field name, <expr> is '+-' (sign), '+-N', '+-N%%', "
-                           "Adding '=' (must go before '%%') compares >=, <= instead of >, <. "
-                           "The '%%' means a percentage relative to the first collection's value.")
-
     subp.add_argument("-e", "--email", dest='email', default=None, metavar="ADDR",
                       help="Email report, instead of printing it to standard output. "
                            "ADDR is of the form: sender/receiver,[receiver2...][/subject].")
@@ -324,6 +318,14 @@ def main(cmdline=None):
     subp.add_argument("-k", "--key", help="Key for matching records", dest="key", required=True)
     subp.add_argument("-m", "--missing", help="Only report keys that are in the 'old' collection, but "
                                               "not in the 'new' collection", action="store_true", dest="missonly")
+    subp.add_argument("-n", "--numeric", dest="numprops", default=None, metavar="EXPR",
+                      help="Fields with numeric values that must match, with a tolerance, "
+                           "as a comma-separated list. "
+                           "e.g., '<name1>=<expr1>, <name2>=<expr2>, ..'. "
+                           "<name> is a field name, <expr> syntax is: '+-' (sign), '+-N', '+-N%%', "
+                           "where N is a number. "
+                           "Adding '=' (must go before '%%') compares >=, <= instead of >, <. "
+                           "The '%%' means a percentage relative to the first collection's value.")
     subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
                                            ", e.g 'these_must,match'", dest="props", default=None)
     subp.add_argument("-q", "--query", metavar="EXPR", help="Expression to filter records before diff. "
