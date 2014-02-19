@@ -191,7 +191,7 @@ class Differ(object):
                                   "old": "{:f}".format(oldval), "new": "{:f}".format(newval),
                                   "rule": self._prop_deltas[pkey]}
                         changed.append(_up(change, info[key]) if info else change)
-                        # Exact property comparison.
+            # Exact property comparison.
             if has_eqprops:
                 if not eqprops[0][key] == eqprops[1][key]:
                     change = {"match_type": "exact", self._key: key,
@@ -225,6 +225,13 @@ class Delta(object):
         m = self._expr.match(s)
         if m is None:
             raise ValueError("Bad syntax for delta '{}'".format(s))
+        if m.span()[1] != len(s):
+            p = m.span()[1]
+            raise ValueError("Junk at end of delta '{}': {}".format(s, s[p:]))
+
+
+        # Save a copy of orig.
+        self._orig_expr = s
 
         # Initialize parsed values.
         self._sign = False
@@ -255,6 +262,9 @@ class Delta(object):
             self._cmp = self._cmp_val_pct
         else:
             self._cmp = self._cmp_val
+
+    def __str__(self):
+        return self._orig_expr
 
     def cmp(self, old, new):
         """Compare numeric values with delta expression.

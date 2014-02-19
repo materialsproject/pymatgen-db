@@ -46,7 +46,9 @@ PATTERN_KEY_PREFIX_IGNORE = '_'
 class FunctionError(Exception):
     """Error with a top-level function.
     """
-    pass
+    def __init__(self, command, why):
+        msg = "In '{}' command: {}".format(command, why)
+        Exception.__init__(self, msg)
 
 ## Functions
 
@@ -168,6 +170,12 @@ def _dbinfo(cfg):
 def command_diff(args):
     """Sub-command to calculate the difference of 2 collections.
     """
+    # Check that conf files exist
+    try:
+        map(open, (args.old, args.new))
+    except IOError as err:
+        raise FunctionError("diff", "Cannot open configuration file: {}".format(err))
+
     # Parse info arg.
     info, props = [], []
     if args.info is not None:
@@ -181,22 +189,24 @@ def command_diff(args):
         try:
             fltr = to_mongo(args.fltr)
         except BadExpression as err:
-            raise FunctionError("In 'diff' command: filter={} error={}"
-            .format(err.expr, err.details))
+            raise FunctionError("diff", "Bad query filter: {}".format(err.details))
         _log.info("Filter (original => mongo): {} => {}".format(args.fltr, fltr))
 
     # Parse numeric change fields, if given
     deltas = {}
     for np in args.numprops:
         try:
-            field, expr = np.split("=")
+            field, expr = np.split("=", 1)
         except ValueError:
-            raise FunctionError("In 'diff' command: numeric expression '{}' not in form 'field=expr'"
-            .format(np))
+            raise FunctionError("diff", "numeric expression '{}' not in form 'field=expr'"
+                                .format(np))
+        if field in deltas:
+            raise FunctionError("diff", "Only one numeric expression allowed per field, '{}' has "
+                                "at least 2: '{}', '{}'".format(field, deltas[field], expr))
         try:
             deltas[field] = diff.Delta(expr)
         except ValueError as err:
-            raise FunctionError("In 'diff' command: Bad numeric expr for field '{}': {}".format(field, err))
+            raise FunctionError("diff", "Bad numeric expr for field '{}': {}".format(field, err))
 
     # Instantiate main class.
     df = diff.Differ(key=args.key, info=info, props=props, fltr=fltr, deltas=deltas)
@@ -330,7 +340,7 @@ def main(cmdline=None):
         try:
             return args.func(args)
         except FunctionError as err:
-            _log.critical("Function {} failed: {}".format(args.func.__name__, err))
+            _log.critical("{}".format(err))
             return -1
 
     # Connect and authenticate
