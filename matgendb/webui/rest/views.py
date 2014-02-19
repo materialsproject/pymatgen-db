@@ -16,8 +16,12 @@ import datetime
 from django.utils.encoding import force_unicode
 from django.core.serializers.json import DjangoJSONEncoder
 
-config = json.loads(os.environ["MGDB_CONFIG"])
-qe = QueryEngine(host=config["host"], port=config["port"],
+qe = None
+
+mgdb_config = os.environ.get("MGDB_CONFIG", "")
+if mgdb_config:
+    config = json.loads(mgdb_config)
+    qe = QueryEngine(host=config["host"], port=config["port"],
                  database=config["database"], user=config["readonly_user"],
                  password=config["readonly_password"],
                  collection=config["collection"],
@@ -26,6 +30,10 @@ qe = QueryEngine(host=config["host"], port=config["port"],
 
 def index(request, rest_query):
     if request.method == "GET":
+        if qe is None:
+            return HttpResponseBadRequest(
+                json.dumps({"error": "no database configured"}),
+                mimetype="application/json")
         try:
             rest_query = rest_query.strip("/")
             if rest_query == "":
