@@ -70,7 +70,7 @@ def nvpstr(s):
     p = s.find('=')
     if p < 0:
         raise ValueError('expected "name=value", got "{}"'.format(s))
-    nvp = (s[:p].strip(), s[p+1:].strip())
+    nvp = (s[:p].strip(), s[p + 1:].strip())
     #print("NVP: {}".format(nvp))
     return nvp
 
@@ -129,7 +129,7 @@ def _config_email(fname):
             d['recipients'] = [d['recipients']]
     except KeyError, err:
         raise ValueError('from/to not found in file {} mapping key "_email"'
-                         .format(fname))
+        .format(fname))
     if 'port' in info:
         d['port'] = int(info['port'])
     if 'host' in info:
@@ -182,10 +182,24 @@ def command_diff(args):
             fltr = to_mongo(args.fltr)
         except BadExpression as err:
             raise FunctionError("In 'diff' command: filter={} error={}"
-                                .format(err.expr, err.details))
+            .format(err.expr, err.details))
         _log.info("Filter (original => mongo): {} => {}".format(args.fltr, fltr))
+
+    # Parse numeric change fields, if given
+    deltas = {}
+    for np in args.numprops:
+        try:
+            field, expr = np.split("=")
+        except ValueError:
+            raise FunctionError("In 'diff' command: numeric expression '{}' not in form 'field=expr'"
+            .format(np))
+        try:
+            deltas[field] = diff.Delta(expr)
+        except ValueError as err:
+            raise FunctionError("In 'diff' command: Bad numeric expr for field '{}': {}".format(field, err))
+
     # Instantiate main class.
-    df = diff.Differ(key=args.key, info=info, props=props, fltr=fltr)
+    df = diff.Differ(key=args.key, info=info, props=props, fltr=fltr, deltas=deltas)
 
     # Run diff.
     t0 = time.time()
@@ -255,9 +269,9 @@ def main(cmdline=None):
                         help='Collection name for constraints given on command-line')
     parser.add_argument('--email', '-e', dest='email', default=None,
                         help='Email report to EMAIL at {from}:{to}[:host[:port[/subject]]].'
-                        'The "from" and "to" are required; default host is localhost. '
-                        'This information can also be in the main config file under the "_email" key, '
-                        'which should be a mapping with keys "from", "to", "host", "port", and "subject".')
+                             'The "from" and "to" are required; default host is localhost. '
+                             'This information can also be in the main config file under the "_email" key, '
+                             'which should be a mapping with keys "from", "to", "host", "port", and "subject".')
     parser.add_argument('--empty', dest='send_on_empty', action='store_true',
                         help="Send a report, even if it is empty (default=print warning and don't send)")
     parser.add_argument('--exonly', dest='must_exist', action='store_true', default=False,
@@ -277,11 +291,12 @@ def main(cmdline=None):
     subparsers = parser.add_subparsers(description="Other actions")
     subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
     subp.set_defaults(func=command_diff)
-    subp.add_argument("-c", "--change", dest='delta', default=[], action="append", metavar="EXPR",
+    subp.add_argument("-c", "--change", dest="numprops", default=[], action="append", metavar="EXPR",
                       help="An expression for a change in a value to report (repeatable). "
-                           "Notated as '<name>=<op>[<val>[%]]'. "
-                           "<name> is a field name, <op> is '+', '-', '+-', or '!-' (sign), <val> is a numeric value "
-                           "indicating an absolute delta, except if it ends in '%' it is a relative percentage.")
+                           "Notated as '<name>=<expr>[=,%%]'. "
+                           "<name> is a field name, <expr> is '+-' (sign), '+-N', '+-N%%', "
+                           "Adding '=' (must go before '%%') compares >=, <= instead of >, <. "
+                           "The '%%' means a percentage relative to the first collection's value.")
 
     subp.add_argument("-e", "--email", dest='email', default=None, metavar="ADDR",
                       help="Email report, instead of printing it to standard output. "
@@ -292,15 +307,15 @@ def main(cmdline=None):
     subp.add_argument("-s", "--email-server", dest="email_server", default="localhost", metavar="HOST",
                       help="Server HOST for an email report, in form hostname[:port]. Default is localhost")
     subp.add_argument("-i", "--info", help="Extra fields for records, as comma-separated list"
-                      ", e.g 'extra,fields,to_include'", dest="info", default=None)
+                                           ", e.g 'extra,fields,to_include'", dest="info", default=None)
     subp.add_argument("-k", "--key", help="Key for matching records", dest="key", required=True)
     subp.add_argument("-m", "--missing", help="Only report keys that are in the 'old' collection, but "
-                      "not in the 'new' collection", action="store_true", dest="missonly")
+                                              "not in the 'new' collection", action="store_true", dest="missonly")
     subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
                                            ", e.g 'these_must,match'", dest="props", default=None)
     subp.add_argument("-q", "--query", metavar="EXPR", help="Expression to filter records before diff. "
-                                            "Uses simplified constraint syntax, e.g., "
-                                            "'name = \"oscar\" and grouchiness > 3'",
+                                                            "Uses simplified constraint syntax, e.g., "
+                                                            "'name = \"oscar\" and grouchiness > 3'",
                       dest="fltr")
     subp.add_argument("old", help="pymatgen-db JSON config file for the 'old' collection")
     subp.add_argument("new", help="pymatgen-db JSON config file for the 'new' collection")
@@ -347,7 +362,7 @@ def main(cmdline=None):
             parser.error('Cannot authenticate to database as user {}'.format(user))
     else:
         _log.info('Connecting to DB "{}" without authentication'.format(config[db_key]))
-    # get collection name if given
+        # get collection name if given
     if 'collection' in config:
         db_coll_name = config['collection']
     else:
@@ -374,7 +389,7 @@ def main(cmdline=None):
                 coll_name = db_coll_name
         if not args.constraint:
             parser.error('at least one constraint is required')
-        # re-split command-line arguments on commas (not whitespace)
+            # re-split command-line arguments on commas (not whitespace)
         plist = ' '.join(args.constraint).split(',')
         # make dict(key=collection) of list of the constraints, just like YAML config file
         constraints = {coll_name: [plist]}
@@ -414,7 +429,7 @@ def main(cmdline=None):
         user_name = args.user or 'unknown'
     rpt_hdr = report.ReportHeader("Materials Project Validation Report")
     rpt_hdr.add('Report time', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()))
-    rpt_hdr.add('Report user',  user_name)
+    rpt_hdr.add('Report user', user_name)
     rpt_hdr.add('Report host', socket.gethostname())
     rpt_hdr.add('Limit', args.limit)
     rpt = report.Report(rpt_hdr)
@@ -423,7 +438,7 @@ def main(cmdline=None):
     formatter_class = formatters.get(fmt, None)
     if formatter_class is None:
         parser.error('Unknown format "{}" for --format, choose from: {}'
-                    .format(fmt, textlist(formatters.keys())))
+        .format(fmt, textlist(formatters.keys())))
 
     # Run validation for each collection
     validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=10, add_exists=args.must_exist)
@@ -444,7 +459,7 @@ def main(cmdline=None):
                 except ValueError, err:
                     _log.error('processing constraints for {}: {}'.format(coll_name, err))
                     break
-                #sect = get_constraint_sections(constraint_spec)
+                    #sect = get_constraint_sections(constraint_spec)
                 vsect = 0
                 for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
                     if len(vgroup) == 0:

@@ -34,26 +34,17 @@ class Differ(object):
         :param props: List of fields to use for matching records
         :param info: List of extra fields to retrieve from (and show) for each record.
         :param fltr: Filter for records, a MongoDB query expression
-        :param deltas: {prop: delta} to check ('delta' is a string parsed by :class:Delta).
+        :param deltas: {prop: delta} to check. 'prop' is a string, 'delta' is an instance of :class:`Delta`.
                        Any key for 'prop' not in parameter 'props' will get added.
         :type deltas: dict
         :raise: ValueError if some delta does not parse.
         """
         self._key = key
         self._props = [] if props is None else props
-        self._all_props = self._props[:]
         self._info = [] if info is None else info
         self._filter = fltr if fltr else {}
-        self._prop_deltas = {}
-        if deltas:
-            for p, dt in deltas.iteritems():
-                if p not in self._props:
-                    _log.warn("Adding delta property '{}' to properties".format(p))
-                    self._all_props.append(p)
-                try:
-                    self._prop_deltas[p] = Delta(dt)
-                except ValueError as err:
-                    raise ValueError("Delta for property '{}': {}".format(p, err))
+        self._prop_deltas = {} if deltas is None else deltas
+        self._all_props = list(set(self._props[:] + self._prop_deltas.keys()))
 
     def diff(self, c1, c2, only_missing=False, allow_dup=False):
         """Perform a difference between the 2 collections.

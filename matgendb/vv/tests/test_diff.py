@@ -107,7 +107,7 @@ class MyTestCase(unittest.TestCase):
         """Keys and props, all are the same.
         """
         # Perform diff.
-        df = Differ(key='name', deltas={"zero": "+-0.001"})
+        df = Differ(key='name', deltas={"zero": Delta("+-0.001")})
         d = df.diff(*self.engines)
         # Check results.
         self.assertEqual(len(d[Differ.CHANGED]), 0)
@@ -117,7 +117,7 @@ class MyTestCase(unittest.TestCase):
         """
         # Perform diff.
         delta = 0.5
-        df = Differ(key='name', deltas={"energy": "+-{:f}".format(delta)})
+        df = Differ(key='name', deltas={"energy": Delta("+-{:f}".format(delta))})
         d = df.diff(*self.engines)
         # Calculate expected results.
         is_different = lambda a, b: abs(a - b) > delta
@@ -129,7 +129,7 @@ class MyTestCase(unittest.TestCase):
         """Keys and props, some props different.
         """
         # Perform diff.
-        df = Differ(key='name', deltas={"energy": "+-"})
+        df = Differ(key='name', deltas={"energy": Delta("+-")})
         d = df.diff(*self.engines)
         # Calculate expected results.
         is_different = lambda a, b: a < 0 < b or b < 0 < a
@@ -142,7 +142,7 @@ class MyTestCase(unittest.TestCase):
         """
         # Perform diff.
         minus, plus = 10, 20
-        df = Differ(key='name', deltas={"energy": "+{}-{}=%".format(plus, minus)})
+        df = Differ(key='name', deltas={"energy": Delta("+{}-{}=%".format(plus, minus))})
         d = df.diff(*self.engines)
 
         # Calculate expected results.
