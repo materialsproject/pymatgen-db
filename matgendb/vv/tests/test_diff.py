@@ -27,7 +27,7 @@ def create_record(num):
         'same': 'yawn',
         'idlist': range(num),
         'zero': 0,
-        'energy': random.random() * 5,
+        'energy': random.random() * 5 - 2.5,
     }
 
 #
@@ -121,7 +121,19 @@ class MyTestCase(unittest.TestCase):
         d = df.diff(*self.engines)
         # Calculate expected results.
         is_different = lambda a, b: abs(a - b) > delta
-        changed = sum((int(is_different(c[0], c[1])) for c in self.energies))
+        changed = sum((int(is_different(e[0], e[1])) for e in self.energies))
+        # Check results.
+        self.assertEqual(len(d[Differ.CHANGED]), changed)
+
+    def test_numprops_different_sign(self):
+        """Keys and props, some props different.
+        """
+        # Perform diff.
+        df = Differ(key='name', deltas={"energy": "+-"})
+        d = df.diff(*self.engines)
+        # Calculate expected results.
+        is_different = lambda a, b: a < 0 < b or b < 0 < a
+        changed = sum((int(is_different(e[0], e[1])) for e in self.energies))
         # Check results.
         self.assertEqual(len(d[Differ.CHANGED]), changed)
 
@@ -137,7 +149,7 @@ class MyTestCase(unittest.TestCase):
         def is_different(a, b):
             pct = 100.0 * (b - a) / a
             return pct <= -minus or pct >= plus
-        changed = sum((int(is_different(c[0], c[1])) for c in self.energies))
+        changed = sum((int(is_different(e[0], e[1])) for e in self.energies))
 
         # Check results.
         if len(d[Differ.CHANGED]) != changed:
