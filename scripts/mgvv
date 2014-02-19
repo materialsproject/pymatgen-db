@@ -16,6 +16,7 @@ import smtplib
 import socket
 import sys
 import time
+import traceback
 import yaml
 # local module
 from matgendb.util import get_settings
@@ -218,6 +219,9 @@ def command_diff(args):
     try:
         r = df.diff(args.old, args.new, only_missing=args.missonly)
     except Exception as err:
+        if _log.getEffectiveLevel() in (logging.DEBUG,):
+	    exc_str = traceback.format_exc()
+	    err = "{}\nTraceback:\n{}".format(err, exc_str)
         raise FunctionError("diff", "Runtime error: {}".format(err))
     t1 = time.time()
 
@@ -339,7 +343,8 @@ def main(cmdline=None):
     args = parser.parse_args(cmdline)
 
     # Set logging level.
-    _log.setLevel((logging.ERROR, logging.INFO, logging.DEBUG)[min(args.vb, 2)])
+    verbosity = (logging.ERROR, logging.INFO, logging.DEBUG)[min(args.vb, 2)]
+    _log.setLevel(verbosity)
 
     # Handle sub-commands.
     if hasattr(args, 'func'):
