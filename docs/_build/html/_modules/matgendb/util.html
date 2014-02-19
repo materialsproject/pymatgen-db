@@ -132,6 +132,43 @@
     <span class="k">return</span> <span class="n">db</span>
 
 </div>
+<div class="viewcode-block" id="normalize_auth"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.normalize_auth">[docs]</a><span class="k">def</span> <span class="nf">normalize_auth</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">readonly</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform the readonly/admin user and password to simple user/password,</span>
+<span class="sd">    as expected by QueryEngine.</span>
+
+<span class="sd">    :param settings: Connection settings</span>
+<span class="sd">    :type settings: dict</span>
+<span class="sd">    :param admin: Check for admin password</span>
+<span class="sd">    :param readonly: Check for readonly password</span>
+<span class="sd">    :return: Whether user/password are now in settings</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    :raise: KeyError if neither readonly, admin, or plain user/password are found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">P</span> <span class="o">=</span> <span class="s">&quot;user&quot;</span><span class="p">,</span> <span class="s">&quot;password&quot;</span>
+    <span class="c"># If user/password, un-prefixed, exists, do nothing.</span>
+    <span class="k">if</span> <span class="n">U</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="n">P</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="c"># Set prefixes</span>
+    <span class="n">prefixes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
+        <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;admin_&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">readonly</span><span class="p">:</span>
+        <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;readonly_&quot;</span><span class="p">)</span>
+
+    <span class="c"># Look for first user/password matching.</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">for</span> <span class="n">pfx</span> <span class="ow">in</span> <span class="n">prefixes</span><span class="p">:</span>
+        <span class="n">ukey</span><span class="p">,</span> <span class="n">pkey</span> <span class="o">=</span> <span class="n">pfx</span> <span class="o">+</span> <span class="n">U</span><span class="p">,</span> <span class="n">pfx</span> <span class="o">+</span> <span class="n">P</span>
+        <span class="k">if</span> <span class="n">ukey</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="n">pkey</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+            <span class="n">settings</span><span class="p">[</span><span class="n">U</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="n">ukey</span><span class="p">]</span>
+            <span class="n">settings</span><span class="p">[</span><span class="n">P</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">found</span>
+
+</div>
 <div class="viewcode-block" id="get_collection"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.get_collection">[docs]</a><span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">get_database</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="n">admin</span><span class="p">)</span>
     <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>

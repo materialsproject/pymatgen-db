@@ -1,14 +1,6 @@
 vv Package
 ==========
 
-:mod:`mquery` Module
---------------------
-
-.. automodule:: matgendb.vv.mquery
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`diff` Module
 --------------------
 

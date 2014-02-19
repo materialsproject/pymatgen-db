@@ -67,8 +67,7 @@ The "from" and "to" are required; default server is localhost.
 If a file path is given (i.e. the option does not have a ':' in it),
 then the format is JSON/YAML and the specification should be given
 under the "_email" key, which should be a mapping with keys
- "from", "to", and "server".
-For example the following commandline uses localhost:9101 to send mail::
+"from", "to", and "server". For example the following commandline uses localhost:9101 to send mail::
 
         mgvv [options] --email dkgunter@lbl.gov:somebody@host.org:localhost:9101
 
@@ -262,7 +261,7 @@ Arguments
 ---------
 
 Two positional arguments are required, to set the two collections.
-These are called the 'old' and 'new' collections, and both
+These are called the `old` and `new` collections, respectively. Both
 are configured using a pymatgen-db JSON config file.
 
 For an unauthenticated database, we only need 3 keys::
@@ -330,13 +329,46 @@ Key for matching records.
 
 Only report keys that are in the 'old' collection, but not in the 'new' collection.
 
+.. option:: -n, --numeric
+
+Fields with numeric values that must match, with a tolerance, as a comma-separated list, e.g.,
+``<name1>=<expr1>, <name2>=<expr2>, ..``. <name> is a field name, <expr> syntax is:
+
+==========  =======
+Expression  Meaning
+==========  =======
++-          Change in sign.
++-X         Plus or minus more than X. abs(new - old) > X
++X-Y        Plus more than X or minus more than Y. (new - old) > X or (old - new) > Y
++-X=        Plus or minus X or more. abs(new - old) >= X
++X-Y=       Plus X or more, or minus Y or more. (new - old) >= X or (old - new) >= Y
+...%        Percent change. Instead of "(new - old)", use "100 * (new - old) / old"
+==========  =======
+
+Some examples follow.
+
+* Report records where the value ``analysis.e_above_hull`` changes by more than 20% in either direction::
+
+        mgvv diff -k task_id --numeric "analysis.e_above_hull=+-20%" prod.json dev.json
+
+* Report records where the value ``energy`` changes sign::
+
+        mgvv diff -k name --numeric "energy=+-" conf/test1.json conf/test2.json
+
+* Report records where either the value ``frequency`` or ``duration`` change is some quantity or more::
+
+        mgvv diff -k somekey --numeric "frequency=+1.0-0.5=, duration=+10-15=" foo.json bar.json
+
+This option may be combined with any of the other options.
+
 .. option:: -p PROPS, --prop PROPS
 
 Fields with properties that must match, as comma-separated list , e.g '``these_must,match``'.
 
 .. option:: -q EXPR, --query EXPR
 
-Query to filter records before diff. Uses simplified constraint syntax, from smoqe package, e.g.,
+Query to filter records before key and value tests.
+Uses simplified constraint syntax, from smoqe package, e.g.,
 'name = "oscar" and grouchiness > 3'
 
 .. _mgvv diff examples:
