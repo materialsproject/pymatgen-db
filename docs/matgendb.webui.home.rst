@@ -1,27 +1,38 @@
-home Package
-============
+matgendb.webui.home package
+===========================
 
-:mod:`models` Module
---------------------
+Submodules
+----------
+
+matgendb.webui.home.models module
+---------------------------------
 
 .. automodule:: matgendb.webui.home.models
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`urls` Module
-------------------
+matgendb.webui.home.urls module
+-------------------------------
 
 .. automodule:: matgendb.webui.home.urls
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`views` Module
--------------------
+matgendb.webui.home.views module
+--------------------------------
 
 .. automodule:: matgendb.webui.home.views
     :members:
     :undoc-members:
     :show-inheritance:
 
+
+Module contents
+---------------
+
+.. automodule:: matgendb.webui.home
+    :members:
+    :undoc-members:
+    :show-inheritance:

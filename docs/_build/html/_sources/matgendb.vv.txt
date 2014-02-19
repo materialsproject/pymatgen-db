@@ -1,35 +1,52 @@
-vv Package
-==========
+matgendb.vv package
+===================
 
-:mod:`diff` Module
---------------------
+Subpackages
+-----------
+
+.. toctree::
+
+
+Submodules
+----------
+
+matgendb.vv.diff module
+-----------------------
 
 .. automodule:: matgendb.vv.diff
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`report` Module
---------------------
+matgendb.vv.report module
+-------------------------
 
 .. automodule:: matgendb.vv.report
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`util` Module
-------------------
+matgendb.vv.util module
+-----------------------
 
 .. automodule:: matgendb.vv.util
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`validate` Module
-----------------------
+matgendb.vv.validate module
+---------------------------
 
 .. automodule:: matgendb.vv.validate
     :members:
     :undoc-members:
     :show-inheritance:
 
+
+Module contents
+---------------
+
+.. automodule:: matgendb.vv
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,37 +1,5 @@
-matgendb Package
+matgendb package
 ================
-
-:mod:`matgendb` Package
------------------------
-
-.. automodule:: matgendb.__init__
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`creator` Module
----------------------
-
-.. automodule:: matgendb.creator
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`query_engine` Module
---------------------------
-
-.. automodule:: matgendb.query_engine
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`util` Module
-------------------
-
-.. automodule:: matgendb.util
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 Subpackages
 -----------
@@ -39,6 +7,42 @@ Subpackages
 .. toctree::
 
     matgendb.alchemy
+    matgendb.builders
     matgendb.vv
     matgendb.webui
 
+Submodules
+----------
+
+matgendb.creator module
+-----------------------
+
+.. automodule:: matgendb.creator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+matgendb.query_engine module
+----------------------------
+
+.. automodule:: matgendb.query_engine
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+matgendb.util module
+--------------------
+
+.. automodule:: matgendb.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: matgendb
+    :members:
+    :undoc-members:
+    :show-inheritance:
