@@ -193,8 +193,9 @@ def command_diff(args):
         _log.info("Filter (original => mongo): {} => {}".format(args.fltr, fltr))
 
     # Parse numeric change fields, if given
-    deltas = {}
-    numprops = [e.strip() for e in args.numprops.split(",")]
+    deltas, numprops = {}, []
+    if args.numprops:
+        numprops = [e.strip() for e in args.numprops.split(",")]
     for np in numprops:
         try:
             field, expr = np.split("=", 1)
