@@ -213,7 +213,10 @@ def command_diff(args):
 
     # Run diff.
     t0 = time.time()
-    r = df.diff(args.old, args.new, only_missing=args.missonly)
+    try:
+        r = df.diff(args.old, args.new, only_missing=args.missonly)
+    except Exception as err:
+        raise FunctionError("diff", "Runtime error: {}".format(err))
     t1 = time.time()
 
     # Build report.
