@@ -39,7 +39,7 @@ class Differ(object):
         :type deltas: dict
         :raise: ValueError if some delta does not parse.
         """
-        self._key = key
+        self._key_field = key
         self._props = [] if props is None else props
         self._info = [] if info is None else info
         self._filter = fltr if fltr else {}
@@ -69,10 +69,16 @@ class Differ(object):
         # Connect.
         _log.info("connect.start")
         if isinstance(c1, QueryEngine):
-            # assume
-            collections = [c.collection for c in c1, c2]
+            engines = [c1, c2]
         else:
-            collections = map(util.get_collection, (c1, c2))
+            engines = []
+            for cfg in c1, c2:
+                settings = util.get_settings(cfg)
+                if not util.normalize_auth(settings):
+                    _log.warn("Config file {} does not have a username/password".format(cfg))
+                settings["aliases_config"] = {"aliases": {}, "defaults": {}}
+                engine = QueryEngine(**settings)
+                engines.append(engine)
         _log.info("connect.end")
 
         # Query DB.
@@ -81,7 +87,7 @@ class Differ(object):
         numprops = [{}, {}]
 
         # Build query fields.
-        fields = dict.fromkeys(self._info + self._all_props + [self._key], True)
+        fields = dict.fromkeys(self._info + self._all_props + [self._key_field], True)
         if not '_id' in fields:  # explicitly remove _id if not given
             fields['_id'] = False
 
@@ -89,24 +95,25 @@ class Differ(object):
         info = {}  # per-key information
         has_info, has_props = bool(self._info), bool(self._all_props)
         has_numprops, has_eqprops = bool(self._prop_deltas), bool(self._props)
-        _log.info("query.start")
+        _log.info("query.start query={} fields={}".format(self._filter, fields))
         t0 = time.time()
 
         # Main query loop.
-        for i, coll in enumerate(collections):
+        for i, coll in enumerate(engines):
             _log.debug("collection {:d}".format(i))
             count, missing_props = 0, 0
-            for rec in coll.find(self._filter, fields=fields):
+            for rec in coll.query(criteria=self._filter, properties=fields):
                 count += 1
-                key = rec[self._key]
-                if not allow_dup and key in keys[i]:
-                    raise ValueError("Duplicate key: {}".format(key))
+                # Extract key from record.
                 try:
-                    keys[i].add(key)
+                    key = rec[self._key_field]
                 except KeyError:
                     _log.critical("Key '{}' not found in record: {}. Abort.".format(
-                                  self._key, rec))
+                        self._key_field, rec))
                     return {}
+                if not allow_dup and key in keys[i]:
+                    raise ValueError("Duplicate key: {}".format(key))
+                keys[i].add(key)
                 # Extract numeric properties.
                 if has_numprops:
                     pvals = {}
@@ -114,9 +121,10 @@ class Differ(object):
                         try:
                             pvals[pkey] = float(rec[pkey])
                         except KeyError:
+                            print("@@ missing {} on {}".format(pkey, rec))
                             missing_props += 1
                             continue
-                        except ValueError:
+                        except (TypeError, ValueError):
                             raise ValueError("Not a number: collection={c} key={k} {p}='{v}'"
                                              .format(k=key, c=("old", "new")[i], p=pkey, v=rec[pkey]))
                     numprops[i][key] = pvals
@@ -126,6 +134,7 @@ class Differ(object):
                         propval = tuple([(p, str(rec[p])) for p in self._props])
                     except KeyError:
                         missing_props += 1
+                        print("@@ missing {} on {}".format(pkey, rec))
                         continue
                     eqprops[i][key] = propval
 
@@ -134,7 +143,7 @@ class Differ(object):
                     info[key] = {k: rec[k] for k in self._info}
 
             # Stop if we don't have properties on any record at all
-            if missing_props == count:
+            if 0 < count == missing_props:
                 _log.critical("Missing one or more properties on all {:d} records"
                               .format(count))
                 return {}
@@ -169,9 +178,9 @@ class Differ(object):
             if not only_missing:
                 result[self.NEW] = [info[key] for key in new]
         else:
-            result[self.MISSING] = [{self._key: key} for key in missing]
+            result[self.MISSING] = [{self._key_field: key} for key in missing]
             if not only_missing:
-                result[self.NEW] = [{self._key: key} for key in new]
+                result[self.NEW] = [{self._key_field: key} for key in new]
         result[self.CHANGED] = changed
         _log.debug("build_result.end")
 
@@ -187,14 +196,14 @@ class Differ(object):
                 for pkey in self._prop_deltas:
                     oldval, newval = numprops[0][key][pkey], numprops[1][key][pkey]
                     if self._prop_deltas[pkey].cmp(oldval, newval):
-                        change = {"match_type": "delta", self._key: key, "property": pkey,
+                        change = {"match_type": "delta", self._key_field: key, "property": pkey,
                                   "old": "{:f}".format(oldval), "new": "{:f}".format(newval),
                                   "rule": self._prop_deltas[pkey]}
                         changed.append(_up(change, info[key]) if info else change)
             # Exact property comparison.
             if has_eqprops:
                 if not eqprops[0][key] == eqprops[1][key]:
-                    change = {"match_type": "exact", self._key: key,
+                    change = {"match_type": "exact", self._key_field: key,
                               "old": eqprops[0][key], "new": eqprops[1][key]}
                     changed.append(_up(change, info[key]) if info else change)
         return changed
