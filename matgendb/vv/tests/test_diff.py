@@ -12,7 +12,11 @@ from matgendb.vv.diff import Differ, Delta
 db_config = {
     'host': 'localhost',
     'port': 27017,
-    'database': 'test'
+    'database': 'test',
+    'aliases_config': {
+        'aliases': {},
+        'defaults': {}
+    }
 }
 
 
