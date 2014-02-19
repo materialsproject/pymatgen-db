@@ -59,7 +59,7 @@ class QueryEngine(object):
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
-                 aliases_config=None, default_properties=None):
+                 aliases_config=None, default_properties=None, **ignore):
         """
         Args:
             host:
@@ -345,6 +345,7 @@ class QueryEngine(object):
             props, prop_dict = None, None
 
         crit = self._parse_criteria(criteria) if criteria is not None else {}
+        #print("@@ mongo query = {} and fields = {}".format(crit, props))
         cur = self.collection.find(crit, fields=props,
                                    timeout=False).skip(index)
         if limit is not None:
