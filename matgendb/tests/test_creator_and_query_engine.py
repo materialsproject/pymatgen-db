@@ -55,6 +55,9 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
         self.assertEqual(drone.database, "wacky")
 
     def test_assimilate(self):
+        """Borg assimilation code.
+        This takes too long for a unit test!
+        """
         simulate = True if VaspToDbTaskDroneTest.conn is None else False
         drone = VaspToDbTaskDrone(database="creator_unittest",
                                   simulate_mode=simulate)
