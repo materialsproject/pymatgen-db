@@ -75,6 +75,43 @@ def get_database(config_file=None, settings=None, admin=False):
     return db
 
 
+def normalize_auth(settings, admin=True, readonly=True):
+    """Transform the readonly/admin user and password to simple user/password,
+    as expected by QueryEngine.
+
+    :param settings: Connection settings
+    :type settings: dict
+    :param admin: Check for admin password
+    :param readonly: Check for readonly password
+    :return: Whether user/password are now in settings
+    :rtype: bool
+    :raise: KeyError if neither readonly, admin, or plain user/password are found
+    """
+    U, P = "user", "password"
+    # If user/password, un-prefixed, exists, do nothing.
+    if U in settings and P in settings:
+        return True
+
+    # Set prefixes
+    prefixes = []
+    if admin:
+        prefixes.append("admin_")
+    if readonly:
+        prefixes.append("readonly_")
+
+    # Look for first user/password matching.
+    found = False
+    for pfx in prefixes:
+        ukey, pkey = pfx + U, pfx + P
+        if ukey in settings and pkey in settings:
+            settings[U] = settings[ukey]
+            settings[P] = settings[pkey]
+            found = True
+            break
+
+    return found
+
+
 def get_collection(config_file, admin=False):
     db = get_database(config_file, admin=admin)
     settings = get_settings(config_file)
