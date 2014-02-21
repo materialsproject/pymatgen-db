@@ -220,8 +220,8 @@ def command_diff(args):
         r = df.diff(args.old, args.new, only_missing=args.missonly)
     except Exception as err:
         if _log.getEffectiveLevel() in (logging.DEBUG,):
-	    exc_str = traceback.format_exc()
-	    err = "{}\nTraceback:\n{}".format(err, exc_str)
+            exc_str = traceback.format_exc()
+            err = "{}\nTraceback:\n{}".format(err, exc_str)
         raise FunctionError("diff", "Runtime error: {}".format(err))
     t1 = time.time()
 
@@ -235,8 +235,11 @@ def command_diff(args):
     if args.format is None:
         args.format = ("text", "html")[bool(args.email)]
     as_html = args.format == "html"
+    fmt_kwargs = dict(key=args.key)
+    if as_html:
+        fmt_kwargs['url'] = args.rest_url
     fmt_class = getattr(report, ("DiffTextFormatter", "DiffHtmlFormatter")[as_html])
-    text = fmt_class(meta).format(r)
+    text = fmt_class(meta, **fmt_kwargs).format(r)
 
     # Print or send report.
     if args.email:
@@ -337,6 +340,9 @@ def main(cmdline=None):
                                                             "Uses simplified constraint syntax, e.g., "
                                                             "'name = \"oscar\" and grouchiness > 3'",
                       dest="fltr")
+    subp.add_argument("-u", "--url", metavar="URL", dest="rest_url",
+                      help="In HTML reports, make the key into a hyperlink by prefixing with URL. "
+                           "e.g., 'https://materialsproject.org/tasks/'.")
     subp.add_argument("old", help="pymatgen-db JSON config file for the 'old' collection")
     subp.add_argument("new", help="pymatgen-db JSON config file for the 'new' collection")
 

@@ -69,7 +69,7 @@
 
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">DoesLogging</span>
 <span class="kn">from</span> <span class="nn">..util</span> <span class="kn">import</span> <span class="n">MongoJSONEncoder</span>
-
+<span class="kn">from</span> <span class="nn">.diff</span> <span class="kn">import</span> <span class="n">Differ</span>  <span class="c"># for field constants</span>
 
 <div class="viewcode-block" id="Report"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Report">[docs]</a><span class="k">class</span> <span class="nc">Report</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
@@ -457,7 +457,7 @@
 
     <span class="n">TITLE</span> <span class="o">=</span> <span class="s">&quot;Materials Project Database Diff Report&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">TITLE</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
 <span class="sd">        :param meta: Report metadata, must have the following keys:</span>
@@ -465,8 +465,11 @@
 <span class="sd">                     - elapsed: float #sec for end_time - start_time</span>
 <span class="sd">                     - db1, db2: string repr of 2 input database/collections.</span>
 <span class="sd">        :type meta: dict</span>
+<span class="sd">        :param key: Record key field</span>
+<span class="sd">        :type key: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">meta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
 
 <div class="viewcode-block" id="DiffFormatter.format"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Format a report from a result object.</span>
@@ -475,6 +478,35 @@
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="DiffFormatter.result_subsets"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffFormatter.result_subsets">[docs]</a>    <span class="k">def</span> <span class="nf">result_subsets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Break a result set into subsets with the same keys.</span>
+
+<span class="sd">        :param rs: Result set, rows of a result as a list of dicts</span>
+<span class="sd">        :type rs: list of dict</span>
+<span class="sd">        :return: A set with distinct keys (tuples), and a dict, by these tuples, of max. widths for each column</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keyset</span><span class="p">,</span> <span class="n">maxwid</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rs</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="n">keyset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">maxwid</span><span class="p">:</span>
+                <span class="n">maxwid</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="n">strlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+                <span class="n">maxwid</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxwid</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">strlen</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">keyset</span><span class="p">,</span> <span class="n">maxwid</span>
+</div>
+<div class="viewcode-block" id="DiffFormatter.ordered_cols"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffFormatter.ordered_cols">[docs]</a>    <span class="k">def</span> <span class="nf">ordered_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return ordered list of columns, from given columns and the name of the section</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>  <span class="c"># might be a tuple</span>
+        <span class="n">fixed_cols</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;different&quot;</span><span class="p">:</span>
+            <span class="n">fixed_cols</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_MATCH_KEY</span><span class="p">,</span> <span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_OLD</span><span class="p">,</span> <span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_NEW</span><span class="p">])</span>
+        <span class="nb">map</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">remove</span><span class="p">,</span> <span class="n">fixed_cols</span><span class="p">)</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fixed_cols</span> <span class="o">+</span> <span class="n">columns</span>
 
 </div></div>
 <div class="viewcode-block" id="DiffHtmlFormatter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffHtmlFormatter">[docs]</a><span class="k">class</span> <span class="nc">DiffHtmlFormatter</span><span class="p">(</span><span class="n">DiffFormatter</span><span class="p">):</span>
@@ -501,6 +533,16 @@
 <span class="s">    .fixed { font-family: Consolas, monaco, monospace; }</span>
 <span class="s">    &quot;&quot;&quot;</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param meta: see superclass</span>
+<span class="sd">        :param url: Optional URL to create hyperlink for keys</span>
+<span class="sd">        :type url: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">DiffFormatter</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="n">url</span>
+
 <div class="viewcode-block" id="DiffHtmlFormatter.format"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffHtmlFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate HTML report.</span>
 
@@ -521,24 +563,32 @@
 
     <span class="k">def</span> <span class="nf">_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="n">body</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&lt;div class=&#39;content&#39;&gt;&quot;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="s">&quot;additional&quot;</span><span class="p">,</span> <span class="s">&quot;missing&quot;</span><span class="p">,</span> <span class="s">&quot;different&quot;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;div class=&#39;section&#39;&gt;&lt;h2&gt;{}&lt;/h2&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">title</span><span class="p">()))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;div class=&#39;empty&#39;&gt;Empty&lt;/div&gt;&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">body</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">]))</span>
+                <span class="n">body</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">]))</span>
             <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
         <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
-        <span class="n">table</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&lt;table&gt;&quot;</span><span class="p">]</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="n">table</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;&lt;tr&gt;&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;th&gt;{}&lt;/th&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;/tr&gt;&quot;</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;&lt;tr&gt;&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;td&gt;{}&lt;/td&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;/tr&gt;&quot;</span><span class="p">])</span>
-        <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/table&gt;&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">table</span>
+    <span class="k">def</span> <span class="nf">_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+        <span class="n">subsets</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_subsets</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">subset</span> <span class="ow">in</span> <span class="n">subsets</span><span class="p">:</span>
+            <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;table&gt;&quot;</span><span class="p">)</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_cols</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
+            <span class="c"># Format the table.</span>
+            <span class="n">tables</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;&lt;tr&gt;&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;th&gt;{}&lt;/th&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;/tr&gt;&quot;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="o">!=</span> <span class="n">subset</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">r</span><span class="p">[</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="s">&quot;&lt;a href=&#39;{p}{v}&#39;&gt;{v}&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+                <span class="n">tables</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;&lt;tr&gt;&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;td&gt;{}&lt;/td&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;/tr&gt;&quot;</span><span class="p">])</span>
+            <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/table&gt;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tables</span>
 
 </div>
 <div class="viewcode-block" id="DiffTextFormatter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffTextFormatter">[docs]</a><span class="k">class</span> <span class="nc">DiffTextFormatter</span><span class="p">(</span><span class="n">DiffFormatter</span><span class="p">):</span>
@@ -565,25 +615,19 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;{}EMPTY&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">indent</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">rs</span><span class="p">,</span> <span class="n">keyset</span><span class="p">,</span> <span class="n">maxwid</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">],</span> <span class="nb">set</span><span class="p">(),</span> <span class="p">{}</span>
-                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rs</span><span class="p">:</span>
-                    <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-                    <span class="n">keyset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">maxwid</span><span class="p">:</span>
-                        <span class="n">maxwid</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-                        <span class="n">strlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
-                        <span class="n">maxwid</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxwid</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">strlen</span><span class="p">)</span>
+                <span class="n">keyset</span><span class="p">,</span> <span class="n">maxwid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_subsets</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">])</span>
                 <span class="k">for</span> <span class="n">columns</span> <span class="ow">in</span> <span class="n">keyset</span><span class="p">:</span>
+                    <span class="n">ocol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_cols</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
                     <span class="n">mw</span> <span class="o">=</span> <span class="n">maxwid</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
-                    <span class="n">fmt</span> <span class="o">=</span> <span class="s">&#39;  &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;{{:{:d}s}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mw</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">))])</span>
+                    <span class="n">mw_i</span> <span class="o">=</span> <span class="p">[</span><span class="n">columns</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ocol</span><span class="p">]</span>  <span class="c"># reorder indexes</span>
+                    <span class="n">fmt</span> <span class="o">=</span> <span class="s">&#39;  &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;{{:{:d}s}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mw</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mw_i</span><span class="p">])</span>
                     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
-                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">columns</span><span class="p">))</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">ocol</span><span class="p">))</span>
                     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="s">&#39;-_&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)))</span>
-                    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rs</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">]:</span>
                         <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
                         <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">columns</span><span class="p">:</span>
-                            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]</span>
+                            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ocol</span><span class="p">]</span>
                             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">))</span>
         <span class="k">return</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
 </div>

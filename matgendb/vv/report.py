@@ -12,7 +12,7 @@ import smtplib
 
 from .util import DoesLogging
 from ..util import MongoJSONEncoder
-
+from .diff import Differ  # for field constants
 
 class Report:
     def __init__(self, header):
@@ -400,7 +400,7 @@ class DiffFormatter(object):
 
     TITLE = "Materials Project Database Diff Report"
 
-    def __init__(self, meta, title=TITLE):
+    def __init__(self, meta, key=None):
         """Constructor.
 
         :param meta: Report metadata, must have the following keys:
@@ -408,8 +408,11 @@ class DiffFormatter(object):
                      - elapsed: float #sec for end_time - start_time
                      - db1, db2: string repr of 2 input database/collections.
         :type meta: dict
+        :param key: Record key field
+        :type key: str
         """
         self.meta = meta
+        self.key = key
 
     def format(self, result):
         """Format a report from a result object.
@@ -418,6 +421,35 @@ class DiffFormatter(object):
         :rtype: str
         """
         raise NotImplementedError()
+
+    def result_subsets(self, rs):
+        """Break a result set into subsets with the same keys.
+
+        :param rs: Result set, rows of a result as a list of dicts
+        :type rs: list of dict
+        :return: A set with distinct keys (tuples), and a dict, by these tuples, of max. widths for each column
+        """
+        keyset, maxwid = set(), {}
+        for r in rs:
+            key = tuple(sorted(r.keys()))
+            keyset.add(key)
+            if key not in maxwid:
+                maxwid[key] = [len(k) for k in key]
+            for i, k in enumerate(key):
+                strlen = len("{}".format(r[k]))
+                maxwid[key][i] = max(maxwid[key][i], strlen)
+        return keyset, maxwid
+
+    def ordered_cols(self, columns, section):
+        """Return ordered list of columns, from given columns and the name of the section
+        """
+        columns = list(columns)  # might be a tuple
+        fixed_cols = [self.key]
+        if section.lower() == "different":
+            fixed_cols.extend([Differ.CHANGED_MATCH_KEY, Differ.CHANGED_OLD, Differ.CHANGED_NEW])
+        map(columns.remove, fixed_cols)
+        columns.sort()
+        return fixed_cols + columns
 
 
 class DiffHtmlFormatter(DiffFormatter):
@@ -444,6 +476,16 @@ class DiffHtmlFormatter(DiffFormatter):
     .fixed { font-family: Consolas, monaco, monospace; }
     """)
 
+    def __init__(self, meta, url=None, **kwargs):
+        """Constructor.
+
+        :param meta: see superclass
+        :param url: Optional URL to create hyperlink for keys
+        :type url: str
+        """
+        DiffFormatter.__init__(self, meta, **kwargs)
+        self._url = url
+
     def format(self, result):
         """Generate HTML report.
 
@@ -464,24 +506,32 @@ class DiffHtmlFormatter(DiffFormatter):
 
     def _body(self, result):
         body = ["<div class='content'>"]
-        for section in "additional", "missing", "different":
+        for section in result.keys():
             body.append("<div class='section'><h2>{}</h2>".format(section.title()))
             if len(result[section]) == 0:
                 body.append("<div class='empty'>Empty</div>")
             else:
-                body.extend(self._table(result[section]))
+                body.extend(self._table(section, result[section]))
             body.append("</div>")
         body.append("</div>")
         return ''.join(body)
 
-    def _table(self, rows):
-        table = ["<table>"]
-        cols = sorted(rows[0].keys())
-        table.extend(["<tr>"] + ["<th>{}</th>".format(c) for c in cols] + ["</tr>"])
-        for r in rows:
-            table.extend(["<tr>"] + ["<td>{}</td>".format(r[c]) for c in cols] + ["</tr>"])
-        table.append("</table>")
-        return table
+    def _table(self, section, rows):
+        subsets, _ = self.result_subsets(rows)
+        tables = []
+        for subset in subsets:
+            tables.append("<table>")
+            cols = self.ordered_cols(subset, section)
+            # Format the table.
+            tables.extend(["<tr>"] + ["<th>{}</th>".format(c) for c in cols] + ["</tr>"])
+            for r in rows:
+                if tuple(sorted(r.keys())) != subset:
+                    continue
+                if self._url is not None:
+                    r[cols[0]] = "<a href='{p}{v}'>{v}</a>".format(p=self._url, v=r[cols[0]])
+                tables.extend(["<tr>"] + ["<td>{}</td>".format(r[c]) for c in cols] + ["</tr>"])
+            tables.append("</table>")
+        return tables
 
 
 class DiffTextFormatter(DiffFormatter):
@@ -508,25 +558,19 @@ class DiffTextFormatter(DiffFormatter):
             if len(result[section]) == 0:
                 lines.append("{}EMPTY".format(indent))
             else:
-                rs, keyset, maxwid = result[section], set(), {}
-                for r in rs:
-                    key = tuple(sorted(r.keys()))
-                    keyset.add(key)
-                    if key not in maxwid:
-                        maxwid[key] = [len(k) for k in key]
-                    for i, k in enumerate(key):
-                        strlen = len("{}".format(r[k]))
-                        maxwid[key][i] = max(maxwid[key][i], strlen)
+                keyset, maxwid = self.result_subsets(result[section])
                 for columns in keyset:
+                    ocol = self.ordered_cols(columns, section)
                     mw = maxwid[columns]
-                    fmt = '  '.join(["{{:{:d}s}}".format(mw[i]) for i in xrange(len(columns))])
+                    mw_i = [columns.index(c) for c in ocol]  # reorder indexes
+                    fmt = '  '.join(["{{:{:d}s}}".format(mw[i]) for i in mw_i])
                     lines.append("")
-                    lines.append(indent + fmt.format(*columns))
+                    lines.append(indent + fmt.format(*ocol))
                     lines.append(indent + '-_' * (sum(mw)/2 + len(columns)))
-                    for r in rs:
+                    for r in result[section]:
                         key = tuple(sorted(r.keys()))
                         if key == columns:
-                            values = [r[k] for k in columns]
+                            values = [r[k] for k in ocol]
                             lines.append(indent + fmt.format(*values))
         return '\n'.join(lines)
 

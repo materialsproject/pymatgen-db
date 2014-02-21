@@ -291,7 +291,7 @@ Options
 
 usage: mgvv [constraint [constraint ...]] diff [-h] [--verbose] [-e ADDR]
                                                [-f FORMAT] [-s HOST] [-i INFO]
-                                               -k KEY [-m] [-p PROPS]
+                                               -k KEY [-m] [-p PROPS] [-q query]
                                                old new
 
 .. option:: --help, -h
@@ -338,6 +338,7 @@ Fields with numeric values that must match, with a tolerance, as a comma-separat
 Expression  Meaning
 ==========  =======
 +-          Change in sign.
++-=         Change in sign, including change from positive or negative to zero.
 +-X         Plus or minus more than X. abs(new - old) > X
 +X-Y        Plus more than X or minus more than Y. (new - old) > X or (old - new) > Y
 +-X=        Plus or minus X or more. abs(new - old) >= X
@@ -370,6 +371,14 @@ Fields with properties that must match, as comma-separated list , e.g '``these_m
 Query to filter records before key and value tests.
 Uses simplified constraint syntax, from smoqe package, e.g.,
 'name = "oscar" and grouchiness > 3'
+
+.. option::  -u URL, --url URL
+
+In HTML reports, make the key into a hyperlink by prefixing with URL.
+This can be used to take advantage of clean RESTful URL schemes such as those found in
+the Materials Project webpages::
+
+    mgvv diff -k task_id -u 'https://materialsproject.org/tasks/'
 
 .. _mgvv diff examples:
 

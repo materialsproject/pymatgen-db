@@ -24,6 +24,13 @@ class Differ(object):
     #: Keys in result dictionary.
     MISSING, NEW, CHANGED = 'missing', 'additional', 'different'
 
+    #: CHANGED result fields
+    CHANGED_MATCH_KEY = "match type"
+    CHANGED_MATCH_DELTA = "delta"
+    CHANGED_MATCH_EXACT = "exact"
+    CHANGED_OLD = "old"
+    CHANGED_NEW = "new"
+
     #: for missing property
     NO_PROPERTY = "__MISSING__"
 
@@ -140,8 +147,8 @@ class Differ(object):
 
                 # Extract informational fields.
                 if has_info:
-		    if key not in info:
-		        info[key] = {}
+                    if key not in info:
+                        info[key] = {}
                     for k in self._info:
                         info[key][k] = rec[k]
 
@@ -159,7 +166,7 @@ class Differ(object):
 
         # Compute missing and new keys.
         _log.debug("compute_difference.start")
-        missing = keys[0] - keys[1]
+        missing, new = keys[0] - keys[1], []
         if not only_missing:
             new = keys[1] - keys[0]
         _log.debug("compute_difference.end")
@@ -173,19 +180,18 @@ class Differ(object):
 
         # Build result.
         _log.debug("build_result.begin")
-        result = {}
-        result[self.MISSING] = []
+        result = {self.MISSING: []}
         for key in missing:
-	    rec = {self._key_field: key}
+            rec = {self._key_field: key}
             if has_info:
                 rec.update(info.get(key, {}))
-	    result[self.MISSING].append(rec)
+            result[self.MISSING].append(rec)
         if not only_missing:
             result[self.NEW] = []
             for key in new:
-	        rec = {self._key_field: key}
+                rec = {self._key_field: key}
                 if has_info:
-		    rec.update(info.get(key,{}))
+                    rec.update(info.get(key, {}))
                 result[self.NEW].append(rec)
         result[self.CHANGED] = changed
         _log.debug("build_result.end")
@@ -202,15 +208,15 @@ class Differ(object):
                 for pkey in self._prop_deltas:
                     oldval, newval = numprops[0][key][pkey], numprops[1][key][pkey]
                     if self._prop_deltas[pkey].cmp(oldval, newval):
-                        change = {"match_type": "delta", self._key_field: key, "property": pkey,
-                                  "old": "{:f}".format(oldval), "new": "{:f}".format(newval),
+                        change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_DELTA, self._key_field: key, "property": pkey,
+                                  self.CHANGED_OLD: "{:f}".format(oldval), self.CHANGED_NEW: "{:f}".format(newval),
                                   "rule": self._prop_deltas[pkey]}
                         changed.append(_up(change, info[key]) if info else change)
             # Exact property comparison.
             if has_eqprops:
                 if not eqprops[0][key] == eqprops[1][key]:
-                    change = {"match_type": "exact", self._key_field: key,
-                              "old": eqprops[0][key], "new": eqprops[1][key]}
+                    change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_EXACT, self._key_field: key,
+                              self.CHANGED_OLD: eqprops[0][key], self.CHANGED_NEW: eqprops[1][key]}
                     changed.append(_up(change, info[key]) if info else change)
         return changed
 
@@ -219,7 +225,8 @@ class Delta(object):
     """Delta between two properties.
 
     Syntax:
-        +-       Change in sign
+        +-       Change in sign, 0 not included
+        +-=      Change in sign, + to 0 or - to 0 included
         +-X      abs(new - old) > X
         +X-Y     (new - old) > X or (old - new) > Y
         +-X=     abs(new - old) >= X
@@ -244,7 +251,6 @@ class Delta(object):
             p = m.span()[1]
             raise ValueError("Junk at end of delta '{}': {}".format(s, s[p:]))
 
-
         # Save a copy of orig.
         self._orig_expr = s
 
@@ -260,6 +266,7 @@ class Delta(object):
         if d['X'] is None and d['Y'] is None:
             # Change in sign only
             self._sign = True
+            self._eq = d['eq'] is not None
         elif d['X'] is not None and d['Y'] is None:
             raise ValueError("Bad syntax for delta '{}': +X-".format(s))
         else:
@@ -298,6 +305,8 @@ class Delta(object):
         return self._cmp(old, new)
 
     def _cmp_sign(self, a, b):
+        if self._eq:
+            return (a < 0 <= b) or (a > 0 >= b)
         return (a < 0 < b) or (a > 0 > b)
 
     def _cmp_val(self, a, b):
