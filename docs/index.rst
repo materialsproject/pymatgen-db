@@ -16,6 +16,9 @@ In addition, Pymatgen-db provides command-line tools for validation of MongoDB d
 tools are designed with the Materials Project databases in mind, they could be used
 with almost any MongoDB database.
 
+.. contents::
+    :depth: 1
+
 Change Log
 ==========
 

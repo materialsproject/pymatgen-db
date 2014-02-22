@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 """
-Run validation tests of (MongoDB) databases.
+Run validation-related actions against (MongoDB) databases.
 Database connections are configured from a file
 and the constraints to validate against can come from a file or the command-line.
 """
@@ -27,21 +27,28 @@ from matgendb.vv import diff
 #from matgendb.vv import mquery
 from smoqe.query import to_mongo, BadExpression
 
-# Initialize module logging
+
+# Logging
+# -------
+
 _log_name = 'mg'
 _log = logging.getLogger(_log_name)
 _handler = logging.StreamHandler()
 _handler.setFormatter(logging.Formatter('%(levelname)-7s [%(name)s] %(message)s'))
 _log.addHandler(_handler)
 
-## Constants
+
+# Constants
+# ---------
 
 DB_KEY = '_db'              # in YAML file
 ALIASES_KEY = '_aliases'    # in YAML file
 
 PATTERN_KEY_PREFIX_IGNORE = '_'
 
-## Exceptions
+
+# Exceptions
+# ----------
 
 
 class FunctionError(Exception):
@@ -51,7 +58,18 @@ class FunctionError(Exception):
         msg = "In '{}' command: {}".format(command, why)
         Exception.__init__(self, msg)
 
-## Functions
+
+class ArgumentError(Exception):
+    """Command-line arg. error
+    """
+
+    def __init__(self, msg):
+        Exception.__init__(self, msg)
+        self.msg = msg
+
+
+# Utility functions
+# -----------------
 
 
 def wstrip(s):
@@ -61,8 +79,10 @@ def wstrip(s):
 def textlist(items):
     return ', '.join(items)
 
+
 def mapdump(d):
     return textlist(('{}={}'.format(k, v) for k, v in d.iteritems()))
+
 
 def nvpstr(s):
     """Return tuple (name, value) from string in form 'name=value'.
@@ -130,9 +150,9 @@ def _config_email(fname):
         d['recipients'] = info['to']
         if isinstance(d['recipients'], str):
             d['recipients'] = [d['recipients']]
-    except KeyError, err:
+    except KeyError:
         raise ValueError('from/to not found in file {} mapping key "_email"'
-        .format(fname))
+                         .format(fname))
     if 'port' in info:
         d['port'] = int(info['port'])
     if 'host' in info:
@@ -141,10 +161,6 @@ def _config_email(fname):
         d['subject'] = info['subject']
     return d
 
-
-# --------
-# Commands
-# --------
 
 def _splitup(s, sep, n1, n2):
     parts = s.split(sep)
@@ -160,12 +176,16 @@ def parse_email_args(msg, server):
     return {"sender": mp[0],
             "recipients": [x.strip() for x in mp[1].split(',')],
             "subject": "" if len(mp) < 3 else mp[2],
-            "host": sp[0],
+            "server": sp[0],
             "port": int(sp[1]) if len(sp) > 1 else smtplib.SMTP_PORT}
 
 
 def _dbinfo(cfg):
     return "{host}/{collection}.{database}".format(**cfg)
+
+
+# Subcommands
+# -----------
 
 
 def command_diff(args):
@@ -217,7 +237,7 @@ def command_diff(args):
     # Run diff.
     t0 = time.time()
     try:
-        r = df.diff(args.old, args.new, only_missing=args.missonly)
+        r = df.diff(args.old, args.new, only_missing=args.missonly, only_values=args.changeonly)
     except Exception as err:
         if _log.getEffectiveLevel() in (logging.DEBUG,):
             exc_str = traceback.format_exc()
@@ -238,6 +258,7 @@ def command_diff(args):
     fmt_kwargs = dict(key=args.key)
     if as_html:
         fmt_kwargs['url'] = args.rest_url
+        fmt_kwargs['email_mode'] = args.email
     fmt_class = getattr(report, ("DiffTextFormatter", "DiffHtmlFormatter")[as_html])
     text = fmt_class(meta, **fmt_kwargs).format(r)
 
@@ -251,129 +272,24 @@ def command_diff(args):
 
     return 0
 
-# ------------
-# Main program
-# ------------
 
-
-def main(cmdline=None):
-    """Main program entry point.
-
-    :param cmdline: command-line
-    :return: Status, 0=ok otherwise an error
-    :rtype : int
+def command_validate(args, formatters):
+    """Run validation command.
     """
-    retcode = 0
-
-    if cmdline is None:
-        cmdline = sys.argv[1:]
-    desc = ' '.join(__doc__.split())
-    formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter,
-                      md=report.MarkdownFormatter)
-
-    # Configure parent parser for shared args.
-    parent_parser = argparse.ArgumentParser(add_help=False)
-    parent_parser.add_argument('--verbose', '-v', dest='vb', action="count", default=0,
-                               help="Print more verbose messages to standard error. Repeatable. (default=ERROR)")
-
-    # Options for main command.
-    parser = argparse.ArgumentParser(description=desc, parents=[parent_parser])
-    parser.add_argument('constraint', nargs='*')
-    parser.add_argument('--alias', '-a', dest='aliases', action='append', type=nvpstr, metavar="ALIAS", default=[],
-                        help='Alias for a field used in a constraint or condition, in form alias=name_in_db')
-    parser.add_argument('--config', '-c', dest='config_file', metavar='FILE', default=None,
-                        help="Configuration file for database connection. "
-                             "Generate one using mgdb init --config filename.json, if necessary. "
-                             "Otherwise, the code searches for a db.json. If "
-                             "none is found, a no-authentication "
-                             "localhost:27017/vasp database is assumed.")
-    parser.add_argument('--collection', '-C', dest='coll', metavar='NAME', default=None,
-                        help='Collection name for constraints given on command-line')
-    parser.add_argument('--email', '-e', dest='email', default=None,
-                        help='Email report to EMAIL at {from}:{to}[:host[:port[/subject]]].'
-                             'The "from" and "to" are required; default host is localhost. '
-                             'This information can also be in the main config file under the "_email" key, '
-                             'which should be a mapping with keys "from", "to", "host", "port", and "subject".')
-    parser.add_argument('--empty', dest='send_on_empty', action='store_true',
-                        help="Send a report, even if it is empty (default=print warning and don't send)")
-    parser.add_argument('--exonly', dest='must_exist', action='store_true', default=False,
-                        help='Only show results where all fields in the constraints are also present in the record')
-    parser.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
-                        help='Main configuration file. Has constraints, and optionally email info.')
-    parser.add_argument('--format', '-F', dest='report_format', metavar='FORMAT', default='html',
-                        help='Report format: {} (default=html)'.format(', '.join(formatters.keys())))
-    parser.add_argument('--limit', '-m', dest='limit', metavar='NUM', type=int, default=50,
-                        help='Limit number of displayed constraint violations per-collection 0=no limit (50)')
-    parser.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
-                        help='Report progress every NUM invalid records found')
-    parser.add_argument('--user', '-u', dest='user', metavar='NAME', default=None,
-                        help='User name, for the report')
-
-    # Diff command.
-    subparsers = parser.add_subparsers(description="Other actions")
-    subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
-    subp.set_defaults(func=command_diff)
-    subp.add_argument("-e", "--email", dest='email', default=None, metavar="ADDR",
-                      help="Email report, instead of printing it to standard output. "
-                           "ADDR is of the form: sender/receiver,[receiver2...][/subject].")
-    subp.add_argument("-f", "--format", dest="format", metavar="FORMAT", default=None,
-                      help="Report format: 'text' (default for screen) or 'html' (default for email)",
-                      choices=["text", "html"])
-    subp.add_argument("-s", "--email-server", dest="email_server", default="localhost", metavar="HOST",
-                      help="Server HOST for an email report, in form hostname[:port]. Default is localhost")
-    subp.add_argument("-i", "--info", help="Extra fields for records, as comma-separated list"
-                                           ", e.g 'extra,fields,to_include'", dest="info", default=None)
-    subp.add_argument("-k", "--key", help="Key for matching records", dest="key", required=True)
-    subp.add_argument("-m", "--missing", help="Only report keys that are in the 'old' collection, but "
-                                              "not in the 'new' collection", action="store_true", dest="missonly")
-    subp.add_argument("-n", "--numeric", dest="numprops", default=None, metavar="EXPR",
-                      help="Fields with numeric values that must match, with a tolerance, "
-                           "as a comma-separated list. "
-                           "e.g., '<name1>=<expr1>, <name2>=<expr2>, ..'. "
-                           "<name> is a field name, <expr> syntax is: '+-' (sign), '+-N', '+-N%%', "
-                           "where N is a number. "
-                           "Adding '=' (must go before '%%') compares >=, <= instead of >, <. "
-                           "The '%%' means a percentage relative to the first collection's value.")
-    subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
-                                           ", e.g 'these_must,match'", dest="props", default=None)
-    subp.add_argument("-q", "--query", metavar="EXPR", help="Expression to filter records before diff. "
-                                                            "Uses simplified constraint syntax, e.g., "
-                                                            "'name = \"oscar\" and grouchiness > 3'",
-                      dest="fltr")
-    subp.add_argument("-u", "--url", metavar="URL", dest="rest_url",
-                      help="In HTML reports, make the key into a hyperlink by prefixing with URL. "
-                           "e.g., 'https://materialsproject.org/tasks/'.")
-    subp.add_argument("old", help="pymatgen-db JSON config file for the 'old' collection")
-    subp.add_argument("new", help="pymatgen-db JSON config file for the 'new' collection")
-
-    args = parser.parse_args(cmdline)
-
-    # Set logging level.
-    verbosity = (logging.ERROR, logging.INFO, logging.DEBUG)[min(args.vb, 2)]
-    _log.setLevel(verbosity)
-
-    # Handle sub-commands.
-    if hasattr(args, 'func'):
-        try:
-            return args.func(args)
-        except FunctionError as err:
-            _log.critical("{}".format(err))
-            return -1
-
+    retcode = 0  # return code
     # Connect and authenticate
-    conn, config = None, None
     fname = args.config_file if args.config_file else "db.json"
     try:
         config = get_settings(args.config_file)
     except ValueError, err:
-        parser.error('Cannot parse configuration "{}": {}'.format(fname, err))
+        raise ArgumentError('Cannot parse configuration "{}": {}'.format(fname, err))
     try:
         conn = pymongo.MongoClient(config['host'], config['port'])
     except pymongo.errors.ConnectionFailure, err:
-        parser.error('Cannot connect to server: {}'.format(err))
+        raise ArgumentError('Cannot connect to server: {}'.format(err))
     db_key = 'database'
     if not db_key in config:
-        parser.error('Configuration in "{}" is missing "{}"'.format(fname, db_key))
+        raise ArgumentError('Configuration in "{}" is missing "{}"'.format(fname, db_key))
     db = conn[config[db_key]]
     user, passwd = None, None
     # try both readonly and admin credentials
@@ -382,11 +298,11 @@ def main(cmdline=None):
             try:
                 user, passwd = config[utype + '_user'], config[utype + '_password']
             except KeyError:
-                parser.error('Configuration error in file {0}: {1}_user but no {1}_password'
-                             .format(args.config_file, utype))
+                raise ArgumentError('Configuration error in file {0}: {1}_user but no {1}_password'
+                                    .format(args.config_file, utype))
     if user and passwd:
         if not db.authenticate(user, passwd):
-            parser.error('Cannot authenticate to database as user {}'.format(user))
+            raise ArgumentError('Cannot authenticate to database as user {}'.format(user))
     else:
         _log.info('Connecting to DB "{}" without authentication'.format(config[db_key]))
         # get collection name if given
@@ -402,20 +318,20 @@ def main(cmdline=None):
             f = open(args.constfile, 'rb')
         except IOError:
             if not os.path.exists(args.constfile):
-                parser.error('constraints file "{}" not found'.format(args.constfile))
+                raise ArgumentError('constraints file "{}" not found'.format(args.constfile))
             else:
-                parser.error('constraints file "{}" found, but unreadable'.format(args.constfile))
+                raise ArgumentError('constraints file "{}" found, but unreadable'.format(args.constfile))
         with Timing('load.yaml', file=f.name):
             constraints = yaml.safe_load(f)
     else:
         coll_name = args.coll
         if coll_name is None:
             if db_coll_name is None:
-                parser.error('collection name not found')
+                raise ArgumentError('collection name not found')
             else:
                 coll_name = db_coll_name
         if not args.constraint:
-            parser.error('at least one constraint is required')
+            raise ArgumentError('at least one constraint is required')
             # re-split command-line arguments on commas (not whitespace)
         plist = ' '.join(args.constraint).split(',')
         # make dict(key=collection) of list of the constraints, just like YAML config file
@@ -423,19 +339,19 @@ def main(cmdline=None):
         _log.debug("command-line constraints dump: {}".format(constraints))
 
     # Init aliases from file or command-line
+    aliases = {}
     if constraints_from_file:
+        astr = ""
         try:
             astr = constraints.get(ALIASES_KEY, {})
             aliases = dict(map(nvpstr, astr))
         except ValueError, err:
-            parser.error('aliases should be list of name=value, got "{}": {}'.format(astr, err))
+            raise ArgumentError('aliases should be list of name=value, got "{}": {}'.format(astr, err))
         except AttributeError:
             if constraints is None:
-                parser.error('constraints file "{}" is empty'.format(args.constfile))
+                raise ArgumentError('constraints file "{}" is empty'.format(args.constfile))
     elif len(args.aliases) > 0:
         aliases = dict(args.aliases)
-    else:
-        aliases = {}
 
     # Init email from file or command-line
     emailer, email_kw = None, None
@@ -464,8 +380,8 @@ def main(cmdline=None):
     fmt = args.report_format.lower()
     formatter_class = formatters.get(fmt, None)
     if formatter_class is None:
-        parser.error('Unknown format "{}" for --format, choose from: {}'
-        .format(fmt, textlist(formatters.keys())))
+        raise ArgumentError('Unknown format "{}" for --format, choose from: {}'
+                            .format(fmt, textlist(formatters.keys())))
 
     # Run validation for each collection
     validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=10, add_exists=args.must_exist)
@@ -516,7 +432,8 @@ def main(cmdline=None):
             rpt.add_section(rpt_sect)
     rpt.header.add('Elapsed time', '{:.2f}s'.format(elapsed.value))
     _log.debug('Run time: {:.2f}'.format(elapsed.value))
-    # Report results
+
+    # Report results.
     if not args.send_on_empty and rpt.is_empty():
         _log.warn("Report is empty, skipping output")
         retcode = 1
@@ -537,6 +454,120 @@ def main(cmdline=None):
             print(text)
 
     return retcode
+
+# Main
+# ----
+
+
+def main(cmdline=None):
+    """Main program entry point.
+
+    :param cmdline: command-line
+    :return: Status, 0=ok otherwise an error
+    :rtype : int
+    """
+    if cmdline is None:
+        cmdline = sys.argv[1:]
+    desc = ' '.join(__doc__.split())
+    formatters = dict(json=report.JSONFormatter, html=report.HTMLFormatter,
+                      md=report.MarkdownFormatter)
+
+    # Configure parent parser for shared args.
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('--verbose', '-v', dest='vb', action="count", default=0,
+                               help="Print more verbose messages to standard error. Repeatable. (default=ERROR)")
+
+    parser = argparse.ArgumentParser(description=desc, parents=[parent_parser])
+    subparsers = parser.add_subparsers(description="Actions")
+
+    # Validation command.
+    subp = subparsers.add_parser("validate", help="Validate a collection", parents=[parent_parser])
+    subp.set_defaults(func=command_validate, func_args=(formatters,))
+    subp.add_argument('constraint', nargs='*')
+    subp.add_argument('--alias', '-a', dest='aliases', action='append', type=nvpstr, metavar="ALIAS", default=[],
+                      help='Alias for a field used in a constraint or condition, in form alias=name_in_db')
+    subp.add_argument('--config', '-c', dest='config_file', metavar='FILE', default=None,
+                      help="Configuration file for database connection. "
+                           "Generate one using mgdb init --config filename.json, if necessary. "
+                           "Otherwise, the code searches for a db.json. If "
+                           "none is found, a no-authentication "
+                           "localhost:27017/vasp database is assumed.")
+    subp.add_argument('--collection', '-C', dest='coll', metavar='NAME', default=None,
+                      help='Collection name for constraints given on command-line')
+    subp.add_argument('--email', '-e', dest='email', default=None,
+                      help='Email report to EMAIL at {from}:{to}[:host[:port[/subject]]].'
+                           'The "from" and "to" are required; default host is localhost. '
+                           'This information can also be in the main config file under the "_email" key, '
+                           'which should be a mapping with keys "from", "to", "host", "port", and "subject".')
+    subp.add_argument('--empty', dest='send_on_empty', action='store_true',
+                      help="Send a report, even if it is empty (default=print warning and don't send)")
+    subp.add_argument('--exonly', dest='must_exist', action='store_true', default=False,
+                      help='Only show results where all fields in the constraints are also present in the record')
+    subp.add_argument('--file', '-f', dest='constfile', metavar='FILE', default=None,
+                      help='Main configuration file. Has constraints, and optionally email info.')
+    subp.add_argument('--format', '-F', dest='report_format', metavar='FORMAT', default='html',
+                      help='Report format: {} (default=html)'.format(', '.join(formatters.keys())))
+    subp.add_argument('--limit', '-m', dest='limit', metavar='NUM', type=int, default=50,
+                      help='Limit number of displayed constraint violations per-collection 0=no limit (50)')
+    subp.add_argument('--progress', '-p', dest='progress', metavar='NUM', type=int, default=0,
+                      help='Report progress every NUM invalid records found')
+    subp.add_argument('--user', '-u', dest='user', metavar='NAME', default=None,
+                      help='User name, for the report')
+
+    # Diff command.
+    subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
+    subp.set_defaults(func=command_diff, func_args=())
+    subp.add_argument("-e", "--email", dest='email', default=None, metavar="ADDR",
+                      help="Email report, instead of printing it to standard output. "
+                           "ADDR is of the form: sender/receiver,[receiver2...][/subject].")
+    subp.add_argument("-f", "--format", dest="format", metavar="FORMAT", default=None,
+                      help="Report format: 'text' (default for screen) or 'html' (default for email)",
+                      choices=["text", "html"])
+    subp.add_argument("-s", "--email-server", dest="email_server", default="localhost", metavar="HOST",
+                      help="Server HOST for an email report, in form hostname[:port]. Default is localhost")
+    subp.add_argument("-i", "--info", help="Extra fields for records, as comma-separated list"
+                                           ", e.g 'extra,fields,to_include'", dest="info", default=None)
+    subp.add_argument("-k", "--key", help="Key for matching records", dest="key", required=True)
+    subp.add_argument("-m", "--missing", help="Only report keys that are in the 'old' collection, but "
+                                              "not in the 'new' collection", action="store_true", dest="missonly")
+    subp.add_argument("-n", "--numeric", dest="numprops", default=None, metavar="EXPR",
+                      help="Fields with numeric values that must match, with a tolerance, "
+                           "as a comma-separated list. "
+                           "e.g., '<name1>=<expr1>, <name2>=<expr2>, ..'. "
+                           "<name> is a field name, <expr> syntax is: '+-' (sign), '+-N', '+-N%%', "
+                           "where N is a number. "
+                           "Adding '=' (must go before '%%') compares >=, <= instead of >, <. "
+                           "The '%%' means a percentage relative to the first collection's value.")
+    subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
+                                           ", e.g 'these_must,match'", dest="props", default=None)
+    subp.add_argument("-q", "--query", metavar="EXPR", help="Expression to filter records before diff. "
+                                                            "Uses simplified constraint syntax, e.g., "
+                                                            "'name = \"oscar\" and grouchiness > 3'",
+                      dest="fltr")
+    subp.add_argument("-u", "--url", metavar="URL", dest="rest_url",
+                      help="In HTML reports, make the key into a hyperlink by prefixing with URL. "
+                           "e.g., 'https://materialsproject.org/tasks/'.")
+    subp.add_argument("-V", "--values", dest="changeonly", action="store_true",
+                      help="Only report changes in values, not missing or added keys")
+    subp.add_argument("old", help="pymatgen-db JSON config file for the 'old' collection")
+    subp.add_argument("new", help="pymatgen-db JSON config file for the 'new' collection")
+
+    args = parser.parse_args(cmdline)
+
+    # Set logging level.
+    verbosity = (logging.ERROR, logging.INFO, logging.DEBUG)[min(args.vb, 2)]
+    _log.setLevel(verbosity)
+
+    # Run subcommand.
+    if hasattr(args, 'func'):
+        try:
+            return args.func(args, *args.func_args)
+        except ArgumentError as err:
+            parser.error(err.msg)
+        except FunctionError as err:
+            _log.critical("{}".format(err))
+            return -1
+
 
 if __name__ == '__main__':
     sys.exit(main())

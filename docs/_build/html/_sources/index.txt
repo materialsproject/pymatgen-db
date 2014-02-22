@@ -16,12 +16,23 @@ In addition, Pymatgen-db provides command-line tools for validation of MongoDB d
 tools are designed with the Materials Project databases in mind, they could be used
 with almost any MongoDB database.
 
+.. contents::
+    :depth: 1
+    
 Change Log
 ==========
 
+Version 0.3.9
+-------------
+#. `mgvv diff` HTML output can make they key field into a hyperlink using a user-provided prefix
+#. Added brief introduction to `mgvv` in front page of Sphinx docs
+
+Version 0.3.8
+-------------
+#. `mgvv diff` can perform numeric diffs. Better error handling.
+
 Version 0.3.7
 -------------
-
 #. New package maintainer, Dan Gunter <dkgunter@lbl.gov>
 #. Added `vv.diff` package and associated `mgvv diff` subcommand, for taking the difference of two arbitrary MongoDB collections.
 #. Some cleanup and simplification of config files. `user` and `password` are accepted as aliases for `readonly_user` and `readonly_password`.

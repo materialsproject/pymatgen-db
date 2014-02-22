@@ -9,10 +9,11 @@ from email.mime.text import MIMEText
 import json
 from operator import itemgetter
 import smtplib
-
+#
 from .util import DoesLogging
 from ..util import MongoJSONEncoder
 from .diff import Differ  # for field constants
+
 
 class Report:
     def __init__(self, header):
@@ -169,33 +170,38 @@ class ReportBackupError(Exception):
 
 
 def css_minify(s):
-    return s.replace('\n', ' ').replace('  ', ' ')
+    #return s.replace('\n', ' ').replace('  ', ' ')
+    s = s.replace("{ ", "{")
+    s = s.replace(" }", "}")
+    return s
 
 # CSS for HTML report output
-DEFAULT_CSS = css_minify("""
-html { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-body { margin: 2em;}
-table { margin-top: 1em; clear: both; border: 0;}
-dl, dt, dd { float: left; }
-dl, dt { clear: both; }
-dt { width: 8em; font-weight: 700; }
-dd { width: 32em; }
-tr:nth-child(even) { background-color: #E9E9E9; }
-tr:nth-child(odd) { background-color: #E9E9E9; }
-th, td {padding: 0.2em 0.5em;}
-th { text-align: left;  color: black; margin: 0; font-weight: 300;}
-h1, h2, h3 { clear: both; margin: 0; padding: 0; }
-h1 { font-size: 18; color: rgb(44, 62, 80); }
-h2 { font-size: 14; color: black; }
-""")
+DEFAULT_CSS = [
+    "html { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }",
+    "body { margin: 2em;}",
+    "table { margin-top: 1em; clear: both; border: 0;}",
+    "dl, dt, dd { float: left; }",
+    "dl, dt { clear: both; }",
+    "dt { width: 8em; font-weight: 700; }",
+    "dd { width: 32em; }",
+    "tr:nth-child(even) { background-color: #E9E9E9; }",
+    "tr:nth-child(odd) { background-color: #E9E9E9; }",
+    "th, td {padding: 0.2em 0.5em;}",
+    "th { text-align: left;  color: black; margin: 0; font-weight: 300;}",
+    "h1, h2, h3 { clear: both; margin: 0; padding: 0; }",
+    "h1 { font-size: 18; color: rgb(44, 62, 80); }",
+    "h2 { font-size: 14; color: black; }"
+]
 
 
 class HTMLFormatter:
     """Format a report as HTML.
     """
-    def __init__(self, line_sep='\n', id_column=0, css=DEFAULT_CSS):
+    def __init__(self, line_sep='\n', id_column=0, css=None):
         self._sep = line_sep
         self._idcol = id_column
+        if css is None:
+            css = DEFAULT_CSS
         self._css = css
 
     def format(self, report):
@@ -206,7 +212,7 @@ class HTMLFormatter:
         text.append('<head>')
         if self._css:
             text.append('<style>')
-            text.append(self._css)
+            text.append("\r\n".join(self._css))
             text.append('</style>')
         text.append('</head>')
         text.append('<body>')
@@ -367,10 +373,13 @@ class Emailer(DoesLogging):
         :return: Number of recipients it was sent to
         :rtype: int
         """
-        num_recip = 0
         main_fmt, sub_fmt = fmt.split('/')
-        mime_class = dict(text=MIMEText).get(main_fmt, MIMEText)
-        msg = mime_class(text, sub_fmt)
+        if sub_fmt.lower() == "text":
+            msg = MIMEText(text, "plain")
+        elif sub_fmt.lower() == "html":
+            msg = MIMEText(text, "html")
+        else:
+            raise ValueError("Unknown message format: {}".format(fmt))
         msg['Subject'] = self._subject
         msg['From'] = self._sender
         msg['To'] = ', '.join(self._recipients)
@@ -381,7 +390,12 @@ class Emailer(DoesLogging):
         self._log.info("connect to email server {}".format(conn_kwargs))
         try:
             s = smtplib.SMTP(**conn_kwargs)
-            s.sendmail(self._sender, self._recipients, msg.as_string())
+            #s.set_debuglevel(2)
+            refused = s.sendmail(self._sender, self._recipients, msg.as_string())
+            if refused:
+                self._log.warn("Email to {:d} recipients was refused".format(len(refused)))
+                for person, (code, msg) in refused.iteritems():
+                    self._log("Email to {p} was refused ({c}): {m}".format(p=person, c=code, m=msg))
             s.quit()
             n_recip = len(self._recipients)
         except Exception, err:
@@ -455,28 +469,49 @@ class DiffFormatter(object):
 class DiffHtmlFormatter(DiffFormatter):
     """Format an HTML diff report.
     """
+    DIFF_CSS = [
+        ".header {padding: 5px; margin: 0 5px;}",
+        ".header h1 {color: #165F4B; font-size: 20; text-align: left; margin-left: 20px;}",
+        ".header p {color: #666666; margin-left: 20px; height: 12px;}",
+        ".header p em {color: #4169E1; font-style: normal;}",
+        ".content {padding: 15px; padding-top: 0px; margin: 0; background-color: #F3F3F3;}",
+        ".content h2 {color: #2C3E50; font-size: 16px;}",
+        ".empty { font-size: 14px; font-style: italic;}",
+        ".section {padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px;}",
+        ".section div {margin-left: 10px;}",
+        ".section table {margin-left: 5px;}",
+        "tr:nth-child(even) { background-color: white; }",
+        "tr:nth-child(odd) { background-color: #F5F5F5; }",
+        "tr:nth-child(1) { background-color: #778899; font-weight: 500;}",
+        "th, td {padding: 0.2em 0.5em;}",
+        "th { text-align: left;  color: white; margin: 0;}",
+        ".fixed { font-family: Consolas, monaco, monospace; }",
+    ]
+    css = DEFAULT_CSS + DIFF_CSS
 
-    CSS = DEFAULT_CSS + css_minify("""
-    body {background-color: #F3F3F3; margin: 1em;}
-    .header {padding: 5px; margin: 0 5px;}
-    .header h1 {color: #165F4B; font-size: 20; text-align: left; margin-left: 20px;}
-    .header p {color: #666666; margin-left: 20px; height: 12px;}
-    .header p em {color: #4169E1; font-style: normal;}
-    .content {padding: 15px; padding-top: 0px; margin: 0;}
-    .content h2 {color: #2C3E50; font-size: 16px;}
-    .empty { font-size: 14px; font-style: italic;}
-    .section {padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px;}
-    .section div {margin-left: 10px;}
-    .section table {margin-left: 5px;}
-    tr:nth-child(even) { background-color: white; }
-    tr:nth-child(odd) { background-color: #F5F5F5; }
-    tr:nth-child(1) { background-color: #778899; font-weight: 500;}
-    th, td {padding: 0.2em 0.5em;}
-    th { text-align: left;  color: white; margin: 0;}
-    .fixed { font-family: Consolas, monaco, monospace; }
-    """)
+    # for email inlining
+    styles = {
+        "header": {
+            "h1": "color: #165F4B; font-size: 20; text-align: left; margin-left: 20px",
+            "p":  "color: #666666; margin-left: 20px; height: 12px",
+            "em": "color: #4169E1; font-style: normal"
+        },
+        "content": {
+            "_": "padding: 15px; padding-top: 0px; margin: 0; background-color: #F3F3F3",
+            "h2": "color: #2C3E50; font-size: 16px",
+            "section": "padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px"
+        },
+        "table": {
+            "table": "margin-top: 1em; clear: both; border: 0",
+            "tr_even": "background-color: white",
+            "tr_odd": "background-color: #F5F5F5",
+            "tr1": "background-color: #778899; font-weight: 500",
+            "th": "text-align: left;  color: white; margin: 0; padding: 0.2em 0.5em",
+            "td": "padding: 0.2em 0.5em"
+        }
+    }
 
-    def __init__(self, meta, url=None, **kwargs):
+    def __init__(self, meta, url=None, email_mode=False, **kwargs):
         """Constructor.
 
         :param meta: see superclass
@@ -485,6 +520,7 @@ class DiffHtmlFormatter(DiffFormatter):
         """
         DiffFormatter.__init__(self, meta, **kwargs)
         self._url = url
+        self._email = email_mode
 
     def format(self, result):
         """Generate HTML report.
@@ -492,44 +528,91 @@ class DiffHtmlFormatter(DiffFormatter):
         :return: Report body
         :rtype: str
         """
-        return ("<html><head><style>{css}</style><body>{header}{body}</body></html>"
-                .format(css=self.CSS, header=self._header(),
-                body=self._body(result)))
+        css = "\n".join(self.css)
+        content = "{}{}".format(self._header(), self._body(result))
+        if self._email:
+            text = """<!DOCTYPE html>
+            <html>
+            <table width="100%" style="{sty}">
+            {content}
+            </table>
+            </html>
+            """.format(css=css, content=content, sty=self.styles["content"]["_"])
+        else:
+            text = """<html>
+            <head>
+            <style>{css}</style>
+            </head>
+            <body>
+            {content}
+            </body>
+            </html>
+            """.format(css=css, content=content)
+        return text
 
     def _header(self):
-        s = "<div class='header'><h1>{}</h1>".format(self.TITLE)
-        s += "<p>Compared <em>{db1}</em> with <em>{db2}</em></p>"
-        s += "<p>Filter: <span class='fixed'>{filter}</span></p>"
-        s += "<p>Run time: <em>{start_time}</em> to <em>{end_time}</em> "
-        s += "(<em>{elapsed:.1f}</em> sec)</p>"
-        return (s + "</div>").format(**self.meta)
+        lines = ["<div class='header'><h1{{sh1}}>{t}</h1>".format(t=self.TITLE),
+                 "<p{sp}>Compared <em{sem}>{{db1}}</em> with <em{sem}>{{db2}}</em></p>",
+                 "<p{sp}>Filter: <span class='fixed'>{{filter}}</span></p>",
+                 "<p{sp}>Run time: <em{sem}>{{start_time}}</em> to <em{sem}>{{end_time}}</em> ",
+                 "(<em{sem}>{{elapsed:.1f}}</em> sec)</p>",
+                 "</div>"]
+        if self._email:  # inline the styles
+            _c = "header"
+            _f = lambda s: s.format(sp=self.style(_c, "p"), sem=self.style(_c, "em"), sh1=self.style(_c, "h1"))
+        else:
+            _f = lambda s: s.format(sp="", sem="", sh1="")
+        lines = map(_f, lines)
+        s = "\n".join(lines)
+        return s.format(**self.meta)
+
+    def style(self, css_class, elt):
+        s = ""
+        if css_class in self.styles and elt in self.styles[css_class]:
+            s = " style='{}'".format(self.styles[css_class][elt])
+        return s
 
     def _body(self, result):
         body = ["<div class='content'>"]
         for section in result.keys():
-            body.append("<div class='section'><h2>{}</h2>".format(section.title()))
+            body.append("<div class='section'{{ssec}}><h2{{sh2}}>{t}</h2>".format(t=section.title()))
             if len(result[section]) == 0:
                 body.append("<div class='empty'>Empty</div>")
             else:
                 body.extend(self._table(section, result[section]))
             body.append("</div>")
         body.append("</div>")
-        return ''.join(body)
+        if self._email:
+            _c = "content"
+            _f = lambda s: s.format(s_=self.style(_c, "_"), sh2=self.style(_c, "h2"), ssec=self.style(_c, "section"))
+        else:
+            _f = lambda s: s.format(s_="", sh2="", ssec="")
+        body = map(_f, body)
+        return '\n'.join(body)
 
     def _table(self, section, rows):
+        if self._email:
+            inline = {k: self.style("table", k) for k in self.styles["table"]}
+        else:
+            inline = dict.fromkeys(self.styles["table"], "")
         subsets, _ = self.result_subsets(rows)
         tables = []
         for subset in subsets:
-            tables.append("<table>")
+            tables.append("<table{table}>".format(**inline))
             cols = self.ordered_cols(subset, section)
             # Format the table.
-            tables.extend(["<tr>"] + ["<th>{}</th>".format(c) for c in cols] + ["</tr>"])
-            for r in rows:
+            tables.extend(["<tr{tr1}>".format(**inline)] +
+                          ["<th{th}>{c}</th>".format(c=c, **inline) for c in cols] +
+                          ["</tr>"])
+            for i, r in enumerate(rows):
+                tr = "{{tr_{}}}".format(("even", "odd")[i % 2])
                 if tuple(sorted(r.keys())) != subset:
                     continue
                 if self._url is not None:
                     r[cols[0]] = "<a href='{p}{v}'>{v}</a>".format(p=self._url, v=r[cols[0]])
-                tables.extend(["<tr>"] + ["<td>{}</td>".format(r[c]) for c in cols] + ["</tr>"])
+                tables.extend(["<tr{}>".format(tr).format(**inline)] +
+                              ["<td{td}>{d}</td>".format(d=r[c], **inline) for c in cols] +
+                              ["</tr>"])
             tables.append("</table>")
         return tables
 

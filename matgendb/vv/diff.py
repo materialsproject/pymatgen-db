@@ -53,7 +53,7 @@ class Differ(object):
         self._prop_deltas = {} if deltas is None else deltas
         self._all_props = list(set(self._props[:] + self._prop_deltas.keys()))
 
-    def diff(self, c1, c2, only_missing=False, allow_dup=False):
+    def diff(self, c1, c2, only_missing=False, only_values=False, allow_dup=False):
         """Perform a difference between the 2 collections.
         The first collection is treated as the previous one, and the second
         is treated as the new one.
@@ -65,6 +65,7 @@ class Differ(object):
         :param c2: Collection (2) config file, or QueryEngine object
         :type c2: str or QueryEngine
         :param only_missing: Only find and return self.MISSING; ignore 'new' keys
+        :param only_values: Only find and return self.CHANGED; ignore new or missing keys
         :param allow_dup: Allow duplicate keys, otherwise fail with ValueError
         :return: dict with keys self.MISSING, self.NEW (unless only_missing is True), & self.CHANGED,
                  each a list of records with the key and
@@ -165,11 +166,14 @@ class Differ(object):
         _log.info("query.end sec={:f}".format(t1 - t0))
 
         # Compute missing and new keys.
-        _log.debug("compute_difference.start")
-        missing, new = keys[0] - keys[1], []
-        if not only_missing:
-            new = keys[1] - keys[0]
-        _log.debug("compute_difference.end")
+        if only_values:
+            missing, new = [], []
+        else:
+            _log.debug("compute_difference.start")
+            missing, new = keys[0] - keys[1], []
+            if not only_missing:
+                new = keys[1] - keys[0]
+            _log.debug("compute_difference.end")
 
         # Compute mis-matched properties.
         if has_props:
@@ -180,19 +184,21 @@ class Differ(object):
 
         # Build result.
         _log.debug("build_result.begin")
-        result = {self.MISSING: []}
-        for key in missing:
-            rec = {self._key_field: key}
-            if has_info:
-                rec.update(info.get(key, {}))
-            result[self.MISSING].append(rec)
-        if not only_missing:
-            result[self.NEW] = []
-            for key in new:
+        result = {}
+        if not only_values:
+            result[self.MISSING] = []
+            for key in missing:
                 rec = {self._key_field: key}
                 if has_info:
                     rec.update(info.get(key, {}))
-                result[self.NEW].append(rec)
+                result[self.MISSING].append(rec)
+            if not only_missing:
+                result[self.NEW] = []
+                for key in new:
+                    rec = {self._key_field: key}
+                    if has_info:
+                        rec.update(info.get(key, {}))
+                    result[self.NEW].append(rec)
         result[self.CHANGED] = changed
         _log.debug("build_result.end")
 
