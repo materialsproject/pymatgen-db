@@ -533,19 +533,13 @@ class DiffHtmlFormatter(DiffFormatter):
         if self._email:
             text = """<!DOCTYPE html>
             <html>
-            <table width="100%" style="{sty}">
-            {content}
-            </table>
+            <div width="100%" style="{sty}">{content}</div>
             </html>
             """.format(css=css, content=content, sty=self.styles["content"]["_"])
         else:
             text = """<html>
-            <head>
-            <style>{css}</style>
-            </head>
-            <body>
-            {content}
-            </body>
+            <head><style>{css}</style></head>
+            <body>{content}</body>
             </html>
             """.format(css=css, content=content)
         return text
