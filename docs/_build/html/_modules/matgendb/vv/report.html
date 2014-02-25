@@ -66,10 +66,11 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
 <span class="kn">import</span> <span class="nn">smtplib</span>
-
+<span class="c">#</span>
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">DoesLogging</span>
 <span class="kn">from</span> <span class="nn">..util</span> <span class="kn">import</span> <span class="n">MongoJSONEncoder</span>
-<span class="kn">from</span> <span class="nn">.diff</span> <span class="kn">import</span> <span class="n">Differ</span>  <span class="c"># for field constants</span>
+<span class="kn">from</span> <span class="nn">.diff</span> <span class="kn">import</span> <span class="n">Differ</span><span class="p">,</span> <span class="n">Delta</span>  <span class="c"># for field constants, formatting</span>
+
 
 <div class="viewcode-block" id="Report"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.Report">[docs]</a><span class="k">class</span> <span class="nc">Report</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
@@ -226,33 +227,38 @@
 
 </div>
 <div class="viewcode-block" id="css_minify"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.css_minify">[docs]</a><span class="k">def</span> <span class="nf">css_minify</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;  &#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">)</span>
+    <span class="c">#return s.replace(&#39;\n&#39;, &#39; &#39;).replace(&#39;  &#39;, &#39; &#39;)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;{ &quot;</span><span class="p">,</span> <span class="s">&quot;{&quot;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; }&quot;</span><span class="p">,</span> <span class="s">&quot;}&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span>
 
 <span class="c"># CSS for HTML report output</span></div>
-<span class="n">DEFAULT_CSS</span> <span class="o">=</span> <span class="n">css_minify</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">html { font-family: &#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif; }</span>
-<span class="s">body { margin: 2em;}</span>
-<span class="s">table { margin-top: 1em; clear: both; border: 0;}</span>
-<span class="s">dl, dt, dd { float: left; }</span>
-<span class="s">dl, dt { clear: both; }</span>
-<span class="s">dt { width: 8em; font-weight: 700; }</span>
-<span class="s">dd { width: 32em; }</span>
-<span class="s">tr:nth-child(even) { background-color: #E9E9E9; }</span>
-<span class="s">tr:nth-child(odd) { background-color: #E9E9E9; }</span>
-<span class="s">th, td {padding: 0.2em 0.5em;}</span>
-<span class="s">th { text-align: left;  color: black; margin: 0; font-weight: 300;}</span>
-<span class="s">h1, h2, h3 { clear: both; margin: 0; padding: 0; }</span>
-<span class="s">h1 { font-size: 18; color: rgb(44, 62, 80); }</span>
-<span class="s">h2 { font-size: 14; color: black; }</span>
-<span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="n">DEFAULT_CSS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">&quot;html { font-family: &#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif; }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;body { margin: 2em;}&quot;</span><span class="p">,</span>
+    <span class="s">&quot;table { margin-top: 1em; clear: both; border: 0;}&quot;</span><span class="p">,</span>
+    <span class="s">&quot;dl, dt, dd { float: left; }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;dl, dt { clear: both; }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;dt { width: 8em; font-weight: 700; }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;dd { width: 32em; }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;tr:nth-child(even) { background-color: #E9E9E9; }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;tr:nth-child(odd) { background-color: #E9E9E9; }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;th, td {padding: 0.2em 0.5em;}&quot;</span><span class="p">,</span>
+    <span class="s">&quot;th { text-align: left;  color: black; margin: 0; font-weight: 300;}&quot;</span><span class="p">,</span>
+    <span class="s">&quot;h1, h2, h3 { clear: both; margin: 0; padding: 0; }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;h1 { font-size: 18; color: rgb(44, 62, 80); }&quot;</span><span class="p">,</span>
+    <span class="s">&quot;h2 { font-size: 14; color: black; }&quot;</span>
+<span class="p">]</span>
 
 
 <div class="viewcode-block" id="HTMLFormatter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.HTMLFormatter">[docs]</a><span class="k">class</span> <span class="nc">HTMLFormatter</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Format a report as HTML.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">css</span><span class="o">=</span><span class="n">DEFAULT_CSS</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">css</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sep</span> <span class="o">=</span> <span class="n">line_sep</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idcol</span> <span class="o">=</span> <span class="n">id_column</span>
+        <span class="k">if</span> <span class="n">css</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">css</span> <span class="o">=</span> <span class="n">DEFAULT_CSS</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_css</span> <span class="o">=</span> <span class="n">css</span>
 
 <div class="viewcode-block" id="HTMLFormatter.format"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.HTMLFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report</span><span class="p">):</span>
@@ -263,7 +269,7 @@
         <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;head&gt;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_css</span><span class="p">:</span>
             <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;style&gt;&#39;</span><span class="p">)</span>
-            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_css</span><span class="p">)</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_css</span><span class="p">))</span>
             <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/style&gt;&#39;</span><span class="p">)</span>
         <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;/head&gt;&#39;</span><span class="p">)</span>
         <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;body&gt;&#39;</span><span class="p">)</span>
@@ -424,10 +430,13 @@
 <span class="sd">        :return: Number of recipients it was sent to</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">num_recip</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">main_fmt</span><span class="p">,</span> <span class="n">sub_fmt</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
-        <span class="n">mime_class</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">MIMEText</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">main_fmt</span><span class="p">,</span> <span class="n">MIMEText</span><span class="p">)</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">mime_class</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">sub_fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sub_fmt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;text&quot;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">MIMEText</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s">&quot;plain&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sub_fmt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;html&quot;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">MIMEText</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s">&quot;html&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Unknown message format: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">))</span>
         <span class="n">msg</span><span class="p">[</span><span class="s">&#39;Subject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subject</span>
         <span class="n">msg</span><span class="p">[</span><span class="s">&#39;From&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sender</span>
         <span class="n">msg</span><span class="p">[</span><span class="s">&#39;To&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recipients</span><span class="p">)</span>
@@ -438,7 +447,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;connect to email server {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">conn_kwargs</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP</span><span class="p">(</span><span class="o">**</span><span class="n">conn_kwargs</span><span class="p">)</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">sendmail</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sender</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recipients</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">as_string</span><span class="p">())</span>
+            <span class="c">#s.set_debuglevel(2)</span>
+            <span class="n">refused</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">sendmail</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sender</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recipients</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">as_string</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">refused</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Email to {:d} recipients was refused&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">refused</span><span class="p">)))</span>
+                <span class="k">for</span> <span class="n">person</span><span class="p">,</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">refused</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="s">&quot;Email to {p} was refused ({c}): {m}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">person</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">code</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">msg</span><span class="p">))</span>
             <span class="n">s</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
             <span class="n">n_recip</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recipients</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
@@ -509,31 +523,65 @@
         <span class="k">return</span> <span class="n">fixed_cols</span> <span class="o">+</span> <span class="n">columns</span>
 
 </div></div>
+<div class="viewcode-block" id="DiffJsonFormatter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffJsonFormatter">[docs]</a><span class="k">class</span> <span class="nc">DiffJsonFormatter</span><span class="p">(</span><span class="n">DiffFormatter</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DiffJsonFormatter.Encoder"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffJsonFormatter.Encoder">[docs]</a>    <span class="k">class</span> <span class="nc">Encoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+<div class="viewcode-block" id="DiffJsonFormatter.Encoder.default"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffJsonFormatter.Encoder.default">[docs]</a>        <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s">&#39;as_json&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">as_json</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="DiffJsonFormatter.format"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffJsonFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Encoder</span><span class="p">)</span>
+
+</div></div>
 <div class="viewcode-block" id="DiffHtmlFormatter"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffHtmlFormatter">[docs]</a><span class="k">class</span> <span class="nc">DiffHtmlFormatter</span><span class="p">(</span><span class="n">DiffFormatter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Format an HTML diff report.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DIFF_CSS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s">&quot;.header {padding: 5px; margin: 0 5px;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.header h1 {color: #165F4B; font-size: 20; text-align: left; margin-left: 20px;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.header p {color: #666666; margin-left: 20px; height: 12px;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.header p em {color: #4169E1; font-style: normal;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.content {padding: 15px; padding-top: 0px; margin: 0; background-color: #F3F3F3;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.content h2 {color: #2C3E50; font-size: 16px;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.empty { font-size: 14px; font-style: italic;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.section {padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.section div {margin-left: 10px;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.section table {margin-left: 5px;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;tr:nth-child(even) { background-color: white; }&quot;</span><span class="p">,</span>
+        <span class="s">&quot;tr:nth-child(odd) { background-color: #F5F5F5; }&quot;</span><span class="p">,</span>
+        <span class="s">&quot;tr:nth-child(1) { background-color: #778899; font-weight: 500;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;th, td {padding: 0.2em 0.5em;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;th { text-align: left;  color: white; margin: 0;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.fixed { font-family: Consolas, monaco, monospace; }&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">css</span> <span class="o">=</span> <span class="n">DEFAULT_CSS</span> <span class="o">+</span> <span class="n">DIFF_CSS</span>
 
-    <span class="n">CSS</span> <span class="o">=</span> <span class="n">DEFAULT_CSS</span> <span class="o">+</span> <span class="n">css_minify</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">    body {background-color: #F3F3F3; margin: 1em;}</span>
-<span class="s">    .header {padding: 5px; margin: 0 5px;}</span>
-<span class="s">    .header h1 {color: #165F4B; font-size: 20; text-align: left; margin-left: 20px;}</span>
-<span class="s">    .header p {color: #666666; margin-left: 20px; height: 12px;}</span>
-<span class="s">    .header p em {color: #4169E1; font-style: normal;}</span>
-<span class="s">    .content {padding: 15px; padding-top: 0px; margin: 0;}</span>
-<span class="s">    .content h2 {color: #2C3E50; font-size: 16px;}</span>
-<span class="s">    .empty { font-size: 14px; font-style: italic;}</span>
-<span class="s">    .section {padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px;}</span>
-<span class="s">    .section div {margin-left: 10px;}</span>
-<span class="s">    .section table {margin-left: 5px;}</span>
-<span class="s">    tr:nth-child(even) { background-color: white; }</span>
-<span class="s">    tr:nth-child(odd) { background-color: #F5F5F5; }</span>
-<span class="s">    tr:nth-child(1) { background-color: #778899; font-weight: 500;}</span>
-<span class="s">    th, td {padding: 0.2em 0.5em;}</span>
-<span class="s">    th { text-align: left;  color: white; margin: 0;}</span>
-<span class="s">    .fixed { font-family: Consolas, monaco, monospace; }</span>
-<span class="s">    &quot;&quot;&quot;</span><span class="p">)</span>
+    <span class="c"># for email inlining</span>
+    <span class="n">styles</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;header&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;h1&quot;</span><span class="p">:</span> <span class="s">&quot;color: #165F4B; font-size: 20; text-align: left; margin-left: 20px&quot;</span><span class="p">,</span>
+            <span class="s">&quot;p&quot;</span><span class="p">:</span>  <span class="s">&quot;color: #666666; margin-left: 20px; height: 12px&quot;</span><span class="p">,</span>
+            <span class="s">&quot;em&quot;</span><span class="p">:</span> <span class="s">&quot;color: #4169E1; font-style: normal&quot;</span>
+        <span class="p">},</span>
+        <span class="s">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;_&quot;</span><span class="p">:</span> <span class="s">&quot;padding: 15px; padding-top: 0px; margin: 0; background-color: #F3F3F3&quot;</span><span class="p">,</span>
+            <span class="s">&quot;h2&quot;</span><span class="p">:</span> <span class="s">&quot;color: #2C3E50; font-size: 16px&quot;</span><span class="p">,</span>
+            <span class="s">&quot;section&quot;</span><span class="p">:</span> <span class="s">&quot;padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px&quot;</span>
+        <span class="p">},</span>
+        <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;margin-top: 1em; clear: both; border: 0&quot;</span><span class="p">,</span>
+            <span class="s">&quot;tr_even&quot;</span><span class="p">:</span> <span class="s">&quot;background-color: white&quot;</span><span class="p">,</span>
+            <span class="s">&quot;tr_odd&quot;</span><span class="p">:</span> <span class="s">&quot;background-color: #F5F5F5&quot;</span><span class="p">,</span>
+            <span class="s">&quot;tr1&quot;</span><span class="p">:</span> <span class="s">&quot;background-color: #778899; font-weight: 500&quot;</span><span class="p">,</span>
+            <span class="s">&quot;th&quot;</span><span class="p">:</span> <span class="s">&quot;text-align: left;  color: white; margin: 0; padding: 0.2em 0.5em&quot;</span><span class="p">,</span>
+            <span class="s">&quot;td&quot;</span><span class="p">:</span> <span class="s">&quot;padding: 0.2em 0.5em&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">email_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
 <span class="sd">        :param meta: see superclass</span>
@@ -542,6 +590,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">DiffFormatter</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_email</span> <span class="o">=</span> <span class="n">email_mode</span>
 
 <div class="viewcode-block" id="DiffHtmlFormatter.format"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffHtmlFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate HTML report.</span>
@@ -549,44 +598,85 @@
 <span class="sd">        :return: Report body</span>
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s">&quot;&lt;html&gt;&lt;head&gt;&lt;style&gt;{css}&lt;/style&gt;&lt;body&gt;{header}{body}&lt;/body&gt;&lt;/html&gt;&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">css</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CSS</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">(),</span>
-                <span class="n">body</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">(</span><span class="n">result</span><span class="p">)))</span>
+        <span class="n">css</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">css</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="s">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;!DOCTYPE html&gt;</span>
+<span class="s">            &lt;html&gt;</span>
+<span class="s">            &lt;div width=&quot;100%&quot; style=&quot;{sty}&quot;&gt;{content}&lt;/div&gt;</span>
+<span class="s">            &lt;/html&gt;</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">css</span><span class="o">=</span><span class="n">css</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span> <span class="n">sty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="s">&quot;content&quot;</span><span class="p">][</span><span class="s">&quot;_&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;html&gt;</span>
+<span class="s">            &lt;head&gt;&lt;style&gt;{css}&lt;/style&gt;&lt;/head&gt;</span>
+<span class="s">            &lt;body&gt;{content}&lt;/body&gt;</span>
+<span class="s">            &lt;/html&gt;</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">css</span><span class="o">=</span><span class="n">css</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">text</span>
 </div>
     <span class="k">def</span> <span class="nf">_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;&lt;div class=&#39;header&#39;&gt;&lt;h1&gt;{}&lt;/h1&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TITLE</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;&lt;p&gt;Compared &lt;em&gt;{db1}&lt;/em&gt; with &lt;em&gt;{db2}&lt;/em&gt;&lt;/p&gt;&quot;</span>
-        <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;&lt;p&gt;Filter: &lt;span class=&#39;fixed&#39;&gt;{filter}&lt;/span&gt;&lt;/p&gt;&quot;</span>
-        <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;&lt;p&gt;Run time: &lt;em&gt;{start_time}&lt;/em&gt; to &lt;em&gt;{end_time}&lt;/em&gt; &quot;</span>
-        <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;(&lt;em&gt;{elapsed:.1f}&lt;/em&gt; sec)&lt;/p&gt;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="s">&quot;&lt;/div&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&lt;div class=&#39;header&#39;&gt;&lt;h1{{sh1}}&gt;{t}&lt;/h1&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TITLE</span><span class="p">),</span>
+                 <span class="s">&quot;&lt;p{sp}&gt;Compared &lt;em{sem}&gt;{{db1}}&lt;/em&gt; with &lt;em{sem}&gt;{{db2}}&lt;/em&gt;&lt;/p&gt;&quot;</span><span class="p">,</span>
+                 <span class="s">&quot;&lt;p{sp}&gt;Filter: &lt;span class=&#39;fixed&#39;&gt;{{filter}}&lt;/span&gt;&lt;/p&gt;&quot;</span><span class="p">,</span>
+                 <span class="s">&quot;&lt;p{sp}&gt;Run time: &lt;em{sem}&gt;{{start_time}}&lt;/em&gt; to &lt;em{sem}&gt;{{end_time}}&lt;/em&gt; &quot;</span><span class="p">,</span>
+                 <span class="s">&quot;(&lt;em{sem}&gt;{{elapsed:.1f}}&lt;/em&gt; sec)&lt;/p&gt;&quot;</span><span class="p">,</span>
+                 <span class="s">&quot;&lt;/div&gt;&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span><span class="p">:</span>  <span class="c"># inline the styles</span>
+            <span class="n">_c</span> <span class="o">=</span> <span class="s">&quot;header&quot;</span>
+            <span class="n">_f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="n">_c</span><span class="p">,</span> <span class="s">&quot;p&quot;</span><span class="p">),</span> <span class="n">sem</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="n">_c</span><span class="p">,</span> <span class="s">&quot;em&quot;</span><span class="p">),</span> <span class="n">sh1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="n">_c</span><span class="p">,</span> <span class="s">&quot;h1&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sp</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">sem</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">sh1</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">_f</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
 
+<div class="viewcode-block" id="DiffHtmlFormatter.style"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.report.DiffHtmlFormatter.style">[docs]</a>    <span class="k">def</span> <span class="nf">style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">css_class</span><span class="p">,</span> <span class="n">elt</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">css_class</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span> <span class="ow">and</span> <span class="n">elt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="n">css_class</span><span class="p">]:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&quot; style=&#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="n">css_class</span><span class="p">][</span><span class="n">elt</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">s</span>
+</div>
     <span class="k">def</span> <span class="nf">_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="n">body</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&lt;div class=&#39;content&#39;&gt;&quot;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;div class=&#39;section&#39;&gt;&lt;h2&gt;{}&lt;/h2&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">title</span><span class="p">()))</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;div class=&#39;section&#39;{{ssec}}&gt;&lt;h2{{sh2}}&gt;{t}&lt;/h2&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">title</span><span class="p">()))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;div class=&#39;empty&#39;&gt;Empty&lt;/div&gt;&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">body</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="n">section</span><span class="p">]))</span>
             <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
         <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span><span class="p">:</span>
+            <span class="n">_c</span> <span class="o">=</span> <span class="s">&quot;content&quot;</span>
+            <span class="n">_f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s_</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="n">_c</span><span class="p">,</span> <span class="s">&quot;_&quot;</span><span class="p">),</span> <span class="n">sh2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="n">_c</span><span class="p">,</span> <span class="s">&quot;h2&quot;</span><span class="p">),</span> <span class="n">ssec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="n">_c</span><span class="p">,</span> <span class="s">&quot;section&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s_</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">sh2</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">ssec</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">_f</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_email</span><span class="p">:</span>
+            <span class="n">inline</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">(</span><span class="s">&quot;table&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="s">&quot;table&quot;</span><span class="p">]}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inline</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">styles</span><span class="p">[</span><span class="s">&quot;table&quot;</span><span class="p">],</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
         <span class="n">subsets</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_subsets</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">subset</span> <span class="ow">in</span> <span class="n">subsets</span><span class="p">:</span>
-            <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;table&gt;&quot;</span><span class="p">)</span>
+            <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;table{table}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">inline</span><span class="p">))</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_cols</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
             <span class="c"># Format the table.</span>
-            <span class="n">tables</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;&lt;tr&gt;&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;th&gt;{}&lt;/th&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;/tr&gt;&quot;</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">tables</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;&lt;tr{tr1}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">inline</span><span class="p">)]</span> <span class="o">+</span>
+                          <span class="p">[</span><span class="s">&quot;&lt;th{th}&gt;{c}&lt;/th&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="o">**</span><span class="n">inline</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span>
+                          <span class="p">[</span><span class="s">&quot;&lt;/tr&gt;&quot;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+                <span class="n">tr</span> <span class="o">=</span> <span class="s">&quot;{{tr_{}}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="s">&quot;even&quot;</span><span class="p">,</span> <span class="s">&quot;odd&quot;</span><span class="p">)[</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">])</span>
                 <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="o">!=</span> <span class="n">subset</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="n">r</span><span class="p">[</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="s">&quot;&lt;a href=&#39;{p}{v}&#39;&gt;{v}&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_url</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-                <span class="n">tables</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;&lt;tr&gt;&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;td&gt;{}&lt;/td&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&quot;&lt;/tr&gt;&quot;</span><span class="p">])</span>
+                <span class="n">tables</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;&lt;tr{}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">inline</span><span class="p">)]</span> <span class="o">+</span>
+                              <span class="p">[</span><span class="s">&quot;&lt;td{td}&gt;{d}&lt;/td&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="o">**</span><span class="n">inline</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span> <span class="o">+</span>
+                              <span class="p">[</span><span class="s">&quot;&lt;/tr&gt;&quot;</span><span class="p">])</span>
             <span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/table&gt;&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tables</span>
 
