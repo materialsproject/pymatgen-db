@@ -236,5 +236,31 @@ class MyTestCase(unittest.TestCase):
         self.assertEquals(d.cmp(6, 8), False)
         self.assertEquals(d.cmp(6, 9), True)
 
+    def test_delta_plus(self):
+        """Delta class value 'plus only'.
+        """
+        d = Delta("+50")
+        self.assertEquals(d.cmp(0, 50), False)
+        self.assertEquals(d.cmp(0, 51), True)
+        self.assertEquals(d.cmp(10, 5), False)
+        d = Delta("+50=")
+        self.assertEquals(d.cmp(0, 50), True)
+        d = Delta("+50%")
+        self.assertEquals(d.cmp(10, 25), True)
+        self.assertEquals(d.cmp(25, 10), False)
+
+    def test_delta_minus(self):
+        """Delta class value 'minus only'.
+        """
+        d = Delta("-50")
+        self.assertEquals(d.cmp(0, 50), False)
+        self.assertEquals(d.cmp(51, 0), True)
+        self.assertEquals(d.cmp(5, 10), False)
+        d = Delta("-50=")
+        self.assertEquals(d.cmp(50, 0), True)
+        d = Delta("-50%")
+        self.assertEquals(d.cmp(25, 10), True)
+        self.assertEquals(d.cmp(10, 25), False)
+
 if __name__ == '__main__':
     unittest.main()
