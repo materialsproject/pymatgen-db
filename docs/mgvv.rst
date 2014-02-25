@@ -343,6 +343,8 @@ Expression  Meaning
 +X-Y        Plus more than X or minus more than Y. (new - old) > X or (old - new) > Y
 +-X=        Plus or minus X or more. abs(new - old) >= X
 +X-Y=       Plus X or more, or minus Y or more. (new - old) >= X or (old - new) >= Y
++X[=]       Positive changes only
+-Y[=]       Negative changes only
 ...%        Percent change. Instead of "(new - old)", use "100 * (new - old) / old"
 ==========  =======
 
