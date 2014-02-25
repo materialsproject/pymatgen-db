@@ -4,13 +4,24 @@ Diff collections, as sets
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '3/29/13'
 
+# System
 import logging
 import re
 import time
+# Package
 from matgendb import util
 from matgendb.query_engine import QueryEngine
 
 _log = logging.getLogger("mg.vv.diff")
+
+
+class IID(object):
+    _value = 0
+
+    @classmethod
+    def next(cls):
+        cls._value += 1
+        return cls._value
 
 
 class Differ(object):
@@ -237,10 +248,17 @@ class Delta(object):
         +X-Y     (new - old) > X or (old - new) > Y
         +-X=     abs(new - old) >= X
         +X-Y=    (new - old) >= X or (old - new) >= Y
+        +X[=]   Just look in '+' direction
+        -Y[=]   Just look in '-' direction
         ...%     Instead of (v2 - v1), use 100*(v2 - v1)/v1
     """
     _num = "\d+(\.\d+)?"
-    _expr = re.compile("\+(?P<X>{n})?-(?P<Y>{n})?(?P<eq>=)?(?P<pct>%)?".format(n=_num))
+    _expr = re.compile("(?:"
+                       "\+(?P<X>{n})?-(?P<Y>{n})?|"  # both + and -
+                       "\+(?P<X2>{n})?|"              # only +
+                       "-(?P<Y2>{n})?"                # only -
+                       ")"
+                       "(?P<eq>=)?(?P<pct>%)?".format(n=_num))
 
     def __init__(self, s):
         """Constructor.
@@ -269,16 +287,25 @@ class Delta(object):
         # Set parsed values.
         d = m.groupdict()
         #print("@@ expr :: {}".format(d))
-        if d['X'] is None and d['Y'] is None:
+        if all((d[k] is None for k in ('X', 'Y', 'X2', 'Y2'))):
             # Change in sign only
             self._sign = True
             self._eq = d['eq'] is not None
         elif d['X'] is not None and d['Y'] is None:
-            raise ValueError("Bad syntax for delta '{}': +X-".format(s))
+            raise ValueError("Missing value for negative delta '{}'".format(s))
         else:
-            # Main branch for +-XY
-            self._dy = -float(d['Y'])
-            self._dx = float(d['X'] or d['Y'])
+            if d['X2'] is not None:
+                # Positive only
+                self._dx = float(d['X2'])
+                self._dy = None
+            elif d['Y2'] is not None:
+                # Negative only
+                self._dx = None
+                self._dy = -float(d['Y2'])
+            else:
+                # Both
+                self._dy = -float(d['Y'])
+                self._dx = float(d['X'] or d['Y'])
             self._eq = d['eq'] is not None
             self._pct = d['pct'] is not None
             #print("@@ dx,dy eq,pct = {},{}  {},{}".format(self._dx, self._dy, self._eq, self._pct))
@@ -289,10 +316,29 @@ class Delta(object):
         elif self._pct:
             self._cmp = self._cmp_val_pct
         else:
-            self._cmp = self._cmp_val
+            self._cmp = self._cmp_val_abs
+
+        self._json_id = None  # for repeated serialization
 
     def __str__(self):
         return self._orig_expr
+
+    def as_json(self):
+        if self._json_id:
+            # only serialize fully the first time
+            return {'delta': {'id': self._json_id}}
+        dtype = 'abs' if self._eq else 'pct'
+        incl = self._eq
+        self._json_id = IID.next()
+        return {
+            'delta': {
+                'plus': self._dx,
+                'minus': self._dy,
+                'type': dtype,
+                'endpoints': incl,
+                'id': self._json_id
+            }
+        }
 
     def cmp(self, old, new):
         """Compare numeric values with delta expression.
@@ -315,17 +361,24 @@ class Delta(object):
             return (a < 0 <= b) or (a > 0 >= b)
         return (a < 0 < b) or (a > 0 > b)
 
-    def _cmp_val(self, a, b):
-        delta = b - a
-        #print("@@ val cmp {:f}".format(delta))
-        if self._eq:
-            return delta >= self._dx or delta <= self._dy
-        return delta > self._dx or delta < self._dy
+    def _cmp_val_abs(self, a, b):
+        return self._cmp_val(b - a)
 
     def _cmp_val_pct(self, a, b):
         if a == 0:
             return False
-        delta = 100.0 * (b - a) / a
+        return self._cmp_val(100.0 * (b - a) / a)
+
+    def _cmp_val(self, delta):
+        oor = False  # oor = out-of-range
         if self._eq:
-            return delta >= self._dx or delta <= self._dy
-        return delta > self._dx or delta < self._dy
+            if self._dx is not None:
+                oor |= delta >= self._dx
+            if self._dy is not None:
+                oor |= delta <= self._dy
+        else:
+            if self._dx is not None:
+                oor |= delta > self._dx
+            if self._dy is not None:
+                oor |= delta < self._dy
+        return oor

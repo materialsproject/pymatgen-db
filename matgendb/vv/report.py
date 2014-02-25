@@ -12,7 +12,7 @@ import smtplib
 #
 from .util import DoesLogging
 from ..util import MongoJSONEncoder
-from .diff import Differ  # for field constants
+from .diff import Differ, Delta  # for field constants, formatting
 
 
 class Report:
@@ -464,6 +464,19 @@ class DiffFormatter(object):
         map(columns.remove, fixed_cols)
         columns.sort()
         return fixed_cols + columns
+
+
+class DiffJsonFormatter(DiffFormatter):
+
+    class Encoder(json.JSONEncoder):
+        def default(self, o):
+            if hasattr(o, 'as_json'):
+                return o.as_json()
+            return json.JSONEncoder.default(self, o)
+
+    def format(self, result):
+        result.update(self.meta)
+        return json.dumps(result, cls=self.Encoder)
 
 
 class DiffHtmlFormatter(DiffFormatter):
