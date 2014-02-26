@@ -19,7 +19,7 @@ import time
 import traceback
 import yaml
 # local module
-from matgendb.util import get_settings
+from matgendb.util import get_settings, get_collection
 from matgendb.vv.validate import ConstraintSpec, Validator, DBError
 from matgendb.vv import report
 from matgendb.vv.util import Timing, ElapsedTime, letter_num
@@ -252,24 +252,54 @@ def command_diff(args):
             'filter': fltr,
             'db1': _dbinfo(get_settings(args.old)),
             'db2': _dbinfo(get_settings(args.new))}
-    if args.format is None:
-        args.format = ("text", "html")[bool(args.email)]
+    meta.update(system_metadata())
     fmt_kwargs = dict(key=args.key)
     if args.format == "html":
         fmt_kwargs['url'] = args.rest_url
-        fmt_kwargs['email_mode'] = args.email
-    fmt_class = getattr(report, "Diff{}Formatter".format(args.format.title()))
-    text = fmt_class(meta, **fmt_kwargs).format(r)
+        fmt_kwargs['email_mode'] = args.rpt_email
 
-    # Print or send report.
-    if args.email:
-        kw = parse_email_args(args.email, args.email_server)
+    make_report = lambda f: getattr(report, "Diff{}Formatter".format(f.title()))(meta, **fmt_kwargs).format(r)
+
+    # Print or send, optionally record, a report.
+    # (a) email
+    if args.rpt_email:
+        kw = parse_email_args(args.rpt_email, args.email_server)
         emailer = report.Emailer(**kw)
-        emailer.send(text, ("text/plain", "text/html")[as_html])
-    else:
+        fmt = args.format or "html"
+        text = make_report(fmt)
+        emailer.send(text, ("text/plain", "text/html")[fmt == "html"])
+    # (b) print
+    if args.rpt_print or (not args.rpt_email and not args.rpt_print and not args.rpt_db):
+        if args.format == "json":
+            fmt_kwargs['pretty'] = True
+        text = make_report(args.format or "text")
         print(text)
+    # (c) DB
+    if args.rpt_db:
+        try:
+            coll = get_collection(args.rpt_db, admin=True)
+        except Exception as err:
+            raise FunctionError("diff", "Connecting to report DB: {}".format(err))
+        try:
+            coll.database.add_son_manipulator(report.DiffJsonFormatter.Manipulator())
+            doc = report.DiffJsonFormatter(meta).document(r)
+            coll.insert(doc)
+        except pymongo.errors.OperationFailure as err:
+            raise FunctionError("diff", "Authenticating to report DB: {}".format(err))
 
     return 0
+
+
+def system_metadata():
+    """Return some simple system metadata.
+    """
+    try:
+        user_name = os.getlogin()
+    except OSError:
+        user_name = args.user or 'unknown'
+    host_name = socket.gethostname()
+    cmdline = " ".join(sys.argv)
+    return {'user': user_name, 'host': host_name, "command": cmdline}
 
 
 def command_validate(args, formatters):
@@ -365,14 +395,11 @@ def command_validate(args, formatters):
         emailer = report.Emailer(**_kwd)
 
     # Initialize report
-    try:
-        user_name = os.getlogin()
-    except OSError:
-        user_name = args.user or 'unknown'
+    sys_meta = system_metadata()
     rpt_hdr = report.ReportHeader("Materials Project Validation Report")
     rpt_hdr.add('Report time', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()))
-    rpt_hdr.add('Report user', user_name)
-    rpt_hdr.add('Report host', socket.gethostname())
+    rpt_hdr.add('Report user', sys_meta['user'])
+    rpt_hdr.add('Report host', sys_meta['host'])
     rpt_hdr.add('Limit', args.limit)
     rpt = report.Report(rpt_hdr)
     # pick report formatter
@@ -516,11 +543,15 @@ def main(cmdline=None):
     # Diff command.
     subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
     subp.set_defaults(func=command_diff, func_args=())
-    subp.add_argument("-e", "--email", dest='email', default=None, metavar="ADDR",
-                      help="Email report, instead of printing it to standard output. "
-                           "ADDR is of the form: sender/receiver,[receiver2...][/subject].")
+    subp.add_argument("-D", "--db", dest="rpt_db", default=None, metavar="CONFIG",
+                      help="Record a JSON record of the report in the MongoDB collection configured by CONFIG, "
+                           "which is a standard pymatgen-db configuration file.")
+    subp.add_argument("-E", "--email", dest='rpt_email', default=None, metavar="ADDR",
+                      help="Email report to ADDR, which is of the form:  "
+                           "sender/receiver,[receiver2...][/subject].")
     subp.add_argument("-f", "--format", dest="format", metavar="FORMAT", default=None,
-                      help="Report format: 'text' (default for screen) or 'html' (default for email) or 'json'",
+                      help="Default report format: 'text', 'html', or 'json'. If not given, the format will "
+                           "be determined by the output: text for console, html for email.",
                       choices=["text", "html", "json"])
     subp.add_argument("-s", "--email-server", dest="email_server", default="localhost", metavar="HOST",
                       help="Server HOST for an email report, in form hostname[:port]. Default is localhost")
@@ -539,6 +570,7 @@ def main(cmdline=None):
                            "The '%%' means a percentage relative to the first collection's value.")
     subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
                                            ", e.g 'these_must,match'", dest="props", default=None)
+    subp.add_argument("-P", "--print", help="Print report to the console", action="store_true", dest="rpt_print")
     subp.add_argument("-q", "--query", metavar="EXPR", help="Expression to filter records before diff. "
                                                             "Uses simplified constraint syntax, e.g., "
                                                             "'name = \"oscar\" and grouchiness > 3'",
