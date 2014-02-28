@@ -11,7 +11,7 @@ from operator import itemgetter
 import pymongo  # for SONManipulator
 import smtplib
 #
-from .util import DoesLogging
+from .util import DoesLogging, JsonWalker
 from ..util import MongoJSONEncoder
 from .diff import Differ, Delta  # for field constants, formatting
 
@@ -475,9 +475,9 @@ class DiffJsonFormatter(DiffFormatter):
                 return o.as_json()
             return json.JSONEncoder.default(self, o)
 
-    class Manipulator(pymongo.son_manipulator.SONManipulator):
-        def transform_incoming(self, son, collection):
-            return walk(son, visit_as_json, None)
+#    class Manipulator(pymongo.son_manipulator.SONManipulator):
+#        def transform_incoming(self, son, collection):
+#            return walk(son, visit_as_json, None)
 
     def __init__(self, meta, pretty=False, **kwargs):
         """Constructor.
@@ -500,47 +500,9 @@ class DiffJsonFormatter(DiffFormatter):
         """Build dict for MongoDB, expanding result keys as we go.
         """
         result.update(self.meta)
-        r = walk(result, visit_as_json, visit_expand)
+        walker = JsonWalker(JsonWalker.value_json, JsonWalker.dict_expand)
+        r = walker.walk(result)
         return r
-
-# Tree-walking for JSON formatter
-
-
-def walk(o, transform, dict_transform):
-    """Walk a dict & transform.
-    """
-    if isinstance(o, dict):
-        d = o if dict_transform is None else dict_transform(o)
-        return {k: walk(v, transform, dict_transform) for k, v in d.iteritems()}
-    elif isinstance(o, list):
-        return [walk(v, transform, dict_transform) for v in o]
-    else:
-        return o if transform is None else transform(o)
-
-
-def visit_as_json(o):
-    if hasattr(o, 'as_json'):
-        return o.as_json()
-    return o
-
-
-def visit_expand(o):
-    r = {}
-    for k, v in o.iteritems():
-        if isinstance(k, str):
-            k = k.replace('$', '_')
-        if "." in k:
-            sub_r, keys = r, k.split('.')
-            # create sub-dicts until last part of key
-            for k2 in keys[:-1]:
-                sub_r[k2] = {}
-                sub_r = sub_r[k2]  # descend
-                # assign last part of key to value
-            sub_r[keys[-1]] = v
-        else:
-            r[k] = v
-    #print("@@ exp. result::{}".format(o))
-    return r
 
 
 class DiffHtmlFormatter(DiffFormatter):

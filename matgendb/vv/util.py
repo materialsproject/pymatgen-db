@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Utility functions and classes for validation.
 """
@@ -9,11 +10,16 @@ __email__ = "dkgunter@lbl.gov"
 __status__ = "Development"
 __date__ = "3/29/13"
 
-import time
-import logging
-from sys import getsizeof, stderr
-from itertools import chain
+#!/usr/bin/env python3
+
+
+from argparse import Action
 from collections import deque
+from itertools import chain
+import logging
+import time
+from sys import getsizeof
+from yaml import load
 
 TRACE = logging.DEBUG -1
 
@@ -77,9 +83,11 @@ def total_size(o, handlers={}, verbose=False, count=False):
 
     return sizeof(o)
 
+
 class ElapsedTime(object):
     def __init__(self):
         self.value = -1
+
 
 class Timing(object):
     """Perform and report timings using the 'with' keyword.
@@ -112,3 +120,128 @@ def letter_num(x, letter='A'):
         s = chr(a0 + x % 26) + s
         x /= 26
     return s
+
+
+class JsonWalker(object):
+    """Walk a dict, transforming.
+    Used for JSON formatting.
+    """
+    def __init__(self, value_transform=None, dict_transform=None):
+        """Constructor.
+
+        :param value_transform: Apply this function to each value in a list or dict.
+        :type value_transform: function taking a single arg (the value)
+        :param dict_transform: Apply this function to each dict
+        :type dict_transform: function taking a single arg (the dict)
+        """
+        self._vx = value_transform
+        self._dx = dict_transform
+
+    def walk(self, o):
+        """Walk a dict & transform.
+        """
+        if isinstance(o, dict):
+            d = o if self._dx is None else self._dx(o)
+            return {k: self.walk(v) for k, v in d.iteritems()}
+        elif isinstance(o, list):
+            return [self.walk(v) for v in o]
+        else:
+            return o if self._vx is None else self._vx(o)
+
+    @staticmethod
+    def value_json(o):
+        """Apply as_json() method on object to get value,
+        otherwise return object itself as the value.
+        """
+        if hasattr(o, 'as_json'):
+            return o.as_json()
+        return o
+
+    @staticmethod
+    def dict_expand(o):
+        """Expand keys in a dict with '.' in them into
+        sub-dictionaries, e.g.
+
+        {'a.b.c': 'foo'} ==> {'a': {'b': {'c': 'foo'}}}
+        """
+        r = {}
+        for k, v in o.iteritems():
+            if isinstance(k, str):
+                k = k.replace('$', '_')
+            if "." in k:
+                sub_r, keys = r, k.split('.')
+                # create sub-dicts until last part of key
+                for k2 in keys[:-1]:
+                    sub_r[k2] = {}
+                    sub_r = sub_r[k2]  # descend
+                    # assign last part of key to value
+                sub_r[keys[-1]] = v
+            else:
+                r[k] = v
+        return r
+
+# Argument handling
+# -----------------
+
+_alog = logging.getLogger("mg.args")
+#_alog.setLevel(logging.DEBUG)
+_argparse_is_dumb = True  # because it doesn't report orig. error text
+
+
+class YamlConfig(Action):
+    """Populate arguments with YAML file contents.
+
+    Adapted and expanded from:
+      http://code.activestate.com/recipes/577918-filling-command-line-arguments-with-a-file/
+    """
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        config = self._get_config_from_file(values)
+        for key, value in config.items():
+            setattr(namespace, key, value)
+        _alog.debug("YamlConfig.namespace={}".format(namespace))
+
+    def _get_config_from_file(self, filename):
+        with open(filename) as f:
+            config = load(f)
+        return config
+
+
+def args_kvp_nodup(s):
+    """Parse argument string as key=value pairs separated by commas.
+
+    :param s: Argument string
+    :return: Parsed value
+    :rtype: dict
+    :raises: ValueError for format violations or a duplicated key.
+    """
+    if s is None:
+        return {}
+    d = {}
+    for item in [e.strip() for e in s.split(",")]:
+        try:
+            key, value = item.split("=", 1)
+        except ValueError:
+            msg = "argument item '{}' not in form key=value".format(item)
+            if _argparse_is_dumb:
+                _alog.warn(msg)
+            raise ValueError(msg)
+        if key in d:
+            msg = "Duplicate key for '{}' not allowed".format(key)
+            if _argparse_is_dumb:
+                _alog.warn(msg)
+            raise ValueError(msg)
+        d[key] = value
+    return d
+
+
+def args_list(s):
+    """Parse argument string as list of values separated by commas.
+
+    :param s: Argument string
+    :return: Parsed value
+    :rtype: list
+    """
+    if s is None:
+        return []
+    return [item.strip() for item in s.split(',')]

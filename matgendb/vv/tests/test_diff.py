@@ -1,4 +1,7 @@
-__author__ = 'dang'
+"""
+Test vv.diff module
+"""
+__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 
 import logging
 import random
