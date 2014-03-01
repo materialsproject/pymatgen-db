@@ -191,7 +191,7 @@ _argparse_is_dumb = True  # because it doesn't report orig. error text
 class YamlConfig(Action):
     """Populate arguments with YAML file contents.
 
-    Adapted and expanded from:
+    Adapted from:
       http://code.activestate.com/recipes/577918-filling-command-line-arguments-with-a-file/
     """
 

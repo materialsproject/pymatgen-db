@@ -492,14 +492,18 @@ class DiffJsonFormatter(DiffFormatter):
     def will_copy(self):
             return True
 
+    def _add_meta(self, result):
+        #result.update(self.meta)
+        result['meta'] = self.meta
+
     def format(self, result):
-        result.update(self.meta)
+        self._add_meta(result)
         return json.dumps(result, cls=self.Encoder, indent=self._indent)
 
     def document(self, result):
         """Build dict for MongoDB, expanding result keys as we go.
         """
-        result.update(self.meta)
+        self._add_meta(result)
         walker = JsonWalker(JsonWalker.value_json, JsonWalker.dict_expand)
         r = walker.walk(result)
         return r
@@ -686,7 +690,7 @@ class DiffTextFormatter(DiffFormatter):
                     for r in result[section]:
                         key = tuple(sorted(r.keys()))
                         if key == columns:
-                            values = [r[k] for k in ocol]
+                            values = [str(r[k]) for k in ocol]
                             lines.append(indent + fmt.format(*values))
         return '\n'.join(lines)
 

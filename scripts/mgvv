@@ -237,7 +237,10 @@ def command_diff(args):
             'elapsed': t1 - t0,
             'filter': fltr,
             'db1': _dbinfo(get_settings(args.old)),
-            'db2': _dbinfo(get_settings(args.new))}
+            'db2': _dbinfo(get_settings(args.new)),
+            'args': {k: v for k, v in vars(args).iteritems()
+                     if not k.startswith("func")}
+    }
     meta.update(system_metadata())
     fmt_kwargs = dict(key=args.key)
     if args.format == "html":
@@ -282,10 +285,12 @@ def system_metadata():
     try:
         user_name = os.getlogin()
     except OSError:
-        user_name = args.user or 'unknown'
+        user_name = 'unknown'
     host_name = socket.gethostname()
     cmdline = " ".join(sys.argv)
-    return {'user': user_name, 'host': host_name, "command": cmdline}
+    return {'user': user_name,
+            'host': host_name,
+            "cmdline": cmdline}
 
 
 def command_validate(args, formatters):
@@ -551,7 +556,8 @@ def main(cmdline=None):
     subp.add_argument("-i", "--info", help="Extra fields for records, as comma-separated list"
                                            ", e.g 'extra,fields,to_include'", dest="info",
                       default=None, type=args_list)
-    subp.add_argument("-k", "--key", help="Key for matching records", dest="key", default=None)
+    subp.add_argument("-k", "--key", help="Key for matching records (default='key')", dest="key",
+                      default="key")
     subp.add_argument("-m", "--missing", help="Only report keys that are in the 'old' collection, but "
                                               "not in the 'new' collection", action="store_true", dest="missonly")
     subp.add_argument("-n", "--numeric", dest="numprops", default=None, metavar="EXPR", type=args_kvp_nodup,
@@ -580,10 +586,8 @@ def main(cmdline=None):
 
     args = parser.parse_args(cmdline)
 
+    # Do some extra arg. checking for diff command, due to YAML config option.
     if hasattr(args, 'func') and args.func == command_diff:
-        # Manually check for --key, since required=True fails with --file config
-        if getattr(args, "key") is None:
-            parser.error("sorry, -k/--key is required")
         # Manually check types on some args
         for name, type_, opt in (("info", list, "-i/--info"), ("props", list, "-p/--prop"),
                                  ("numprops", dict, "-n/--numeric")):
