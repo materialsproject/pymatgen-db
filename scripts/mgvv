@@ -218,7 +218,7 @@ def command_diff(args):
                                     .format(field, err))
 
     # Instantiate main class.
-    df = diff.Differ(key=args.key, info=args.info, props=args.props, fltr=fltr, deltas=deltas)
+    df = diff.Differ(key=args.key, info=args.info, props=args.properties, fltr=fltr, deltas=deltas)
 
     # Run diff.
     t0 = time.time()
@@ -568,8 +568,8 @@ def main(cmdline=None):
                            "where N is a number. "
                            "Adding '=' (must go before '%%') compares >=, <= instead of >, <. "
                            "The '%%' means a percentage relative to the first collection's value.")
-    subp.add_argument("-p", "--prop", help="Fields with properties that must match, as comma-separated list "
-                                           ", e.g 'these_must,match'", dest="props", default=None,
+    subp.add_argument("-p", "--properties", help="Fields with properties that must match, as comma-separated list "
+                                           ", e.g 'these_must,match'", dest="properties", default=None,
                       type=args_list)
     subp.add_argument("-P", "--print", help="Print report to the console", action="store_true", dest="rpt_print")
     subp.add_argument("-q", "--query", metavar="EXPR", help="Expression to filter records before diff. "
@@ -589,7 +589,7 @@ def main(cmdline=None):
     # Do some extra arg. checking for diff command, due to YAML config option.
     if hasattr(args, 'func') and args.func == command_diff:
         # Manually check types on some args
-        for name, type_, opt in (("info", list, "-i/--info"), ("props", list, "-p/--prop"),
+        for name, type_, opt in (("info", list, "-i/--info"), ("properties", list, "-p/--properties"),
                                  ("numprops", dict, "-n/--numeric")):
             val = getattr(args, name)
             if val is None:
