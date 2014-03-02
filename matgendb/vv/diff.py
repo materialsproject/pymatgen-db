@@ -41,6 +41,7 @@ class Differ(object):
     CHANGED_MATCH_EXACT = "exact"
     CHANGED_OLD = "old"
     CHANGED_NEW = "new"
+    CHANGED_DELTA = "delta"
 
     #: for missing property
     NO_PROPERTY = "__MISSING__"
@@ -227,7 +228,8 @@ class Differ(object):
                     if self._prop_deltas[pkey].cmp(oldval, newval):
                         change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_DELTA, self._key_field: key, "property": pkey,
                                   self.CHANGED_OLD: "{:f}".format(oldval), self.CHANGED_NEW: "{:f}".format(newval),
-                                  "rule": self._prop_deltas[pkey]}
+                                  "rule": self._prop_deltas[pkey],
+                                  self.CHANGED_DELTA: "{:f}".format(newval - oldval)}
                         changed.append(_up(change, info[key]) if info else change)
             # Exact property comparison.
             if has_eqprops:

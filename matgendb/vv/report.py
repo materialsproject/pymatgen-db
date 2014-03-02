@@ -8,7 +8,6 @@ __date__ = '2/21/13'
 from email.mime.text import MIMEText
 import json
 from operator import itemgetter
-import pymongo  # for SONManipulator
 import smtplib
 #
 from .util import DoesLogging, JsonWalker
@@ -466,6 +465,22 @@ class DiffFormatter(object):
         columns.sort()
         return fixed_cols + columns
 
+    def sort_rows(self, rows, section):
+        """Sort the rows, as appropriate for the section.
+
+        :param rows: List of tuples (all same length, same values in each position)
+        :param section: Name of section, should match const in Differ class
+        :return: None; rows are sorted in-place
+        """
+        #print("@@ SORT ROWS:\n{}".format(rows))
+        # Section-specific determination of sort key
+        if section.lower() == Differ.CHANGED.lower():
+            sort_key = Differ.CHANGED_DELTA
+        else:
+            sort_key = None
+        if sort_key is not None:
+            rows.sort(key=itemgetter(sort_key))
+
 
 class DiffJsonFormatter(DiffFormatter):
 
@@ -493,8 +508,10 @@ class DiffJsonFormatter(DiffFormatter):
             return True
 
     def _add_meta(self, result):
-        #result.update(self.meta)
+        # put metadata into its own section
         result['meta'] = self.meta
+        # .. but promote a timestamp, for searching
+        result['time'] = self.meta['end_time']
 
     def format(self, result):
         self._add_meta(result)
@@ -641,6 +658,7 @@ class DiffHtmlFormatter(DiffFormatter):
             tables.extend(["<tr{tr1}>".format(**inline)] +
                           ["<th{th}>{c}</th>".format(c=c, **inline) for c in cols] +
                           ["</tr>"])
+            self.sort_rows(rows, section)
             for i, r in enumerate(rows):
                 tr = "{{tr_{}}}".format(("even", "odd")[i % 2])
                 if tuple(sorted(r.keys())) != subset:
@@ -687,7 +705,9 @@ class DiffTextFormatter(DiffFormatter):
                     lines.append("")
                     lines.append(indent + fmt.format(*ocol))
                     lines.append(indent + '-_' * (sum(mw)/2 + len(columns)))
-                    for r in result[section]:
+                    rows = result[section]
+                    self.sort_rows(rows, section)
+                    for r in rows:
                         key = tuple(sorted(r.keys()))
                         if key == columns:
                             values = [str(r[k]) for k in ocol]
