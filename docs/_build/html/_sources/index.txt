@@ -12,15 +12,30 @@ Pymatgen-db also provides a clean and intuitive web ui (the
 originates for the purpose of exploring collections generated using
 pymatgen-db, it can be used to explore any Mongo database and collection.
 
-In addition, Pymatgen-db provides command-line tools for validation of MongoDB databases. Although these
-tools are designed with the Materials Project databases in mind, they could be used
-with almost any MongoDB database.
+In addition, a command-line tool :doc:`mgbuild <mgbuild>` and the
+associated API (see :class:`matgendb.builders.Builder` in the :doc:`pymatgen-db API docs </modules>`), provides a flexible
+framework for building MongoDB collections from other
+MongoDB collections or external sources.
+
+Finally, Pymatgen-db provides the command-line tool, :doc:`mgvv
+<mgvv>` for validation & verification operations on MongoDB databases.
+Although these tools are designed with the Materials Project databases
+in mind, they could be used with almost any MongoDB database.
 
 .. contents::
     :depth: 1
 
 Change Log
 ==========
+
+Version 0.4.0
+-------------
+New `mgvv diff` features.
+
+#. Configure from YAML file
+#. Improved JSON output
+#. Add JSON reports to a database
+#. Sort numeric diffs by delta value
 
 Version 0.3.9
 -------------
@@ -266,41 +281,6 @@ The language follows very closely to pymongo/MongoDB syntax, except that
 QueryEngine provides useful aliases for commonly used fields as well as
 translation to commonly used pymatgen objects like Structure and
 ComputedEntries.
-
-Validating a database
-----------------------
-
-The :doc:`pymatgen-db validation script (mgvv) </mgvv>` is used to validate MongoDB databases.
-
-Vhe basic usage of this command is::
-
-    mgvv [options] 'constraints'
-
-The constraints use a simplified syntax that was originally developed for this purpose, but has since
-been moved into an independent package called smoqe_ .
-
-.. _smoqe: https://pypi.python.org/pypi/smoqe/
-
-The constraints can be placed in a YAML file so that complicated sets of constraints can be built up
-and re-used. Results of validation can be formatted as plain text or HTML, and either printed to the
-screen or emailed to a list of recipients.
-
-In addition, there is a sub-command that does a "diff" of any two collections, looking for identifiers
-that are missing from one or the other, or for mis-matching values for identifiers that are the same.
-
-For example, if you want to compare the 'materials' collection in a development and production database.
-You could have two JSON configuration files, `prod.json` and `dev.json` that specified the servers,
-user and password, and database and collection names. These files have exactly the same format used
-by the `mgdb` command-line tool.
-
-You could issue this command-line::
-
-    mgvv diff -k task_id  -p icsd_id -v -i pretty_formula mdev.json mprod.json
-
-This compares with the key `task_id` and matches items with the same key on the property `icsd_id`, adding to the
-output the value of the field `pretty_formula`. Because output is to the console, the format will default to text.
-
-Like the main `mgvv` command, the results of database diffs can be formatted as text or HTML, and printed or emailed.
 
 Extending pymatgen-db
 ---------------------

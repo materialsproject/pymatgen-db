@@ -1,3 +1,5 @@
+.. _mgbuild:
+
 Materials Project Database Builder: mgbuild
 ============================================
 
@@ -103,3 +105,14 @@ The "vasp" command builds the set of derived collections from the electronic str
                             parallel (16)
       -m, --merged          Use merged tasks collection with suffix merged, as
                             created by the 'merge' command for sandboxes
+
+.. _builderAPI:
+
+Builder API
+===========
+
+.. currentmodule:: matgendb.builders
+
+.. autoclass:: Builder
+
+

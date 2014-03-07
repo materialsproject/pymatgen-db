@@ -4,24 +4,19 @@
 Materials Project Database Validation: mgvv
 ============================================
 
-The command-line program, `mgvv`, is used to validate MongoDB databases.
+The command-line program, `mgvv`, is used to validate MongoDB databases. This command has two sub-commands:
 
-Validation includes (1) filtering records on a set of criteria (conjunction)
-and (2) applying simple constraints and find records that do not match any given constraint (disjunction).
+1. :ref:`mgvv validate <mgvv validate>` - Filter records on a set of criteria (conjunction) and apply a set of constraints.
 
-In addition, there is a sub-command that does a "diff" of any two collections, looking for identifiers
-that are missing from one or the other, or for mis-matching values for identifiers that are the same.
-This is the :ref:`mgvv diff <mgvv diff>` subcommand.
+2. :ref:`mgvv diff <mgvv diff>` - Look at the "diff" of any two collections, for identifiers that are missing from one or the other, or for mis-matching values for identifiers that are the same.
 
-.. _mgvv:
+.. _mgvv validate:
 
 .. program:: mgvv
 
-mgvv
-----
+mgvv validate subcommand
+-------------------------
 
-The `mgvv` program provides a convenient command-line interface to run
-validation tests of MongoDB databases.
 Database connections are configured from a file, exactly as for `mgdb`/
 The patterns to validate against can come from a file or the command-line.
 
@@ -238,7 +233,7 @@ Note that this only applies to constraints that use the 'size' family of array o
 Constraint syntax
 -----------------
 
-The constraint syntax is taken from the "smoqe" package. See http://pythonhosted.org/smoqe/ .
+The constraint syntax is taken from the `smoqe package <http://pythonhosted.org/smoqe/>`_.
 
 .. _mgvv diff:
 
@@ -247,15 +242,15 @@ The constraint syntax is taken from the "smoqe" package. See http://pythonhosted
 mgvv diff subcommand
 ---------------------
 
-The `diff` sub-command is invoked as one would expect::
+The `diff` sub-command takes options and two DB configurations::
 
-    mgvv diff [options..]
+    mgvv diff [options..] old.json new.json
 
 The command provides a convenient command-line interface to take the difference
 of two MongoDB database collections.
-Database connections are configured from files, exactly as for `mgdb`.
-See the :ref:`examples <mgvv diff examples>` at the end of this section for some
-full usage examples.
+Database connections are configured from JSON files, 
+exactly as for `mgdb`.
+See the :ref:`examples <mgvv diff examples>` at the end of this section for full usage examples.
 
 Arguments
 ---------
@@ -283,16 +278,10 @@ or `admin_user` and `admin_password`) are required::
         "password": "let-me-in"
     }
 
-By convention, these files end in `.json`, e.g. "foo1.json" and "foo2.json", but really
-the filenames can be anything.
-
 Options
 -------
 
-usage: mgvv [constraint [constraint ...]] diff [-h] [--verbose] [-e ADDR]
-                                               [-f FORMAT] [-s HOST] [-i INFO]
-                                               -k KEY [-m] [-p PROPS] [-q query]
-                                               old new
+usage: mgvv diff [-h] [--verbose] [-D CONFIG] [-E ADDR] [-f FILE] [-F FORMAT] [-s HOST] [-i INFO] [-k KEY] [-m] [-n EXPR] [-p PROPERTIES] [-P] [-q EXPR] [-u URL] [-V] old new
 
 .. option:: --help, -h
 
@@ -302,20 +291,43 @@ show help message and exit
 
 Increase log message verbosity. Repeatable. Messages are logged to standard error.
 
+.. option:: -D CONFIG, --db CONFIG
 
-.. option::  -e ADDR, --email ADDR
+Insert a JSON record of the report in the MongoDB collection pointed to by
+CONFIG, which is a standard pymatgen-db JSON configuration file. Note that
+the target database and collection must be writable.
 
-Email report, instead of printing it to standard output. ADDR is of the form:
+.. option::  -E ADDR, --email ADDR
+
+Email report to one or more email addresses. ADDR is a list of the form:
 '``sender/receiver,[receiver2...][/subject]``'.
-
 
 .. option:: -s HOST, --email-server HOST
 
 Server HOST for an email report, in form hostname[:port]. Default is localhost
 
-.. option:: -f FORMAT, --format FORMAT
+.. option:: -f FILE, --file FILE 
 
-Report format: 'text' (default for screen) or 'html' (default for email).
+Read options from FILE instead of command line. File format is YAML (or JSON,
+a subset), with the long option names as keys. Any time the command-line
+option takes a comma-separated list, the config file uses a real list;
+command-line key/value pair lists become config file mappings.
+
+For example::
+
+    Command-line                    Config file
+    ============                    ==============
+    --numeric='x=+-1.5,y=+-0.5'     numeric:
+                                       x: '+-1.5'               
+                                       y: '+-0.5'
+
+     --info=foo,bar                info:                        
+                                       - foo                    
+                                       - bar                    
+
+.. option:: -F FORMAT, --format FORMAT
+
+Default report format: 'text', 'html', or 'json'. If not given, the format will be determined by the output: text for console, html for email.
 
 .. option:: -i INFO, --info INFO
 
@@ -364,15 +376,20 @@ Some examples follow.
 
 This option may be combined with any of the other options.
 
-.. option:: -p PROPS, --prop PROPS
+.. option:: -p PROPS, --properties PROPS
 
 Fields with properties that must match, as comma-separated list , e.g '``these_must,match``'.
+
+.. option:: -P, --print
+
+Print report to the console.
 
 .. option:: -q EXPR, --query EXPR
 
 Query to filter records before key and value tests.
-Uses simplified constraint syntax, from smoqe package, e.g.,
-'name = "oscar" and grouchiness > 3'
+Uses simplified constraint syntax, from the `smoqe package <http://pythonhosted.org/smoqe/>`_. For example::
+
+    --query='name = "oscar" and grouchiness > 3'
 
 .. option::  -u URL, --url URL
 
@@ -381,6 +398,10 @@ This can be used to take advantage of clean RESTful URL schemes such as those fo
 the Materials Project webpages::
 
     mgvv diff -k task_id -u 'https://materialsproject.org/tasks/'
+
+ .. option:: -V, --values
+
+ Only report changes in values, not missing or added keys.
 
 .. _mgvv diff examples:
 
@@ -414,12 +435,14 @@ You could issue this command-line::
 
     mgvv diff -k task_id  -p icsd_id -v -i pretty_formula mdev.json mprod.json
 
-This compares with the key `task_id` and matches items with the same key on the property `icsd_id`, adding to the
-output the value of the field `pretty_formula`. Because output is to the console, the format will default to text.
+This compares with the key `task_id` and matches items with the same key on
+the property `icsd_id`, adding to the output the value of the field
+`pretty_formula`. Because output is to the console, the format will default to
+text.
 
-To produce and view an HTML output report instead, just use the `-f` option::
+To produce and view an HTML output report instead, just use the `--format` option::
 
-    mgvv diff -f html -k task_id  -p icsd_id -v -i pretty_formula mdev.json mprod.json > page.html
+    mgvv diff --format html -k task_id  -p icsd_id -v -i pretty_formula mdev.json mprod.json > page.html
     open page.html # on OSX, view in a browser
 
 To add an email report set the recipient and, optionally, the relay server (default will be localhost)::
@@ -427,5 +450,18 @@ To add an email report set the recipient and, optionally, the relay server (defa
     mgvv diff -e "me@my.mail.domain/you@your.mail.domain/DB diff" \
         -k task_id  -p icsd_id -v -i pretty_formula mdev.json mprod.json
 
-Note that the third part of the `-e/--email` command, the subject, is optional -- but if you leave it out the
-email will arrive with no subject line.
+Note that the third part of the `-e/--email` command, the subject, is optional -- but if you leave it out the email will arrive with no subject line.
+
+As you may have noticed, the command-lines begin to get rather complicated. To replace that last example with a configuration file, use instead this command::
+
+    mgvv diff --file diff.yaml mdev.json mprod.json
+
+and then put the options into `diff.yaml` like this::
+
+    email:
+        - "me@my.mail.domain/you@your.mail.domain/DB diff"
+    key: task_id
+    properties:
+        - icsd_id
+    info:
+        - pretty_formula

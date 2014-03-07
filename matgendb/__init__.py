@@ -7,9 +7,9 @@ is also provided to enable the easy translation of MongoDB docs to useful
 pymatgen objects for analysis purposes.
 """
 
-__author__ = "Shyue Ping Ong"
-__date__ = "Sep 20 2013"
-__version__ = "0.3.9"
+__author__ = "Shyue Ping Ong, Dan Gunter"
+__date__ = "Mar 7 2014"
+__version__ = "0.4.0"
 
 
 from query_engine import QueryEngine
