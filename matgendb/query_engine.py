@@ -19,9 +19,13 @@ import json
 import itertools
 import logging
 import os
+import gridfs
 from collections import OrderedDict, Iterable
+
 from pymongo import MongoClient
 from pymatgen import Structure, Composition
+from pymatgen.electronic_structure.core import Orbital, Spin
+from pymatgen.electronic_structure.dos import CompleteDos, Dos
 from pymatgen.entries.computed_entries import ComputedEntry,\
     ComputedStructureEntry
 
@@ -438,6 +442,39 @@ class QueryEngine(object):
         """
         return self.db[item]
 
+    def get_dos_from_id(self, task_id):
+        """
+        Overrides the get_dos_from_id for the MIT gridfs format.
+        """
+        args = {'task_id': task_id}
+        fields = ['calculations']
+        structure = self.get_structure_from_id(task_id)
+        dosid = None
+        for r in self.query(fields, args):
+            dosid = r['calculations'][-1]['dos_fs_id']
+        if dosid != None:
+            self._fs = gridfs.GridFS(self.db, 'dos_fs')
+            with self._fs.get(dosid) as dosfile:
+                d = json.loads(dosfile.read())
+                try:
+                    #Ugly hack to support old dos format.
+                    cdos = CompleteDos.from_dict(d)
+                    return cdos
+                except:
+                    tdos = Dos.from_dict(d)
+                    pdoss = {}
+                    for i in xrange(len(d['pdos'])):
+                        ados = d['pdos'][i]
+                        all_ados = {}
+                        for j in xrange(len(ados)):
+                            orb = Orbital.from_vasp_index(j)
+                            odos = ados[str(orb)]
+                            all_ados[orb] = {Spin.from_int(int(k)): v
+                                             for k, v
+                                             in odos['densities'].items()}
+                        pdoss[structure[i]] = all_ados
+                    return CompleteDos(structure, tdos, pdoss)
+        return None
 
 class QueryResults(Iterable):
     """

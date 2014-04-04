@@ -60,7 +60,8 @@ def update_db(args):
     additional_fields = {"author": args.author, "tags": args.tag}
     drone = VaspToDbTaskDrone(
         host=d["host"], port=d["port"],  database=d["database"],
-        user=d["admin_user"], password=d["admin_password"], parse_dos=False,
+        user=d["admin_user"], password=d["admin_password"],
+        parse_dos=args.parse_dos,
         collection=d["collection"], update_duplicates=args.force_update_dupes,
         additional_fields=additional_fields, mapi_key=d.get("mapi_key", None))
     ncpus = multiprocessing.cpu_count() if not args.ncpus else args.ncpus
@@ -87,6 +88,7 @@ def optimize_indexes(args):
         coll.ensure_index(key)
     print "Building nelements and elements compound index"
     compound_index = [('nelements', ASCENDING), ('elements', ASCENDING)]
+    coll.ensure_index(compound_index)
     coll.ensure_index(compound_index)
 
 
@@ -322,6 +324,9 @@ if __name__ == "__main__":
                          action="store_true",
                          help="Force update duplicates. This forces the "
                               "analyzer to reanalyze already inserted data.")
+    pinsert.add_argument("-d", "--parse_dos", dest="parse_dos",
+                         action="store_true",
+                         help="Whether to parse the dos.")
     pinsert.add_argument("-a", "--author", dest="author", type=str, nargs=1,
                          default=None,
                          help="Enter a *unique* author field so that you can "
