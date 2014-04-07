@@ -75,17 +75,25 @@ def get_database(config_file=None, settings=None, admin=False):
     return db
 
 
-def normalize_auth(settings, admin=True, readonly=True):
+def get_collection(config_file, admin=False, settings=None):
+    if settings is None:
+        settings = get_settings(config_file)
+    db = get_database(admin=admin, settings=settings)
+    return db[settings["collection"]]
+
+
+def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
     """Transform the readonly/admin user and password to simple user/password,
-    as expected by QueryEngine.
+    as expected by QueryEngine. If return value is true, then
+    admin or readonly password will be in keys "user" and "password".
 
     :param settings: Connection settings
     :type settings: dict
     :param admin: Check for admin password
     :param readonly: Check for readonly password
-    :return: Whether user/password are now in settings
+    :param readonly_first: Check for readonly password before admin
+    :return: Whether user/password were found
     :rtype: bool
-    :raise: KeyError if neither readonly, admin, or plain user/password are found
     """
     U, P = "user", "password"
     # If user/password, un-prefixed, exists, do nothing.
@@ -94,10 +102,16 @@ def normalize_auth(settings, admin=True, readonly=True):
 
     # Set prefixes
     prefixes = []
-    if admin:
-        prefixes.append("admin_")
-    if readonly:
-        prefixes.append("readonly_")
+    if readonly_first:
+        if readonly:
+            prefixes.append("readonly_")
+        if admin:
+            prefixes.append("admin_")
+    else:
+        if admin:
+            prefixes.append("admin_")
+        if readonly:
+            prefixes.append("readonly_")
 
     # Look for first user/password matching.
     found = False
@@ -112,11 +126,6 @@ def normalize_auth(settings, admin=True, readonly=True):
     return found
 
 
-def get_collection(config_file, admin=False):
-    db = get_database(config_file, admin=admin)
-    settings = get_settings(config_file)
-    return db[settings["collection"]]
-
 
 class MongoJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -125,3 +134,20 @@ class MongoJSONEncoder(json.JSONEncoder):
         if isinstance(o, datetime.datetime):
             return o.isoformat()
         return json.JSONEncoder.default(self, o)
+
+
+def collection_keys(coll, sep='.'):
+    """Get a list of all (including nested) keys in a collection.
+    Examines the first document in the collection.
+
+    :param sep: Separator for nested keys
+    :return: List of str
+    """
+    def _keys(x, pre=''):
+        for k in x:
+            yield (pre + k)
+            if isinstance(x[k], dict):
+                for nested in _keys(x[k], pre + k + sep):
+                    yield nested
+
+    return list(_keys(coll.find_one()))
