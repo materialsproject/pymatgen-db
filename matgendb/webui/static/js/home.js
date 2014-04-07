@@ -276,4 +276,85 @@ window.onload = function () {
             }
         });
 
+    // from http://jqueryui.com/autocomplete/#multiple
+    $(function() {
+	// TODO: get tags from db schema (save them to a schema collection when inserted?) instead of hardcoded
+	var availableTags = [
+	    "dir_name",
+	    "is_hubbard",
+	    "last_updated",
+	    "pseudo_potential",
+	    "run_stats",
+	    "state",
+	    "task_id",
+	    "energy_per_atom",
+	    "transformations",
+	    "anonymous_formula",
+	    "chemsys",
+	    "elements",
+	    "nelements",
+	    "nsites",
+	    "pretty_formula",
+	    "reduced_cell_formula",
+	    "unit_cell_formula",
+	    "hubbards",
+	    "author",
+	    "calculations",
+	    "analysis",
+	    "cif",
+	    "completed_at",
+	    "density",
+	    "input",
+	    "name",
+	    "output",
+	    "schema_version",
+	    "spacegroup",
+	    "tags",
+	    "incar",
+	    "oszicar",
+	    "poscar",
+	    "kpoints"
+	];
+
+	function split( val ) {
+	    return val.split( / \s*/ );
+	}
+
+	function extractLast( term ) {
+	    return split( term ).pop();
+	}
+
+	$( "#properties-input" )
+	// don't navigate away from the field on tab when selecting an item
+	    .bind( "keydown", function( event ) {
+		if ( event.keyCode === $.ui.keyCode.TAB &&
+		     $( this ).data( "ui-autocomplete" ).menu.active ) {
+		    event.preventDefault();
+		}
+	    })
+	    .autocomplete({
+		minLength: 0,
+
+		source: function( request, response ) {
+		    // delegate back to autocomplete, but extract the last term
+		    response( $.ui.autocomplete.filter(
+			availableTags, extractLast( request.term ) ) );
+		},
+		focus: function() {
+		    // prevent value inserted on focus
+		    return false;
+		},
+		select: function( event, ui ) {
+		    var terms = split( this.value );
+		    // remove the current input
+		    terms.pop();
+		    // add the selected item
+		    terms.push( ui.item.value );
+		    // add placeholder to get the comma-and-space at the end
+		    terms.push( "" );
+		    this.value = terms.join( " " );
+		    return false;
+		}
+	    });
+    });
 }
