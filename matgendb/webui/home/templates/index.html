@@ -24,11 +24,16 @@
     <link rel='stylesheet' href="/static/css/home.css" type='text/css'>
 
     {% block extra_css %}{% endblock extra_css %}
-    {% block top_javascript %} {% endblock top_javascript %}
+    {% block top_javascript %}
+    <script type="text/javascript">
+    {% autoescape off %}
+        setCollKeys({{ keys_list }});
+    {% endautoescape %}
+    </script>
+    {% endblock top_javascript %}
 </head>
 
 <body>
-
 <h1>materials genomics ui</h1>
 <h2 id="subtitle">Connected to: {{ host }}:{{ port }} with {{ ndocs }} docs.</h2>
 <div id="search-div">

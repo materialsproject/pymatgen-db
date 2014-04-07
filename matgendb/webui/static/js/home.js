@@ -1,5 +1,6 @@
 var currentData = [];
 var properties = [];
+var collection_keys = [];
 
 function displayData() {
     var i, j, checkedValue, props, oTable, data, row;
@@ -232,6 +233,16 @@ function regEvents() {
     });
 }
 
+/**
+ * Get/set collection keys, for completion.
+ */
+function getCollKeys() {
+    return collection_keys;
+}
+function setCollKeys(k) {
+    collection_keys = k;
+}
+
 window.onload = function () {
     $('input').addClass("ui-corner-all");
     $("input").keyup(function () {
@@ -279,42 +290,7 @@ window.onload = function () {
     // from http://jqueryui.com/autocomplete/#multiple
     $(function() {
 	// TODO: get tags from db schema (save them to a schema collection when inserted?) instead of hardcoded
-	var availableTags = [
-	    "dir_name",
-	    "is_hubbard",
-	    "last_updated",
-	    "pseudo_potential",
-	    "run_stats",
-	    "state",
-	    "task_id",
-	    "energy_per_atom",
-	    "transformations",
-	    "anonymous_formula",
-	    "chemsys",
-	    "elements",
-	    "nelements",
-	    "nsites",
-	    "pretty_formula",
-	    "reduced_cell_formula",
-	    "unit_cell_formula",
-	    "hubbards",
-	    "author",
-	    "calculations",
-	    "analysis",
-	    "cif",
-	    "completed_at",
-	    "density",
-	    "input",
-	    "name",
-	    "output",
-	    "schema_version",
-	    "spacegroup",
-	    "tags",
-	    "incar",
-	    "oszicar",
-	    "poscar",
-	    "kpoints"
-	];
+	var availableTags = getCollKeys();
 
 	function split( val ) {
 	    return val.split( / \s*/ );

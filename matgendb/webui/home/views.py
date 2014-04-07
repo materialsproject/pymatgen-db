@@ -28,8 +28,11 @@ def index(request):
         return "<p>No database configured.</p>"
     d = config.copy()
     d["ndocs"] = qe.collection.count()
-    d["keys"] = dbutil.collection_keys(qe.collection)
+    d["keys_list"] = _jsarr(dbutil.collection_keys(qe.collection))
     return render_to_response("home/templates/index.html",
                               RequestContext(request, d))
 
 
+def _jsarr(x):
+    """Return a string that would work for a javascript array"""
+    return "[" + ", ".join(['"{}"'.format(i) for i in x]) + "]"

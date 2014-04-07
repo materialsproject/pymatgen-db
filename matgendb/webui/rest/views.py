@@ -10,6 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from pymatgen import Composition, Element
 
 from matgendb.query_engine import QueryEngine
+from matgendb import util as dbutil
+
 import bson
 import datetime
 
@@ -21,9 +23,11 @@ qe = None
 mgdb_config = os.environ.get("MGDB_CONFIG", "")
 if mgdb_config:
     config = json.loads(mgdb_config)
+    if not dbutil.normalize_auth(config, readonly_first=True):
+        config["user"] = config["password"] = None
     qe = QueryEngine(host=config["host"], port=config["port"],
-                 database=config["database"], user=config["readonly_user"],
-                 password=config["readonly_password"],
+                 database=config["database"], user=config["user"],
+                 password=config["password"],
                  collection=config["collection"],
                  aliases_config=config.get("aliases_config", None))
 
@@ -104,6 +108,7 @@ def query(request):
             properties = list(results[0].keys())
         d = {"valid_response": True, "results": results,
              "properties": properties}
+        #print("@@ criteria: {}, result: {}".format(criteria, d))
         return HttpResponse(json.dumps(d, cls=MongoJSONEncoder),
                             mimetype="application/json")
     return HttpResponseBadRequest(
