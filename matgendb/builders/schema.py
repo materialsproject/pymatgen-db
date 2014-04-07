@@ -30,7 +30,7 @@ VALUE_RE = re.compile("(?:{spec})?([a-zA-Z]+)(?:{spec})?\s*(.*)"
                       .format(spec=SPECIAL))
 
 # Global obj with all collected schemas
-schemata = []
+schemata = {}
 
 
 class SchemaError(Exception):
@@ -69,12 +69,13 @@ def add_schemas(path, ext="json"):
         raise SchemaPathError()
     filepat = "*." + ext if ext else "*"
     for f in glob.glob(os.path.join(path, filepat)):
-        try:
-            schema = json.load(f)
-        except ValueError:
-            raise SchemaParseError("error parsing '{}'".format(f))
+        with open(f, 'r') as fp:
+            try:
+                schema = json.load(fp)
+            except ValueError:
+                raise SchemaParseError("error parsing '{}'".format(f))
         name = os.path.splitext(os.path.basename(f))[0]
-        schemata[name] = schema
+        schemata[name] = Schema(schema)
 
 
 def get_schema(name):
@@ -88,6 +89,19 @@ def get_schema(name):
     """
     return schemata[name]
 
+
+def load_schema(file_or_fp):
+    """Load schema from file.
+
+    :param file_or_fp: File name or file object
+    :type file_or_fp: str, file
+    :raise: IOError if file cannot be opened or read, ValueError if
+            file is not valid JSON or JSON is not a valid schema.
+    """
+    fp = open(file_or_fp, 'r') if isinstance(file_or_fp, str) else file_or_fp
+    obj = json.load(fp)
+    schema = Schema(obj)
+    return schema
 
 ## Validator classes
 
@@ -132,6 +146,7 @@ class Schema(HasMeta):
         self.is_optional = optional
         self._schema = self._parse(schema)
         self._json_schema = None
+        self._json_schema_keys = {}
 
     def validate(self, doc, path="(root)"):
         t = self._whatis(doc)
@@ -161,14 +176,17 @@ class Schema(HasMeta):
                 return self._vresult(path, "bad value '{}' for type {}",
                                      doc, self._schema)
 
-    @property
-    def json_schema(self):
+    def json_schema(self, **add_keys):
         """Convert our compact schema representation to the standard, but more verbose,
         JSON Schema standard.
 
         Example JSON schema: http://json-schema.org/examples.html
         Core standard: http://json-schema.org/latest/json-schema-core.html
+
+        :param add_keys: Key, default value pairs to add in,
+                         e.g. description=""
         """
+        self._json_schema_keys = add_keys
         if self._json_schema is None:
             self._json_schema = self._build_schema(self._schema)
         return self._json_schema
@@ -189,6 +207,9 @@ class Schema(HasMeta):
                 js["required"] = req
         else:
             js = {"type": self._jstype(w, s)}
+        for k, v in self._json_schema_keys.iteritems():
+            if k not in js:
+                js[k] = v
         return js
 
     def _jstype(self, stype, sval):
