@@ -12,6 +12,19 @@ function displayData() {
             visualize(currentData);
             $("#result-tree").show();
             $("#num-results").show();
+            $("#result-plot").hide();
+            $("#results-table-div").hide();
+        }
+        catch (e) {
+            alert("Sorry error in json string, please correct and try again: " + e.message);
+        }
+    }
+    else if (checkedValue == "plot" && currentData.length > 0) {
+        try {
+            visualize_plot(currentData);
+            $("#result-plot").show();
+            $("#num-results").show();
+            $("#result-tree").hide();
             $("#results-table-div").hide();
         }
         catch (e) {
@@ -67,6 +80,7 @@ function displayData() {
         $("#results-table-div").show();
         $("#num-results").show();
         $("#result-tree").hide();
+        $("#result-plot").hide();
     }
 }
 
@@ -134,6 +148,39 @@ var transforms = {
 function visualize(json) {
     $('#result-tree').html('');
     $('#result-tree').json2html(convert('Results', json, 'open'), transforms.object);
+    regEvents();
+}
+
+function visualize_plot(json) {
+    
+    alldata = [];
+    
+    for (j = 1; j < properties.length; j++) {
+	values = [];
+	for (i = 0; i < currentData.length; i++) {
+            x = currentData[i][properties[0]];
+            y = currentData[i][properties[j]];
+            values.push([x,y]);
+	}
+	values.sort(function(a,b){return a[0]-b[0]});
+	series = { label: properties[j], data: values };
+	alldata.push(series);
+    }
+    
+    var options = {
+	series: {
+            lines: { show: true },
+            points: { show: true }
+	}
+    };
+    
+    try {
+	$.plot($("#result-plot"), alldata, options);
+    }
+    catch (e) {
+	alert("Sorry error in plot, please correct and try again: " + e.message);
+    }
+    
     regEvents();
 }
 

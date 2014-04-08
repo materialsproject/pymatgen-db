@@ -17,6 +17,7 @@
     <script type="text/javascript" src="/static/js/DataTables-1.9.4/extras/TableTools/media/js/TableTools.min.js"></script>
     <script type="text/javascript" src="/static/js/DataTables-1.9.4/extras/Scroller/media/js/dataTables.scroller.min.js"></script>
     <script type="text/javascript" src="/static/js/jquery.spinner.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.flot.js"></script>
     <script type="text/javascript" src="/static/js/home.js"></script>
     <link rel="shortcut icon" href='/static/images/favicon.ico'/>
     <link rel='stylesheet' href="/static/js/DataTables-1.9.4/extras/TableTools/media/css/TableTools.css" type='text/css'>
@@ -61,7 +62,8 @@
                     <td>
                 <span class="emph">display format:
                 <input type="radio" name="display" value="table" checked>table
-                <input type="radio" name="display" value="tree">tree</span>
+                <input type="radio" name="display" value="tree">tree
+                <input type="radio" name="display" value="plot">plot</span>
                     </td>
                     <td>
                     <td><span id="limit-label" class="emph">limit: </span></td><td>
@@ -86,6 +88,7 @@
     <div class='divider' style='margin-top:40px;'></div>
     <h2 id="num-results">x results</h2>
     <div id='result-tree'></div>
+    <div id='result-plot'></div>
     <div id='results-table-div'>
     <table id='results-table'>
     </table>
