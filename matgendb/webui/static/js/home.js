@@ -182,7 +182,6 @@ function visualize_plot(json) {
 	alert("Sorry error in plot, please correct and try again: " + e.message);
     }
     
-    regEvents();
 }
 
 function getValue(obj) {
