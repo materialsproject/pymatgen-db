@@ -21,6 +21,7 @@ function displayData() {
     }
     else if (checkedValue == "plot" && currentData.length > 0) {
         try {
+	    $("#result-plot").hide();
             visualize_plot(currentData);
             $("#result-plot").show();
             $("#num-results").show();
