@@ -86,7 +86,7 @@ function displayData() {
 }
 
 function doQuery() {
-    var crit, prop, opts, limit;
+    var j, crit, prop, opts, limit;
     crit = $("#criteria-input").val();
     prop = $("#properties-input").val();
     limit = $("#limit-slider").slider("value");
@@ -111,7 +111,22 @@ function doQuery() {
                   if (data["valid_response"]) {
                       currentData = data["results"];
                       properties = data["properties"];
+
+		      // check if it makes sense to plot
+                      $("#plot-option").hide();
+		      $("#result-plot").hide();
+                      if (typeof(currentData[0][properties[0]]) == 'number') {
+                          for (j = 1; j < properties.length; j++) {
+                              if (typeof(currentData[0][properties[j]]) == 'number') {
+                                  // there's at least one property to plot against the first
+                                  $("#plot-option").show();
+				  break;
+                              }
+                          }
+                      }
+
                       displayData();
+
                   } else {
                       $("#error_msg").text(data["error"]);
                       $("#error_msg").show();
@@ -291,6 +306,8 @@ function setCollKeys(k) {
 }
 
 window.onload = function () {
+    $("#plot-option").hide();
+
     $('input').addClass("ui-corner-all");
     $("input").keyup(function () {
         $("#error_msg").hide();
