@@ -1,0 +1,144 @@
+#!/usr/bin/env python
+"""
+Check for out-of-order ids in MongoDB collection.
+
+For -t/--test, the code simply creates a number of threads, which read from a
+list of numbers 1:N in a shared queue, and insert that number into
+MongoDB. In the results, one can see how mis-ordered Object IDs
+match mis-ordered numbers.
+
+"""
+import argparse
+import logging
+import Queue
+import threading
+import time
+
+from matgendb.util import get_collection, get_database
+
+_log = logging.getLogger("mg")
+_log.addHandler(logging.StreamHandler())
+
+# Change this to True to see
+# that serializing the threads makes the
+# ObjectIDs become ordered again.
+g_serialize = False 
+if g_serialize:
+    g_insert_lock = threading.Lock()
+
+# Change this to False to turn off manipulation of IDs by client
+g_client_manipulate = True
+
+
+def insert(coll, q, autoincr=None):
+    """Insert records from queue.
+    """
+    while 1:
+        try:
+            if g_serialize:
+                with g_insert_lock:
+                    coll.insert(q.get_nowait())
+            else:
+                rec = q.get_nowait()
+                if autoincr:
+                    # XXX: this is not what we want. We want to evaluate the autoincr() function
+                    # as part of the insert, to make sure it's atomic.
+                    rec['_id'] = coll.database.eval('autoincr("{}")'.format(autoincr))
+                coll.insert(rec, manipulate=g_client_manipulate)
+        except Queue.Empty:
+            break
+    
+
+def fill_queue(q, num_items):
+    for i in xrange(num_items):
+        q.put({'i': i+1})
+    return q
+    
+
+def create_threads(num_threads, conf, q, ai):
+    coll = get_collection(conf)
+    coll.remove()
+    threads = []
+    for i in range(num_threads):
+        coll = get_collection(conf)
+        threads.append(threading.Thread(target=insert, args=(coll, q), kwargs=dict(autoincr=ai)))
+    return threads
+
+
+def run_test(conf, nitems, nthreads, ai):
+    q = fill_queue(Queue.Queue(), nitems)
+    threads = create_threads(nthreads, conf, q, ai)
+    print("Start")
+    t0 = time.time()
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    t1 = time.time()
+    print("Stop")
+    print("Start time = {:f}".format(t0))
+    print("End time = {:f}".format(t1))
+
+
+def run_check(conf, fields=()):
+    coll = get_collection(conf)
+    prev_rec, i = None, 1
+    for rec in coll.find({}, fields=fields, limit=1000000):
+        if prev_rec:
+            ooo = rec['_id'] < prev_rec['_id']
+            if ooo:
+                data = ', '.join([str(rec[f]) for f in fields])
+                print("{:d}: {} {}".format(i, rec['_id'], data))
+        prev_rec = rec
+        i += 1
+        if (i % 1000) == 0:
+            print("{:d} records read".format(i))
+    print("{:d} records total".format(coll.count()))
+
+
+def create_autoincr(conf, name):
+    db = get_database(conf)
+    counter_coll = "autoincrement"
+    func_body = "function(n) {"\
+                "return db.@.findAndModify({query: {_id: n}, update: {$inc: {seq: 1}}, new: true}).seq;}"\
+        .replace('@', counter_coll)
+    db.system_js.autoincr = func_body
+    db[counter_coll].remove()
+    db[counter_coll].insert({"_id": name, "seq": 0})
+
+
+if __name__ == '__main__':
+    # Parse args.
+    p = argparse.ArgumentParser()
+    # XXX: this doesn't work yet
+    #p.add_argument("-a", "--auto", dest="autoincr", help="Use auto-increment for _id, for -t/--test",
+    #               action="store_true")
+    p.add_argument("-c", "--config", dest="conf", help="pymatgen-db JSON config file",
+                   default="db.json")
+    p.add_argument("-i", "--nitems", dest="nitems",
+                   help="Number of items to insert for -t/--test (100)", default=100, type=int)
+    p.add_argument("-m", "--manipulate", dest="manip", help="Manipulate _id on server", action="store_true")
+    p.add_argument("-p", "--nthreads", dest="nthreads",
+                   help="Number of threads to run for -t/--test (10)", default=10, type=int)
+    p.add_argument("-t", "--test", dest="test", action="store_true",
+                   help="Perform a test on target collection by clearing and filling with data")
+    p.add_argument("-v", "--verbose", dest="vb", action="count", default=0,
+                   help="Verbosity level")
+    a = p.parse_args()
+
+    # Set logging level.
+    verbosity = (logging.ERROR, logging.INFO, logging.DEBUG)[min(a.vb, 3)]
+    _log.setLevel(verbosity)
+
+    # Run.
+    fields = []
+    if a.test:
+        if a.manip:
+            g_client_manipulate = False
+        ai_name = None
+        if a.autoincr:
+            ai_name = "aictr"
+            create_autoincr(a.conf, ai_name)
+        run_test(a.conf, a.nitems, a.nthreads, ai_name)
+        fields.append('i')
+    run_check(a.conf, fields=fields)
