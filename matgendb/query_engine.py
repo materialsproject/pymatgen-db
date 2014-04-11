@@ -183,7 +183,7 @@ class QueryEngine(object):
         self.connection.disconnect()
 
     def get_entries_in_system(self, elements, inc_structure=False,
-                              optional_data=None):
+                              optional_data=None, additional_criteria=None):
         """
         Gets all entries in a chemical system, e.g. Li-Fe-O will return all
         Li-O, Fe-O, Li-Fe, Li-Fe-O compounds.
@@ -207,6 +207,9 @@ class QueryEngine(object):
             optional_data:
                 Optional data to include with the entry. This allows the data
                 to be access via entry.data[key].
+            additional_criteria:
+                Added ability to provide additional criteria other than just
+                the chemical system.
 
         Returns:
             List of ComputedEntries in the chemical system.
@@ -217,6 +220,8 @@ class QueryEngine(object):
                 chemsys = "-".join(sorted(combi))
                 chemsys_list.append(chemsys)
         crit = {"chemsys": {"$in": chemsys_list}}
+        if additional_criteria is not None:
+            crit.update(additional_criteria)
         return self.get_entries(crit, inc_structure,
                                 optional_data=optional_data)
 
