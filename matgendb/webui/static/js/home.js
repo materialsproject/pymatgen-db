@@ -169,7 +169,7 @@ function visualize(json) {
 
 function visualize_plot(json) {
     
-    alldata = [];
+    var alldata = [];
     
     for (j = 1; j < properties.length; j++) {
 	values = [];
