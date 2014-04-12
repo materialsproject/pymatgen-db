@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>{% block title %} mgui {% endblock %}</title>
+    <link rel='stylesheet'
+          href="/static/css/jquery-ui-1.10.1.custom.min.css"
+          type='text/css'>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="Materials Design, Materials Database, Materials Information, Materials Tools" />
+    <meta name="description"
+          content="Simple access web front end for pymatgen-db databases." />
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui-1.10.1.custom.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.json2html-3.1-min.js" ></script>
+    <script type="text/javascript" src="/static/js/DataTables-1.9.4/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/static/js/DataTables-1.9.4/extras/TableTools/media/js/TableTools.min.js"></script>
+    <script type="text/javascript" src="/static/js/DataTables-1.9.4/extras/Scroller/media/js/dataTables.scroller.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.spinner.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.flot.js"></script>
+    <script type="text/javascript" src="/static/js/entry.js"></script>
+    <link rel="shortcut icon" href='/static/images/favicon.ico'/>
+    <link rel='stylesheet' href="/static/js/DataTables-1.9.4/extras/TableTools/media/css/TableTools.css" type='text/css'>
+    <link rel='stylesheet' href="/static/js/DataTables-1.9.4/media/css/jquery.dataTables.css" type='text/css'>
+    <link rel='stylesheet' href="/static/css/home.css" type='text/css'>
+
+    {% block extra_css %}{% endblock extra_css %}
+    {% block top_javascript %}
+    <script type="text/javascript">
+      {% autoescape off %}
+      setTaskId( {{ task_id }} );
+      {% endautoescape %}
+    </script>
+    {% endblock top_javascript %}
+</head>
+
+<body>
+<h1>materials genomics ui</h1>
+<h2 id="subtitle">Connected to: {{ host }}:{{ port }} with {{ ndocs }} docs.</h2>
+
+<h3 id="entry-id">Showing task_id {{ task_id }}.</h3>
+
+<div id="entry"></div>
+
+</body>
+
+</html>

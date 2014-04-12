@@ -32,6 +32,16 @@ def index(request):
     return render_to_response("home/templates/index.html",
                               RequestContext(request, d))
 
+def entry(request, task_id):
+    if qe is None:
+        return "<p>No database configured.</p>"
+    d = config.copy()
+    d["task_id"] = task_id
+    d["ndocs"] = qe.collection.count()
+    d["keys_list"] = _jsarr(dbutil.collection_keys(qe.collection))
+    return render_to_response("home/templates/entry.html",
+                              RequestContext(request, d))
+
 
 def _jsarr(x):
     """Return a string that would work for a javascript array"""
