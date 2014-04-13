@@ -1,16 +1,6 @@
 matgendb.builders package
 =========================
 
-Subpackages
------------
-
-.. toctree::
-
-    matgendb.builders.porous
-
-Submodules
-----------
-
 matgendb.builders.core module
 -----------------------------
 
@@ -18,6 +8,14 @@ matgendb.builders.core module
     :members:
     :undoc-members:
     :show-inheritance:
+
+matgendb.builders.incr module
+-----------------------------
+
+.. automodule:: matgendb.builders.incr
+    :members:
+    :show-inheritance:
+
 
 matgendb.builders.schema module
 -------------------------------
