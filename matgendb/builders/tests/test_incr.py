@@ -12,7 +12,11 @@ from matgendb.builders.incr import *
 
 
 # Global collection object
-coll = mongomock.Connection().db.collection
+conn = mongomock.Connection()
+db = conn.db
+coll = db.collection
+# mongomock does this wrong
+coll.database = db
 
 
 def clear():
@@ -27,39 +31,38 @@ def add_records(n):
         coll.insert(obj)
     return obj
 
+def dumpcoll(c):
+    print("-- Collection '{}' --".format(c.name))
+    for rec in c.find():
+        print(">> {}".format(rec))
 
 class TestCollectionTracker(TestCase):
 
-    extractors = [IdExtractor]
-
     def setUp(self):
         clear()
-        self.trackers = {ex: CollectionTracker(coll, ex) for ex in self.extractors}
+        self.trackers = {coll: CollectionTracker(coll)}
 
     def test_mark(self):
-        op = Operation.other
-        for ex, trk in self.trackers.iteritems():
-            trk.set_mark(op)
-            mark = trk.get_mark(op)
-            self.assertEqual(mark, {}, "Expected empty mark")
+        for op in Operation.other, Operation.copy, Operation.build:
+            # check with empty collection
+            mark = Mark(coll, op, field='_id')
+            self.assertEqual(mark.pos, {'_id': 0})
+            # add some records and see if it matches the last one
             rec = add_records(10)
-            trk.set_mark(op)
-            mark = trk.get_mark(op)
-            if ex is IdExtractor:
-                expected = {'_id': {'$gt': rec['_id']}}
-            else:
-                print("class of ex = {}".format(ex.__class__.__name__))
-                expected = None   # XXX: no other extractors yet
-            self.assertEqual(mark, expected,
-                             "Mark '{}' does not match '{}'"
-                             .format(mark, expected))
+            mark.update()
+            self.assertEqual(mark.pos, {'_id': rec['_id']})
+            clear()
 
-
-    def test_get_mark(self):
-        self.fail()
-
-    def test_find(self):
-        self.fail()
+    def test_collection_tracker(self):
+        index = '_id'
+        for op in Operation.other, Operation.copy, Operation.build:
+            rec = add_records(10)
+            tracker = CollectionTracker(coll)
+            tracker.save(Mark(coll, op, field=index))
+            mark = tracker.retrieve(op, field=index)
+            #dumpcoll(tracker.tracking_collection)
+            self.assertEqual(mark.pos, {index: rec[index]})
+            clear()
 
 if __name__ == '__main__':
     unittest.main()

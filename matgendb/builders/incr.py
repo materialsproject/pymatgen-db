@@ -1,5 +1,19 @@
 """
-Incremental builders
+Incremental builders.
+
+The main classes are Mark and CollectionTracker. Usage example::
+
+    from matgendb.builders.incr import *
+    collection = pymongo.MongoClient().mydb.mycollection
+    # Init tracker
+    tracker = CollectionTracker(collection)
+    # Save mark for copy operation
+    tracker.save(Mark(collection, Operation.copy, field='_id'))
+    # Retrieve mark for copy operation
+    mark = tracker.retrieve(Operation.copy, field='_id')
+    # Update mark position, and print mark
+    print(mark.update().as_dict())
+
 """
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/11/14'
@@ -22,40 +36,85 @@ class Operation(Enum):
     other = 3
 
 
-class CollectionExtractor(object):
-    """Extract highest identifier from a collection.
+class Mark(object):
+    """The position in a collection for the last record that was
+    processed by a given operation.
     """
-    def __init__(self, coll):
-        self.coll = coll
+    # Fields for JSON representation
+    FLD_OP, FLD_MARK = "operation", "mark"
 
-    def highest(self):
-        """Return key / value pair for highest id.
+    def __init__(self, collection=None, operation=None, field=None, kvp=None):
+        """Constructor.
 
-        For example::
+        Can be called in two ways, with `kvp` set to a dict describing the
+        highest record values, or with `field` giving the field in the collection
+        to use for finding the highest values. If both are provided,
+        the `kvp` takes precedence, but will be replaced with a call to :meth:`update`.
+        If neither is provided, the Mark has an "empty" position of {<field>: 0}.
 
-            {'myid': 12345}
+        :param collection: Collection to track
+        :type collection: pymongo.collection.Collection
+        :param operation: Operation for this mark.
+        :type operation: Operation
+        :param field: Name of field to determine highest record
+        :type field: str
+        :param kvp: Key/value pairs that describe the mark position
+        :type kvp: dict
+        """
+        self._c = collection
+        self._op = operation
+        self._fld = field
+        if kvp:
+            self._pos = kvp
+        elif field:
+            self.update()
+        else:
+            self._pos = self._empty_pos()
 
-        :return: Simple key/value pair for highest id, empty for an empty collection.
+    def update(self):
+        """Update the position of the mark in the collection.
+
+        :return: this object, for chaining
+        :rtype: Mark
+        """
+        rec = self._c.find_one({}, {self._fld: 1}, sort=[(self._fld, -1)], limit=1)
+        self._pos = self._empty_pos() if rec is None else rec
+        return self
+
+    def _empty_pos(self):
+        return {self._fld: 0}
+
+    @property
+    def pos(self):
+        return self._pos
+
+    def as_dict(self):
+        """Representation as a dict for JSON serialization.
+        """
+        return {self.FLD_OP: self._op.name,
+                self.FLD_MARK: self._pos}
+
+    to_dict = as_dict   # synonym
+
+    @classmethod
+    def from_dict(cls, d):
+        """Construct from dict
+
+        :param d: Input
+        :type d: dict
+        :return: new instance
+        :rtype: Mark
+        """
+        return Mark(operation=Operation[d[cls.FLD_OP]], kvp=d[cls.FLD_MARK])
+
+    @property
+    def query(self):
+        """A mongdb query expression to find all records with higher values
+        for this mark's fields in the collection.
+
         :rtype: dict
         """
-        try:
-            return self._highest()
-        except IndexError:
-            return {}
-
-    def _highest(self):
-        """Override in subclasses to return key/value pair for highest id.
-        Raise IndexError if the collection is empty (i.e. simply use cursor[0]).
-        """
-        pass
-
-
-class IdExtractor(CollectionExtractor):
-    """Extract highest `_id`
-    """
-    def _highest(self):
-        cursor = self.coll.find({}, {"_id": 1}, sort=[("_id", -1)], limit=1)
-        return cursor[0]
+        return {key: {'$gt': val} for key, val in self._pos.iteritems()}
 
 
 class CollectionTracker(object):
@@ -66,72 +125,54 @@ class CollectionTracker(object):
     #: name of the target collection to create the tracking collection.
     TRACKING_NAME = 'tracker'
 
-    # Fields in tracking collection
-    FLD_OP, FLD_MARK = "operation", "mark"
-
-    def __init__(self, coll, extractor):
+    def __init__(self, coll):
         """Constructor.
 
        :param coll: Collection to track
        :type coll: pymongo.collection.Collection
-       :param extractor: Class to use for extracting the highest identifier.
-       :type extractor: :class:`CollectionIdExtractor`
         """
         self.collection, self.db = coll, coll.database
-        self._track = self.db[self.TRACKING_NAME]
-        self._extract = extractor(coll)
+        self._track = self.db[self.tracking_collection_name]
 
-    def set_mark(self, operation):
-        """Set a mark for the given operation.
+    @property
+    def tracking_collection_name(self):
+        return self.collection.name + '.' + self.TRACKING_NAME
 
-        :param operation: Name of an operation
-        :type operation: :class:`Operation`
+    @property
+    def tracking_collection(self):
+        return self._track
+
+    def save(self, mark):
+        """Save a position in this collection.
+
+        :param mark: The position to save
+        :type mark: Mark
         :raises: DBError
         """
+        obj = mark.as_dict()
         try:
-            self._set_mark(operation)
+            self._track.insert(obj)
         except pymongo.errors.PyMongoError, err:
             raise DBError("{}".format(err))
 
-    def _set_mark(self, operation):
-        highest = self._extract.highest()
-        expr = {key: {'$gt': val} for key, val in highest.iteritems()}
-        obj = {self.FLD_OP: operation.name,
-               self.FLD_MARK: expr}
-        self._track.insert(obj)
-
-    def get_mark(self, operation):
-        """Get a query expression that will find records
-        after the point last set by :meth:`set_mark`, for the given operation.
-
-        The returned expression will be a dict like this:
-
-            {"field": { "$gt" : value }, ... }
+    def retrieve(self, operation, field=None):
+        """Retrieve a position in this collection.
 
         :param operation: Name of an operation
         :type operation: :class:`Operation`
-        :return: Mongo query expression. An empty expression if there is no mark,
-                 or the mark was set in an empty collection.
-        :rtype: dict
+        :param field: Name of field for sort order
+        :type field: str
+        :return: The position for this operation
+        :rtype: Mark
         """
-        obj = self._track.find_one({self.FLD_OP: operation.name})
-        return obj[self.FLD_MARK]
+        query = {Mark.FLD_OP: operation.name,
+                 Mark.FLD_MARK + "." + field: {"$exists": True}}
+        obj = self._track.find_one(query)
+        if obj is None:
+            # empty Mark instance
+            return Mark(collection=self.collection, operation=operation)
+        return Mark.from_dict(obj)
 
-    def find(self, operation, query=None, **kwargs):
-        """Perform a query on the original collection that will return
-        only records after the point last set by :meth:`set_mark`, for the given operation.
 
-        This is a convenience function, as `tracker.find(oper, query)` is equivalent to
-        `query.update(tracker.get_mark(oper)); tracker.collection.find(query)`.
-
-        :param operation: Name of an operation
-        :type operation: :class:`Operation`
-        :param query: Additional query expression to include in query
-        :type query: dict or None
-        :param kwargs: Additional keywords passed to `pymongo.collection.Collection.find()`
-        :return: Cursor over results
-        :rtype: pymongo.cursor.Cursor
-        """
-        pass
 
 
