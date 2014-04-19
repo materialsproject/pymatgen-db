@@ -1,6 +1,24 @@
 """
 Incremental builders.
 
+## High-level API ##
+
+The main class is TrackedQueryEngine. Usage example::
+
+    from matgendb.builders.incr import *
+    qe = TrackedQueryEngine(track_operation=Operation.copy,
+                            track_field='_id', ...other kw...)
+    # That's it! Use as you normally would.
+    # The collection 'inside' the qe will be tracked, so
+    # when you are done using the QE instance, you can call either
+    qe.set_mark()
+    # or
+    qe.collection.set_mark()
+    # Just be sure not to set the collection attribute directly,
+    # always use qe.set_collection("new_name")
+
+## Low-level API ##
+
 The main classes are Mark and CollectionTracker. Usage example::
 
     from matgendb.builders.incr import *
@@ -20,6 +38,7 @@ __date__ = '4/11/14'
 
 import pymongo
 from enum import Enum
+from matgendb.query_engine import QueryEngine
 
 
 class DBError(Exception):
@@ -28,12 +47,78 @@ class DBError(Exception):
     pass
 
 
+class NoTrackingCollection(Exception):
+    """Raised if no tracking collection is present,
+    but some operation is requested on that collection.
+    """
+    pass
+
+
+## --------------
+## High level API
+## --------------
+
+class TrackedQueryEngine(QueryEngine):
+    """A QE that only examines records past the last 'mark' that was set for the
+    given operation and field.
+    """
+    def __init__(self, track_operation=None, track_field=None, **kwargs):
+        QueryEngine.__init__(self, **kwargs)
+        self._t_op, self._t_field = track_operation, track_field  # shotput!
+
+    def set_collection(self, coll_name):
+        """Override base class to make this a tracked collection.
+        """
+        coll = self.db[coll_name]
+        return TrackedCollection(coll, operation=self._t_op, field=self._t_field)
+
+    def set_mark(self):
+        """Set the mark to the current end of the collection. This is saved in the database
+        so it is available for later operations.
+        """
+        self.collection.set_mark()
+
+
+class TrackedCollection(object):
+    def __init__(self, coll, operation=None, field=None):
+        self._coll, self._coll_find = coll, coll.find
+        self._tracker = CollectionTracker(coll, create=True)
+        self._mark = self._tracker.retrieve(operation=operation, field=field)
+
+    def __getattr__(self, item):
+        if item == 'find':
+            # monkey-patch the find() method in the collection object
+            return self.tracked_find
+        else:
+            return getattr(self._coll, item)
+
+    def tracked_find(self, *args, **kwargs):
+        # fish 'spec' out of args or kwargs
+        if len(args) > 0:
+            spec = args[0]
+        else:
+            if 'spec' not in kwargs:
+                kwargs['spec'] = {}
+            spec = kwargs['spec']
+        # update spec with tracker query
+        spec.update(self._mark.query)
+        # delegate to "real" find()
+        return self._coll_find(*args, **kwargs)
+
+    def set_mark(self):
+        self._tracker.save(self._mark.update())
+
+
+## --------------
+## Low level API
+## --------------
+
 class Operation(Enum):
     """Enumeration of collection operations.
     """
     copy = 1
     build = 2
-    other = 3
+    other = 99
 
 
 class Mark(object):
@@ -125,14 +210,23 @@ class CollectionTracker(object):
     #: name of the target collection to create the tracking collection.
     TRACKING_NAME = 'tracker'
 
-    def __init__(self, coll):
+    def __init__(self, coll, create=True):
         """Constructor.
 
-       :param coll: Collection to track
-       :type coll: pymongo.collection.Collection
+        :param coll: Collection to track
+        :type coll: pymongo.collection.Collection
+        :param create: Create tracking collection, if not present. Otherwise the tracking
+                       collection can be manually created with :meth:`create`, later.
+                       If the collection is not created, :meth:`save` and :meth:`retrieve` will
+                       raise a `NoTrackingCollection` exception.
+        :type create: bool
         """
         self.collection, self.db = coll, coll.database
-        self._track = self.db[self.tracking_collection_name]
+        trk = self.tracking_collection_name
+        if not create and trk not in self.db.collection_names(False):
+            self._track = None
+        else:
+            self._track = self.db[trk]
 
     @property
     def tracking_collection_name(self):
@@ -140,15 +234,25 @@ class CollectionTracker(object):
 
     @property
     def tracking_collection(self):
+        """Return current tracking collection, or None if it does not exist.
+        """
         return self._track
+
+    def create(self):
+        """Create tracking collection.
+        Does nothing if tracking collection already exists.
+        """
+        if self._track is None:
+            self._track = self.db[self.tracking_collection_name]
 
     def save(self, mark):
         """Save a position in this collection.
 
         :param mark: The position to save
         :type mark: Mark
-        :raises: DBError
+        :raises: DBError, NoTrackingCollection
         """
+        self._check_exists()
         obj = mark.as_dict()
         try:
             self._track.insert(obj)
@@ -164,15 +268,20 @@ class CollectionTracker(object):
         :type field: str
         :return: The position for this operation
         :rtype: Mark
+        :raises: NoTrackingCollection
         """
-        query = {Mark.FLD_OP: operation.name,
-                 Mark.FLD_MARK + "." + field: {"$exists": True}}
-        obj = self._track.find_one(query)
+        obj = self._get(operation, field)
         if obj is None:
             # empty Mark instance
             return Mark(collection=self.collection, operation=operation)
         return Mark.from_dict(obj)
 
+    def _get(self, operation, field):
+        self._check_exists()
+        query = {Mark.FLD_OP: operation.name,
+                 Mark.FLD_MARK + "." + field: {"$exists": True}}
+        return self._track.find_one(query)
 
-
-
+    def _check_exists(self):
+        if self._track is None:
+            raise NoTrackingCollection()

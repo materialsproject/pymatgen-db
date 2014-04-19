@@ -14,30 +14,34 @@ from matgendb.builders.incr import *
 # Global collection object
 conn = mongomock.Connection()
 db = conn.db
-coll = db.collection
-# mongomock does this wrong
+coll = db.my_collection
+# Hacks for mongomock deficiencies
 coll.database = db
+db.collection_names = lambda x: ['my_collection']
 
 
 def clear():
     coll.remove()
 
 
-def add_records(n):
+def add_records(n, offs=0):
     obj = None
     for i in xrange(n):
-        obj = {"n": i,
+        obj = {"n": i + offs,
                "s": "foo-{:d}".format(i)}
         coll.insert(obj)
     return obj
+
 
 def dumpcoll(c):
     print("-- Collection '{}' --".format(c.name))
     for rec in c.find():
         print(">> {}".format(rec))
 
-class TestCollectionTracker(TestCase):
 
+class TestCollectionTrackerLL(TestCase):
+    """Test low-level API.
+    """
     def setUp(self):
         clear()
         self.trackers = {coll: CollectionTracker(coll)}
@@ -63,6 +67,54 @@ class TestCollectionTracker(TestCase):
             #dumpcoll(tracker.tracking_collection)
             self.assertEqual(mark.pos, {index: rec[index]})
             clear()
+
+    def test_collection_tracker_exist(self):
+        # init, but do not create tracking collection
+        tracker = CollectionTracker(coll, create=False)
+        # check that collection is None and operations fail
+        self.assertEqual(tracker.tracking_collection, None)
+        self.assertRaises(NoTrackingCollection, tracker.save, ('foo',))
+        self.assertRaises(NoTrackingCollection, tracker.save, (Operation.copy, 'foo'))
+        # create tracking collection, now it should exist
+        tracker.create()
+        self.assertNotEqual(tracker.tracking_collection, None)
+
+    def test_query(self):
+        index = '_id'
+        op = Operation.copy
+        tracker = CollectionTracker(coll)
+        # get mark (start of coll.)
+        mark = Mark(collection=coll, operation=op, field=index)
+        # add records
+        add_records(10)
+        # get all records after mark (0..9)
+        values = [r['n'] for r in coll.find(mark.query)]
+        values.sort()
+        # check that all 10 records are returned
+        self.assertEqual(values, list(range(10)))
+        # update and save mark
+        tracker.save(mark.update())
+        # retrieve saved mark
+        mark = tracker.retrieve(operation=op, field=index)
+        # get all records after mark (=0)
+        values = [r['n'] for r in coll.find(mark.query)]
+        # check that 0 records are returned
+        self.assertEqual(values, [])
+        # now add 10 more records, #'ed 10-19
+        add_records(10, offs=10)
+        # get all records after mark (10..19)
+        values = [r['n'] for r in coll.find(mark.query)]
+        values.sort()
+        # check that next 10 records are returned
+        self.assertEqual(values, list(range(10, 20)))
+
+
+class TestCollectionTrackerHL(TestCase):
+    """Test high-level API.
+    """
+    def test_tracked_qe(self):
+        self.fail("not done")
+
 
 if __name__ == '__main__':
     unittest.main()

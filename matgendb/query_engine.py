@@ -288,7 +288,13 @@ class QueryEngine(object):
         using aliases, as well as some useful sanitization. For example, string
         formulas such as "Fe2O3" are auto-converted to proper mongo queries of
         {"Fe":2, "O":3}.
+
+        If 'criteria' is None, returns an empty dict. Putting this logic here
+        simplifies callers and allows subclasses to insert something even
+        when there are no criteria.
         """
+        if criteria is None:
+            return dict()
         parsed_crit = dict()
         for k, v in self.defaults.items():
             if k not in criteria:
@@ -353,7 +359,7 @@ class QueryEngine(object):
         else:
             props, prop_dict = None, None
 
-        crit = self._parse_criteria(criteria) if criteria is not None else {}
+        crit = self._parse_criteria(criteria)
         #print("@@ mongo query = {} and fields = {}".format(crit, props))
         cur = self.collection.find(crit, fields=props,
                                    timeout=False).skip(index)
