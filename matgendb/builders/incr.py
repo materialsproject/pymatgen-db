@@ -14,8 +14,8 @@ The main class is TrackedQueryEngine. Usage example::
     qe.set_mark()
     # or
     qe.collection.set_mark()
-    # Just be sure not to set the collection attribute directly,
-    # always use qe.set_collection("new_name")
+    # Just be sure not to set the `qe.collection` attribute directly,
+    # always use `qe.set_collection("new_name")`.
 
 ## Low-level API ##
 
@@ -39,7 +39,6 @@ __date__ = '4/11/14'
 import pymongo
 from enum import Enum
 from matgendb.query_engine import QueryEngine
-
 
 class DBError(Exception):
     """Generic database error.
@@ -107,6 +106,10 @@ class TrackedCollection(object):
 
     def set_mark(self):
         self._tracker.save(self._mark.update())
+
+# TODO: TrackedFileset -- Same basic idea with one or more files in a directory.
+# TODO: This would enable the incremental interface to work just as well with loading
+# TODO: from files into the DB as it does with DB -> DB operations.
 
 
 ## --------------
