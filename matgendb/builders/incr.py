@@ -40,6 +40,7 @@ import pymongo
 from enum import Enum
 from matgendb.query_engine import QueryEngine
 
+
 class DBError(Exception):
     """Generic database error.
     """

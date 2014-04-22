@@ -286,7 +286,7 @@ class Builder(object):
     # ----------------------------
 
     @abstractmethod
-    def setup(self):
+    def setup(self, *args):
         """Perform one-time setup at the top of a run, returning
         an iterator on items to use as input.
 

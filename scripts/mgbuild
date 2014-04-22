@@ -32,6 +32,7 @@ import pymongo
 # Local imports.
 from matgendb.builders import core
 from matgendb.query_engine import QueryEngine
+from matgendb.builders.incr import TrackedQueryEngine, Operation
 
 # Global variables.
 
@@ -206,10 +207,11 @@ def command_build(args):
         if not 'type' in info:
             raise ConfigurationError("for builder '{}'".format(args.builder),
                                      "Missing ':type {}: <type>' in docstring".format(name))
+        is_query_engine = is_mqe(info['type'])
         try:
             value = args_kw[name]
         except KeyError:
-            if is_mqe(info['type']):
+            if is_query_engine:
                 value = name  # for collection foo, default to 'foo.json' config
             else:
                 if '(optional)' in info['desc']:
@@ -219,15 +221,23 @@ def command_build(args):
                     raise ConfigurationError("for builder '{}'".format(args.builder),
                                              "Missing value for parameter '{}' in {}".format(name, full_mod_path))
         # take special action for some types
-        if is_mqe(info['type']):  # QueryEngine
+        if is_query_engine:
             # configure new DB connection
             config_file = os.path.join(args.config_path, value + ".json")
             _log.info("load DB configuration for '{}' from '{}'".format(name, config_file))
             db_settings = get_settings(config_file)
+            # pick QE class depending on incremental flag
+            if args.incr:
+                qe_class = TrackedQueryEngine
+                # Update settings to include the type of operation, and field, used
+                # to track the position in the source collection.
+                db_settings.update(dict(track_operation=args.incr_op, track_field=args.incr_field))
+            else:
+                qe_class = QueryEngine
             # replace value with MQE obj
             _log.debug("QueryEngine.create settings={}".format(db_settings))
             try:
-                args_kw[name] = QueryEngine(**db_settings)
+                args_kw[name] = qe_class(**db_settings)
             except pymongo.errors.ConnectionFailure as err:
                 raise BuilderError("Cannot connect from settings in '{}': {}"
                                    .format(config_file, err))
@@ -356,6 +366,9 @@ def normalize_aliases(cfg):
 def main():
     global _log
 
+    csv_list = lambda l: ', '.join(map(str, l))  # useful formatter
+
+
     # Configure parent parser for shared args.
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument('--quiet', '-q', dest='quiet', action="store_true", default=False,
@@ -396,6 +409,13 @@ def main():
     subp.set_defaults(func=command_build)
     subp.add_argument("-b", "--builder", dest="builder", type=str, metavar="NAME", default="",
                       help="Run builder NAME, which is relative to the module path in -m/--module")
+    subp.add_argument("-i", "--incr", dest="incr", action="store_true", default=False,
+                      help="Incremental mode, only build from new values in source. See --incr-op and --incr-field.")
+    incr_ops_nocopy = csv_list(set(Operation.__members__.keys()) - set([Operation.copy.name]))
+    subp.add_argument("--incr-op", dest="incr_op", type="str", default=Operation.copy.name,
+                      help="Operation name for incremental mode: *%(default)s, {}".format(incr_ops_nocopy))
+    subp.add_argument("--incr-field", dest="incr_field", type="str", default="_id",
+                      help="Field to sort on for incremental mode (%(default)s)")
     subp.add_argument("-C", "--config-path", dest="config_path", type=str, metavar='DIR', default=".",
                       help="Configure database connection from .json files in DIR (default=%(default)s)")
     subp.add_argument("-k", "--kvp", dest="keywords", action="append", default=[],

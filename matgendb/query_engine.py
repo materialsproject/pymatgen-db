@@ -7,7 +7,7 @@ generated using hive.
 
 from __future__ import division
 
-__author__ = "Shyue Ping Ong, Michael Kocher"
+__author__ = "Shyue Ping Ong, Michael Kocher, Dan Gunter"
 __copyright__ = "Copyright 2011, The Materials Project"
 __version__ = "2.0"
 __maintainer__ = "Shyue Ping Ong"
