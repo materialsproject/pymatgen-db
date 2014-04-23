@@ -16,7 +16,14 @@ __date__ = '4/22/14'
 from matgendb.builders import core as bld_core
 from matgendb.query_engine import QueryEngine
 
+_log = bld_core.get_builder_log("copy")
+
+
 class Builder(bld_core.Builder):
+    def __init__(self, *args, **kwargs):
+        self._target_coll = None
+        bld_core.Builder.__init__(self, *args, **kwargs)
+
     def setup(self, source, target, crit):
         """Copy records from source to target collection.
 
@@ -30,9 +37,10 @@ class Builder(bld_core.Builder):
         self._target_coll = target.collection
         if not crit:  # reduce any False-y crit value to None
             crit = None
-        else:
-            crit = eval(crit)  # XXX: Security hole?
+        _log.info("query, crit={}".format(crit))
         return source.query(criteria=crit)
 
     def process_item(self, item):
+        assert self._target_coll
+        _log.debug("insert item")
         self._target_coll.insert(item)

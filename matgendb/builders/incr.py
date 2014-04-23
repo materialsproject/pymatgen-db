@@ -154,16 +154,10 @@ class Mark(object):
     processed by a given operation.
     """
     # Fields for JSON representation
-    FLD_OP, FLD_MARK = "operation", "mark"
+    FLD_OP, FLD_MARK, FLD_FLD = "operation", "mark", "field"
 
-    def __init__(self, collection=None, operation=None, field=None, kvp=None):
+    def __init__(self, collection=None, operation=None, field=None, pos=None):
         """Constructor.
-
-        Can be called in two ways, with `kvp` set to a dict describing the
-        highest record values, or with `field` giving the field in the collection
-        to use for finding the highest values. If both are provided,
-        the `kvp` takes precedence, but will be replaced with a call to :meth:`update`.
-        If neither is provided, the Mark has an "empty" position of {<field>: 0}.
 
         :param collection: Collection to track
         :type collection: pymongo.collection.Collection
@@ -171,18 +165,15 @@ class Mark(object):
         :type operation: Operation
         :param field: Name of field to determine highest record
         :type field: str
-        :param kvp: Key/value pairs that describe the mark position
-        :type kvp: dict
+        :param pos: Optional query for position
+        :type pos: dict
         """
         self._c = collection
         self._op = operation
         self._fld = field
-        assert(self._fld)
-        if kvp:
-            self._pos = kvp
-#        elif field:
-#            self.update()
-#        else:
+        assert self._fld
+        if pos:
+            self._pos = pos
         self._pos = self._empty_pos()
 
     def update(self):
@@ -206,20 +197,23 @@ class Mark(object):
         """Representation as a dict for JSON serialization.
         """
         return {self.FLD_OP: self._op.name,
-                self.FLD_MARK: self._pos}
+                self.FLD_MARK: self._pos,
+                self.FLD_FLD: self._fld}
 
     to_dict = as_dict   # synonym
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, coll, d):
         """Construct from dict
 
+        :param coll: Collection for the mark
         :param d: Input
         :type d: dict
         :return: new instance
         :rtype: Mark
         """
-        return Mark(operation=Operation[d[cls.FLD_OP]], kvp=d[cls.FLD_MARK])
+        return Mark(collection=coll, operation=Operation[d[cls.FLD_OP]],
+                    pos=d[cls.FLD_MARK], field=d[cls.FLD_FLD])
 
     @property
     def query(self):
@@ -303,7 +297,7 @@ class CollectionTracker(object):
         if obj is None:
             # empty Mark instance
             return Mark(collection=self.collection, operation=operation, field=field)
-        return Mark.from_dict(obj)
+        return Mark.from_dict(self.collection, obj)
 
     def _get(self, operation, field):
         self._check_exists()

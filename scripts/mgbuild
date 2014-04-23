@@ -18,6 +18,7 @@ __date__ = '5/22/13'
 
 # System imports.
 import argparse
+import ast
 import imp
 import json
 import logging
@@ -176,7 +177,6 @@ def _show_builder(b):
         desc, type_ = value
         print("{i}{i}{name} = ({type}) {desc}".format(i=indent, name=key, type=type_, desc=desc))
 
-
 def command_build(args):
     """Command: Run builder, invoked from 'build' sub-command
 
@@ -199,8 +199,6 @@ def command_build(args):
                                      "Bad key=value pair: {}".format(kwd))
         args_kw[key] = value
 
-    db_settings = {}
-
     # Parse builder's setup() method docstring.
     _log.debug("parse builder docstring")
     params, returnval = core.parse_fn_docstring(builder_class.setup)
@@ -209,7 +207,8 @@ def command_build(args):
         if not 'type' in info:
             raise ConfigurationError("for builder '{}'".format(args.builder),
                                      "Missing ':type {}: <type>' in docstring".format(name))
-        is_query_engine = is_mqe(info['type'])
+        value_type = info['type']
+        is_query_engine = is_mqe(value_type)
         try:
             value = args_kw[name]
         except KeyError:
@@ -224,45 +223,19 @@ def command_build(args):
                                              "Missing value for parameter '{}' in {}".format(name, full_mod_path))
         # take special action for some types
         if is_query_engine:
-            # configure new DB connection
-            config_files = [os.path.join(args.config_path, x) for x in [value, value + ".json"]]
-            found = False
-            for config_file in config_files:
-                if os.path.exists(config_file):
-                    found = True
-                    break
-            if not found:
-                tried_paths = csv_list(config_files)
-                raise ConfigurationError("while loading DB configuration",
-                                         "Configuration file '{}' not found Tried: {}".format(value, tried_paths))
-            _log.info("load DB configuration for '{}' from '{}'".format(name, config_file))
-            db_settings = get_settings(config_file)
-            # pick QE class depending on incremental flag
-            if args.incr:
-                qe_class = TrackedQueryEngine
-                # Update settings to include the type of operation, and field, used
-                # to track the position in the source collection.
-                try:
-                    t_op = Operation[args.incr_op]
-                except KeyError:
-                    raise ConfigurationError("while setting incremental operator",
-                                             "Unrecognized operation for incremental mode: '{}'".format(args.incr_op))
-                db_settings.update(dict(track_operation=t_op, track_field=args.incr_field))
-            else:
-                qe_class = UnTrackedQueryEngine
-            # replace value with MQE obj
-            _log.debug("QueryEngine.create settings={}".format(db_settings))
+            qes.append(configure_query_engine(args, args_kw, name, value))
+        elif value_type in ('dict', 'list', 'int', 'float'):
+            parsed_type = eval(value_type)
             try:
-                args_kw[name] = qe = qe_class(**db_settings)
-                qes.append(qe)
-            except pymongo.errors.ConnectionFailure as err:
-                raise BuilderError("Cannot connect from settings in '{}': {}"
-                                   .format(config_file, err))
-            _log.debug("Configured query engine {}: {}".format(name, db_settings))
-
+                value = _parse_literal(value, value_type)
+                if value is not None and not isinstance(value, parsed_type):
+                    raise ValueError()
+            except ValueError:
+                raise ConfigurationError("parsing key '{}'".format(name),
+                                         "value '{}' must be a dictionary like {{'foo':'bar'}}".format(value))
     # Run builder.
     _log.info("run builder, keywords: {}".format(csv_dict(args_kw)))
-    builder = builder_class(ncores=args.num_cores, config=db_settings)
+    builder = builder_class(ncores=args.num_cores)
     count = builder.run(setup_kw=args_kw)
     if count < 1:
         _log.warn("Processed {:d} items".format(count))
@@ -273,6 +246,57 @@ def command_build(args):
     result = 0
 
     return result
+
+def _parse_literal(v, vt):
+    if not v:
+        return None
+    return ast.literal_eval(v)
+
+def configure_query_engine(args, args_kw, qe_name, path):
+    """Configure a new DB connection.
+
+    :param args: Command-line args
+    :param args_kw: Function-specific keywords in args
+    :param qe_name: Name of query engine
+    :param path: Path to config file
+    :return: QueryEngine instance
+    :raise: ConfigurationError
+    """
+    qe = None  # query engine obj
+    config_files = [os.path.join(args.config_path, x) for x in [path, path + ".json"]]
+    found = False
+    for config_file in config_files:
+        if os.path.exists(config_file):
+            found = True
+            break
+    if not found:
+        tried_paths = csv_list(config_files)
+        raise ConfigurationError("while loading DB configuration",
+                                 "Configuration file '{}' not found Tried: {}".format(path, tried_paths))
+    _log.info("load DB configuration for '{}' from '{}'".format(qe_name, config_file))
+    db_settings = get_settings(config_file)
+    # pick QE class depending on incremental flag
+    if args.incr:
+        qe_class = TrackedQueryEngine
+        # Update settings to include the type of operation, and field, used
+        # to track the position in the source collection.
+        try:
+            t_op = Operation[args.incr_op]
+        except KeyError:
+            raise ConfigurationError("while setting incremental operator",
+                                     "Unrecognized operation for incremental mode: '{}'".format(args.incr_op))
+        db_settings.update(dict(track_operation=t_op, track_field=args.incr_field))
+    else:
+        qe_class = UnTrackedQueryEngine
+    # replace value with MQE obj
+    _log.debug("QueryEngine.create settings={}".format(db_settings))
+    try:
+        args_kw[qe_name] = qe = qe_class(**db_settings)
+    except pymongo.errors.ConnectionFailure as err:
+        raise BuilderError("Cannot connect from settings in '{}': {}"
+                           .format(config_file, err))
+    _log.debug("Configured query engine {}: {}".format(qe_name, db_settings))
+    return qe
 
 
 # Utility functions

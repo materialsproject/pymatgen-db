@@ -24,6 +24,17 @@ from matgendb import util as dbutil
 
 _log = logging.getLogger("mg.builders.shared")
 
+def get_builder_log(name):
+    """Get a logging object, in the right place in the
+    hierarchy, for a given builder.
+
+    :param name: Builder name, e.g. 'my_builder'
+    :type name: str
+    :returns: New logger
+    :rtype: logging.Logger
+    """
+    return logging.getLogger("mg.builders." + name)
+
 ## Exceptions
 
 
@@ -256,16 +267,13 @@ class Builder(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, ncores=0, threads=False, config=None):
+    def __init__(self, ncores=0, threads=False):
         """Create new builder for threaded or multiprocess execution.
 
         :param ncores: Desired number of threads or processes to run
         :type ncores: int
         :param threads: Use threads (True) or processes (False)
         :type threads: bool
-        :param config: If given, automatically connect to database using `connect` method.
-                       You can access the connection with the attribute 'conn'.
-        :type config: None, str, dict
         :raise: ValueError for bad 'config' arg
         """
         self._ncores = ncores if ncores else 15
@@ -278,8 +286,6 @@ class Builder(object):
             self._queue = multiprocessing.Queue()
             self._run_parallel_fn = self._run_parallel_multiprocess
         self._status = BuilderStatus(ncores, is_threaded=threads)
-        # connect, if config is given
-        self.conn = self.connect(config) if config else None
 
     # ----------------------------
     # Override these in subclasses
@@ -306,6 +312,9 @@ class Builder(object):
         If the type of the argument is 'QueryEngine', then the driver program will
         add options for, and create, a matgendb.query_engine.QueryEngine instance.
         The value given for this argument will be interpreted as the MongoDB collection name.
+
+        Some other basic Python types -- list, dict, int, float -- are automatically parsed before being
+        handed to the function. If an empty value is supplied for these, then None will be passed.
 
         :return: iterator
         """
