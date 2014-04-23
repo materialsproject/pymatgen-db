@@ -64,7 +64,7 @@
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
-<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong, Michael Kocher&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong, Michael Kocher, Dan Gunter&quot;</span>
 <span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2011, The Materials Project&quot;</span>
 <span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;2.0&quot;</span>
 <span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong&quot;</span>
@@ -120,7 +120,8 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">27017</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s">&quot;vasp&quot;</span><span class="p">,</span>
                  <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s">&quot;tasks&quot;</span><span class="p">,</span>
-                 <span class="n">aliases_config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">default_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">ignore</span><span class="p">):</span>
+                 <span class="n">aliases_config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">default_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">connection</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">ignore</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            host:</span>
@@ -138,6 +139,8 @@
 <span class="sd">                authentication.</span>
 <span class="sd">            collection:</span>
 <span class="sd">                Collection to query. Defaults to &quot;tasks&quot;.</span>
+<span class="sd">            connection:</span>
+<span class="sd">                If given, ignore &#39;host&#39; and &#39;port&#39; and use existing connection.</span>
 <span class="sd">            aliases_config:</span>
 <span class="sd">                An alias dict to use. Defaults to None, which means the default</span>
 <span class="sd">                aliases defined in &quot;aliases.json&quot; is used. The aliases config</span>
@@ -175,7 +178,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database_name</span> <span class="o">=</span> <span class="n">database</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span> <span class="o">=</span> <span class="n">collection</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">connection</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">[</span><span class="n">database</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
@@ -345,7 +351,13 @@
 <span class="sd">        using aliases, as well as some useful sanitization. For example, string</span>
 <span class="sd">        formulas such as &quot;Fe2O3&quot; are auto-converted to proper mongo queries of</span>
 <span class="sd">        {&quot;Fe&quot;:2, &quot;O&quot;:3}.</span>
+
+<span class="sd">        If &#39;criteria&#39; is None, returns an empty dict. Putting this logic here</span>
+<span class="sd">        simplifies callers and allows subclasses to insert something even</span>
+<span class="sd">        when there are no criteria.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">parsed_crit</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">criteria</span><span class="p">:</span>
@@ -410,8 +422,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">props</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
 
-        <span class="n">crit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_criteria</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span> <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">{}</span>
-        <span class="c">#print(&quot;@@ mongo query = {} and fields = {}&quot;.format(crit, props))</span>
+        <span class="n">crit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_criteria</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span>
+        <span class="c">#print(&quot;@@ {}.find({}, fields={}, timeout=False)&quot;.format(self.collection.name, crit, props))</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">crit</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">props</span><span class="p">,</span>
                                    <span class="n">timeout</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>

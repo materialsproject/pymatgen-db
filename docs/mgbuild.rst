@@ -37,9 +37,12 @@ The main mgbuild command just presents a menu of the subcommands.
     subcommands:
       Actions
 
-      {vasp,merge}
-        vasp        Build VASP derived collections
-        merge       Merge sandbox and core database
+    {merge,list,build}
+        merge_             Merge sandbox and core database
+        list_              list builders
+        build_             run a builder
+
+.. _merge:
 
 `mgbuild merge` usage
 ----------------------
@@ -85,26 +88,68 @@ These files would be the arguments to `-c` and `-s`.
 
 The target output collection will be in the "sandbox" database and it will have the name [<prefix>].tasks.merged, where <prefix> is the value of `-n/--name`.
 
-`mgbuild vasp` usage
+.. _build:
+
+`mgbuild build` usage
 ---------------------
 
-The "vasp" command builds the set of derived collections from the electronic structure information in the "tasks" collection.
+The "build" command builds the set of derived collections from the electronic structure information in the "tasks" collection.
 
-    usage: mgbuild.py vasp [-h] [-c FILE] [-p PREFIX] [--verbose] [-P NUM_CORES] [-m]
+usage: mgbuild build [-h] [--quiet] [--verbose] [-b NAME] [-i]
+                     [--incr-op INCR_OP] [--incr-field INCR_FIELD] [-C DIR]
+                     [-k KEYWORDS] [-m MODULE] [-n NUM_CORES] [-p PREFIX]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --quiet, -q           Minimal verbosity.
+  --verbose, -v         Print more verbose messages to standard error.
+                        Repeatable. (default=ERROR)
+  -b NAME, --builder NAME
+                        Run builder NAME, which is relative to the module path
+                        in -m/--module
+  -i, --incr            Incremental mode, only build from new values in
+                        source. See also: --incr-op and --incr-field.
+  --incr-op INCR_OP     Operation name for incremental mode: *copy, other,
+                        build
+  --incr-field INCR_FIELD
+                        Field to sort on for incremental mode (_id)
+  -C DIR, --config-path DIR
+                        Configure database connection from .json files in DIR
+                        (default=.)
+  -k KEYWORDS, --kvp KEYWORDS
+                        Key/value pairs, in format <key>=<value>, passed to
+                        builder function. For QueryEngine arguments, the value
+                        should be the name of a DB configuration file,
+                        relative to the path given by -C/--config-path,
+                        without the '.json' suffix; if not given, a
+                        configuration file '<key>.json' will be assumed.
+  -m MODULE, --module MODULE
+                        Find builder modules under MODULE
+                        (default=matgendb.builders)
+  -n NUM_CORES, --ncores NUM_CORES
+                        Number of cores or processes to run in parallel (16)
+  -p PREFIX, --prefix PREFIX
+                        Collection name prefix for input (and possibly output)
+                        collections
+
+.. _list:
+
+`mgbuild list` usage
+---------------------
+
+The list command shows avaiable `builder` modules under a given path.
+
+    usage: mgbuild list [-h] [--quiet] [--verbose] [-m MODULE]
 
     optional arguments:
       -h, --help            show this help message and exit
-      -c FILE, --config FILE
-                            Configure database connection from FILE (db.json)
-      -p PREFIX, --prefix PREFIX
-                            Collection name prefix, ie namespace
+      --quiet, -q           Minimal verbosity.
       --verbose, -v         Print more verbose messages to standard error.
                             Repeatable. (default=ERROR)
-      -P NUM_CORES, --ncores NUM_CORES
-                            Number of cores, thus number of threads to runin
-                            parallel (16)
-      -m, --merged          Use merged tasks collection with suffix merged, as
-                            created by the 'merge' command for sandboxes
+      -m MODULE, --module MODULE
+                            Find builder modules under MODULE
+                            (default=matgendb.builders)
+
 
 .. _builderAPI:
 
