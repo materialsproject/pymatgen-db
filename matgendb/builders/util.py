@@ -5,6 +5,7 @@ __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '11/4/13'
 
 ## Imports
+import logging
 import matgendb
 # Stdlib
 import os
@@ -74,3 +75,14 @@ def csv_dict(d):
     if len(d) == 0:
         return "{}"
     return "{" + ', '.join(["'{}': '{}'".format(k, v) for k, v in d.iteritems()]) + "}"
+
+def get_builder_log(name):
+    """Get a logging object, in the right place in the
+    hierarchy, for a given builder.
+
+    :param name: Builder name, e.g. 'my_builder'
+    :type name: str
+    :returns: New logger
+    :rtype: logging.Logger
+    """
+    return logging.getLogger("mg.builders." + name)

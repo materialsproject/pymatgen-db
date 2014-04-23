@@ -17,23 +17,12 @@ import Queue
 import threading
 import multiprocessing
 # local
-from matgendb.builders import schema
+from matgendb.builders import schema, util
 from matgendb import util as dbutil
 
 ## Logging
 
-_log = logging.getLogger("mg.builders.shared")
-
-def get_builder_log(name):
-    """Get a logging object, in the right place in the
-    hierarchy, for a given builder.
-
-    :param name: Builder name, e.g. 'my_builder'
-    :type name: str
-    :returns: New logger
-    :rtype: logging.Logger
-    """
-    return logging.getLogger("mg.builders." + name)
+_log = util.get_builder_log("core")
 
 ## Exceptions
 
@@ -383,8 +372,11 @@ class Builder(object):
         :return: Number of items processed
         :rtype: int
         """
+        _log.debug("_build, chunk_size={:d}".format(chunk_size))
         n, i = 0, 0
         for i, item in enumerate(items):
+            if i == 0:
+                _log.debug("_build, first item")
             if 0 == (i + 1) % chunk_size:
                 self._run_parallel_fn()  # process the chunk
                 if self._status.has_failures():

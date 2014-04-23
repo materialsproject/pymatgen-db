@@ -14,9 +14,10 @@ __date__ = '4/22/14'
 
 
 from matgendb.builders import core as bld_core
+from matgendb.builders import util as bld_util
 from matgendb.query_engine import QueryEngine
 
-_log = bld_core.get_builder_log("copy")
+_log = bld_util.get_builder_log("copy")
 
 
 class Builder(bld_core.Builder):
@@ -37,10 +38,12 @@ class Builder(bld_core.Builder):
         self._target_coll = target.collection
         if not crit:  # reduce any False-y crit value to None
             crit = None
-        _log.info("query, crit={} source={} target.coll={}".format(crit, source, target.collection))
-        return source.query(criteria=crit)
+        cur = source.query(criteria=crit)
+        _log.info("setup: source.collection={} crit={} source_records={:d}"
+                  .format(source.collection, crit, len(cur)))
+        return cur
 
     def process_item(self, item):
         assert self._target_coll
-        _log.debug("insert item")
+        _log.debug("process item: insert item")
         self._target_coll.insert(item)

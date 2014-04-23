@@ -40,7 +40,13 @@ from abc import abstractmethod, ABCMeta
 import pymongo
 from enum import Enum
 from matgendb.query_engine import QueryEngine
+from matgendb.builders import util as bld_util
 
+# Logging
+
+_log = bld_util.get_builder_log("incr")
+
+# Exceptions
 
 class DBError(Exception):
     """Generic database error.
@@ -61,6 +67,7 @@ class NoTrackingCollection(Exception):
 
 class TrackingInterface(object):
     __metaclass__ = ABCMeta
+
     @abstractmethod
     def set_mark(self):
         """Set the mark to the current end of the collection. This is saved in the database
@@ -87,6 +94,7 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
         # Set these first because QueryEngine.__init__ calls overridden `set_collection()`.
         assert track_field
         self._t_op, self._t_field = track_operation, track_field
+        self.collection = None
         # Now init parent
         QueryEngine.__init__(self, **kwargs)
 
@@ -100,10 +108,13 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
     def set_mark(self):
         """See :meth:`TrackingInterface.set_mark`
         """
+        assert self.collection
         self.collection.set_mark()
 
-
 class TrackedCollection(object):
+    """Wrapper on a pymongo collection to make `find' operations start
+    after the "tracking" mark.
+    """
     def __init__(self, coll, operation=None, field=None):
         self._coll, self._coll_find = coll, coll.find
         self._tracker = CollectionTracker(coll, create=True)
@@ -116,7 +127,11 @@ class TrackedCollection(object):
         else:
             return getattr(self._coll, item)
 
+    def __str__(self):
+        return "Tracked collection ({})".format(self._coll)
+
     def tracked_find(self, *args, **kwargs):
+        _log.info("tracked_find.begin")
         # fish 'spec' out of args or kwargs
         if len(args) > 0:
             spec = args[0]
@@ -127,6 +142,7 @@ class TrackedCollection(object):
         # update spec with tracker query
         spec.update(self._mark.query)
         # delegate to "real" find()
+        _log.info("tracked_find.end, call: {}.find(args={} kwargs={})".format(self._coll.name, args, kwargs))
         return self._coll_find(*args, **kwargs)
 
     def set_mark(self):
@@ -174,7 +190,8 @@ class Mark(object):
         assert self._fld
         if pos:
             self._pos = pos
-        self._pos = self._empty_pos()
+        else:
+            self._pos = self._empty_pos()
 
     def update(self):
         """Update the position of the mark in the collection.
@@ -183,11 +200,14 @@ class Mark(object):
         :rtype: Mark
         """
         rec = self._c.find_one({}, {self._fld: 1}, sort=[(self._fld, -1)], limit=1)
-        self._pos = self._empty_pos() if rec is None else rec
+        if rec is None:
+            self._pos = self._empty_pos()
+        else:
+            self._pos = {self._fld: rec[self._fld]}
         return self
 
     def _empty_pos(self):
-        return {self._fld: 0}
+        return {self._fld: None}
 
     @property
     def pos(self):
@@ -222,7 +242,13 @@ class Mark(object):
 
         :rtype: dict
         """
-        return {key: {'$gt': val} for key, val in self._pos.iteritems()}
+        q = {}
+        for field, value in self._pos.iteritems():
+            if value is None:
+                q.update({field: {'$exists': True}})
+            else:
+                q.update({field: {'$gt': value}})
+        return q
 
 
 class CollectionTracker(object):
@@ -278,6 +304,10 @@ class CollectionTracker(object):
         self._check_exists()
         obj = mark.as_dict()
         try:
+
+            NEED TO DO AN UPSERT so we do not get duplicate records
+
+            _log.debug("save: upsert-obj:{}".format(obj))
             self._track.insert(obj)
         except pymongo.errors.PyMongoError, err:
             raise DBError("{}".format(err))
