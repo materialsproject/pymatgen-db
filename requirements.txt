@@ -5,4 +5,4 @@ prettytable>=0.7
 django>=1.5
 mongomock>=1.2.0
 smoqe>=0.1.1
-enum>=0.9.23
+enum34>=0.9.23
