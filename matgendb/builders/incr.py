@@ -63,6 +63,9 @@ class TrackingInterface(object):
     __metaclass__ = ABCMeta
     @abstractmethod
     def set_mark(self):
+        """Set the mark to the current end of the collection. This is saved in the database
+        so it is available for later operations.
+        """
         pass
 
 class UnTrackedQueryEngine(QueryEngine, TrackingInterface):
@@ -71,6 +74,8 @@ class UnTrackedQueryEngine(QueryEngine, TrackingInterface):
     activated or not.
     """
     def set_mark(self):
+        """Does nothing and returns None.
+        """
         return
 
 
@@ -80,7 +85,7 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
     """
     def __init__(self, track_operation=None, track_field=None, **kwargs):
         # Set these first because QueryEngine.__init__ calls overridden `set_collection()`.
-        assert(track_field)
+        assert track_field
         self._t_op, self._t_field = track_operation, track_field
         # Now init parent
         QueryEngine.__init__(self, **kwargs)
@@ -93,8 +98,7 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
         return self.collection
 
     def set_mark(self):
-        """Set the mark to the current end of the collection. This is saved in the database
-        so it is available for later operations.
+        """See :meth:`TrackingInterface.set_mark`
         """
         self.collection.set_mark()
 
