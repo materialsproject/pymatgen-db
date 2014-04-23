@@ -63,7 +63,8 @@ class QueryEngine(object):
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
-                 aliases_config=None, default_properties=None, **ignore):
+                 aliases_config=None, default_properties=None,
+                 connection=None, **ignore):
         """
         Args:
             host:
@@ -81,6 +82,8 @@ class QueryEngine(object):
                 authentication.
             collection:
                 Collection to query. Defaults to "tasks".
+            connection:
+                If given, ignore 'host' and 'port' and use existing connection.
             aliases_config:
                 An alias dict to use. Defaults to None, which means the default
                 aliases defined in "aliases.json" is used. The aliases config
@@ -118,7 +121,10 @@ class QueryEngine(object):
         self.port = port
         self.database_name = database
         self.collection_name = collection
-        self.connection = MongoClient(self.host, self.port)
+        if connection is None:
+            self.connection = MongoClient(self.host, self.port)
+        else:
+            self.connection = connection
         self.db = self.connection[database]
         if user:
             self.db.authenticate(user, password)

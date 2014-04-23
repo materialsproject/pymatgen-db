@@ -11,13 +11,16 @@ import unittest
 from matgendb.builders.incr import *
 
 
+COLLECTION = 'my_collection'
+DATABASE = 'db'
+
 # Global collection object
 conn = mongomock.Connection()
-db = conn.db
+db = conn[DATABASE]
 coll = db.my_collection
 # Hacks for mongomock deficiencies
 coll.database = db
-db.collection_names = lambda x: ['my_collection']
+db.collection_names = lambda x: [COLLECTION]
 
 
 def clear():
@@ -50,7 +53,7 @@ class TestCollectionTrackerLL(TestCase):
         for op in Operation.other, Operation.copy, Operation.build:
             # check with empty collection
             mark = Mark(coll, op, field='_id')
-            self.assertEqual(mark.pos, {'_id': 0})
+            self.assertEqual(mark.pos, {'_id': None})
             # add some records and see if it matches the last one
             rec = add_records(10)
             mark.update()
@@ -62,9 +65,10 @@ class TestCollectionTrackerLL(TestCase):
         for op in Operation.other, Operation.copy, Operation.build:
             rec = add_records(10)
             tracker = CollectionTracker(coll)
-            tracker.save(Mark(coll, op, field=index))
+            tracker.save(Mark(coll, op, field=index).update())
             mark = tracker.retrieve(op, field=index)
             #dumpcoll(tracker.tracking_collection)
+            #print("@@ mark pos={}".format(mark.pos))
             self.assertEqual(mark.pos, {index: rec[index]})
             clear()
 
@@ -112,9 +116,31 @@ class TestCollectionTrackerLL(TestCase):
 class TestCollectionTrackerHL(TestCase):
     """Test high-level API.
     """
-    def test_tracked_qe(self):
-        self.fail("not done")
+    def setUp(self):
+        clear()
 
+    def test_tracked_qe(self):
+        index, props = '_id', ['n']
+        qe = TrackedQueryEngine(track_operation=Operation.copy,
+                                track_field=index, connection=conn,
+                                collection=COLLECTION, database=DATABASE)
+        # Add new records
+        add_records(10)
+        # Check that we get all new records
+        cur = qe.query(properties=props)
+        self.assertEqual(len(cur), 10)
+        # Set mark, now these records are 'old'
+        qe.set_mark()
+        # Check that we get no records
+        cur = qe.query(properties=props)
+        self.assertEqual(len(cur), 0)
+        # Add more records
+        add_records(5, offs=100)
+        # Check that new records ONLY are retrieved
+        cur = qe.query(properties=props)
+        self.assertEqual(len(cur), 5)
+        for rec in cur:
+            self.assertGreaterEqual(rec['n'], 100)
 
 if __name__ == '__main__':
     unittest.main()

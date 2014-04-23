@@ -255,7 +255,7 @@ class CollectionTracker(object):
     """Track which records are 'new' in a MongoDB collection
     with respect to a given operation.
     """
-    #: Sub-collection name, added as ".TRACKING_NAME" to the
+    #: Sub-collection name, added as ".<TRACKING_NAME>" to the
     #: name of the target collection to create the tracking collection.
     TRACKING_NAME = 'tracker'
 
@@ -304,11 +304,11 @@ class CollectionTracker(object):
         self._check_exists()
         obj = mark.as_dict()
         try:
-
-            NEED TO DO AN UPSERT so we do not get duplicate records
-
-            _log.debug("save: upsert-obj:{}".format(obj))
-            self._track.insert(obj)
+            # Make a 'spec' to find/update existing record, which uses
+            # the field name and operation (but not the position).
+            spec = {k: obj[k] for k in (mark.FLD_FLD, mark.FLD_OP)}
+            _log.debug("save: upsert-spec={} upsert-obj={}".format(spec, obj))
+            self._track.update(spec, obj, upsert=True)
         except pymongo.errors.PyMongoError, err:
             raise DBError("{}".format(err))
 
@@ -330,11 +330,15 @@ class CollectionTracker(object):
         return Mark.from_dict(self.collection, obj)
 
     def _get(self, operation, field):
+        """Get tracked position for a given operation and field."""
         self._check_exists()
         query = {Mark.FLD_OP: operation.name,
                  Mark.FLD_MARK + "." + field: {"$exists": True}}
         return self._track.find_one(query)
 
     def _check_exists(self):
+        """Check whether the tracked collection exists at all.
+        If not, raises NoTrackingCollection
+        """
         if self._track is None:
             raise NoTrackingCollection()
