@@ -24,7 +24,7 @@ class Builder(bld_core.Builder):
         self._target_coll = None
         bld_core.Builder.__init__(self, *args, **kwargs)
 
-    def setup(self, source, target, crit):
+    def setup(self, source=None, target=None, crit=None):
         """Copy records from source to target collection.
 
         :param source: Input collection
@@ -37,7 +37,7 @@ class Builder(bld_core.Builder):
         self._target_coll = target.collection
         if not crit:  # reduce any False-y crit value to None
             crit = None
-        _log.info("query, crit={}".format(crit))
+        _log.info("query, crit={} source={} target.coll={}".format(crit, source, target.collection))
         return source.query(criteria=crit)
 
     def process_item(self, item):
