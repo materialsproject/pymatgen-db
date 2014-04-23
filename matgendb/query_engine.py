@@ -360,7 +360,7 @@ class QueryEngine(object):
             props, prop_dict = None, None
 
         crit = self._parse_criteria(criteria)
-        #print("@@ mongo query = {} and fields = {}".format(crit, props))
+        print("@@ {}.find({}, fields={}, timeout=False)".format(self.collection.name, crit, props))
         cur = self.collection.find(crit, fields=props,
                                    timeout=False).skip(index)
         if limit is not None:

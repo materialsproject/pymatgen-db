@@ -36,6 +36,7 @@ The main classes are Mark and CollectionTracker. Usage example::
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/11/14'
 
+from abc import abstractmethod, ABCMeta
 import pymongo
 from enum import Enum
 from matgendb.query_engine import QueryEngine
@@ -58,19 +59,38 @@ class NoTrackingCollection(Exception):
 ## High level API
 ## --------------
 
-class TrackedQueryEngine(QueryEngine):
+class TrackingInterface(object):
+    __metaclass__ = ABCMeta
+    @abstractmethod
+    def set_mark(self):
+        pass
+
+class UnTrackedQueryEngine(QueryEngine, TrackingInterface):
+    """A QE that has the interface for tracking, but does nothing for it.
+    Allows for callers to do same operations regardless of whether tracking is
+    activated or not.
+    """
+    def set_mark(self):
+        return
+
+
+class TrackedQueryEngine(QueryEngine, TrackingInterface):
     """A QE that only examines records past the last 'mark' that was set for the
     given operation and field.
     """
     def __init__(self, track_operation=None, track_field=None, **kwargs):
+        # Set these first because QueryEngine.__init__ calls overridden `set_collection()`.
+        assert(track_field)
+        self._t_op, self._t_field = track_operation, track_field
+        # Now init parent
         QueryEngine.__init__(self, **kwargs)
-        self._t_op, self._t_field = track_operation, track_field  # shotput!
 
-    def set_collection(self, coll_name):
+    def set_collection(self, collection):
         """Override base class to make this a tracked collection.
         """
-        coll = self.db[coll_name]
-        return TrackedCollection(coll, operation=self._t_op, field=self._t_field)
+        coll = self.db[collection]
+        self.collection = TrackedCollection(coll, operation=self._t_op, field=self._t_field)
+        return self.collection
 
     def set_mark(self):
         """Set the mark to the current end of the collection. This is saved in the database
@@ -153,12 +173,13 @@ class Mark(object):
         self._c = collection
         self._op = operation
         self._fld = field
+        assert(self._fld)
         if kvp:
             self._pos = kvp
-        elif field:
-            self.update()
-        else:
-            self._pos = self._empty_pos()
+#        elif field:
+#            self.update()
+#        else:
+        self._pos = self._empty_pos()
 
     def update(self):
         """Update the position of the mark in the collection.
@@ -277,7 +298,7 @@ class CollectionTracker(object):
         obj = self._get(operation, field)
         if obj is None:
             # empty Mark instance
-            return Mark(collection=self.collection, operation=operation)
+            return Mark(collection=self.collection, operation=operation, field=field)
         return Mark.from_dict(obj)
 
     def _get(self, operation, field):

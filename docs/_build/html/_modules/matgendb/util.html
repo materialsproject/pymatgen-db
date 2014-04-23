@@ -132,17 +132,25 @@
     <span class="k">return</span> <span class="n">db</span>
 
 </div>
-<div class="viewcode-block" id="normalize_auth"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.normalize_auth">[docs]</a><span class="k">def</span> <span class="nf">normalize_auth</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">readonly</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="get_collection"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.get_collection">[docs]</a><span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">get_database</span><span class="p">(</span><span class="n">admin</span><span class="o">=</span><span class="n">admin</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">db</span><span class="p">[</span><span class="n">settings</span><span class="p">[</span><span class="s">&quot;collection&quot;</span><span class="p">]]</span>
+
+</div>
+<div class="viewcode-block" id="normalize_auth"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.normalize_auth">[docs]</a><span class="k">def</span> <span class="nf">normalize_auth</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">readonly</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">readonly_first</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Transform the readonly/admin user and password to simple user/password,</span>
-<span class="sd">    as expected by QueryEngine.</span>
+<span class="sd">    as expected by QueryEngine. If return value is true, then</span>
+<span class="sd">    admin or readonly password will be in keys &quot;user&quot; and &quot;password&quot;.</span>
 
 <span class="sd">    :param settings: Connection settings</span>
 <span class="sd">    :type settings: dict</span>
 <span class="sd">    :param admin: Check for admin password</span>
 <span class="sd">    :param readonly: Check for readonly password</span>
-<span class="sd">    :return: Whether user/password are now in settings</span>
+<span class="sd">    :param readonly_first: Check for readonly password before admin</span>
+<span class="sd">    :return: Whether user/password were found</span>
 <span class="sd">    :rtype: bool</span>
-<span class="sd">    :raise: KeyError if neither readonly, admin, or plain user/password are found</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">U</span><span class="p">,</span> <span class="n">P</span> <span class="o">=</span> <span class="s">&quot;user&quot;</span><span class="p">,</span> <span class="s">&quot;password&quot;</span>
     <span class="c"># If user/password, un-prefixed, exists, do nothing.</span>
@@ -151,10 +159,16 @@
 
     <span class="c"># Set prefixes</span>
     <span class="n">prefixes</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
-        <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;admin_&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">readonly</span><span class="p">:</span>
-        <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;readonly_&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">readonly_first</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">readonly</span><span class="p">:</span>
+            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;readonly_&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
+            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;admin_&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
+            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;admin_&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">readonly</span><span class="p">:</span>
+            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;readonly_&quot;</span><span class="p">)</span>
 
     <span class="c"># Look for first user/password matching.</span>
     <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
@@ -168,11 +182,6 @@
 
     <span class="k">return</span> <span class="n">found</span>
 
-</div>
-<div class="viewcode-block" id="get_collection"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.get_collection">[docs]</a><span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-    <span class="n">db</span> <span class="o">=</span> <span class="n">get_database</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="n">admin</span><span class="p">)</span>
-    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">db</span><span class="p">[</span><span class="n">settings</span><span class="p">[</span><span class="s">&quot;collection&quot;</span><span class="p">]]</span>
 
 </div>
 <div class="viewcode-block" id="MongoJSONEncoder"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.MongoJSONEncoder">[docs]</a><span class="k">class</span> <span class="nc">MongoJSONEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
@@ -181,7 +190,24 @@
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="collection_keys"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.collection_keys">[docs]</a><span class="k">def</span> <span class="nf">collection_keys</span><span class="p">(</span><span class="n">coll</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a list of all (including nested) keys in a collection.</span>
+<span class="sd">    Examines the first document in the collection.</span>
+
+<span class="sd">    :param sep: Separator for nested keys</span>
+<span class="sd">    :return: List of str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_keys</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">pre</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">nested</span> <span class="ow">in</span> <span class="n">_keys</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">pre</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="n">sep</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">nested</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_keys</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">find_one</span><span class="p">()))</span></div>
 </pre></div>
 
           </div>
@@ -222,7 +248,7 @@
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

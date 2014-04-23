@@ -76,9 +76,13 @@
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">gridfs</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">Iterable</span>
+
 <span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
 <span class="kn">from</span> <span class="nn">pymatgen</span> <span class="kn">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">pymatgen.electronic_structure.core</span> <span class="kn">import</span> <span class="n">Orbital</span><span class="p">,</span> <span class="n">Spin</span>
+<span class="kn">from</span> <span class="nn">pymatgen.electronic_structure.dos</span> <span class="kn">import</span> <span class="n">CompleteDos</span><span class="p">,</span> <span class="n">Dos</span>
 <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span><span class="p">,</span>\
     <span class="n">ComputedStructureEntry</span>
 
@@ -236,7 +240,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 </div>
 <div class="viewcode-block" id="QueryEngine.get_entries_in_system"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.get_entries_in_system">[docs]</a>    <span class="k">def</span> <span class="nf">get_entries_in_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="n">inc_structure</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                              <span class="n">optional_data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                              <span class="n">optional_data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">additional_criteria</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets all entries in a chemical system, e.g. Li-Fe-O will return all</span>
 <span class="sd">        Li-O, Fe-O, Li-Fe, Li-Fe-O compounds.</span>
@@ -260,6 +264,9 @@
 <span class="sd">            optional_data:</span>
 <span class="sd">                Optional data to include with the entry. This allows the data</span>
 <span class="sd">                to be access via entry.data[key].</span>
+<span class="sd">            additional_criteria:</span>
+<span class="sd">                Added ability to provide additional criteria other than just</span>
+<span class="sd">                the chemical system.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List of ComputedEntries in the chemical system.</span>
@@ -270,6 +277,8 @@
                 <span class="n">chemsys</span> <span class="o">=</span> <span class="s">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">combi</span><span class="p">))</span>
                 <span class="n">chemsys_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chemsys</span><span class="p">)</span>
         <span class="n">crit</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;chemsys&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;$in&quot;</span><span class="p">:</span> <span class="n">chemsys_list</span><span class="p">}}</span>
+        <span class="k">if</span> <span class="n">additional_criteria</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">crit</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">additional_criteria</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entries</span><span class="p">(</span><span class="n">crit</span><span class="p">,</span> <span class="n">inc_structure</span><span class="p">,</span>
                                 <span class="n">optional_data</span><span class="o">=</span><span class="n">optional_data</span><span class="p">)</span>
 </div>
@@ -495,7 +504,35 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 
-</div>
+<div class="viewcode-block" id="QueryEngine.get_dos_from_id"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryEngine.get_dos_from_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_dos_from_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overrides the get_dos_from_id for the MIT gridfs format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;task_id&#39;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">}</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;calculations&#39;</span><span class="p">]</span>
+        <span class="n">structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_from_id</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+        <span class="n">dosid</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+            <span class="n">dosid</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s">&#39;calculations&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;dos_fs_id&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dosid</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fs</span> <span class="o">=</span> <span class="n">gridfs</span><span class="o">.</span><span class="n">GridFS</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="s">&#39;dos_fs&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dosid</span><span class="p">)</span> <span class="k">as</span> <span class="n">dosfile</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dosfile</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="n">tdos</span> <span class="o">=</span> <span class="n">Dos</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                <span class="n">pdoss</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&#39;pdos&#39;</span><span class="p">])):</span>
+                    <span class="n">ados</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;pdos&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">all_ados</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ados</span><span class="p">)):</span>
+                        <span class="n">orb</span> <span class="o">=</span> <span class="n">Orbital</span><span class="o">.</span><span class="n">from_vasp_index</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                        <span class="n">odos</span> <span class="o">=</span> <span class="n">ados</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">orb</span><span class="p">)]</span>
+                        <span class="n">all_ados</span><span class="p">[</span><span class="n">orb</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">Spin</span><span class="o">.</span><span class="n">from_int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">)):</span> <span class="n">v</span>
+                                         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span>
+                                         <span class="ow">in</span> <span class="n">odos</span><span class="p">[</span><span class="s">&#39;densities&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                    <span class="n">pdoss</span><span class="p">[</span><span class="n">structure</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">all_ados</span>
+                <span class="k">return</span> <span class="n">CompleteDos</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">tdos</span><span class="p">,</span> <span class="n">pdoss</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div></div>
 <div class="viewcode-block" id="QueryResults"><a class="viewcode-back" href="../../matgendb.html#matgendb.query_engine.QueryResults">[docs]</a><span class="k">class</span> <span class="nc">QueryResults</span><span class="p">(</span><span class="n">Iterable</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Iterable wrapper for results from QueryEngine.</span>
@@ -608,7 +645,7 @@
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

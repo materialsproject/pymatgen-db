@@ -376,7 +376,7 @@ class Builder(object):
         """
         n, i = 0, 0
         for i, item in enumerate(items):
-            if 0 == (i+1) % chunk_size:
+            if 0 == (i + 1) % chunk_size:
                 self._run_parallel_fn()  # process the chunk
                 if self._status.has_failures():
                     break
