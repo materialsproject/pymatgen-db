@@ -132,7 +132,7 @@ class Test1(Regression):
                      "Bad count after 1st copy: "
                      "expected=1000 got={:d}".format(n))
         # do a few more copies
-        total, m, ovhd, rectm = n, (1, 500, 1000, 2000), 0, {}
+        total, m, ovhd, rectm = n, (1, 100, 500, 1000, 501, 101), 0, {}
         for i, newrec in enumerate(m):
             # Add records and copy
             add_records(self.src, newrec)
@@ -142,7 +142,7 @@ class Test1(Regression):
             if newrec == 1:
                 ovhd = t1 - t0
             else:
-                rectm[newrec] = (t1 - t0 - ovhd) / newrec
+                rectm[newrec] = t1 - t0 - ovhd
             # count records in copied-to collection
             n = self.dst.count()
             total += newrec
@@ -151,7 +151,7 @@ class Test1(Regression):
                          "expected={:d} got={:d}".format(i + 2, total, n))
         _log.info("Overhead = {:.1f} seconds".format(ovhd))
         for sz in m[1:]:
-            _log.info("Time per record @ {:d} = {:.0f} microseconds".format(sz, rectm[sz] * 1e6))
+            _log.info("{:d} = {:g}s, {:.0f}us/rec".format(sz, rectm[sz], rectm[sz] / sz * 1e6))
 
 if __name__ == '__main__':
     res = 0
