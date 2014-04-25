@@ -1,5 +1,7 @@
 """
-Test the builders.incr module
+Test the builders.incr module.
+
+These tests use `mongomock` instead of a real MongoDB server.
 """
 from unittest import TestCase
 
