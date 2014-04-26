@@ -49,8 +49,6 @@ class DBConfig(object):
                     config_file = self.DEFAULT_FILE
             # If there was a config_file, parse it
             if config_file is not None:
-                if isinstance(config_file, str):
-                    config_file = open(config_file, 'r')
                 try:
                     settings = get_settings(config_file)
                 except Exception, err:
