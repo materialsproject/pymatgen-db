@@ -4,8 +4,11 @@ Unit tests for `dbconfig` module.
 __author__ = 'Dan Gunter'
 __date__ = '2014-04-25'
 
+import json
+import tempfile
 import unittest
-from matgendb.dbconfig import *
+from matgendb.dbconfig import DBConfig, normalize_auth
+from matgendb.dbconfig import ConfigurationFileError
 
 class NormAuthTestCase(unittest.TestCase):
     """Test cases for normalize_auth().
@@ -55,6 +58,51 @@ class NormAuthTestCase(unittest.TestCase):
         normalize_auth(s, readonly_first=True)
         self.assertEqual(s["user"], self.U + "_1")
 
+
+class SettingsTestCase(unittest.TestCase):
+    def setUp(self):
+        self.cfg = {
+            "host": u"localhost",
+            "port": 27017,
+            "database": u"foo",
+            "user": u"guy",
+            "password": u"knock-knock"
+        }
+        self.tmp = tempfile.NamedTemporaryFile()
+        json.dump(self.cfg, self.tmp)
+        self.tmp.flush()
+        # reset file to beginning
+        self.tmp.seek(0)
+
+    def _aliased_cfg(self):
+        """Imitate authorization de-aliasing."""
+        cfg = self.cfg.copy()
+        cfg['readonly_password'] = cfg['password']
+        cfg['readonly_user'] = cfg['user']
+        return cfg
+
+    def test_init_file(self):
+        """Create DBConfig from file or path.
+        """
+        # sending file obj, or its path, should have same effect
+        d1 = DBConfig(config_file=self.tmp)
+        d2 = DBConfig(config_file=self.tmp.name)
+        self.assertEqual(d1.settings, d2.settings)
+        self.assertEqual(d2.settings, self._aliased_cfg())
+
+    def test_init_dict(self):
+        """Create DBConfig from dict object.
+        """
+        d1 = DBConfig(config_dict=self.cfg)
+        self.assertEqual(d1.settings, self._aliased_cfg())
+
+    def test_init_junk_file(self):
+        """Check error when creating DBConfig from bad input file.
+        """
+        f = open(self.tmp.name, 'w')
+        f.write("JUNK")
+        f.close()
+        self.assertRaises(ConfigurationFileError, DBConfig, config_file=f.name)
 
 if __name__ == '__main__':
     unittest.main()

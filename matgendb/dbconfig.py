@@ -1,5 +1,16 @@
 """
-Encapsulate database configuration parsing and usage.
+Database configuration functions.
+
+Main class is DBConfig, which encapsulates a database configuration
+passed in as a file or object. For example::
+
+    cfg1 = DBConfig()  # use defaults
+    cfg2 = DBConfig("/path/to/myfile.json")  # read from file
+    f = open("/other/file.json")
+    cfg3 = DBConfig(f)  # read from file object
+    # access dict of parsed conf. settings
+    settings = cfg1.settings
+
 """
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/25/14'
@@ -34,14 +45,15 @@ class DBConfig(object):
         the DEFAULT_SETTINGS are used without modification.
 
         :param config_file: Read configuration from this file.
-        :type config_file: str, file
+        :type config_file: file or str path
         :param config_dict: Set configuration from this dictionary.
         :raises: ConfigurationFileError if cannot read/parse config_file
         """
         self._cfg = dict(self.DEFAULT_SETTINGS)
         settings = {}
         if config_dict:
-            settings = config_dict
+            settings = config_dict.copy()
+            auth_aliases(settings)
         else:
             # Try to use DEFAULT_FILE if no config_file
             if config_file is None:
@@ -52,7 +64,8 @@ class DBConfig(object):
                 try:
                     settings = get_settings(config_file)
                 except Exception, err:
-                    raise ConfigurationFileError(config_file.name, err)
+                    path = _as_file(config_file).name
+                    raise ConfigurationFileError(path, err)
         self._cfg.update(settings)
         normalize_auth(self._cfg)
 
@@ -64,18 +77,22 @@ def get_settings(infile):
     """Read settings from input file.
 
     :param infile: Input file for JSON settings.
-    :return: Settings
+    :type infile: file or str path
+    :return: Settings parsed from file
     :rtype: dict
     """
-    settings = json.load(open(infile))
-    # Allow some aliases
+    settings = json.load(_as_file(infile))
+    auth_aliases(settings)
+    return settings
+
+def auth_aliases(d):
+    """Interpret user/password aliases.
+    """
     for alias, real in (("user", "readonly_user"),
                         ("password", "readonly_password")):
-        if alias in settings:
-            settings[real] = settings[alias]
-            del settings[alias]
-
-    return settings
+        if alias in d:
+            d[real] = d[alias]
+            del d[alias]
 
 def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
     """Transform the readonly/admin user and password to simple user/password,
@@ -119,3 +136,8 @@ def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
             break
 
     return found
+
+def _as_file(f, mode='r'):
+    if isinstance(f, basestring):
+        return open(f, mode)
+    return f

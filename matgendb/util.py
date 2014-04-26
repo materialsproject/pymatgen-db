@@ -1,5 +1,5 @@
 """
-Utility functions used across scripts
+Utility functions used across scripts.
 """
 __author__ = "Shyue Ping Ong, Dan Gunter"
 __copyright__ = "Copyright 2012-2014, The Materials Project"
@@ -18,10 +18,13 @@ from pymongo.mongo_client import MongoClient
 
 from matgendb.dbconfig import DBConfig
 
-# Temporarily allow normalize_auth to be imported
-# from this module (as well as new location).
-# --dang 2014-04-25
+# Backwards compatibility from refactor to `dbconfig` module
+# Copy of functions that were moved
 from matgendb.dbconfig import normalize_auth
+# Copy of global constants that were moved
+DEFAULT_PORT = DBConfig.DEFAULT_PORT
+DEFAULT_CONFIG_FILE = DBConfig.DEFAULT_FILE
+DEFAULT_SETTINGS = DBConfig.DEFAULT_SETTINGS
 
 ## Logging
 
