@@ -94,7 +94,7 @@ class Differ(object):
             engines = []
             for cfg in c1, c2:
                 settings = util.get_settings(cfg)
-                if not util.normalize_auth(settings):
+                if not dbconfig.normalize_auth(settings):
                     _log.warn("Config file {} does not have a username/password".format(cfg))
                 settings["aliases_config"] = {"aliases": {}, "defaults": {}}
                 engine = QueryEngine(**settings)

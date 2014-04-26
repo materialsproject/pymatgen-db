@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from pymatgen import Composition, Element
 
 from matgendb.query_engine import QueryEngine
-from matgendb import util as dbutil
+from matgendb import dbconfig
 
 import bson
 import datetime
@@ -23,7 +23,7 @@ qe = None
 mgdb_config = os.environ.get("MGDB_CONFIG", "")
 if mgdb_config:
     config = json.loads(mgdb_config)
-    if not dbutil.normalize_auth(config, readonly_first=True):
+    if not dbconfig.normalize_auth(config, readonly_first=True):
         config["user"] = config["password"] = None
     qe = QueryEngine(host=config["host"], port=config["port"],
                  database=config["database"], user=config["user"],
