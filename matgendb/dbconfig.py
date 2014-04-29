@@ -18,6 +18,14 @@ __date__ = '4/25/14'
 import json
 import os
 
+# Constants for keys
+HOST_KEY = "host"
+PORT_KEY = "port"
+DB_KEY = "database"
+COLL_KEY = "collection"
+USER_KEY = "user"
+PASS_KEY = "password"
+
 class ConfigurationFileError(Exception):
     def __init__(self, filename, err):
         msg = "reading '{}': {}".format(filename, err)
@@ -30,9 +38,9 @@ class DBConfig(object):
     DEFAULT_PORT = 27017
     DEFAULT_FILE = 'db.json'
     DEFAULT_SETTINGS = [
-        ("host", "localhost"),
-        ("port", DEFAULT_PORT),
-        ("database", "vasp")
+        (HOST_KEY, "localhost"),
+        (PORT_KEY, DEFAULT_PORT),
+        (DB_KEY, "vasp")
     ]
 
     def __init__(self, config_file=None, config_dict=None):
@@ -88,8 +96,8 @@ def get_settings(infile):
 def auth_aliases(d):
     """Interpret user/password aliases.
     """
-    for alias, real in (("user", "readonly_user"),
-                        ("password", "readonly_password")):
+    for alias, real in ((USER_KEY, "readonly_user"),
+                        (PASS_KEY, "readonly_password")):
         if alias in d:
             d[real] = d[alias]
             del d[alias]
@@ -107,7 +115,7 @@ def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
     :return: Whether user/password were found
     :rtype: bool
     """
-    U, P = "user", "password"
+    U, P = USER_KEY, PASS_KEY
     # If user/password, un-prefixed, exists, do nothing.
     if U in settings and P in settings:
         return True
