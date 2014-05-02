@@ -77,9 +77,39 @@ class DBConfig(object):
         self._cfg.update(settings)
         normalize_auth(self._cfg)
 
+    def copy(self):
+        """Return a copy of self (internal settings are copied).
+        """
+        return DBConfig(config_dict=self._cfg.copy())
+
     @property
     def settings(self):
         return self._cfg
+
+    @property
+    def host(self):
+        return self._cfg.get(HOST_KEY, None)
+
+    @property
+    def port(self):
+        return self._cfg.get(PORT_KEY, self.DEFAULT_PORT)
+
+    @property
+    def collection(self):
+        return self._cfg.get(COLL_KEY, None)
+
+    @collection.setter
+    def collection(self, value):
+        self._cfg[COLL_KEY] = value
+
+    @property
+    def user(self):
+        return self._cfg.get(USER_KEY, None)
+
+    @property
+    def password(self):
+        return self._cfg.get(PASS_KEY, None)
+
 
 def get_settings(infile):
     """Read settings from input file.

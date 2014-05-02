@@ -7,35 +7,76 @@ __email__ = "dkgunter@lbl.gov"
 __date__ = "2014-04-29"
 
 import json
+import mongomock
 import os
 import tempfile
 import unittest
-from matgendb.dbgroup import QEGroup
+from matgendb.dbgroup import ConfigGroup
 from matgendb import dbconfig
 
 _opj = os.path.join
+
+mockdb = mongomock.MongoClient()
+doc = {"hello": "world"}
+mockdb.testdb.data.insert(doc)
+# add some nested collections
+mockcoll = [
+    'data.a1',
+    'data.a1.b1',
+    'data.a1.b2',
+    'data.a2'
+]
+[mockdb.testdb[c].insert(doc) for c in mockcoll]
 
 class MockQueryEngine(object):
     def __init__(self, **kwargs):
         self.kw = kwargs
 
-class QEGroupTestCase(unittest.TestCase):
+    def __eq__(self, other):
+        return other.kw == self.kw
+
+    @property
+    def db(self):
+        return mockdb.testdb
+
+    @property
+    def collection(self):
+        return mockdb.testdb[self.kw['collection']]
+
+    @property
+    def db(self):
+        class DB(object):
+            _c = mockcoll
+            def collection_names(self, x=None):
+                return self._c
+        return DB()
+
+class Cfg(object):
+    def __init__(self, v):
+        self.settings = {'collection': v}
+        self.collection = v
+    def copy(self):
+        return Cfg(self.collection)
+
+class ConfigGroupTestCase(unittest.TestCase):
     def setUp(self):
-        self.g = QEGroup(qe_class=MockQueryEngine)
+        self.g = ConfigGroup(qe_class=MockQueryEngine)
+        self.configs = [Cfg("qe{:d}".format(i)) for i in range(5)]
 
     def test_add(self):
-        """QEGroup add and lookup
+        """ConfigGroup add and lookup
         """
-        self.g.add("foo", "qe1")\
-            .add("bar", "qe2")\
-            .add("foo.a", "qe3")\
-            .add("foo.b", "qe4")
-        self.assertEqual(self.g["foo"], "qe1")
-        self.assertEqual(self.g["bar"], "qe2")
-        self.assertEqual(self.g["bar*"], {"bar": "qe2"})
-        self.assertEqual(self.g["foo.a"], "qe3")
+        keys = ["foo", "bar", "foo.a", "foo.b"]
+        expect = {}
+        for i, k in enumerate(keys):
+            self.g.add(k, self.configs[i])
+            expect[k] = MockQueryEngine(**self.configs[i].settings)
+        self.assertEqual(self.g["foo"], expect["foo"])
+        self.assertEqual(self.g["bar"], expect["bar"])
+        self.assertEqual(self.g["bar*"], {"bar": expect["bar"]})
+        self.assertEqual(self.g["foo.a"], expect["foo.a"])
         self.assertEqual(self.g["foo.*"],
-                         {"foo.a": "qe3", "foo.b": "qe4"})
+                         {"foo.a": expect["foo.a"], "foo.b": expect["foo.b"]})
 
     def test_add_path(self):
         """Add set of query engines from a path.
@@ -79,6 +120,33 @@ class QEGroupTestCase(unittest.TestCase):
             for f in os.listdir(d):
                 os.unlink(os.path.join(d, f))
             os.rmdir(d)
+
+    def test_uncache(self):
+        """Remove cached query engine(s) from ConfigGroup.
+        """
+        keys = ("foo.a", "foo", "bar")
+        for i in range(len(keys)):
+            self.g.add(keys[i], self.configs[i])
+        # force instantiation/caching
+        for i in range(len(keys)):
+            self.g[keys[i]]
+        left_behind = self.g[keys[2]]
+        # remove all foo from cache
+        self.g.uncache("foo*")
+        # check that they are not cached
+        for i in range(2):
+            self.assertRaises(KeyError, self.g._cached.__getitem__, keys[i])
+        # check that un-removed remain
+        self.assertEqual(self.g[keys[2]], left_behind)
+
+    def test_expand(self):
+        """Add multiple collections at once with 'expand'.
+        """
+        self.g.add("foo", Cfg("data"), expand=True)
+        # check that data.* got added as foo.*
+        keys = set(self.g.keys())
+        expect = set(["foo"] + [f.replace("data", "foo") for f in mockcoll])
+        self.assertEqual(expect, keys)
 
 def dict_subset(a, b):
     for k in a.iterkeys():

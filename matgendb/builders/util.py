@@ -9,6 +9,8 @@ import logging
 import matgendb
 # Stdlib
 import os
+# Local
+from matgendb.util import csv_dict, csv_list
 
 ## Globals
 
@@ -60,21 +62,6 @@ def get_schema_file(db_version=1, db="mg_core", collection="materials"):
     schemafile = "{}.{}.json".format(db, collection)
     f = open(os.path.join(d, schemafile), "r")
     return f
-
-def csv_list(l):
-    """Format list to a string with comma-separated values.
-    """
-    if len(l) == 0:
-        return ""
-    return ', '.join(map(str, l))
-
-
-def csv_dict(d):
-    """Format dict to a string with comma-separated values.
-    """
-    if len(d) == 0:
-        return "{}"
-    return "{" + ', '.join(["'{}': '{}'".format(k, v) for k, v in d.iteritems()]) + "}"
 
 def get_builder_log(name):
     """Get a logging object, in the right place in the
