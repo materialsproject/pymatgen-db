@@ -83,3 +83,18 @@ def collection_keys(coll, sep='.'):
                     yield nested
 
     return list(_keys(coll.find_one()))
+
+def csv_list(l):
+    """Format list to a string with comma-separated values.
+    """
+    if len(l) == 0:
+        return ""
+    return ', '.join(map(str, l))
+
+
+def csv_dict(d):
+    """Format dict to a string with comma-separated values.
+    """
+    if len(d) == 0:
+        return "{}"
+    return "{" + ', '.join(["'{}': '{}'".format(k, v) for k, v in d.iteritems()]) + "}"
