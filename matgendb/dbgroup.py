@@ -18,7 +18,7 @@ class CreateQueryEngineError(Exception):
     def __init__(self, cls, settings, err):
         msg = "creating query engine, class={cls} settings={s}: {m}"\
             .format(cls=cls.__name__, s=util.csv_dict(settings), m=err)
-        Exception.__init__(msg)
+        Exception.__init__(self, msg)
 
 
 class ConfigGroup(object):
