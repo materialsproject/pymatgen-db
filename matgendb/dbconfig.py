@@ -15,8 +15,9 @@ passed in as a file or object. For example::
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/25/14'
 
-import json
 import os
+#
+import yaml
 
 # Constants for keys
 HOST_KEY = "host"
@@ -119,7 +120,9 @@ def get_settings(infile):
     :return: Settings parsed from file
     :rtype: dict
     """
-    settings = json.load(_as_file(infile))
+    settings = yaml.load(_as_file(infile))
+    if not hasattr(settings, 'keys'):
+        raise ValueError("Settings not found in {}".format(infile))
     auth_aliases(settings)
     return settings
 
