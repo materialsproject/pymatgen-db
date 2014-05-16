@@ -1,9 +1,5 @@
 """
-Component-level tests for incremental builder.
-
-Requires a local MongoDB server, and runs the
-`mgbuild` command, so also requires that pymatgen-db is
-loaded into the environment.
+Component-level tests for builder.
 """
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/24/14'
@@ -16,7 +12,7 @@ import unittest
 # Package
 from matgendb.tests.common import ComponentTest
 
-_log = logging.getLogger("comp_incr")
+_log = logging.getLogger("comp_build")
 _h = logging.StreamHandler(sys.stdout)
 _log.addHandler(_h)
 _log.setLevel(logging.INFO)
@@ -33,9 +29,8 @@ class BuilderComponentTest(ComponentTest):
         options = (
             ('incr', None),
             ('module', 'matgendb.builders.examples'),
-            ('builder', 'copy_builder'),
-            #('kvp', 'crit=\"\"'),
-            ('kvp', 'source=' + self.src_conf.name),
+            ('builder', 'file_builders'),
+            ('kvp', 'input_file=' + self.src_conf.name),
             ('kvp', 'target=' + self.dst_conf.name),
         )
         self.call_build(options)

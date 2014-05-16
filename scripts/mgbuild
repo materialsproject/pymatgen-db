@@ -199,9 +199,14 @@ def command_build(args):
                                      "Bad key=value pair: {}".format(kwd))
         args_kw[key] = value
 
-    # Parse builder's setup() method docstring.
-    _log.debug("parse builder docstring")
-    params = core.parse_fn_docstring(builder_class.setup)
+    # Create biulder
+    builder = builder_class(ncores=args.num_cores)
+
+    params = builder.get_parameters()
+    if params is None:
+        # Parse builder's get_items() method docstring.
+        _log.debug("parse builder docstring")
+        params = core.parse_fn_docstring(builder_class.get_items)
     qes = list()  # query engines
     for name, info in params.iteritems():
         if not 'type' in info:
@@ -235,7 +240,6 @@ def command_build(args):
                                          "value '{}' must be a dictionary like {{'foo':'bar'}}".format(value))
     # Run builder.
     _log.info("run builder, keywords: {}".format(csv_dict(args_kw)))
-    builder = builder_class(ncores=args.num_cores)
     count = builder.run(setup_kw=args_kw)
     if count < 1:
         _log.warn("Processed {:d} items".format(count))

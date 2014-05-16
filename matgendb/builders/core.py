@@ -256,24 +256,31 @@ class Builder(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, ncores=0, threads=False):
+    def __init__(self, ncores=0, threads=False, sequential=False):
         """Create new builder for threaded or multiprocess execution.
 
         :param ncores: Desired number of threads or processes to run
         :type ncores: int
         :param threads: Use threads (True) or processes (False)
         :type threads: bool
+        :param sequential: No threads or processes, run sequentially
+        :type sequential: bool
         :raise: ValueError for bad 'config' arg
         """
-        self._ncores = ncores if ncores else 15
-        self._threaded = threads
-        if threads:
+        if sequential:
+            self._seq = True
             self._queue = Queue.Queue()
-            self._states_lock = threading.Lock()
-            self._run_parallel_fn = self._run_parallel_threaded
         else:
-            self._queue = multiprocessing.Queue()
-            self._run_parallel_fn = self._run_parallel_multiprocess
+            self._seq = False
+            self._ncores = ncores if ncores else 15
+            self._threaded = threads
+            if threads:
+                self._queue = Queue.Queue()
+                self._states_lock = threading.Lock()
+                self._run_parallel_fn = self._run_parallel_threaded
+            else:
+                self._queue = multiprocessing.Queue()
+                self._run_parallel_fn = self._run_parallel_multiprocess
         self._status = BuilderStatus(ncores, is_threaded=threads)
 
     # ----------------------------
@@ -281,33 +288,7 @@ class Builder(object):
     # ----------------------------
 
     @abstractmethod
-    def get_items(self):
-        """Perform one-time setup at the top of a run, returning
-        an iterator on items to use as input.
-
-        If get_items_parameters() doesn't return None, this method is used to
-        discover the names and types of this function's parameters.
-        Otherwise, the docstring of this function is used.
-        This docstring must use the ':' version of the restructured
-        text style. For example::
-
-            class MyBuilder(Builder):
-                def get_items(self, source=None, target=None):
-                '''
-                :param source: The input porous materials collection
-                :type source: QueryEngine
-                :param target: The output materials collection
-                :type target: QueryEngine
-                '''
-
-        More details on the parameters is in :meth:`get_items_parameters`.
-
-        :return: iterator
-        """
-        return [{"Hello": 1}, {"World": 2}]
-
-    @abstractmethod
-    def get_items_parameters(self):
+    def get_parameters(self):
         """Return key/value pairs that will be passed to get_items().
 
         This is an alternative to the use of special docstrings as described
@@ -328,8 +309,31 @@ class Builder(object):
         """
         return None  # means: use docstring
 
-    # For backwards-compatibility
-    setup = get_items
+    @abstractmethod
+    def get_items(self):
+        """Perform one-time setup at the top of a run, returning
+        an iterator on items to use as input.
+
+        If get_parameters() doesn't return None, this method is used to
+        discover the names and types of this function's parameters.
+        Otherwise, the docstring of this function is used.
+        This docstring must use the ':' version of the restructured
+        text style. For example::
+
+            class MyBuilder(Builder):
+                def get_items(self, source=None, target=None):
+                '''
+                :param source: The input porous materials collection
+                :type source: QueryEngine
+                :param target: The output materials collection
+                :type target: QueryEngine
+                '''
+
+        More details on the parameters is in :meth:`get_items_parameters`.
+
+        :return: iterator
+        """
+        return [{"Hello": 1}, {"World": 2}]
 
     @abstractmethod
     def process_item(self, item):
@@ -367,7 +371,7 @@ class Builder(object):
         """
         setup_kw = {} if setup_kw is None else setup_kw
         build_kw = {} if build_kw is None else build_kw
-        n = self._build(self.setup(**setup_kw), **build_kw)
+        n = self._build(self.get_items(**setup_kw), **build_kw)
         finalized = self.finalize(self._status.has_failures())
         if not finalized:
             _log.error("Finalization failed")
@@ -400,13 +404,19 @@ class Builder(object):
             if i == 0:
                 _log.debug("_build, first item")
             if 0 == (i + 1) % chunk_size:
-                self._run_parallel_fn()  # process the chunk
+                if self._seq:
+                    self._run(0)
+                else:
+                    self._run_parallel_fn()  # process the chunk
                 if self._status.has_failures():
                     break
                 n = i + 1
             self._queue.put(item)
         # process final chunk
-        self._run_parallel_fn()
+        if self._seq:
+            self._run(0)
+        else:
+            self._run_parallel_fn()
         if not self._status.has_failures():
             n = i + 1
         return n

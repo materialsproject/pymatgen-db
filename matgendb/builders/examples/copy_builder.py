@@ -12,7 +12,6 @@ mgbuild
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/22/14'
 
-
 from matgendb.builders import core as bld_core
 from matgendb.builders import util as bld_util
 from matgendb.query_engine import QueryEngine
@@ -25,7 +24,7 @@ class Builder(bld_core.Builder):
         self._target_coll = None
         bld_core.Builder.__init__(self, *args, **kwargs)
 
-    def setup(self, source=None, target=None, crit=None):
+    def get_items(self, source=None, target=None, crit=None):
         """Copy records from source to target collection.
 
         :param source: Input collection
@@ -47,3 +46,4 @@ class Builder(bld_core.Builder):
         assert self._target_coll
         _log.debug("process item: insert item")
         self._target_coll.insert(item)
+
