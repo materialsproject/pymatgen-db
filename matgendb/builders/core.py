@@ -49,7 +49,7 @@ def parse_fn_docstring(fn):
        :return: What is returned
        :rtype: double
 
-    :return: A pair (parameters, output), a map of names, each with keys 'type' and 'desc'.
+    :return: A map of names, each with keys 'type' and 'desc'.
     :rtype: tuple(dict)
     """
     doc = fn.__doc__
@@ -74,7 +74,7 @@ def parse_fn_docstring(fn):
         elif line.startswith(":rtype"):
             _1, _2, desc = line.split(":", 2)
             return_['type'] = desc.strip()
-    return params, return_
+    return params #, return_
 
 
 ## Classes
@@ -281,16 +281,18 @@ class Builder(object):
     # ----------------------------
 
     @abstractmethod
-    def setup(self, *args):
+    def get_items(self):
         """Perform one-time setup at the top of a run, returning
         an iterator on items to use as input.
 
-        The parameters for this method are translated into command-line options
-        for the command-line driver program (mgbuild). These parameters *must* be documented
-        in special form in the 'docstring' at the top of the function. For example::
+        If get_items_parameters() doesn't return None, this method is used to
+        discover the names and types of this function's parameters.
+        Otherwise, the docstring of this function is used.
+        This docstring must use the ':' version of the restructured
+        text style. For example::
 
             class MyBuilder(Builder):
-                def setup(self, source, target):
+                def get_items(self, source=None, target=None):
                 '''
                 :param source: The input porous materials collection
                 :type source: QueryEngine
@@ -298,16 +300,36 @@ class Builder(object):
                 :type target: QueryEngine
                 '''
 
-        If the type of the argument is 'QueryEngine', then the driver program will
-        add options for, and create, a matgendb.query_engine.QueryEngine instance.
-        The value given for this argument will be interpreted as the MongoDB collection name.
-
-        Some other basic Python types -- list, dict, int, float -- are automatically parsed before being
-        handed to the function. If an empty value is supplied for these, then None will be passed.
+        More details on the parameters is in :meth:`get_items_parameters`.
 
         :return: iterator
         """
         return [{"Hello": 1}, {"World": 2}]
+
+    @abstractmethod
+    def get_items_parameters(self):
+        """Return key/value pairs that will be passed to get_items().
+
+        This is an alternative to the use of special docstrings as described
+        in :meth:`get_items`.
+
+        If the type of the argument is 'QueryEngine', then the driver program
+        will add options for, and create, a matgendb.query_engine.QueryEngine
+        instance. The value given for this argument will be interpreted as
+        the MongoDB collection name.
+
+        Some other basic Python types -- list, dict, int, float -- are
+        automatically parsed. If an empty value is supplied for these, then
+        None will be passed.
+
+        :return: {'param_name': {'type': 'param_type', 'desc':'description'},
+                  'param2_name': {'type': 'param2_type', 'desc':'descr2'}, ..}
+        :rtype: dict
+        """
+        return None  # means: use docstring
+
+    # For backwards-compatibility
+    setup = get_items
 
     @abstractmethod
     def process_item(self, item):

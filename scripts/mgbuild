@@ -201,7 +201,7 @@ def command_build(args):
 
     # Parse builder's setup() method docstring.
     _log.debug("parse builder docstring")
-    params, returnval = core.parse_fn_docstring(builder_class.setup)
+    params = core.parse_fn_docstring(builder_class.setup)
     qes = list()  # query engines
     for name, info in params.iteritems():
         if not 'type' in info:
