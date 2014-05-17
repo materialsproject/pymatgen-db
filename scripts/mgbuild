@@ -189,58 +189,36 @@ def command_build(args):
     if builder_class is None:
         raise BuilderNotFoundError("{}".format(full_mod_path))
 
-    # Get keywords from args.
-    args_kw = {}
-    for kwd in args.keywords:
-        try:
-            key, value = kwd.split('=', 1)
-        except ValueError:
-            raise ConfigurationError("for builder '{}'".format(args.builder),
-                                     "Bad key=value pair: {}".format(kwd))
-        args_kw[key] = value
-
-    # Create biulder
+    # Create builder
     builder = builder_class(ncores=args.num_cores)
 
+    # Get parameter types
     params = builder.get_parameters()
     if params is None:
         # Parse builder's get_items() method docstring.
         _log.debug("parse builder docstring")
         params = core.parse_fn_docstring(builder_class.get_items)
-    qes = list()  # query engines
-    for name, info in params.iteritems():
-        if not 'type' in info:
-            raise ConfigurationError("for builder '{}'".format(args.builder),
-                                     "Missing ':type {}: <type>' in docstring".format(name))
-        value_type = info['type']
-        is_query_engine = is_mqe(value_type)
-        try:
-            value = args_kw[name]
-        except KeyError:
-            if is_query_engine:
-                value = name  # for collection foo, default to 'foo.json' config
-            else:
-                if '(optional)' in info['desc']:
-                    _log.info("Use default value for parameter '{}'".format(name))
-                    continue
-                else:
-                    raise ConfigurationError("for builder '{}'".format(args.builder),
-                                             "Missing value for parameter '{}' in {}".format(name, full_mod_path))
-        # take special action for some types
-        if is_query_engine:
-            qes.append(configure_query_engine(args, args_kw, name, value))
-        elif value_type in ('dict', 'list', 'int', 'float'):
-            parsed_type = eval(value_type)
+
+    # Parse args against the builder parameters
+    try:
+        builder_args = core.process_args(args.keywords, params)
+    except ValueError, err:
+        raise ConfigurationError("for builder '{}': {}"
+                                 .format(args.builder, err))
+    # Special post-processing for query engine
+    for key, value in builder_args.iteritems():
+        if params[key]['type'].endswith("QueryEngine"):
+            # Replace path to query engine config with a QE instance
             try:
-                value = _parse_literal(value, value_type)
-                if value is not None and not isinstance(value, parsed_type):
-                    raise ValueError()
-            except ValueError:
-                raise ConfigurationError("parsing key '{}'".format(name),
-                                         "value '{}' must be a dictionary like {{'foo':'bar'}}".format(value))
+                builder_args[key] = \
+                    create_qe(value,
+                              args.incr, args.incr_op, args.incr_field)
+            except ValueError, err:
+                raise ConfigurationError("creating query engine", err)
+
     # Run builder.
-    _log.info("run builder, keywords: {}".format(csv_dict(args_kw)))
-    count = builder.run(setup_kw=args_kw)
+    _log.info("run builder, keywords: {}".format(csv_dict(args.keywords)))
+    count = builder.run(user_kw=builder_args)
     if count < 1:
         _log.warn("Processed {:d} items".format(count))
     else:
@@ -256,56 +234,37 @@ def _parse_literal(v, vt):
         return None
     return ast.literal_eval(v)
 
-def configure_query_engine(args, args_kw, qe_name, path):
-    """Configure a new DB connection.
-
-    :param args: Command-line args
-    :param args_kw: Function-specific keywords in args
-    :param qe_name: Name of query engine
-    :param path: Path to config file
-    :return: QueryEngine instance
-    :raise: ConfigurationError
-    """
-    qe = None  # query engine obj
-    config_files = [os.path.join(args.config_path, x) for x in [path, path + ".json"]]
-    found = False
-    for config_file in config_files:
-        if os.path.exists(config_file):
-            found = True
-            break
-    if not found:
-        tried_paths = csv_list(config_files)
-        raise ConfigurationError("while loading DB configuration",
-                                 "Configuration file '{}' not found Tried: {}".format(path, tried_paths))
-    _log.info("load DB configuration for '{}' from '{}'".format(qe_name, config_file))
-    db_settings = get_settings(config_file)
-    # pick QE class depending on incremental flag
-    if args.incr:
-        qe_class = TrackedQueryEngine
-        # Update settings to include the type of operation, and field, used
-        # to track the position in the source collection.
-        try:
-            t_op = Operation[args.incr_op]
-        except KeyError:
-            raise ConfigurationError("while setting incremental operator",
-                                     "Unrecognized operation for incremental mode: '{}'".format(args.incr_op))
-        db_settings.update(dict(track_operation=t_op, track_field=args.incr_field))
-    else:
-        qe_class = UnTrackedQueryEngine
-    # replace value with MQE obj
-    _log.debug("QueryEngine.create settings={}".format(db_settings))
-    try:
-        args_kw[qe_name] = qe = qe_class(**db_settings)
-    except pymongo.errors.ConnectionFailure as err:
-        raise BuilderError("Cannot connect from settings in '{}': {}"
-                           .format(config_file, err))
-    _log.debug("Configured query engine {}: {}".format(qe_name, db_settings))
-    return qe
-
 
 # Utility functions
 # -----------------
 
+def create_qe(path, incr=False, iop=None, ifield=None):
+    """Configure a new QueryEngine from a config file at `path`.
+    """
+    db_settings = get_settings(path)
+
+    # Pick QueryEngine subclass
+    if incr:
+        qe_class = TrackedQueryEngine
+        # Update settings to include the type of operation, and field, used
+        # to track the position in the source collection.
+        try:
+            t_op = Operation[iop]
+        except KeyError:
+            raise ValueError("Bad operation for incremental mode: '{}'"
+                             .format(iop))
+        db_settings.update(dict(track_operation=t_op, track_field=ifield))
+    else:
+        qe_class = UnTrackedQueryEngine
+
+    # Instantiate QueryEngine
+    _log.debug("QueryEngine.create settings={}".format(db_settings))
+    try:
+        qe = qe_class(**db_settings)
+    except pymongo.errors.ConnectionFailure as err:
+        raise ValueError("Cannot connect from settings in '{}': {}"
+                         .format(path, err))
+    return qe
 
 def tell_user(message):
     """Print something to the user.
@@ -329,11 +288,6 @@ def get_settings(config_file, allow_default=True):
     normalize_aliases(cfg)
     return cfg
 
-
-def is_mqe(type_name):
-    """Whether this type name is a QueryEngine.
-    """
-    return type_name.endswith("QueryEngine")
 
 
 def load_module(module):
@@ -406,6 +360,15 @@ def normalize_aliases(cfg):
         # explicitly put empty aliases, to override QueryEngine defaults
         cfg[QueryEngine.ALIASES_CONFIG_KEY] = {'aliases': {}, 'defaults': {}}
 
+def kvp_option(arg):
+    """Parse key=value pair into (key, value)
+    """
+    try:
+        key, value = arg.split('=', 1)
+    except ValueError:
+        raise ConfigurationError("Bad key=value pair: {}".format(arg))
+    return key, value
+
 # Main program
 # ------------
 
@@ -463,7 +426,7 @@ def main():
                       help="Field to sort on for incremental mode (%(default)s)")
     subp.add_argument("-C", "--config-path", dest="config_path", type=str, metavar='DIR', default=".",
                       help="Configure database connection from .json files in DIR (default=%(default)s)")
-    subp.add_argument("-k", "--kvp", dest="keywords", action="append", default=[],
+    subp.add_argument("-k", "--kvp", dest="keywords", action="append", default=[], type=kvp_option,
                       help="Key/value pairs, in format <key>=<value>, passed to builder function. "
                            "For QueryEngine arguments, the value should be the name of a DB configuration file, "
                            "relative to the path given by -C/--config-path, without the '.json' suffix; if not given, "

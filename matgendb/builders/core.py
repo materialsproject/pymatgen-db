@@ -13,6 +13,7 @@ __date__ = '5/29/13'
 from abc import ABCMeta, abstractmethod
 import copy
 import logging
+import os
 import Queue
 import threading
 import multiprocessing
@@ -76,6 +77,45 @@ def parse_fn_docstring(fn):
             return_['type'] = desc.strip()
     return params #, return_
 
+
+def process_args(args, params):
+    """Process arguments to match with params.
+    """
+    qes = list()  # query engines
+    args_kw = dict(args)
+    kw = {}
+    for name, info in params.iteritems():
+        if not 'type' in info:
+            raise ValueError("Missing ':type {}: <type>' in docstring"
+                             .format(name))
+        value_type = info['type']
+        is_query_engine = is_mqe(value_type)
+        try:
+            value = args_kw[name]
+        except KeyError:
+            if is_query_engine:
+                value = name  # for collection foo, default to 'foo.json' config
+            else:
+                if '(optional)' in info['desc']:
+                    _log.info(
+                        "Use default value for parameter '{}'".format(name))
+                    continue
+                else:
+                    raise ValueError("Missing value for '{}'".format(name))
+        # take special action for some types
+        if is_query_engine:
+            qes.append(configure_query_engine(args, args_kw, name, value))
+        elif value_type in ('dict', 'list', 'int', 'float'):
+            parsed_type = eval(value_type)
+            try:
+                value = _parse_literal(value, value_type)
+                if value is not None and not isinstance(value, parsed_type):
+                    raise ValueError()
+            except ValueError:
+                raise ConfigurationError("parsing key '{}'".format(name),
+                                         "value '{}' must be a dictionary like {{'foo':'bar'}}".format(
+                                             value))
+    return qes, kw
 
 ## Classes
 
@@ -359,19 +399,19 @@ class Builder(object):
 
     # -----------------------------
 
-    def run(self, setup_kw=None, build_kw=None):
+    def run(self, user_kw=None, build_kw=None):
         """Run the builder.
 
-        :param setup_kw: keywords to pass to `setup()` method
-        :type setup_kw: dict
-        :param build_kw: keywords to pass to `_build()` method
+        :param user_kw: keywords from user
+        :type user_kw: dict
+        :param build_kw: internal settings
         :type build_kw: dict
         :return: Number of items processed
         :rtype: int
         """
-        setup_kw = {} if setup_kw is None else setup_kw
+        user_kw = {} if user_kw is None else user_kw
         build_kw = {} if build_kw is None else build_kw
-        n = self._build(self.get_items(**setup_kw), **build_kw)
+        n = self._build(self.get_items(**user_kw), **build_kw)
         finalized = self.finalize(self._status.has_failures())
         if not finalized:
             _log.error("Finalization failed")
