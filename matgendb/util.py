@@ -98,3 +98,9 @@ def csv_dict(d):
     if len(d) == 0:
         return "{}"
     return "{" + ', '.join(["'{}': '{}'".format(k, v) for k, v in d.iteritems()]) + "}"
+
+def kvp_dict(d):
+    """Format dict to key=value pairs.
+    """
+    return ', '.join(
+        ["{}='{}'".format(k, v) for k, v in d.iteritems()])

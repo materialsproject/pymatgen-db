@@ -19,7 +19,7 @@ __date__ = '5/22/13'
 # System imports.
 import argparse
 import ast
-import imp
+import importlib
 import json
 import logging
 import os
@@ -32,7 +32,7 @@ import pymongo
 
 # Local imports.
 from matgendb.builders import core
-from matgendb.builders.util import csv_list, csv_dict
+from matgendb.util import csv_list, kvp_dict
 from matgendb.query_engine import QueryEngine
 from matgendb.builders.incr import TrackedQueryEngine, UnTrackedQueryEngine, Operation
 
@@ -142,7 +142,7 @@ def command_list(args):
     # Convert back to full module paths.
     pymods = ["{}.{}".format(args.mod_path, os.path.splitext(f)[0]) for f in pyfiles]
     # Find and show builders in the module paths.
-    builders = filter(None, [get_builder(m) for m in pymods])
+    builders = filter(None, [find_builder(m) for m in pymods])
     n = len(builders)
     if n > 0:
         print("Found {:d} builder{}:".format(n, 's' if n > 1 else ''))
@@ -152,30 +152,20 @@ def command_list(args):
     return n
 
 
-def _show_builder(b):
+def _show_builder(b, params=None, strm=sys.stderr):
     """Print a formatted version of builder info to the console.
+    `b` is a builder class.
     """
-    indent = " " * 4
-    modname = b.__module__.split(".")[-1]
-    print("\n{m}".format(m=modname))
-    builder_doc = b.__doc__ or "(no description)"
-    print("{i}{desc}".format(i=indent, desc=builder_doc.strip()))
-    params = {}
-    setup_doc = b.setup.__doc__.split("\n")
-    for line in setup_doc:
-        s = line.strip()
-        if s.startswith(":"):
-            words = s.split()
-            param_name = words[1].split(":")[0]
-            param_desc = ' '.join(words[2:])
-            if s.startswith(":param"):
-                params[param_name] = [param_desc, None]  # desc goes first
-            else:
-                params[param_name][1] = param_desc  # type goes second
-    print("{i}Parameters:".format(i=indent))
-    for key, value in params.iteritems():
-        desc, type_ = value
-        print("{i}{i}{name} = ({type}) {desc}".format(i=indent, name=key, type=type_, desc=desc))
+    info = dict(desc=(b.__doc__ or "(no description)").strip(),
+                name='.'.join((b.__module__, b.__name__)))
+    strm.write("\n{name}\n  {desc}\n".format(**info))
+    if params is None:
+        params = core.parse_fn_docstring(b.get_items)
+    strm.write("  Parameters:\n")
+    for p, pval in params.iteritems():
+        info = dict(name=p, type=pval['type'], desc=pval['desc'])
+        strm.write("    {name} ({type}): {desc}\n".format(**info))
+    strm.write("\n")
 
 def command_build(args):
     """Command: Run builder, invoked from 'build' sub-command
@@ -183,11 +173,15 @@ def command_build(args):
     :param args: Command-line arguments
     :type args: list
     """
-    # Get builder in module.
-    full_mod_path = "{}.{}".format(args.mod_path, args.builder)
-    builder_class = get_builder(full_mod_path)
+    # Get builder, optionally in module.
+    bld_arg = args.builder
+    if '.' in bld_arg:
+        bld_path, bld_class = bld_arg.rsplit('.', 1)
+    else:
+        bld_path, bld_class = None, bld_arg
+    builder_class = find_builder(bld_path, bld_class)
     if builder_class is None:
-        raise BuilderNotFoundError("{}".format(full_mod_path))
+        raise BuilderNotFoundError(bld_arg)
 
     # Create builder
     builder = builder_class(ncores=args.num_cores)
@@ -199,41 +193,43 @@ def command_build(args):
         _log.debug("parse builder docstring")
         params = core.parse_fn_docstring(builder_class.get_items)
 
-    # Parse args against the builder parameters
-    try:
-        builder_args = core.process_args(args.keywords, params)
-    except ValueError, err:
-        raise ConfigurationError("for builder '{}': {}"
-                                 .format(args.builder, err))
-    # Special post-processing for query engine
-    for key, value in builder_args.iteritems():
-        if params[key]['type'].endswith("QueryEngine"):
+    # Check args against the builder parameters
+    if set([x[0] for x in args.params]) != set(params.keys()):
+        _show_builder(builder_class, params=params)
+        raise ConfigurationError(args.builder, "wrong number of parameters")
+
+    # Fill builder args using builder parameter types
+    simple_types = {k: eval(k) for k in ('dict', 'list', 'int', 'float')}
+    parsed_builder_args, query_engines = {}, []
+    for key, value in args.params:
+        _type = params[key]['type']
+        if _type.endswith("QueryEngine"):
             # Replace path to query engine config with a QE instance
             try:
-                builder_args[key] = \
-                    create_qe(value,
-                              args.incr, args.incr_op, args.incr_field)
+                qe = create_qe(value,
+                               args.incr, args.incr_op, args.incr_field)
+                parsed_builder_args[key] = qe
+                query_engines.append(qe)
             except ValueError, err:
                 raise ConfigurationError("creating query engine", err)
+        elif _type in simple_types:
+            parsed_builder_args[key] = simple_types[_type](value)
+        else:
+            parsed_builder_args[key] = value
 
     # Run builder.
-    _log.info("run builder, keywords: {}".format(csv_dict(args.keywords)))
-    count = builder.run(user_kw=builder_args)
+    _log.info("run: {}({})".format(builder_class.__name__,
+                                   kvp_dict(parsed_builder_args)))
+    count = builder.run(user_kw=parsed_builder_args)
     if count < 1:
         _log.warn("Processed {:d} items".format(count))
     else:
         _log.info("Processed {:d} items".format(count))
     # Save current position, for all query engines
-    [qe.set_mark() for qe in qes]
+    [qe.set_mark() for qe in query_engines]
     result = 0
 
     return result
-
-def _parse_literal(v, vt):
-    if not v:
-        return None
-    return ast.literal_eval(v)
-
 
 # Utility functions
 # -----------------
@@ -288,46 +284,20 @@ def get_settings(config_file, allow_default=True):
     normalize_aliases(cfg)
     return cfg
 
-
-
-def load_module(module):
-    """Extend imp to handle dotted module paths.
+def find_builder(module_name, class_name):
+    """Find a builder class.
+    Return class obj, or None if not found.
     """
-    _log.debug("Loading module: {}".format(module))
-    parts = module.split('.')
-    path, m = None, None
-    # navigate packages
-    for p in parts[:-1]:
-        loc = imp.find_module(p, path)
-        m = imp.load_module(p, *loc)
-        path = m.__path__
-    # load module
-    p = parts[-1]
-    loc = imp.find_module(p, path)
     try:
-        mod = imp.load_module(p, *loc)
-    except (ValueError, ImportError) as err:
-        _log.warn("Skipping module {} on error: {}".format(module, err))
-        mod = None
-    return mod
-
-
-def get_builder(module):
-    """Get the (first) Builder subclass found in the module.
-    """
-    result = None
-    moduleobj = load_module(module)
-    for name in dir(moduleobj):
-        obj = getattr(moduleobj, name)
-        #_log.debug("examine {}.{}".format(module, name))
-        try:
-            if issubclass(obj, core.Builder) and not obj == core.Builder:
-                _log.debug("{}.{} is a Builder".format(module, name))
-                result = obj
-                break
-        except TypeError:
-            pass
-    return result
+        md = importlib.import_module(module_name)
+    except ImportError:
+        _log.info("Failed to import module '{}'".format(module_name))
+        return None
+    if not class_name in dir(md):
+        _log.info("Failed to find class '{}' in module '{}'"
+                  .format(class_name, module_name))
+        return None
+    return getattr(md, class_name)
 
 
 def normalize_userpass(cfg):
@@ -411,33 +381,27 @@ def main():
                       default="matgendb.builders",
                       help="Find builder modules under MODULE (default=matgendb.builders)")
 
-    # Build action.
-    subp = subparsers.add_parser("build", help="run a builder",
-                                 parents=[parent_parser])
-    subp.set_defaults(func=command_build)
-    subp.add_argument("-b", "--builder", dest="builder", type=str, metavar="NAME", default="",
-                      help="Run builder NAME, which is relative to the module path in -m/--module")
-    subp.add_argument("-i", "--incr", dest="incr", action="store_true", default=False,
-                      help="Incremental mode, only build from new values in source. See also: --incr-op and --incr-field.")
-    incr_ops_nocopy = csv_list(set(Operation.__members__.keys()) - set([Operation.copy.name]))
-    subp.add_argument("--incr-op", dest="incr_op", type=str, default=Operation.copy.name,
-                      help="Operation name for incremental mode: *%(default)s, {}".format(incr_ops_nocopy))
-    subp.add_argument("--incr-field", dest="incr_field", type=str, default="_id",
-                      help="Field to sort on for incremental mode (%(default)s)")
-    subp.add_argument("-C", "--config-path", dest="config_path", type=str, metavar='DIR', default=".",
-                      help="Configure database connection from .json files in DIR (default=%(default)s)")
-    subp.add_argument("-k", "--kvp", dest="keywords", action="append", default=[], type=kvp_option,
-                      help="Key/value pairs, in format <key>=<value>, passed to builder function. "
-                           "For QueryEngine arguments, the value should be the name of a DB configuration file, "
-                           "relative to the path given by -C/--config-path, without the '.json' suffix; if not given, "
-                           "a configuration file '<key>.json' will be assumed.")
-    subp.add_argument("-m", "--module", dest="mod_path", type=str, metavar="MODULE",
-                      default="matgendb.builders",
-                      help="Find builder modules under MODULE (default=matgendb.builders)")
-    subp.add_argument("-n", "--ncores", dest="num_cores", type=int, default=16,
-                      help="Number of cores or processes to run in parallel (%(default)d)")
-    subp.add_argument("-p", "--prefix", dest="coll_prefix", type=str, metavar='PREFIX', default=None,
-                      help="Collection name prefix for input (and possibly output) collections")
+    # Build actions: called either 'run' or 'build'.
+    for action in "build", "run":
+        subp = subparsers.add_parser(action, help="run a builder",
+                                     parents=[parent_parser])
+        subp.set_defaults(func=command_build)
+        subp.add_argument("builder", type=str, metavar="builder", default="",
+                          help="Builder class, relative or absolute import path, e.g. "
+                               "'my.awesome.BigBuilder' or 'BigBuilder'.")
+        subp.add_argument("params", nargs="*", metavar="parameter",
+                          type=kvp_option,
+                          help="Builder parameters, in format <name>=<value>. "
+                               "If the parameter type is QueryEngine, the value should be a JSON configuration file.")
+        subp.add_argument("-i", "--incr", dest="incr", action="store_true", default=False,
+                          help="Incremental mode, only build from new values in source. See also: --incr-op and --incr-field.")
+        incr_ops_nocopy = csv_list(set(Operation.__members__.keys()) - set([Operation.copy.name]))
+        subp.add_argument("--incr-op", dest="incr_op", type=str, default=Operation.copy.name,
+                          help="Operation name for incremental mode: *%(default)s, {}".format(incr_ops_nocopy))
+        subp.add_argument("--incr-field", dest="incr_field", type=str, default="_id",
+                          help="Field to sort on for incremental mode (%(default)s)")
+        subp.add_argument("-n", "--ncores", dest="num_cores", type=int, default=1,
+                          help="Number of cores or processes to run in parallel (%(default)d)")
     # Parse arguments.
     args = p.parse_args()
 

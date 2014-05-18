@@ -89,23 +89,7 @@ def process_args(args, params):
             raise ValueError("Missing ':type {}: <type>' in docstring"
                              .format(name))
         value_type = info['type']
-        is_query_engine = is_mqe(value_type)
-        try:
-            value = args_kw[name]
-        except KeyError:
-            if is_query_engine:
-                value = name  # for collection foo, default to 'foo.json' config
-            else:
-                if '(optional)' in info['desc']:
-                    _log.info(
-                        "Use default value for parameter '{}'".format(name))
-                    continue
-                else:
-                    raise ValueError("Missing value for '{}'".format(name))
-        # take special action for some types
-        if is_query_engine:
-            qes.append(configure_query_engine(args, args_kw, name, value))
-        elif value_type in ('dict', 'list', 'int', 'float'):
+        if value_type in ('dict', 'list', 'int', 'float'):
             parsed_type = eval(value_type)
             try:
                 value = _parse_literal(value, value_type)
@@ -296,23 +280,22 @@ class Builder(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, ncores=0, threads=False, sequential=False):
+    def __init__(self, ncores=1, threads=False):
         """Create new builder for threaded or multiprocess execution.
 
         :param ncores: Desired number of threads or processes to run
         :type ncores: int
         :param threads: Use threads (True) or processes (False)
         :type threads: bool
-        :param sequential: No threads or processes, run sequentially
-        :type sequential: bool
         :raise: ValueError for bad 'config' arg
         """
+        sequential = (ncores == 1)
         if sequential:
             self._seq = True
             self._queue = Queue.Queue()
         else:
             self._seq = False
-            self._ncores = ncores if ncores else 15
+            self._ncores = ncores if ncores > 0 else 15
             self._threaded = threads
             if threads:
                 self._queue = Queue.Queue()
