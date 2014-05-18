@@ -310,7 +310,6 @@ class Builder(object):
     # Override these in subclasses
     # ----------------------------
 
-    @abstractmethod
     def get_parameters(self):
         """Return key/value pairs that will be passed to get_items().
 

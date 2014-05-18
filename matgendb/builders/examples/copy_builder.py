@@ -31,7 +31,7 @@ class Builder(bld_core.Builder):
         :type source: QueryEngine
         :param target: Output collection
         :type target: QueryEngine
-        :param crit: Filter criteria, e.g. "{ 'flag': True }. (optional)"
+        :param crit: Filter criteria, e.g. "{ 'flag': True }".
         :type crit: dict
         """
         self._target_coll = target.collection

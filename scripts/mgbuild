@@ -45,6 +45,9 @@ DEFAULT_CONFIG_FILE = "db.json"
 # Suffix for merged tasks collection
 MERGED_SUFFIX = "merged"
 
+# Cmdline flag for parameters
+NOINCR_FLAG = '-'
+
 # Exceptions
 # ----------
 
@@ -206,8 +209,7 @@ def command_build(args):
         if _type.endswith("QueryEngine"):
             # Replace path to query engine config with a QE instance
             try:
-                qe = create_qe(value,
-                               args.incr, args.incr_op, args.incr_field)
+                qe = create_qe(value, args.incr)
                 parsed_builder_args[key] = qe
                 query_engines.append(qe)
             except ValueError, err:
@@ -234,13 +236,19 @@ def command_build(args):
 # Utility functions
 # -----------------
 
-def create_qe(path, incr=False, iop=None, ifield=None):
+def create_qe(path, incr=None):
     """Configure a new QueryEngine from a config file at `path`.
     """
+    if incr is not None and path.startswith(NOINCR_FLAG):
+        incr = None
+        path = path[1:]
+
     db_settings = get_settings(path)
 
     # Pick QueryEngine subclass
-    if incr:
+    if incr is not None:
+        _log.info("Incremental build: {}".format(path))
+        iop, ifield = incr['op'], incr['field']  # set by incr_option()
         qe_class = TrackedQueryEngine
         # Update settings to include the type of operation, and field, used
         # to track the position in the source collection.
@@ -251,6 +259,7 @@ def create_qe(path, incr=False, iop=None, ifield=None):
                              .format(iop))
         db_settings.update(dict(track_operation=t_op, track_field=ifield))
     else:
+        _log.info("Non-incremental build: {}".format(path))
         qe_class = UnTrackedQueryEngine
 
     # Instantiate QueryEngine
@@ -339,6 +348,17 @@ def kvp_option(arg):
         raise ConfigurationError("Bad key=value pair: {}".format(arg))
     return key, value
 
+def incr_option(arg, default_field='_id'):
+    """Parse incremental option of OPERATION[:FIELD]
+    into a little dictionary with keys 'op' and 'field'.
+    """
+    d = {}
+    if ':' in arg:
+        d['op'], d['field'] = arg.split(':', 1)
+    else:
+        d['op'], d['field'] = arg, default_field
+    return d
+
 # Main program
 # ------------
 
@@ -387,21 +407,26 @@ def main():
                                      parents=[parent_parser])
         subp.set_defaults(func=command_build)
         subp.add_argument("builder", type=str, metavar="builder", default="",
-                          help="Builder class, relative or absolute import path, e.g. "
+                          help="Builder class, relative or absolute import "
+                               "path, e.g. "
                                "'my.awesome.BigBuilder' or 'BigBuilder'.")
         subp.add_argument("params", nargs="*", metavar="parameter",
                           type=kvp_option,
                           help="Builder parameters, in format <name>=<value>. "
-                               "If the parameter type is QueryEngine, the value should be a JSON configuration file.")
-        subp.add_argument("-i", "--incr", dest="incr", action="store_true", default=False,
-                          help="Incremental mode, only build from new values in source. See also: --incr-op and --incr-field.")
-        incr_ops_nocopy = csv_list(set(Operation.__members__.keys()) - set([Operation.copy.name]))
-        subp.add_argument("--incr-op", dest="incr_op", type=str, default=Operation.copy.name,
-                          help="Operation name for incremental mode: *%(default)s, {}".format(incr_ops_nocopy))
-        subp.add_argument("--incr-field", dest="incr_field", type=str, default="_id",
-                          help="Field to sort on for incremental mode (%(default)s)")
+                               "If the parameter type is QueryEngine, the value"
+                               " should be a JSON configuration file. "
+                               "Prefix filename with a '{}' to ignore "
+                               "incremental mode for this QueryEngine."
+                               .format(NOINCR_FLAG))
+        iops = csv_list(Operation.__members__.keys())
+        subp.add_argument("-i", "--incr", dest="incr", type=incr_option,
+                          metavar="OPER[:FIELD]",
+                          help="Incremental mode for operation and optional "
+                               "sort-field name. OPER may be one of: "
+                               "{}. Default FIELD is '_id'".format(iops))
         subp.add_argument("-n", "--ncores", dest="num_cores", type=int, default=1,
-                          help="Number of cores or processes to run in parallel (%(default)d)")
+                          help="Number of cores or processes to run "
+                               "in parallel (%(default)d)")
     # Parse arguments.
     args = p.parse_args()
 
@@ -409,7 +434,8 @@ def main():
     _log = logging.getLogger("mg")  # parent
     _log.propagate = False
     hndlr = logging.StreamHandler()
-    hndlr.setFormatter(logging.Formatter("[%(levelname)-6s] %(asctime)s %(name)s :: %(message)s"))
+    hndlr.setFormatter(logging.Formatter(
+        "[%(levelname)-6s] %(asctime)s %(name)s :: %(message)s"))
     _log.addHandler(hndlr)
     if args.quiet:
         lvl = logging.CRITICAL
