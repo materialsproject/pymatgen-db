@@ -12,8 +12,6 @@ __date__ = '5/29/13'
 # system
 from abc import ABCMeta, abstractmethod
 import copy
-import logging
-import os
 import Queue
 import threading
 import multiprocessing

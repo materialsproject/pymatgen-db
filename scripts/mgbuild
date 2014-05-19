@@ -18,8 +18,8 @@ __date__ = '5/22/13'
 
 # System imports.
 import argparse
-import ast
 import importlib
+import itertools as itt
 import json
 import logging
 import os
@@ -127,32 +127,6 @@ def command_merge(args):
     return 0
 
 
-def command_list(args):
-    """Command: List all the builders in a given module dir.
-
-    :param args: Command-line arguments
-    :type args: list
-    :return: Number of builders shown
-    """
-    # Load parent module.
-    module = load_module(args.mod_path)
-    if module is None:
-        print("Error loading module {}. Abort.".format(args.mod_path))
-        return 0
-    # Get all Python modules in directory.
-    path = os.path.dirname(module.__file__)
-    pyfiles = [f for f in os.listdir(path) if f.endswith('.py') and not f.startswith('__')]
-    # Convert back to full module paths.
-    pymods = ["{}.{}".format(args.mod_path, os.path.splitext(f)[0]) for f in pyfiles]
-    # Find and show builders in the module paths.
-    builders = filter(None, [find_builder(m) for m in pymods])
-    n = len(builders)
-    if n > 0:
-        print("Found {:d} builder{}:".format(n, 's' if n > 1 else ''))
-        map(_show_builder, builders)
-    else:
-        print("No builders found in module {}".format(args.mod_path))
-    return n
 
 
 def _show_builder(b, params=None, strm=sys.stderr):
@@ -197,6 +171,9 @@ def command_build(args):
         params = core.parse_fn_docstring(builder_class.get_items)
 
     # Check args against the builder parameters
+    if args.usage:
+        _show_builder(builder_class, params=params)
+        return 0
     if set([x[0] for x in args.params]) != set(params.keys()):
         _show_builder(builder_class, params=params)
         raise ConfigurationError(args.builder, "wrong number of parameters")
@@ -393,13 +370,6 @@ def main():
     subp.add_argument("-W", "--wipe", dest="wipe_target", action="store_true",
                       help="Wipe target collection, removing all data in it, before merge")
 
-    # List builders action.
-    subp = subparsers.add_parser("list", help="list builders",
-                                 parents=[parent_parser])
-    subp.set_defaults(func=command_list)
-    subp.add_argument("-m", "--module", dest="mod_path", type=str, metavar="MODULE",
-                      default="matgendb.builders",
-                      help="Find builder modules under MODULE (default=matgendb.builders)")
 
     # Build actions: called either 'run' or 'build'.
     for action in "build", "run":
@@ -427,6 +397,9 @@ def main():
         subp.add_argument("-n", "--ncores", dest="num_cores", type=int, default=1,
                           help="Number of cores or processes to run "
                                "in parallel (%(default)d)")
+        subp.add_argument("-u", "--usage", action="store_true", dest="usage",
+                           help="Print usage information on selected builder "
+                                "and exit.")
     # Parse arguments.
     args = p.parse_args()
 
