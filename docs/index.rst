@@ -12,18 +12,27 @@ Pymatgen-db also provides a clean and intuitive web ui (the
 originates for the purpose of exploring collections generated using
 pymatgen-db, it can be used to explore any Mongo database and collection.
 
-In addition, a command-line tool :doc:`mgbuild <mgbuild>` and the
-associated API (see :class:`matgendb.builders.Builder` in the :doc:`pymatgen-db API docs </modules>`), provides a flexible
-framework for building MongoDB collections from other
-MongoDB collections or external sources.
 
-Finally, Pymatgen-db provides the command-line tool, :doc:`mgvv
-<mgvv>` for validation & verification operations on MongoDB databases.
-Although these tools are designed with the Materials Project databases
-in mind, they could be used with almost any MongoDB database.
+On this page
+-------------
 
 .. contents::
     :depth: 1
+
+Other pages
+------------
+
+:doc:`mgbuild <mgbuild>`: a command-line tool  and the
+associated API (see :doc:`builders` and :class:`matgendb.builders.Builder`), provides a flexible
+framework for building MongoDB collections from other
+MongoDB collections or external sources.
+
+:doc:`mgvv <mgvv>` a command-line tool for validation & verification operations on MongoDB databases.
+Although these tools are designed with the Materials Project databases
+in mind, they could be used with almost any MongoDB database.
+
+:ref:`API reference <apiref>`: Documentation for all modules in the `matgendb`
+package.
 
 Change Log
 ==========

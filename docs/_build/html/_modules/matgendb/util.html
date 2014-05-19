@@ -56,67 +56,53 @@
             
   <h1>Source code for matgendb.util</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Utility functions used across scripts</span>
+<span class="sd">Utility functions used across scripts.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, The Materials Project&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong, Dan Gunter&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012-2014, The Materials Project&quot;</span>
 <span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;1.1&quot;</span>
-<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong&quot;</span>
-<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;shyue@mit.edu&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s">&quot;Dec 1, 2012&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Dan Gunter&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;dkgunter@lbl.gov&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s">&quot;2012-12-01&quot;</span>
+
+<span class="c">## Imports</span>
 
 <span class="kn">import</span> <span class="nn">bson</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pymongo.mongo_client</span> <span class="kn">import</span> <span class="n">MongoClient</span>
 
+<span class="kn">from</span> <span class="nn">matgendb.dbconfig</span> <span class="kn">import</span> <span class="n">DBConfig</span>
+
+<span class="c"># Backwards compatibility from refactor to `dbconfig` module</span>
+<span class="c"># Copy of functions that were moved</span>
+<span class="kn">from</span> <span class="nn">matgendb.dbconfig</span> <span class="kn">import</span> <span class="n">normalize_auth</span>
+<span class="c"># Copy of global constants that were moved</span>
+<span class="n">DEFAULT_PORT</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="o">.</span><span class="n">DEFAULT_PORT</span>
+<span class="n">DEFAULT_CONFIG_FILE</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="o">.</span><span class="n">DEFAULT_FILE</span>
+<span class="n">DEFAULT_SETTINGS</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="o">.</span><span class="n">DEFAULT_SETTINGS</span>
+
+<span class="c">## Logging</span>
 
 <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mg.util&quot;</span><span class="p">)</span>
 
-<span class="n">DEFAULT_PORT</span> <span class="o">=</span> <span class="mi">27017</span>
-<span class="n">DEFAULT_CONFIG_FILE</span> <span class="o">=</span> <span class="s">&quot;db.json&quot;</span>
+<span class="c">## Classes</span>
 
-<span class="n">DEFAULT_SETTINGS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s">&quot;host&quot;</span><span class="p">,</span> <span class="s">&quot;localhost&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s">&quot;port&quot;</span><span class="p">,</span> <span class="n">DEFAULT_PORT</span><span class="p">),</span>
-    <span class="p">(</span><span class="s">&quot;database&quot;</span><span class="p">,</span> <span class="s">&quot;vasp&quot;</span><span class="p">),</span>
-    <span class="c"># (&quot;admin_user&quot;, None),</span>
-    <span class="c"># (&quot;admin_password&quot;, None),</span>
-    <span class="c"># (&quot;readonly_user&quot;, None),</span>
-    <span class="c"># (&quot;readonly_password&quot;, None),</span>
-    <span class="c"># (&quot;collection&quot;, &quot;tasks&quot;),</span>
-    <span class="c"># (&quot;aliases_config&quot;, None),</span>
-    <span class="c"># (&quot;mapi_key&quot;, None)</span>
-<span class="p">]</span>
+<div class="viewcode-block" id="MongoJSONEncoder"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.MongoJSONEncoder">[docs]</a><span class="k">class</span> <span class="nc">MongoJSONEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+<div class="viewcode-block" id="MongoJSONEncoder.default"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.MongoJSONEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">bson</span><span class="o">.</span><span class="n">objectid</span><span class="o">.</span><span class="n">ObjectId</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
 
 
+<span class="c">## Functions</span>
+</div></div>
 <div class="viewcode-block" id="get_settings"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.get_settings">[docs]</a><span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
-    <span class="c"># Get input file.</span>
-    <span class="n">infile</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="k">if</span> <span class="n">config_file</span><span class="p">:</span>
-        <span class="n">infile</span> <span class="o">=</span> <span class="n">config_file</span>
-    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DEFAULT_CONFIG_FILE</span><span class="p">):</span>
-        <span class="n">infile</span> <span class="o">=</span> <span class="n">DEFAULT_CONFIG_FILE</span>
-
-    <span class="c"># Read settings from input file.</span>
-    <span class="k">if</span> <span class="n">infile</span><span class="p">:</span>
-        <span class="n">config_settings</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">))</span>
-        <span class="c"># Allow some aliases</span>
-        <span class="k">for</span> <span class="n">alias</span><span class="p">,</span> <span class="n">real</span> <span class="ow">in</span> <span class="p">((</span><span class="s">&quot;user&quot;</span><span class="p">,</span> <span class="s">&quot;readonly_user&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;password&quot;</span><span class="p">,</span> <span class="s">&quot;readonly_password&quot;</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">config_settings</span><span class="p">:</span>
-                <span class="n">config_settings</span><span class="p">[</span><span class="n">real</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_settings</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span>
-                <span class="k">del</span> <span class="n">config_settings</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">config_settings</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="c"># Merge input file settings and defaults.</span>
-    <span class="n">settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">DEFAULT_SETTINGS</span><span class="p">)</span>
-    <span class="n">settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">config_settings</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">settings</span>
-
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cfg</span><span class="o">.</span><span class="n">settings</span>
 </div>
 <div class="viewcode-block" id="get_database"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.get_database">[docs]</a><span class="k">def</span> <span class="nf">get_database</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span> <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">settings</span>
@@ -139,60 +125,6 @@
     <span class="k">return</span> <span class="n">db</span><span class="p">[</span><span class="n">settings</span><span class="p">[</span><span class="s">&quot;collection&quot;</span><span class="p">]]</span>
 
 </div>
-<div class="viewcode-block" id="normalize_auth"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.normalize_auth">[docs]</a><span class="k">def</span> <span class="nf">normalize_auth</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">readonly</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">readonly_first</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Transform the readonly/admin user and password to simple user/password,</span>
-<span class="sd">    as expected by QueryEngine. If return value is true, then</span>
-<span class="sd">    admin or readonly password will be in keys &quot;user&quot; and &quot;password&quot;.</span>
-
-<span class="sd">    :param settings: Connection settings</span>
-<span class="sd">    :type settings: dict</span>
-<span class="sd">    :param admin: Check for admin password</span>
-<span class="sd">    :param readonly: Check for readonly password</span>
-<span class="sd">    :param readonly_first: Check for readonly password before admin</span>
-<span class="sd">    :return: Whether user/password were found</span>
-<span class="sd">    :rtype: bool</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">U</span><span class="p">,</span> <span class="n">P</span> <span class="o">=</span> <span class="s">&quot;user&quot;</span><span class="p">,</span> <span class="s">&quot;password&quot;</span>
-    <span class="c"># If user/password, un-prefixed, exists, do nothing.</span>
-    <span class="k">if</span> <span class="n">U</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="n">P</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">True</span>
-
-    <span class="c"># Set prefixes</span>
-    <span class="n">prefixes</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">readonly_first</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">readonly</span><span class="p">:</span>
-            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;readonly_&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
-            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;admin_&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
-            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;admin_&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">readonly</span><span class="p">:</span>
-            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;readonly_&quot;</span><span class="p">)</span>
-
-    <span class="c"># Look for first user/password matching.</span>
-    <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="k">for</span> <span class="n">pfx</span> <span class="ow">in</span> <span class="n">prefixes</span><span class="p">:</span>
-        <span class="n">ukey</span><span class="p">,</span> <span class="n">pkey</span> <span class="o">=</span> <span class="n">pfx</span> <span class="o">+</span> <span class="n">U</span><span class="p">,</span> <span class="n">pfx</span> <span class="o">+</span> <span class="n">P</span>
-        <span class="k">if</span> <span class="n">ukey</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="n">pkey</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
-            <span class="n">settings</span><span class="p">[</span><span class="n">U</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="n">ukey</span><span class="p">]</span>
-            <span class="n">settings</span><span class="p">[</span><span class="n">P</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span>
-            <span class="n">found</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="k">break</span>
-
-    <span class="k">return</span> <span class="n">found</span>
-
-
-</div>
-<div class="viewcode-block" id="MongoJSONEncoder"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.MongoJSONEncoder">[docs]</a><span class="k">class</span> <span class="nc">MongoJSONEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
-<div class="viewcode-block" id="MongoJSONEncoder.default"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.MongoJSONEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">bson</span><span class="o">.</span><span class="n">objectid</span><span class="o">.</span><span class="n">ObjectId</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
-
-</div></div>
 <div class="viewcode-block" id="collection_keys"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.collection_keys">[docs]</a><span class="k">def</span> <span class="nf">collection_keys</span><span class="p">(</span><span class="n">coll</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get a list of all (including nested) keys in a collection.</span>
 <span class="sd">    Examines the first document in the collection.</span>
@@ -207,7 +139,28 @@
                 <span class="k">for</span> <span class="n">nested</span> <span class="ow">in</span> <span class="n">_keys</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">pre</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="n">sep</span><span class="p">):</span>
                     <span class="k">yield</span> <span class="n">nested</span>
 
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_keys</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">find_one</span><span class="p">()))</span></div>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_keys</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">find_one</span><span class="p">()))</span>
+</div>
+<div class="viewcode-block" id="csv_list"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.csv_list">[docs]</a><span class="k">def</span> <span class="nf">csv_list</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format list to a string with comma-separated values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="csv_dict"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.csv_dict">[docs]</a><span class="k">def</span> <span class="nf">csv_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format dict to a string with comma-separated values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&quot;{}&quot;</span>
+    <span class="k">return</span> <span class="s">&quot;{&quot;</span> <span class="o">+</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;&#39;{}&#39;: &#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()])</span> <span class="o">+</span> <span class="s">&quot;}&quot;</span>
+</div>
+<div class="viewcode-block" id="kvp_dict"><a class="viewcode-back" href="../../matgendb.html#matgendb.util.kvp_dict">[docs]</a><span class="k">def</span> <span class="nf">kvp_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format dict to key=value pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="s">&quot;{}=&#39;{}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()])</span></div>
 </pre></div>
 
           </div>
