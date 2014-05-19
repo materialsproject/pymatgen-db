@@ -22,11 +22,11 @@ Writing a builder
 To write a builder, you must create a Python class that inherits from
 `matgendb.builders.core.Builder` and implement a few methods on this class
 to perform the specific work for your builder. In this section we will
-give two example builders: a simple `FileCounter <bld-ex-filecounter>`_ builder
+give two example builders: a simple :ref:`FileCounter <bld-ex-filecounter>` builder
 that just counts the lines in a file,
-and a `CopyBuilder <bld-ex-copy>`_ that copies a MongoDB collection.
+and a :ref:`CopyBuilder <bld-ex-copy>` that copies a MongoDB collection.
 
-.. _bld-ex-filecounter::
+.. _bld-ex-filecounter:
 
 Simple "FileCounter" builder
 ----------------------------
@@ -59,7 +59,7 @@ at a time::
                 self.num_lines, self.num_chars))
             return True
 
-In the first section, we have the class declaration and initialization::
+**Initialization**::
 
     from matgendb.builders.core import Builder
     class FileCounter(Builder):
@@ -69,42 +69,45 @@ In the first section, we have the class declaration and initialization::
             self.num_lines = 0
             Builder.__init__(self, **kwargs)
 
-The class inherits from the matgendb `Builder` class. In this case, it includes
+The class inherits from the ``matgendb.core.Builder`` class. In this case, it includes
 a constructor, but this is optional and often not needed. The constructor
 simply initializes the number of lines counter and then calls its parent.
 
-Next, we have a the method `get_parameters()`::
+**get_parameters**::
 
          def get_parameters(self):
             return {'input_file': {'type': 'str', 'desc': 'Input file path'}}
 
-This method is used to provide metadata about how to run
-this builder to the `mgbuild` program. More details on this are given in
-:ref:`bld-running`. For now, it is enough to note that the
-parameters must match the keyword arguments to `get_items`, both in
-name and type.
+This method returns a dictionary of metadata about the
+parameters for ``get_items()``.
+This metadata is used when running a builder with the `mgbuild` program.
+More details on this are given in :ref:`bld-running`.
+For now, it is enough to note that the
+parameters must match the keyword arguments to ``get_items()``, both in
+name and (expected) type.
 
-The two main methods that you _must_ override are called `get_items` and
-`process_item`. The first will return an iterator, and each item returned
-by that iterator is fed to the second. Here, we see the `get_items` for our
-line counter::
+**get_items**::
 
         def get_items(self, input_file=None):
             with open(input_file, "r") as f:
                 for line in f:
                     yield line
 
-The function simply returns one line of the file at a time.
-Notice that you can make the function into a generator by using `yield` to
+
+The two main methods that you **must** override are called ``get_items()`` and
+``process_item()``. The first will return an iterator, in this case
+the function simply returns one line of the file at a time.
+Notice that you can make the function into a generator by using ``yield`` to
 return items, but returning any other iterable would also work fine (e.g. the
 function could have been a one-liner "return open(input_file).readlines()").
 
-Each item returned is then processed::
+**process_item**::
 
         def process_item(self, item):
             self.num_lines += 1
 
-Here the instance variable `num_lines` is simply incremented.
+Here the instance variable ``num_lines`` is simply incremented for every
+line passed to it by the ``get_items()`` iterator.
 
 .. warning::
 
@@ -117,21 +120,21 @@ Here the instance variable `num_lines` is simply incremented.
     <https://docs.python.org/2/library/multiprocessing.html>`_
     for details.
 
-Optionally, you can put code that will be run once (for all builders) in
-the `finalize` method. Here we just print a result::
+**finalize**::
 
         def finalize(self, errors):
             print("{:d} lines, {:d} characters".format(
                 self.num_lines, self.num_chars))
             return True
 
+Optionally, you can put code that will be run once (for all builders) in
+the ``finalize()`` method. Here we just print a result.
 The return value of finalize is used to determine whether the build was
-successful. So make sure you return `True`, if it succeeds, since the default
-of None will read as False.
+successful. So make sure you return ``True``, if it succeeds, since the default
+of None will read as ``False``.
 
-Note that this builder did not access MongoDB in any way. This is not a
-requirement of builders, though it is certainly the main reason for using this
-framework. The next example will show MongoDB access and other features.
+Note that this builder did not access MongoDB in any way.
+The next example will show MongoDB access and other features.
 
 .. _bld-ex-copy:
 
@@ -173,23 +176,24 @@ and then step through it one snippet at at time::
         def process_item(self, item):
             self._target_coll.insert(item)
 
-In this program, we start by setting up logging::
+**Logging**::
 
     _log = util.get_builder_log("copy")
 
-For convenience, the `util` module has a method `get_builder_log()`
-that creates a new Python logging.Logger instance with a standard name and
-format.
+In this program, we start by setting up logging.
+For convenience, the ``util.get_builder_log()`` method creates a new
+Python logging.Logger instance with a standard name and format.
 
-When we initialize the class, we create an instance variable that we will
-later use to remember the target collection::
+**Initialization**::
 
     def __init__(self, *args, **kwargs):
         self._target_coll = None
         core.Builder.__init__(self, *args, **kwargs)
 
-For a copy operation, the `get_items` method must query the source
-collection and get an iterator over the records::
+When we initialize the class, we create an instance variable that we will
+later use to remember the target collection.
+
+**get_items**::
 
         def get_items(self, source=None, target=None, crit=None):
             """Copy records from source to target collection.
@@ -209,9 +213,12 @@ collection and get an iterator over the records::
                       .format(source.collection, crit, len(cur)))
             return cur
 
+For a copy operation, the ``get_items()`` method must query the source
+collection and get an iterator over the records.
+
 There are two things that are different from the FileCounter example.
-First, note that there is no `get_parameters` method at all. Instead
-the _docstring_ of this method is actually a machine-readable version of
+First, note that there is no ``get_parameters()`` method at all. Instead
+the *docstring* of this method is actually a machine-readable version of
 the metadata needed for running the builder. Not coincidentally, the format
 expected by this docstring is also understood by Sphinx's autodoc feature.
 This way, you will be able to kill two birds with one stone: your builders
@@ -219,12 +226,12 @@ will be documented for command-line invocation, and you can easily generate
 HTML, PDF, etc. documentation pages.
 
 Second, this method connects to the database and queries it. But, you may
-be asking, where is the `db.connect()` call? This is handled by some magic
+be asking, where is the ``db.connect()`` call? This is handled by some magic
 that is in the docstring. Notice that the type of both the source and
-target is `QueryEngine`. This is a special datatype that instructs the
+target is ``QueryEngine``. This is a special datatype that instructs the
 driver program (`mgbuild`) to expect a database configuration file with
 host name, user, password, database name, etc. and to automatically connect
-to this database and return a `matgendb.query_engine.QueryEngine` instance.
+to this database and return a ``matgendb.query_engine.QueryEngine`` instance.
 These instances are passed in as arguments to the method. So, all the
 method has to do is to use the QueryEngine object. In this case,
 this means creating a cursor that iterates over the source collection
@@ -233,19 +240,20 @@ and remembering the target collection in an instance variable.
 .. note::
 
     Unlike the previous example where instance variables might cause
-    strange behavior, here the `_target_coll` instance variable is
+    strange behavior, here the ``_target_coll`` instance variable is
     perfectly fine for parallel execution because the individual
     builder instances do not want to share the state of this variable
     between them -- they each want and need their own copy.
 
-All that is left for the copy operation is to insert every item into the
-target collection::
+**process_item**::
 
         def process_item(self, item):
             self._target_coll.insert(item)
 
+Here, we simply insert every item into the target collection.
+
 As we will see later, the builder framework also contains some automatic
-functionality for _incremental_ building, which means only looking at
+functionality for *incremental* building, which means only looking at
 records that are new since the last time. Usually this involves some extra
 logic inside the builder itself, but in a very simple case like this
 the copying would automatically work with the incremental mode.

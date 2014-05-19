@@ -287,7 +287,7 @@ p.admonition-title:after {
 }
  
 pre {
-    font: 12px/18px 'Droid Sans Mono', arial, serif;
+    font: 'Droid Sans Mono', arial, serif;
     padding: 10px;
     background-color: #fcfeee;
     border:1px solid #ddd;
@@ -299,7 +299,7 @@ pre {
     -moz-box-shadow: 0px 0px 4px #d8d8d8;
     box-shadow: 0px 0px 4px #d8d8d8;
 }
-.pre{
+.pre {
     font-family: 'Droid Sans Mono', arial, serif;
 
 }
