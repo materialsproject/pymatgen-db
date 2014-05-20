@@ -20,7 +20,9 @@ Writing a builder
 =================
 
 To write a builder, you must create a Python class that inherits from
-`matgendb.builders.core.Builder` and implement a few methods on this class
+`matgendb.builders.core.Builder`
+(see the :doc:`matgendb.builders <matgendb.builders>` package)
+and implement a few methods on this class
 to perform the specific work for your builder. In this section we will
 give two example builders: a simple :ref:`FileCounter <bld-ex-filecounter>` builder
 that just counts the lines in a file,
@@ -151,6 +153,8 @@ and then step through it one snippet at at time::
     _log = util.get_builder_log("copy")
 
     class CopyBuilder(core.Builder):
+        """Copy from one MongoDB collection to another.
+        """
         def __init__(self, *args, **kwargs):
             self._target_coll = None
             core.Builder.__init__(self, *args, **kwargs)
@@ -262,3 +266,174 @@ the copying would automatically work with the incremental mode.
 
 Running a builder
 =================
+
+This section describes how,
+once you have written a builder class, you can use `mgbuild` to run
+it, possibly in parallel and possibly "incrementally", on some inputs.
+
+We will break this process into two parts:
+
+* :ref:`Displaying <bld-run-show>` the usage for a given builder class
+* :ref:`Running <bld-run-exe>` the builder
+
+Both of these use the `mgbuild` sub-command "run" (alternatively: "build"),
+like this::
+
+    mgbuild run <arguments>
+
+In the examples below, we will assume that you have pymatgen-db installed and
+in your Python path. We will use the example modules that are installed
+in ``matgendb.builders.examples``.
+
+.. _bld-run-show:
+
+Displaying builder usage
+-------------------------
+
+You can get the list of parameters and their types for a given builder
+by giving its full module path, and the ``-u`` or ``--usage`` option::
+
+    % mgbuild run -u matgendb.builders.examples.copy_builder.CopyBuilder
+
+    matgendb.builders.examples.copy_builder.CopyBuilder
+      Copy from one MongoDB collection to another.
+      Parameters:
+        crit (dict): Filter criteria, e.g. "{ 'flag': True }".
+        source (QueryEngine): Input collection
+        target (QueryEngine): Output collection
+
+.. note::
+
+    You will also get the usage information if you invoke the builder with the
+    wrong number of arguments (e.g. zero), although in this case you will also
+    see some error messages.
+
+.. _bld-run-exe:
+
+Running the builder
+--------------------
+
+The usage of the `mgbuild run` command is as follows::
+
+    usage: mgbuild run [-h] [--quiet] [--verbose] [-i OPER[:FIELD]] [-n NUM_CORES]
+                       [-u]
+                       builder [parameter [parameter ...]]
+
+    positional arguments:
+      builder               Builder class, relative or absolute import path, e.g.
+                            'my.awesome.BigBuilder' or 'BigBuilder'.
+      parameter             Builder parameters, in format <name>=<value>. If the
+                            parameter type is QueryEngine, the value should be a
+                            JSON configuration file. Prefix filename with a '-' to
+                            ignore incremental mode for this QueryEngine.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --quiet, -q           Minimal verbosity.
+      --verbose, -v         Print more verbose messages to standard error.
+                            Repeatable. (default=ERROR)
+      -i OPER[:FIELD], --incr OPER[:FIELD]
+                            Incremental mode for operation and optional sort-field
+                            name. OPER may be one of: copy, other, build. Default
+                            FIELD is '_id'
+      -n NUM_CORES, --ncores NUM_CORES
+                            Number of cores or processes to run in parallel (1)
+      -u, --usage           Print usage information on selected builder and exit.
+
+
+To run the builder, you need at a minimum to give the full path to the
+builder class, and then values for each parameter. There are also optional
+arguments for building in parallel and building incrementally. This section will
+walk through from simple to more complex examples.
+
+Basic usage
+^^^^^^^^^^^
+
+Run the copy builder::
+
+     mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+         source=conf/test1.json target=conf/test2.json crit='{}'
+
+In this example, we are running the CopyBuilder with configuration files
+for the source and target and empty criteria (i.e. copy everything). The
+copy will be run in a single thread.
+
+The configuration files in question are just JSON files that look like this
+(you could add "user" and "password" for authenticated DBs)::
+
+    {"host": "localhost", "port": 27017,
+     "database": "foo", "collection": "test1"}
+
+Running in parallel
+^^^^^^^^^^^^^^^^^^^^
+
+Most machines have multiple cores, and hundreds of cores will be common
+in the near future. If your item processing requires any
+real work, you will probably benefit by running in parallel::
+
+     mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+         source=conf/test1.json target=conf/test2.json crit='{}' -n 8
+
+The same exact command, but with **-n 8** added to cause 8 parallel
+threads to be spawned to run the copy in parallel.
+
+.. note::
+
+    For parallel runs, only the ``process_item()`` method is run in parallel.
+    The ``get_items()`` is always run sequentially.
+
+Incremental builds
+^^^^^^^^^^^^^^^^^^
+
+The most complex feature of the builder is incremental building,
+which is controlled by the `-i`/`--incr` option.
+What this does is to add some behind-the-scenes bookkeeping for every
+parameter of type ``QueryEngine`` (except ones where it is explicitly
+turned off, see below) that records and retrieves the spot where processing
+was last ended. Multiple spots are allowed per-collection by requiring an
+"operation"; so you don't have to guess later,
+only a small set of operations are allowed.
+
+For incremental building to work properly, there must be some field
+in the collection that increases monotonically. This field is used to
+determine which records come *after* the spot marked on the last run. By
+default this field is `_id`, but it is highly recommended to choose a
+collection-specific identifier because `_id` as chosen by the
+client is not always monotonic.
+
+**Basic incremental build**::
+
+    mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+        source=conf/test1.json target=conf/test2.json crit='{}' \
+        -i copy
+
+Copies from source to target. Subsequent runs will only copy records that
+are newer (according to the field, in this case defaulting to ``_id``)
+than the last record from the previous run.
+
+**Incremental build with parallelism**::
+
+    mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+        source=conf/test1.json target=conf/test2.json crit='{}' \
+        -n 8 -i copy
+
+**Incremental build with custom identifier**::
+
+    mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+        source=conf/test1.json target=conf/test2.json crit='{}' \
+        -i copy:num
+
+This example runs an incremental build with the "copy" operation,
+using the ``num`` field instead of the default ``_id``.
+
+**Incremental build skipped for some collections**::
+
+    mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+        source=conf/test1.json target=-conf/test2.json crit='{}' \
+        -i copy:num
+
+This is pretty subtle: notice the "-" inserted at the start of the `target`
+configuration filename. This has the effect of not adding tracking information
+for that collection. In this case, tracking the last record added to the target
+isn't useful for the copy, all that matters is knowing where we stopped
+in the source collection.

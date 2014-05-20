@@ -20,6 +20,8 @@ _log = bld_util.get_builder_log("copy")
 
 
 class CopyBuilder(bld_core.Builder):
+    """Copy from one MongoDB collection to another.
+    """
     def __init__(self, *args, **kwargs):
         self._target_coll = None
         bld_core.Builder.__init__(self, *args, **kwargs)

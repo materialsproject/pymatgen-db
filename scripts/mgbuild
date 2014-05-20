@@ -58,7 +58,7 @@ class BuilderError(Exception):
 
 class ConfigurationError(BuilderError):
     def __init__(self, where, why):
-        Exception.__init__(self, "Failed to load configuration {}: {}".format(where, why))
+        Exception.__init__(self, "class {}: {}".format(where, why))
 
 
 class BuilderNotFoundError(Exception):
@@ -126,9 +126,6 @@ def command_merge(args):
 
     return 0
 
-
-
-
 def _show_builder(b, params=None, strm=sys.stderr):
     """Print a formatted version of builder info to the console.
     `b` is a builder class.
@@ -174,12 +171,22 @@ def command_build(args):
     if args.usage:
         _show_builder(builder_class, params=params)
         return 0
-    if set([x[0] for x in args.params]) != set(params.keys()):
+    user_params, meth_params = [x[0] for x in args.params], params.keys()
+    if set(user_params) != set(meth_params):
+        if len(user_params) != len(meth_params):
+            adj, ineq = (("few", "<"), ("many", ">"))[
+                len(user_params) > len(meth_params)]
+            msg = "too {} arguments (got {:d} {} wanted {:d})".format(
+                adj, len(user_params), ineq, len(meth_params))
+        else:
+            bad_params = [p for p in user_params if not p in meth_params]
+            msg = "unknown argument(s): {}".format(csv_list(bad_params))
         _show_builder(builder_class, params=params)
-        raise ConfigurationError(args.builder, "wrong number of parameters")
+        raise ConfigurationError(args.builder, msg)
 
     # Fill builder args using builder parameter types
-    simple_types = {k: eval(k) for k in ('dict', 'list', 'int', 'float')}
+    simple_types = {k: eval(k) for k in ('int', 'float')}
+    eval_types = {k: eval(k) for k in ('dict', 'list')}
     parsed_builder_args, query_engines = {}, []
     for key, value in args.params:
         _type = params[key]['type']
@@ -193,6 +200,8 @@ def command_build(args):
                 raise ConfigurationError("creating query engine", err)
         elif _type in simple_types:
             parsed_builder_args[key] = simple_types[_type](value)
+        elif _type in eval_types:
+            parsed_builder_args[key] = eval(value)
         else:
             parsed_builder_args[key] = value
 

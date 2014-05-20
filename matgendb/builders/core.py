@@ -15,6 +15,7 @@ import copy
 import Queue
 import threading
 import multiprocessing
+import time
 # local
 from matgendb.builders import schema, util
 from matgendb import util as dbutil
@@ -412,7 +413,7 @@ class Builder(object):
 
     # -----------------------------
 
-    def _build(self, items, chunk_size=1000):
+    def _build(self, items, chunk_size=10000):
         """Build the output, in chunks.
 
         :return: Number of items processed
