@@ -113,12 +113,13 @@ line passed to it by the ``get_items()`` iterator.
 
 .. warning::
 
-    Using instance variables directly like this
+    Updating instance variables
     will cause improper behavior if the user runs the builder in parallel.
     This occurs because the parallel mode automatically starts multiple
-    copies of the same class, and they do not share the same instance variables.
-    Instead, use the Python `multiprocessing` module functions to share
-    state between processes. See the `multiprocessing docs
+    copies of the same class, and their independent actions will clash.
+    If you really need to update some shared state,
+    use the Python `multiprocessing` module functions.
+    See the `multiprocessing docs
     <https://docs.python.org/2/library/multiprocessing.html>`_
     for details.
 
@@ -374,7 +375,7 @@ real work, you will probably benefit by running in parallel::
      mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
          source=conf/test1.json target=conf/test2.json crit='{}' -n 8
 
-The same exact command, but with **-n 8** added to cause 8 parallel
+The same command as previously, but with **-n 8** added to cause 8 parallel
 threads to be spawned to run the copy in parallel.
 
 .. note::
@@ -385,14 +386,21 @@ threads to be spawned to run the copy in parallel.
 Incremental builds
 ^^^^^^^^^^^^^^^^^^
 
-The most complex feature of the builder is incremental building,
-which is controlled by the `-i`/`--incr` option.
-What this does is to add some behind-the-scenes bookkeeping for every
+Incremental building allows successive builds of source MongoDB collection(s)
+to only operate on the records added since the last build. This can save
+huge amounts of time. A cartoon of the difference between an incremental and
+full (non-incremental) build is shown below.
+
+.. image:: _static/incremental_build.png
+
+Incremental building
+is controlled by the ``-i/--incr`` option.
+What this really does is to add some behind-the-scenes bookkeeping for every
 parameter of type ``QueryEngine`` (except ones where it is explicitly
-turned off, see below) that records and retrieves the spot where processing
+turned off, :ref:`see below <bld-incr-skip>`) that records and retrieves the spot where processing
 was last ended. Multiple spots are allowed per-collection by requiring an
-"operation"; so you don't have to guess later,
-only a small set of operations are allowed.
+"operation". Currently,
+only a small set of operations are allowed: "copy", "build", and "other".
 
 For incremental building to work properly, there must be some field
 in the collection that increases monotonically. This field is used to
@@ -417,6 +425,9 @@ than the last record from the previous run.
         source=conf/test1.json target=conf/test2.json crit='{}' \
         -n 8 -i copy
 
+Parallelism is not different with incremental builds. As before, we
+simply add **-n 8** to the command-line.
+
 **Incremental build with custom identifier**::
 
     mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
@@ -426,14 +437,17 @@ than the last record from the previous run.
 This example runs an incremental build with the "copy" operation,
 using the ``num`` field instead of the default ``_id``.
 
+.. _bld-incr-skip:
+
 **Incremental build skipped for some collections**::
 
     mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
         source=conf/test1.json target=-conf/test2.json crit='{}' \
         -i copy:num
 
-This is pretty subtle: notice the "-" inserted at the start of the `target`
-configuration filename. This has the effect of not adding tracking information
-for that collection. In this case, tracking the last record added to the target
+This is pretty subtle: notice the "-" inserted after the "=" in
+``target=-conf/test2.json``. This has the effect of not adding tracking information
+for the target collection.
+In this case, tracking the last record added to the target
 isn't useful for the copy, all that matters is knowing where we stopped
 in the source collection.
