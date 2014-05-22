@@ -144,6 +144,33 @@ class TestCollectionTrackerHL(TestCase):
         for rec in cur:
             self.assertGreaterEqual(rec['n'], 100)
 
+    def test_findall(self):
+        index, props = '_id', ['n']
+        qe = TrackedQueryEngine(track_operation=Operation.copy,
+                                track_field=index, connection=conn,
+                                collection=COLLECTION, database=DATABASE)
+        # Add new records
+        add_records(10)
+        # Check that we get all new records
+        cur = qe.query(properties=props)
+        self.assertEqual(len(cur), 10)
+        # Set mark, now these records are 'old'
+        qe.set_mark()
+        # Check that we get no records
+        cur = qe.query(properties=props)
+        self.assertEqual(len(cur), 0)
+        # ** Turn off tracking **
+        qe.tracking = False
+        # Check that we get *all* records
+        cur = qe.query(properties=props)
+        self.assertEqual(len(cur), 10)
+        # Turn tracking back on
+        qe.tracking = True
+        # Check that we get no records, once again
+        cur = qe.query(properties=props)
+        self.assertEqual(len(cur), 0)
+
+
 if __name__ == '__main__':
     unittest.main()
 

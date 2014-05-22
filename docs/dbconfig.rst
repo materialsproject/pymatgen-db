@@ -1,8 +1,10 @@
+.. _dbconfig:
+
 Database configuration
 =======================
 
-The database configuration file uses JSON syntax.
-It sets the server host and port, as well as authentication parameters
+All the *pymatgen-db* database configuration files use JSON syntax.
+They give the server host and port, as well as authentication parameters
 for the database. If no authentication is given, then it is assumed
 that the "noath" mode of MongoDB is to be used.
 

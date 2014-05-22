@@ -12,19 +12,18 @@ mgbuild
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/22/14'
 
-from matgendb.builders import core as bld_core
-from matgendb.builders import util as bld_util
+from matgendb.builders import core
+from matgendb.builders import util
 from matgendb.query_engine import QueryEngine
 
-_log = bld_util.get_builder_log("copy")
+_log = util.get_builder_log("copy")
 
-
-class CopyBuilder(bld_core.Builder):
+class CopyBuilder(core.Builder):
     """Copy from one MongoDB collection to another.
     """
     def __init__(self, *args, **kwargs):
         self._target_coll = None
-        bld_core.Builder.__init__(self, *args, **kwargs)
+        core.Builder.__init__(self, *args, **kwargs)
 
     def get_items(self, source=None, target=None, crit=None):
         """Copy records from source to target collection.
@@ -40,12 +39,11 @@ class CopyBuilder(bld_core.Builder):
         if not crit:  # reduce any False-y crit value to None
             crit = None
         cur = source.query(criteria=crit)
-        _log.info("setup: source.collection={} crit={} source_records={:d}"
+        _log.info("source.collection={} crit={} source_records={:d}"
                   .format(source.collection, crit, len(cur)))
         return cur
 
     def process_item(self, item):
         assert self._target_coll
-        _log.debug("process item: insert item")
         self._target_coll.insert(item)
 

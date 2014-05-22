@@ -12,10 +12,10 @@ __date__ = '5/29/13'
 # system
 from abc import ABCMeta, abstractmethod
 import copy
-import Queue
-import threading
+import logging
 import multiprocessing
-import time
+import Queue
+import traceback
 # local
 from matgendb.builders import schema, util
 from matgendb import util as dbutil
@@ -75,30 +75,6 @@ def parse_fn_docstring(fn):
             _1, _2, desc = line.split(":", 2)
             return_['type'] = desc.strip()
     return params #, return_
-
-
-def process_args(args, params):
-    """Process arguments to match with params.
-    """
-    qes = list()  # query engines
-    args_kw = dict(args)
-    kw = {}
-    for name, info in params.iteritems():
-        if not 'type' in info:
-            raise ValueError("Missing ':type {}: <type>' in docstring"
-                             .format(name))
-        value_type = info['type']
-        if value_type in ('dict', 'list', 'int', 'float'):
-            parsed_type = eval(value_type)
-            try:
-                value = _parse_literal(value, value_type)
-                if value is not None and not isinstance(value, parsed_type):
-                    raise ValueError()
-            except ValueError:
-                raise ConfigurationError("parsing key '{}'".format(name),
-                                         "value '{}' must be a dictionary like {{'foo':'bar'}}".format(
-                                             value))
-    return qes, kw
 
 ## Classes
 
@@ -249,43 +225,16 @@ class Builder(object):
     """Abstract base class for all builders
 
     To implement a new builder, inherit from this class and
-    define the :meth:`setup` and :meth:`process_item` methods.
-    It is important to add special "docstring" comments in the :meth:`setup`
-    method, so the command-line program "mgbuild" can allow users to set them.
-    See the documentation of the methods for more details.
-
-    Here is a trivial example::
-
-        class MyBuilder(Builder):
-            def setup(self, n):
-                '''My setup.
-
-                :param n: Number of items
-                :type n: int
-                '''
-                return list(range(n))
-
-            def process_item(self, item):
-                '''Process an item.
-                '''
-                print("processing item: {}".format(item))
-
-
-    Although you will most likely not need to run these builders programmatically,
-    if you do then this is an example of how to create and run::
-
-        b = MyBuilder(ncores=1)
-        b.run()
+    define the :meth:`get_items` and :meth:`process_item` methods.
+    See the online documentation for details.
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, ncores=1, threads=False):
+    def __init__(self, ncores=1):
         """Create new builder for threaded or multiprocess execution.
 
         :param ncores: Desired number of threads or processes to run
         :type ncores: int
-        :param threads: Use threads (True) or processes (False)
-        :type threads: bool
         :raise: ValueError for bad 'config' arg
         """
         sequential = (ncores == 1)
@@ -294,16 +243,11 @@ class Builder(object):
             self._queue = Queue.Queue()
         else:
             self._seq = False
+            self._mgr = multiprocessing.Manager()
             self._ncores = ncores if ncores > 0 else 15
-            self._threaded = threads
-            if threads:
-                self._queue = Queue.Queue()
-                self._states_lock = threading.Lock()
-                self._run_parallel_fn = self._run_parallel_threaded
-            else:
-                self._queue = multiprocessing.Queue()
-                self._run_parallel_fn = self._run_parallel_multiprocess
-        self._status = BuilderStatus(ncores, is_threaded=threads)
+            self._queue = multiprocessing.Queue()
+            self._run_parallel_fn = self._run_parallel_multiprocess
+        self._status = BuilderStatus(ncores, self)
 
     # ----------------------------
     # Override these in subclasses
@@ -379,6 +323,28 @@ class Builder(object):
         return True
 
     # -----------------------------
+    # Utility methods
+    # -----------------------------
+
+    def shared_dict(self):
+        """Get dict that can be shared between parallel processes.
+        """
+        if self._seq:
+            return dict()
+        else:
+            return self._mgr.dict()
+
+    def shared_list(self):
+        """Get list that can be shared between parallel processes.
+        """
+        if self._seq:
+            return list()
+        else:
+            return self._mgr.list()
+
+    # -----------------------------
+    # Public/internal
+    # -----------------------------
 
     def run(self, user_kw=None, build_kw=None):
         """Run the builder.
@@ -407,8 +373,8 @@ class Builder(object):
         elif isinstance(config, dict):
             conn = dbutil.get_database(settings=config)
         else:
-            raise ValueError("Configuration, '{}',  must be a path to config file or dict"
-                             .format(config))
+            raise ValueError("Configuration, '{}',  must be a path to "
+                             "a configuration file or dict".format(config))
         return conn
 
     # -----------------------------
@@ -442,22 +408,6 @@ class Builder(object):
             n = i + 1
         return n
 
-    def _run_parallel_threaded(self):
-        """Run threads from queue
-        """
-        _log.debug("run.parallel.threaded.start")
-        threads = []
-        for i in xrange(self._ncores):
-            thr = threading.Thread(target=self._run, args=(i,))
-            self._status.running(i)
-            thr.start()
-            threads.append(thr)
-        for i in xrange(self._ncores):
-            threads[i].join()
-            if threads[i].isAlive():    # timed out
-                _log.warn("run.parallel.threaded: timeout for thread={:d}".format(i))
-        _log.debug("run.parallel.threaded.end states={}".format(self._status))
-
     def _run_parallel_multiprocess(self):
         """Run processes from queue
         """
@@ -490,7 +440,9 @@ class Builder(object):
             except Queue.Empty:
                 break
             except Exception, err:
-                _log.error("Processing exception: {}".format(err))
+                _log.error("In _run(): {}".format(err))
+                if _log.isEnabledFor(logging.DEBUG):
+                    _log.error(traceback.format_exc())
                 self._status.fail(index)
                 raise
         self._status.success(index)
@@ -507,11 +459,10 @@ class BuilderStatus(object):
     # For printing.
     _NAMES = {WAIT: "wait", RUNNING: "run", SUCCESS: "ok", FAILURE: "fail"}
 
-    def __init__(self, num, is_threaded=False):
-        self._states = [self.WAIT] * num
-        self._threaded = is_threaded
-        if self._threaded:
-            self._lock = threading.Lock()
+    def __init__(self, num, builder):
+        self._bld = builder
+        self._states = self._bld.shared_list()
+        self._states.extend([self.WAIT] * num)
 
     def running(self, i):
         """Set state of a single process or thread to 'running'.
@@ -543,25 +494,16 @@ class BuilderStatus(object):
         return self.FAILURE in self._states
 
     def _set(self, index, value):
-        if self._threaded:
-            self._lock.acquire()
         self._states[index] = value
-        if self._threaded:
-            self._lock.release()
 
     def __getitem__(self, index):
-        if self._threaded:
-            self._lock.acquire()
-        value = self._states[index]
-        if self._threaded:
-            self._lock.release()
-        return value
+        return self._states[index]
 
     def __str__(self):
         return ",".join([self._NAMES[state] for state in self._states])
 
 
-class ProcRunner:
+class ProcRunner(object):
     """This is a work-around to the limitation of multiprocessing that the
     function executed in the new module cannot be a method of a class.
     We simply set the instance (self) into the class before forking each

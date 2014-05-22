@@ -1,23 +1,28 @@
 .. _builders:
 
-Materials Project "Builders"
-============================
+Database "Builders"
+====================
 
-The Materials Project relies on MongoDB databases. The process of creating these
-databases from either files or other MongoDB databases is encapsulated in
-the "builders" subpackage. The point of the builders is to automate and
-simplify the process of creating databases; an important sub-goal is to provide
-mechanisms for making building more efficient.
+The Materials Project relies on MongoDB databases. The common parts of the
+process of creating these databases from either files or other MongoDB databases
+are encapsulated in the ``matgendb.builders`` subpackage, and in the
+``mgbuild`` command-line script. This package and script
+comprise a lightweight framework that is meant to
+automate, simplify, and ultimately streamline the process of creating databases.
+All the code and
+methods are general-purpose, and thus could be useful to *any* project that needs
+to perform extract-transform-load (ETL) operations with MongoDB.
 
-Contents:
+The code presented here can be found in the directory
+`matgendb/builders/examples` in the source code distribution.
 
-* :ref:`bld-writing`
-* :ref:`bld-running`
+.. contents::
+    :depth: 3
 
 .. _bld-writing:
 
 Writing a builder
-=================
+------------------
 
 To write a builder, you must create a Python class that inherits from
 `matgendb.builders.core.Builder`
@@ -31,7 +36,7 @@ and a :ref:`CopyBuilder <bld-ex-copy>` that copies a MongoDB collection.
 .. _bld-ex-filecounter:
 
 Simple "FileCounter" builder
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The first builder simply reads from a file, and counts the lines in that file.
 In this section we'll show the whole program, then walk through it one section
@@ -142,7 +147,7 @@ The next example will show MongoDB access and other features.
 .. _bld-ex-copy:
 
 Database "CopyBuilder"
------------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 The next builder does a simple DB operation: copying one MongoDB collection
 from a source to a destination. As before, we begin with the full program
@@ -263,10 +268,188 @@ records that are new since the last time. Usually this involves some extra
 logic inside the builder itself, but in a very simple case like this
 the copying would automatically work with the incremental mode.
 
+.. _bld-writing-incr:
+
+Incremental builder "MaxValueBuilder"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Incremental building allows successive builds of source MongoDB collection(s)
+to only operate on the records added since the last build. This can save
+huge amounts of time. An illustration of the difference between an incremental and
+full (non-incremental) build is shown below.
+
+.. image:: _static/incremental_build.png
+
+The central idea of incremental building is that any builder
+can be run in "incremental mode". When this happens, any QueryEngine objects
+are replaced transparently by equivalent objects that track their last
+position, of class :class:`matgendb.builders.incr.TrackedQueryEngine`, which is
+documented in module :mod:`matgendb.builders.incr`. This tracking can be
+controlled, if necessary, with the instance variable ``tracking`` on the
+TrackedQueryEngine class.
+
+The :ref:`bld-ex-copy` is an example of a trivial builder that can work with
+incremental building, without modification to the source code. With incremental
+mode activated, successive copies will only move over "new" data items. But
+most builders will not be this easy. To help understand what to do in
+a non-trivial case, we show here a contrived example where a collection A
+is used to build a derived collection B. In A, there are 2 values for each
+record, a number and a group name. In B, there are two values for each
+distinct group in A: the group name, and the highest value for that group.
+
+.. |ANEW| replace:: A\ :sub:`new`
+
+For the sake of this example we will use the following algorithm to
+rebuild B from A when A gets new elements |ANEW|.
+
+1. For each record present in |ANEW|:
+
+  * Get its group, `g`
+  * If `g` is not seen, figure out current maximum (if any) from all records in A
+  * Update maximum for `g`, in memory, with value for record
+
+2. After all records in |ANEW| are processed, set new group maximums in B
+   from values stored in memory.
+
+This algorithm is incremental in the sense that it ignores
+any groups that are not in the new elements |ANEW|, yet non-trivial
+because in order to calculate the new maximum value one needs to examine
+all the elements in A::
+
+    from matgendb.builders import core
+    from matgendb.builders import util
+    from matgendb.query_engine import QueryEngine
+
+    class MaxValueBuilder(core.Builder):
+        """Example of incremental builder that requires
+        some custom logic for incremental case.
+        """
+        def get_items(self, source=None, target=None):
+            """Get all records from source collection to add to target.
+
+            :param source: Input collection
+            :type source: QueryEngine
+            :param target: Output collection
+            :type target: QueryEngine
+            """
+            self._groups = self.shared_dict()
+            self._target_coll = target.collection
+            self._src = source
+            return source.query()
+
+        def process_item(self, item):
+            """Calculate new maximum value for each group,
+            for "new" items only.
+            """
+            group, value = item['group'], item['value']
+            if group in self._groups:
+                cur_val = self._groups[group]
+                self._groups[group] = max(cur_val, value)
+            else:
+                # New group. Could fetch old max. from target collection,
+                # but for the sake of illustration recalculate it from
+                # the source collection.
+                self._src.tracking = False  # examine entire collection
+                new_max = value
+                for rec in self._src.query(criteria={'group': group},
+                                           properties=['value']):
+                    new_max = max(new_max, rec['value'])
+                self._src.tracking = True  # back to incremental mode
+                # calculate new max
+                self._groups[group] = new_max
+
+        def finalize(self, errs):
+            """Update target collection with calculated maximum values.
+            """
+            for group, value in self._groups.items():
+                doc = {'group': group, 'value': value}
+                self._target_coll.update({'group': group}, doc, upsert=True)
+            return True
+
+**Initialization**::
+
+    class MaxValueBuilder(core.Builder):
+        """Example of incremental builder that requires
+           some custom logic for incremental case.
+        """
+        def get_items(self, source=None, target=None):
+            """Get all records from source collection to add to target.
+
+            :param source: Input collection
+            :type source: QueryEngine
+            :param target: Output collection
+            :type target: QueryEngine
+            """
+            self._groups = self.shared_dict()
+            self._target_coll = target.collection
+            self._src = source
+            return source.query()
+
+Just as for the CopyBuilder, we use the docstring-style of declaration for the
+parameters to this builder, which are simply the input and output collections.
+We remember both source and target in variables. In addition, we use a utility
+function ``shared_dict()`` in the Builder class to get a dictionary variable
+that can be shared between parallel processes. Finally, this method returns
+a query on all items in the collection.
+
+
+**Processing**::
+
+    def process_item(self, item):
+        """Calculate new maximum value for each group,
+        for "new" items only.
+        """
+        group, value = item['group'], item['value']
+        if group in self._groups:
+            cur_val = self._groups[group]
+            self._groups[group] = max(cur_val, value)
+        else:
+            # New group. Could fetch old max. from target collection,
+            # but for the sake of illustration recalculate it from
+            # the source collection.
+            self._src.tracking = False  # examine entire collection
+            new_max = value
+            for rec in self._src.query(criteria={'group': group},
+                                       properties=['value']):
+                new_max = max(new_max, rec['value'])
+            self._src.tracking = True  # back to incremental mode
+            # calculate new max
+            self._groups[group] = new_max
+
+For each item, we update the shared ``_groups`` variable created in
+``get_items()``. For new groups, we re-scan the whole source collection
+to find the previous maximum value.
+There are a couple better ways to do this,
+but this method is easy to understand and illustrates how a collection
+can be manipulated in its "raw" form in an incremental builder.
+
+The key lines here are
+``self._src.tracking = False`` and, later, ``self._src.tracking = True``.
+These turn off the "incremental mode" so that the query will start at the
+beginning of the collection instead of from the start of |ANEW|.
+
+**Finalization**::
+
+    def finalize(self, errs):
+        """Update target collection with calculated maximum values.
+        """
+        for group, value in self._groups.items():
+            doc = {'group': group, 'value': value}
+            self._target_coll.update({'group': group}, doc, upsert=True)
+        return True
+
+In this case, the ``finalize()`` method is used to set the calculated
+group maximums into the target collection. This is the same as the *reduce*
+stage of a map/reduce task (the ``process_item`` performs the *map*).
+
+In conclusion, we see that for this case only 2 lines turning the
+tracking variable on and off needed to be added to accommodate
+incremental building.
+
 .. _bld-running:
 
 Running a builder
-=================
+-----------------
 
 This section describes how,
 once you have written a builder class, you can use `mgbuild` to run
@@ -289,7 +472,7 @@ in ``matgendb.builders.examples``.
 .. _bld-run-show:
 
 Displaying builder usage
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can get the list of parameters and their types for a given builder
 by giving its full module path, and the ``-u`` or ``--usage`` option::
@@ -312,7 +495,7 @@ by giving its full module path, and the ``-u`` or ``--usage`` option::
 .. _bld-run-exe:
 
 Running the builder
---------------------
+^^^^^^^^^^^^^^^^^^^
 
 The usage of the `mgbuild run` command is as follows::
 
@@ -348,7 +531,7 @@ arguments for building in parallel and building incrementally. This section will
 walk through from simple to more complex examples.
 
 Basic usage
-^^^^^^^^^^^
+~~~~~~~~~~~
 
 Run the copy builder::
 
@@ -365,8 +548,10 @@ The configuration files in question are just JSON files that look like this
     {"host": "localhost", "port": 27017,
      "database": "foo", "collection": "test1"}
 
+See :doc:`dbconfig` for more details.
+
 Running in parallel
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 Most machines have multiple cores, and hundreds of cores will be common
 in the near future. If your item processing requires any
@@ -384,17 +569,10 @@ threads to be spawned to run the copy in parallel.
     The ``get_items()`` is always run sequentially.
 
 Incremental builds
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
-Incremental building allows successive builds of source MongoDB collection(s)
-to only operate on the records added since the last build. This can save
-huge amounts of time. A cartoon of the difference between an incremental and
-full (non-incremental) build is shown below.
-
-.. image:: _static/incremental_build.png
-
-Incremental building
-is controlled by the ``-i/--incr`` option.
+The concept of incremental building was introduced in :ref:`bld-writing-incr`.
+From the command-line, incremental building is controlled by the ``-i/--incr`` option.
 What this really does is to add some behind-the-scenes bookkeeping for every
 parameter of type ``QueryEngine`` (except ones where it is explicitly
 turned off, :ref:`see below <bld-incr-skip>`) that records and retrieves the spot where processing

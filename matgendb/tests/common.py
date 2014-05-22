@@ -6,14 +6,19 @@ __date__ = '10/29/13'
 
 # Stdlib
 import json
+import logging
+import os
 import subprocess
+import sys
 import tempfile
+import traceback
 import unittest
 # Third-party
 from mongomock import MongoClient
 import pymongo
 # Package
 from matgendb.query_engine import QueryEngine
+from matgendb.builders.incr import CollectionTracker
 
 
 class MockQueryEngine(QueryEngine):
@@ -46,15 +51,36 @@ class MockQueryEngine(QueryEngine):
 # Component test classes / functions
 # -----------------------------------
 
+def get_component_logger(name, strm=sys.stdout):
+    log = logging.getLogger(name)
+    if 'TEST_DEBUG' in os.environ:
+        log.setLevel(logging.DEBUG)
+    else:
+        log.setLevel(logging.INFO)
+    _h = logging.StreamHandler(strm)
+    log.addHandler(_h)
+    return log
+
 class ComponentTest(unittest.TestCase):
     DB = 'testdb'
     SRC = 'source'
     DST = 'dest'
 
+    MGBUILD_CMD = ["mgbuild", "run"]
+
     def setUp(self):
         self.db = self.connect(True)
         self.src, self.dst = self.db[self.SRC], self.db[self.DST]
         self.src_conf, self.dst_conf = self.create_configs()
+
+    def mgbuild(self, args):
+        try:
+            s = subprocess.check_output(self.MGBUILD_CMD + args,
+                                        stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError, err:
+            print("ERROR: {}".format(err.output))
+            raise
+        return s
 
     def connect(self, clear=False):
         """Connect to Mongo DB
@@ -66,6 +92,8 @@ class ComponentTest(unittest.TestCase):
         if clear:
             for coll in self.SRC, self.DST:
                 db[coll].remove()
+                tcoll = coll + '.' + CollectionTracker.TRACKING_NAME
+                db[tcoll].remove() # remove tracking as well
         return db
 
     def get_record(self, i):

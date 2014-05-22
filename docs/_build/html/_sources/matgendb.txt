@@ -1,5 +1,3 @@
-.. _apiref:
-
 matgendb package
 ================
 

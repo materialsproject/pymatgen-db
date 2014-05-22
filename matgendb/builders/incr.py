@@ -87,16 +87,37 @@ class UnTrackedQueryEngine(QueryEngine, TrackingInterface):
 
 
 class TrackedQueryEngine(QueryEngine, TrackingInterface):
-    """A QE that only examines records past the last 'mark' that was set for the
+    """A QueryEngine subclass that only examines records
+    past the last 'mark' that was set for the
     given operation and field.
+
+    The concrete result is that for an object, ``t``, the
+    ``t.find()`` method will start *past* the "mark".
+
+    To go around this transparent change, use the ``t.findall``
+    instead.
     """
     def __init__(self, track_operation=None, track_field=None, **kwargs):
+        """Constructor.
+        """
+        self._tracking_off = False
         # Set these first because QueryEngine.__init__ calls overridden `set_collection()`.
         assert track_field
         self._t_op, self._t_field = track_operation, track_field
         self.collection = None
         # Now init parent
         QueryEngine.__init__(self, **kwargs)
+
+    @property
+    def tracking(self):
+        """Whether tracking is really enabled."""
+        return not self._tracking_off
+
+    @tracking.setter
+    def tracking(self, is_tracked):
+        self._tracking_off = not is_tracked
+        if self.collection is not None:
+            self.collection.set_tracking(is_tracked)
 
     def set_collection(self, collection):
         """Override base class to make this a tracked collection.
@@ -117,8 +138,24 @@ class TrackedCollection(object):
     """
     def __init__(self, coll, operation=None, field=None):
         self._coll, self._coll_find = coll, coll.find
+        self._tracking_off = False
         self._tracker = CollectionTracker(coll, create=True)
         self._mark = self._tracker.retrieve(operation=operation, field=field)
+
+    def set_tracking(self, is_tracked):
+        """Set whether find() transparently starts from after the
+        mark (True), or whether it ignores the tracking info and acts like
+        a normal ``find()`` operation (False).
+
+        :param is_tracked: Whether to use tracking info
+        :return:
+        """
+        self._tracking_off = not is_tracked
+
+    def findall(self, *args, **kwargs):
+        """Call non-tracked ``find()`` operation with same args.
+        """
+        return self._coll.find(*args, **kwargs)
 
     def __getattr__(self, item):
         if item == 'find':
@@ -131,7 +168,14 @@ class TrackedCollection(object):
         return "Tracked collection ({})".format(self._coll)
 
     def tracked_find(self, *args, **kwargs):
+        """Replacement for regular ``find()``.
+        """
         _log.info("tracked_find.begin")
+        # if tracking is off, just call find (ie do nothing)
+        if self._tracking_off:
+            _log.info("tracked_find.end, tracking=off")
+            return self._coll_find(*args, **kwargs)
+        # otherwise do somethin' real
         # fish 'spec' out of args or kwargs
         if len(args) > 0:
             spec = args[0]
@@ -201,6 +245,11 @@ class Mark(object):
         """
         rec = self._c.find_one({}, {self._fld: 1}, sort=[(self._fld, -1)], limit=1)
         if rec is None:
+            self._pos = self._empty_pos()
+        elif not self._fld in rec:
+            _log.error("Tracking field not found. field={} collection={}"
+                       .format(self._fld, self._c.name))
+            _log.warn("Continuing without tracking")
             self._pos = self._empty_pos()
         else:
             self._pos = {self._fld: rec[self._fld]}

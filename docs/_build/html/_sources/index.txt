@@ -22,17 +22,13 @@ On this page
 Other pages
 ------------
 
-:doc:`mgbuild <mgbuild>`: a command-line tool  and the
-associated API (see :doc:`builders` and :class:`matgendb.builders.Builder`), provides a flexible
-framework for building MongoDB collections from other
-MongoDB collections or external sources.
+.. toctree::
+    :maxdepth: 1
 
-:doc:`mgvv <mgvv>` a command-line tool for validation & verification operations on MongoDB databases.
-Although these tools are designed with the Materials Project databases
-in mind, they could be used with almost any MongoDB database.
-
-:ref:`API reference <apiref>`: Documentation for all modules in the `matgendb`
-package.
+    Validation and verification <mgvv>
+    Building databases <builders>
+    Configuration file format <dbconfig>
+    API Reference <matgendb>
 
 Change Log
 ==========
@@ -87,7 +83,6 @@ Version 0.3.0
    to CSV, XLS or PDF.
 2. First version of RESTful interface implemented.
 
-:doc:`Older versions </changelog>`
 
 Getting pymatgen-db
 ===================
@@ -144,14 +139,8 @@ running the materials genomics ui, etc. To see all options available, type::
     mgdb --help
 
 Validation and derived-database creation each use their own scripts, which
-are called mgvv and mgbuild respectively. Follow the links below for more
-details on how to use and extend these programs:
+are called :doc:`mgvv <mgvv>` and :doc:`mgbuild <builders>`, respectively.
 
-.. toctree::
-    :maxdepth: 1
-
-    Database validation (mgvv) <mgvv>
-    Database and sandbox creation (mgbuild) <mgbuild>
 
 Initial setup
 -------------
@@ -310,7 +299,7 @@ The API docs are generated using Sphinx auto-doc and outlines the purpose of all
 modules and classes, and the expected argument and returned objects for most
 methods. They are available at the link below.
 
-:doc:`pymatgen-db API docs </modules>`
+:doc:`pymatgen-db API docs <matgendb>`
 
 How to cite pymatgen-db
 =======================
