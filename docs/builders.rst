@@ -19,6 +19,40 @@ The code presented here can be found in the directory
 .. contents::
     :depth: 3
 
+.. _bld-concepts:
+
+Features
+--------
+
+Parallel building
+^^^^^^^^^^^^^^^^^
+
+Builders can be run in parallel without explicit coding of parallelism by
+the author. This allows CPU-intensive transformations of the data to run
+much faster on multicore machines, which includes most modern hardware.
+An illustration of the difference between sequential and parallel builds
+is shown below.
+
+.. image:: _static/parallel_build.png
+
+The builder framework automatically parallelizes the processing of
+each item, by placing items in a shared queue and spawning processes to pull
+items off the queue in parallel. Note that the ``get_items()`` method
+is not automatically parallelized, so for better or worse
+querying the DB happens sequentially (unless you write explicit parallel
+code inside ``get_items()``).
+
+Incremental building
+^^^^^^^^^^^^^^^^^^^^
+
+Incremental building allows successive builds of source MongoDB collection(s)
+to only operate on the records added since the last build. This can save
+huge amounts of time. An illustration of the difference between an incremental and
+full (non-incremental) build is shown below.
+
+.. image:: _static/incremental_build.png
+
+
 .. _bld-writing:
 
 Writing a builder
@@ -273,14 +307,8 @@ the copying would automatically work with the incremental mode.
 Incremental builder "MaxValueBuilder"
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Incremental building allows successive builds of source MongoDB collection(s)
-to only operate on the records added since the last build. This can save
-huge amounts of time. An illustration of the difference between an incremental and
-full (non-incremental) build is shown below.
-
-.. image:: _static/incremental_build.png
-
-The central idea of incremental building is that any builder
+The incremental building concept was introduced in :ref:`bld-concepts`.
+The central idea of the incremental building implementation is that any builder
 can be run in "incremental mode". When this happens, any QueryEngine objects
 are replaced transparently by equivalent objects that track their last
 position, of class :class:`matgendb.builders.incr.TrackedQueryEngine`, which is
