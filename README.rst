@@ -40,6 +40,9 @@ or to install the package in developmental mode::
 
     python setup.py develop
 
+The version number is in the file `VERSION` in the same directory as this
+README.
+
 Requirements
 ============
 
