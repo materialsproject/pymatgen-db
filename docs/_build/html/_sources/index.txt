@@ -33,6 +33,15 @@ Other pages
 Change Log
 ==========
 
+Version 0.4.1
+-------------
+
+#. Refactor of builders (mgbuild and matgendb.builders) to
+   improve usability. Github issues #9 through #13.
+#. Also for 'builders', added incremental building
+#. Added modules dbgroup and dbconfig for more flexible and powerful
+   configuration of multiple databases with a directory of configuration files.
+
 Version 0.4.0
 -------------
 New `mgvv diff` features.
