@@ -29,7 +29,8 @@ class QeTransmuter(StandardTransmuter):
 
     def __init__(self, queryengine, criteria, transformations,
                  extend_collection=0, ncores=None):
-        """
+        """Constructor.
+
         Args:
             queryengine:
                 QueryEngine object for database access

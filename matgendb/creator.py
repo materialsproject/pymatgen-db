@@ -57,23 +57,24 @@ class VaspToDbTaskDrone(AbstractDrone):
 
     There are some restrictions on the valid directory structures:
 
-    1. There can be only one vasp run in each directory. Nested directories
-       are fine.
-    2. Directories designated "relax1", "relax2" are considered to be 2 parts
-       of an aflow style run.
-    3. Directories containing vasp output with ".relax1" and ".relax2" are
-       also considered as 2 parts of an aflow style run.
+        1. There can be only one vasp run in each directory. Nested directories
+           are fine.
+        2. Directories designated "relax1", "relax2" are considered to be
+           2 parts of an aflow style run.
+        3. Directories containing vasp output with ".relax1" and ".relax2" are
+           also considered as 2 parts of an aflow style run.
     """
 
-    #Version of this db creator document.
+    # Version of this db creator document.
     __version__ = "2.0.0"
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
-                 user=None, password=None,  collection="tasks",
+                 user=None, password=None, collection="tasks",
                  parse_dos=False, simulate_mode=False,
                  additional_fields=None, update_duplicates=True,
                  mapi_key=None, use_full_uri=True):
-        """
+        """Constructor.
+
         Args:
             host:
                 Hostname of database machine. Defaults to 127.0.0.1 or

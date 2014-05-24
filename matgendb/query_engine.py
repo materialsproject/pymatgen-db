@@ -31,8 +31,7 @@ _log = logging.getLogger('mg.' + __name__)
 
 
 class QueryEngine(object):
-    """
-    This class defines a QueryEngine interface to a Mongo Collection based on
+    """This class defines a QueryEngine interface to a Mongo Collection based on
     a set of aliases. This query engine also provides convenient translation
     between various pymatgen objects and database objects.
 
@@ -63,7 +62,8 @@ class QueryEngine(object):
                  user=None, password=None, collection="tasks",
                  aliases_config=None, default_properties=None,
                  connection=None, **ignore):
-        """
+        """Constructor.
+
         Args:
             host:
                 Hostname of database machine. Defaults to 127.0.0.1 or

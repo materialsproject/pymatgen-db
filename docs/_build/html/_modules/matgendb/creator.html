@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>matgendb.creator &mdash; pymatgen-db 0.4.0 documentation</title>
+    <title>matgendb.creator &mdash; pymatgen-db 0.4.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/proBlue.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.4.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-    <link rel="top" title="pymatgen-db 0.4.0 documentation" href="../../index.html" />
+    <link rel="top" title="pymatgen-db 0.4.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" />
  
 <script type="text/javascript">
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pymatgen-db 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pymatgen-db 0.4.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -114,23 +114,24 @@
 
 <span class="sd">    There are some restrictions on the valid directory structures:</span>
 
-<span class="sd">    1. There can be only one vasp run in each directory. Nested directories</span>
-<span class="sd">       are fine.</span>
-<span class="sd">    2. Directories designated &quot;relax1&quot;, &quot;relax2&quot; are considered to be 2 parts</span>
-<span class="sd">       of an aflow style run.</span>
-<span class="sd">    3. Directories containing vasp output with &quot;.relax1&quot; and &quot;.relax2&quot; are</span>
-<span class="sd">       also considered as 2 parts of an aflow style run.</span>
+<span class="sd">        1. There can be only one vasp run in each directory. Nested directories</span>
+<span class="sd">           are fine.</span>
+<span class="sd">        2. Directories designated &quot;relax1&quot;, &quot;relax2&quot; are considered to be</span>
+<span class="sd">           2 parts of an aflow style run.</span>
+<span class="sd">        3. Directories containing vasp output with &quot;.relax1&quot; and &quot;.relax2&quot; are</span>
+<span class="sd">           also considered as 2 parts of an aflow style run.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c">#Version of this db creator document.</span>
+    <span class="c"># Version of this db creator document.</span>
     <span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;2.0.0&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">27017</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s">&quot;vasp&quot;</span><span class="p">,</span>
-                 <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>  <span class="n">collection</span><span class="o">=</span><span class="s">&quot;tasks&quot;</span><span class="p">,</span>
+                 <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s">&quot;tasks&quot;</span><span class="p">,</span>
                  <span class="n">parse_dos</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">simulate_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                  <span class="n">additional_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">update_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                  <span class="n">mapi_key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_full_uri</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            host:</span>
 <span class="sd">                Hostname of database machine. Defaults to 127.0.0.1 or</span>
@@ -828,14 +829,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pymatgen-db 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pymatgen-db 0.4.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking
