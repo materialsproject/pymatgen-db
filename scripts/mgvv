@@ -310,7 +310,8 @@ def command_validate(args, formatters):
     db_key = 'database'
     if not db_key in config:
         raise ArgumentError('Configuration in "{}" is missing "{}"'.format(fname, db_key))
-    db = conn[config[db_key]]
+    database_name = config[db_key]
+    db = conn[database_name]
     user, passwd = None, None
     # try both readonly and admin credentials
     for utype in 'readonly', 'admin':
@@ -391,6 +392,7 @@ def command_validate(args, formatters):
     rpt_hdr.add('Report time', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()))
     rpt_hdr.add('Report user', sys_meta['user'])
     rpt_hdr.add('Report host', sys_meta['host'])
+    rpt_hdr.add('Database', database_name)
     rpt_hdr.add('Limit', args.limit)
     rpt = report.Report(rpt_hdr)
     # pick report formatter
