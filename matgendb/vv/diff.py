@@ -205,7 +205,8 @@ class Differ(object):
         # Compute mis-matched properties.
         if has_props:
             changed = self._changed_props(keys, eqprops, numprops, info,
-                                          has_eqprops=has_eqprops, has_numprops=has_numprops)
+                                          has_eqprops=has_eqprops,
+                                          has_numprops=has_numprops)
         else:
             changed = []
 
@@ -241,16 +242,22 @@ class Differ(object):
                 for pkey in self._prop_deltas:
                     oldval, newval = numprops[0][key][pkey], numprops[1][key][pkey]
                     if self._prop_deltas[pkey].cmp(oldval, newval):
-                        change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_DELTA, self._key_field: key, "property": pkey,
-                                  self.CHANGED_OLD: "{:f}".format(oldval), self.CHANGED_NEW: "{:f}".format(newval),
+                        change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_DELTA,
+                                  self._key_field: key, "property": pkey,
+                                  self.CHANGED_OLD: "{:f}".format(oldval),
+                                  self.CHANGED_NEW: "{:f}".format(newval),
                                   "rule": self._prop_deltas[pkey],
                                   self.CHANGED_DELTA: "{:f}".format(newval - oldval)}
                         changed.append(_up(change, info[key]) if info else change)
             # Exact property comparison.
             if has_eqprops:
                 if not eqprops[0][key] == eqprops[1][key]:
-                    change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_EXACT, self._key_field: key,
-                              self.CHANGED_OLD: eqprops[0][key], self.CHANGED_NEW: eqprops[1][key]}
+                    change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_EXACT,
+                              self._key_field: key,
+                              self.CHANGED_OLD: eqprops[0][key],
+                              self.CHANGED_NEW: eqprops[1][key],
+                              # keep 'CHANGED_DELTA' key to allow sorting
+                              self.CHANGED_DELTA: "<>"}
                     changed.append(_up(change, info[key]) if info else change)
         return changed
 

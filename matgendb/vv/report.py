@@ -11,7 +11,7 @@ from operator import itemgetter
 import smtplib
 #
 from .util import DoesLogging, JsonWalker
-from ..util import MongoJSONEncoder
+from ..util import MongoJSONEncoder, kvp_dict
 from .diff import Differ, Delta  # for field constants, formatting
 
 
@@ -460,7 +460,8 @@ class DiffFormatter(object):
         columns = list(columns)  # might be a tuple
         fixed_cols = [self.key]
         if section.lower() == "different":
-            fixed_cols.extend([Differ.CHANGED_MATCH_KEY, Differ.CHANGED_OLD, Differ.CHANGED_NEW])
+            fixed_cols.extend([Differ.CHANGED_MATCH_KEY, Differ.CHANGED_OLD,
+                               Differ.CHANGED_NEW])
         map(columns.remove, fixed_cols)
         columns.sort()
         return fixed_cols + columns
@@ -472,10 +473,11 @@ class DiffFormatter(object):
         :param section: Name of section, should match const in Differ class
         :return: None; rows are sorted in-place
         """
-        #print("@@ SORT ROWS:\n{}".format(rows))
         # Section-specific determination of sort key
         if section.lower() == Differ.CHANGED.lower():
             sort_key = Differ.CHANGED_DELTA
+            #print("@@ {}: SORT ROWS:\n{}"
+            #      .format(section, '\n'.join(map(kvp_dict, rows[:10]))))
         else:
             sort_key = None
         if sort_key is not None:

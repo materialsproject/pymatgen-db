@@ -224,7 +224,8 @@ def command_diff(args):
     # Run diff.
     t0 = time.time()
     try:
-        r = df.diff(args.old, args.new, only_missing=args.missonly, only_values=args.changeonly)
+        r = df.diff(args.old, args.new, only_missing=args.missonly,
+                    only_values=args.changeonly)
     except Exception as err:
         if _log.getEffectiveLevel() in (logging.DEBUG,):
             exc_str = traceback.format_exc()
@@ -248,7 +249,9 @@ def command_diff(args):
         fmt_kwargs['url'] = args.rest_url
         fmt_kwargs['email_mode'] = args.rpt_email
 
-    make_report = lambda f: getattr(report, "Diff{}Formatter".format(f.title()))(meta, **fmt_kwargs).format(r)
+    make_report = lambda f: getattr(report, "Diff{}Formatter"
+                                    .format(f.title()))(meta, **fmt_kwargs)\
+        .format(r)
 
     # Email, print, and/or db-insert a report
     # (a) email
