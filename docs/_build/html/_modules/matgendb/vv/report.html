@@ -68,7 +68,7 @@
 <span class="kn">import</span> <span class="nn">smtplib</span>
 <span class="c">#</span>
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">DoesLogging</span><span class="p">,</span> <span class="n">JsonWalker</span>
-<span class="kn">from</span> <span class="nn">..util</span> <span class="kn">import</span> <span class="n">MongoJSONEncoder</span>
+<span class="kn">from</span> <span class="nn">..util</span> <span class="kn">import</span> <span class="n">MongoJSONEncoder</span><span class="p">,</span> <span class="n">kvp_dict</span>
 <span class="kn">from</span> <span class="nn">.diff</span> <span class="kn">import</span> <span class="n">Differ</span><span class="p">,</span> <span class="n">Delta</span>  <span class="c"># for field constants, formatting</span>
 
 
@@ -517,7 +517,8 @@
         <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>  <span class="c"># might be a tuple</span>
         <span class="n">fixed_cols</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;different&quot;</span><span class="p">:</span>
-            <span class="n">fixed_cols</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_MATCH_KEY</span><span class="p">,</span> <span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_OLD</span><span class="p">,</span> <span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_NEW</span><span class="p">])</span>
+            <span class="n">fixed_cols</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_MATCH_KEY</span><span class="p">,</span> <span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_OLD</span><span class="p">,</span>
+                               <span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_NEW</span><span class="p">])</span>
         <span class="nb">map</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">remove</span><span class="p">,</span> <span class="n">fixed_cols</span><span class="p">)</span>
         <span class="n">columns</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">fixed_cols</span> <span class="o">+</span> <span class="n">columns</span>
@@ -529,10 +530,11 @@
 <span class="sd">        :param section: Name of section, should match const in Differ class</span>
 <span class="sd">        :return: None; rows are sorted in-place</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c">#print(&quot;@@ SORT ROWS:\n{}&quot;.format(rows))</span>
         <span class="c"># Section-specific determination of sort key</span>
         <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
             <span class="n">sort_key</span> <span class="o">=</span> <span class="n">Differ</span><span class="o">.</span><span class="n">CHANGED_DELTA</span>
+            <span class="c">#print(&quot;@@ {}: SORT ROWS:\n{}&quot;</span>
+            <span class="c">#      .format(section, &#39;\n&#39;.join(map(kvp_dict, rows[:10]))))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sort_key</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">if</span> <span class="n">sort_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -814,7 +816,7 @@
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

@@ -376,6 +376,11 @@ Some examples follow.
 
 This option may be combined with any of the other options.
 
+.. option:: -N, --nanok
+
+Ignore numeric fields where one or both of the values is not a number. This allows the comparison
+to continue when, for whatever reason, the new or old value is None.
+
 .. option:: -p PROPS, --properties PROPS
 
 Fields with properties that must match, as comma-separated list , e.g '``these_must,match``'.
