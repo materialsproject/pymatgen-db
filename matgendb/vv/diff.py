@@ -9,6 +9,7 @@ import logging
 import re
 import time
 # Package
+from matgendb import dbconfig
 from matgendb import util
 from matgendb.query_engine import QueryEngine
 
@@ -93,10 +94,18 @@ class Differ(object):
         else:
             engines = []
             for cfg in c1, c2:
-                settings = util.get_settings(cfg)
+                settings = dbconfig.get_settings(cfg)
                 if not dbconfig.normalize_auth(settings):
-                    _log.warn("Config file {} does not have a username/password".format(cfg))
+                    m = "No username and/or password found in '{}'".format(cfg)
+                    raise ValueError(m)
                 settings["aliases_config"] = {"aliases": {}, "defaults": {}}
+                if _log.isEnabledFor(logging.DEBUG):
+                    s2 = settings.copy()
+                    for k in s2:
+                        if k.endswith("password"):
+                            s2[k] = "***"
+                    _log.debug("Login with settings: {}"
+                               .format(util.kvp_dict(s2)))
                 engine = QueryEngine(**settings)
                 engines.append(engine)
         _log.info("connect.end")
