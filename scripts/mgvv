@@ -218,7 +218,8 @@ def command_diff(args):
                                     .format(field, err))
 
     # Instantiate main class.
-    df = diff.Differ(key=args.key, info=args.info, props=args.properties, fltr=fltr, deltas=deltas)
+    df = diff.Differ(key=args.key, info=args.info, props=args.properties,
+                     fltr=fltr, deltas=deltas, nan_ok=args.nan_ok)
 
     # Run diff.
     t0 = time.time()
@@ -570,6 +571,8 @@ def main(cmdline=None):
                            "where N is a number. "
                            "Adding '=' (must go before '%%') compares >=, <= instead of >, <. "
                            "The '%%' means a percentage relative to the first collection's value.")
+    subp.add_argument("-N", "--nanok", dest="nan_ok", action="store_true",
+                      help="Ignore numeric fields where one or both of the values is not a number")
     subp.add_argument("-p", "--properties", help="Fields with properties that must match, as comma-separated list "
                                            ", e.g 'these_must,match'", dest="properties", default=None,
                       type=args_list)

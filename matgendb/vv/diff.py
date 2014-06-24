@@ -47,7 +47,8 @@ class Differ(object):
     #: for missing property
     NO_PROPERTY = "__MISSING__"
 
-    def __init__(self, key='_id', props=None, info=None, fltr=None, deltas=None):
+    def __init__(self, key='_id', props=None, info=None, fltr=None,
+                 deltas=None, nan_ok=False):
         """Constructor.
 
         :param key: Field to use for identifying records
@@ -65,6 +66,7 @@ class Differ(object):
         self._filter = fltr if fltr else {}
         self._prop_deltas = {} if deltas is None else deltas
         self._all_props = list(set(self._props[:] + self._prop_deltas.keys()))
+        self._nan_ok = nan_ok
 
     def diff(self, c1, c2, only_missing=False, only_values=False, allow_dup=False):
         """Perform a difference between the 2 collections.
@@ -154,8 +156,12 @@ class Differ(object):
                             missing_props += 1
                             continue
                         except (TypeError, ValueError):
-                            raise ValueError("Not a number: collection={c} key={k} {p}='{v}'"
-                                             .format(k=key, c=("old", "new")[i], p=pkey, v=rec[pkey]))
+                            if self._nan_ok:
+                                missing_props += 1
+                                continue
+                            else:
+                                raise ValueError("Not a number: collection={c} key={k} {p}='{v}'"
+                                                 .format(k=key, c=("old", "new")[i], p=pkey, v=rec[pkey]))
                     numprops[i][key] = pvals
                 # Extract properties for exact match.
                 if has_eqprops:
@@ -175,7 +181,7 @@ class Differ(object):
                         info[key][k] = rec[k]
 
             # Stop if we don't have properties on any record at all
-            if 0 < count == missing_props:
+            if count <= missing_props:
                 _log.critical("Missing one or more properties on all {:d} records"
                               .format(count))
                 return {}
