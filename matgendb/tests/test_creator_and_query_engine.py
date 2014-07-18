@@ -45,7 +45,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
         all_paths = []
         for path in os.walk(os.path.join(test_dir, 'db_test')):
             all_paths.extend(drone.get_valid_paths(path))
-        self.assertEqual(len(all_paths), 5)
+        self.assertEqual(len(all_paths), 6)
 
     def test_to_from_dict(self):
         drone = VaspToDbTaskDrone(database="wacky", simulate_mode=True)
@@ -64,11 +64,11 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
         queen = BorgQueen(drone)
         queen.serial_assimilate(os.path.join(test_dir, 'db_test'))
         data = queen.get_data()
-        self.assertEqual(len(data), 5)
+        self.assertEqual(len(data), 6)
         if VaspToDbTaskDroneTest.conn:
             db = VaspToDbTaskDroneTest.conn["creator_unittest"]
             data = db.tasks.find()
-            self.assertEqual(data.count(), 5)
+            self.assertEqual(data.count(), 6)
             warnings.warn("Actual db insertion mode.")
 
         for d in data:
@@ -103,7 +103,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
         if VaspToDbTaskDroneTest.conn:
             warnings.warn("Testing query engine mode.")
             qe = QueryEngine(database="creator_unittest")
-            self.assertEqual(qe.query().count(), 5)
+            self.assertEqual(qe.query().count(), 6)
             #Test mappings by query engine.
             for r in qe.query(criteria={"pretty_formula": "Li2O"},
                               properties=["dir_name", "energy",
@@ -122,7 +122,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             self.assertAlmostEqual(d['energy'], -526.66747274, 4)
 
             d = qe.get_entries_in_system(["Li", "O"])
-            self.assertEqual(len(d), 2)
+            self.assertEqual(len(d), 3)
             self.assertIsInstance(d[0], ComputedEntry)
 
             s = qe.get_structure_from_id(d[0].entry_id)

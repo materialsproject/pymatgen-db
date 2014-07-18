@@ -22,6 +22,22 @@ matgendb.creator module
     :undoc-members:
     :show-inheritance:
 
+matgendb.dbconfig module
+------------------------
+
+.. automodule:: matgendb.dbconfig
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+matgendb.dbgroup module
+-----------------------
+
+.. automodule:: matgendb.dbgroup
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 matgendb.query_engine module
 ----------------------------
 
