@@ -261,7 +261,8 @@ class QueryEngine(object):
         fields = [k for k in optional_data]
         fields.extend(["task_id", "unit_cell_formula", "energy", "is_hubbard",
                        "hubbards", "pseudo_potential.labels",
-                       "pseudo_potential.functional", "run_type"])
+                       "pseudo_potential.functional", "run_type",
+                       "input.is_lasph"])
         for c in self.query(fields, criteria):
             func = c["pseudo_potential.functional"]
             labels = c["pseudo_potential.labels"]
@@ -269,7 +270,8 @@ class QueryEngine(object):
             parameters = {"run_type": c["run_type"],
                           "is_hubbard": c["is_hubbard"],
                           "hubbards": c["hubbards"],
-                          "potcar_symbols": symbols}
+                          "potcar_symbols": symbols,
+                          "is_lasph": c.get("input.is_lasph") or False}
             optional_data = {k: c[k] for k in optional_data}
             if inc_structure:
                 struct = self.get_structure_from_id(c["task_id"])

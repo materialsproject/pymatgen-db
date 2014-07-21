@@ -530,7 +530,8 @@ class VaspToDbTaskDrone(AbstractDrone):
                              "is_hubbard", "hubbards", "run_type"]:
                 d[root_key] = d2[root_key]
             d["chemsys"] = "-".join(sorted(d2["elements"]))
-            d["input"] = {"crystal": d1["input"]["crystal"]}
+            d["input"] = {"crystal": d1["input"]["crystal"],
+                          "is_lasph": d2["input"]["incar"].get("LASPH", False)}
             vals = sorted(d2["reduced_cell_formula"].values())
             d["anonymous_formula"] = {string.ascii_uppercase[i]: float(vals[i])
                                       for i in xrange(len(vals))}
