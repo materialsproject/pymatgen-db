@@ -529,9 +529,15 @@ class VaspToDbTaskDrone(AbstractDrone):
                              "elements", "nelements", "cif", "density",
                              "is_hubbard", "hubbards", "run_type"]:
                 d[root_key] = d2[root_key]
-            d["chemsys"] = "-".join(sorted(d2["elements"]))
+            d["chemsys"] = "-".join(sorted(d2["elements"]))    
+
+            #store any overrides to the exchange correlation functional
+            xc = d2["input"]["incar"].get("GGA")
+            if xc:
+                xc = xc.upper()
             d["input"] = {"crystal": d1["input"]["crystal"],
-                          "is_lasph": d2["input"]["incar"].get("LASPH", False)}
+                          "is_lasph": d2["input"]["incar"].get("LASPH", False),
+                          "xc_override": xc}
             vals = sorted(d2["reduced_cell_formula"].values())
             d["anonymous_formula"] = {string.ascii_uppercase[i]: float(vals[i])
                                       for i in xrange(len(vals))}

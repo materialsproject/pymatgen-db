@@ -92,6 +92,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                                        -14.31446494, 6)
                 self.assertEqual(len(d["calculations"]), 2)
                 self.assertEqual(d['input']['is_lasph'], False)
+                self.assertEqual(d['input']['xc_override'], None)
             elif dir_name.endswith("Li2O"):
                 self.assertEqual(d['state'], "successful")
                 self.assertEqual(d['pretty_formula'], "Li2O")
@@ -104,9 +105,10 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                 self.assertEqual(d['state'], "successful")
                 self.assertEqual(d['pretty_formula'], "Li2O")
                 self.assertAlmostEqual(d['output']['final_energy'],
-                                       -14.3133375, 6)
+                                       -13.998171, 6)
                 self.assertEqual(len(d["calculations"]), 2)
                 self.assertEqual(d['input']['is_lasph'], True)
+                self.assertEqual(d['input']['xc_override'], "PS")
 
         if VaspToDbTaskDroneTest.conn:
             warnings.warn("Testing query engine mode.")
@@ -120,16 +122,19 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                     self.assertAlmostEqual(r['energy'], -14.31446494, 4)
                     self.assertEqual(len(r["calculations"]), 2)
                     self.assertEqual(r["input"]["is_lasph"], False)
+                    self.assertEqual(r['input']['xc_override'], None)
                 elif r["dir_name"].endswith("Li2O"):
                     self.assertAlmostEqual(r['energy'],
                                            -14.31337758, 4)
                     self.assertEqual(len(r["calculations"]), 1)
                     self.assertEqual(r["input"]["is_lasph"], False)
+                    self.assertEqual(r['input']['xc_override'], None)
 
             #Test lasph
             e = qe.get_entries({"dir_name":{"$regex":"lasph"}})
             self.assertEqual(len(e), 1)
             self.assertEqual(e[0].parameters["is_lasph"], True)
+            self.assertEqual(e[0].parameters["xc_override"], "PS")
 
             # Test query one.
             d = qe.query_one(criteria={"pretty_formula": "TbZn(BO2)5"},
