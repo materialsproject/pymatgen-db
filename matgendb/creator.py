@@ -72,8 +72,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                  user=None, password=None, collection="tasks",
                  parse_dos=False, simulate_mode=False,
                  additional_fields=None, update_duplicates=True,
-                 mapi_key=None, use_full_uri=True,
-                 runs=None):
+                 mapi_key=None, use_full_uri=True, runs=None):
         """Constructor.
 
         Args:
@@ -93,9 +92,10 @@ class VaspToDbTaskDrone(AbstractDrone):
             collection:
                 Collection to query. Defaults to "tasks".
             parse_dos:
-                Whether to parse the DOS data where possible. Defaults to
-                False. If True, the dos will be inserted into a gridfs
-                collection called dos_fs.
+                Whether to parse the DOS data. Options are True, False, and 'final'
+                Defaults to False. If True, all dos will be inserted into a gridfs
+                collection called dos_fs. If 'final', only the last calculation will
+                be parsed.
             simulate_mode:
                 Allows one to simulate db insertion without actually performing
                 the insertion.
@@ -135,6 +135,8 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.collection = collection
         self.port = port
         self.simulate = simulate_mode
+        if isinstance(parse_dos, basestring) and parse_dos != 'final':
+            raise ValueError('Invalid value for parse_dos')
         self.parse_dos = parse_dos
         self.additional_fields = additional_fields or {}
         self.update_duplicates = update_duplicates
@@ -207,9 +209,11 @@ class VaspToDbTaskDrone(AbstractDrone):
                 for f in files:
                     if fnmatch(f, "vasprun.xml.{}*".format(r)):
                         vasprun_files[r] = f
-        for f in files: #get any remaining vasprun
-            if fnmatch(f, "vasprun.xml*") and f not in vasprun_files.values():
-                vasprun_files['standard'] = f
+        if len(vasprun_files) == 0:
+            for f in files: #get any vasprun from the folder
+                if fnmatch(f, "vasprun.xml*") and \
+                        f not in vasprun_files.values():
+                    vasprun_files['standard'] = f
 
         if len(vasprun_files) > 0:
             d = self.generate_doc(path, vasprun_files)
@@ -469,7 +473,8 @@ class VaspToDbTaskDrone(AbstractDrone):
                 vasprun_file)))
         d["cif"] = str(CifWriter(r.final_structure))
         d["density"] = r.final_structure.density
-        if self.parse_dos:
+        if self.parse_dos and (self.parse_dos != 'final' \
+                               or taskname == self.runs[-1]):
             try:
                 d["dos"] = r.complete_dos.to_dict
             except Exception:
