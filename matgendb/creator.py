@@ -188,11 +188,6 @@ class VaspToDbTaskDrone(AbstractDrone):
     def get_task_doc(self, path):
         """
         Get the entire task doc for a path, including any post-processing.
-        Args:
-            runs:
-                Ordered list of runs to look for e.g. ["relax1", "relax2"].
-                Automatically detects whether the runs are stored in the
-                subfolder or file extension schema.
         """
         logger.info("Getting task doc for base dir :{}".format(path))
         files = os.listdir(path)
