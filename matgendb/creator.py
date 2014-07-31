@@ -72,7 +72,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                  user=None, password=None, collection="tasks",
                  parse_dos=False, simulate_mode=False,
                  additional_fields=None, update_duplicates=True,
-                 mapi_key=None, use_full_uri=True):
+                 mapi_key=None, use_full_uri=True, runs=None):
         """Constructor.
 
         Args:
@@ -92,9 +92,10 @@ class VaspToDbTaskDrone(AbstractDrone):
             collection:
                 Collection to query. Defaults to "tasks".
             parse_dos:
-                Whether to parse the DOS data where possible. Defaults to
-                False. If True, the dos will be inserted into a gridfs
-                collection called dos_fs.
+                Whether to parse the DOS data. Options are True, False, and 'final'
+                Defaults to False. If True, all dos will be inserted into a gridfs
+                collection called dos_fs. If 'final', only the last calculation will
+                be parsed.
             simulate_mode:
                 Allows one to simulate db insertion without actually performing
                 the insertion.
@@ -122,6 +123,10 @@ class VaspToDbTaskDrone(AbstractDrone):
                 Whether to use full uri path (including hostname) for the
                 directory name. Defaults to True. If False, only the abs
                 path will be used.
+            runs:
+                Ordered list of runs to look for e.g. ["relax1", "relax2"].
+                Automatically detects whether the runs are stored in the
+                subfolder or file extension schema.
         """
         self.host = host
         self.database = database
@@ -130,12 +135,14 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.collection = collection
         self.port = port
         self.simulate = simulate_mode
+        if isinstance(parse_dos, basestring) and parse_dos != 'final':
+            raise ValueError('Invalid value for parse_dos')
         self.parse_dos = parse_dos
-        self.additional_fields = {} if not additional_fields \
-            else additional_fields
+        self.additional_fields = additional_fields or {}
         self.update_duplicates = update_duplicates
         self.mapi_key = mapi_key
         self.use_full_uri = use_full_uri
+        self.runs = runs or ["relax1", "relax2"]
         if not simulate_mode:
             conn = MongoClient(self.host, self.port, j=True)
             db = conn[self.database]
@@ -154,8 +161,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             purposes. Else, only the task_id of the inserted doc is returned.
         """
         try:
-            d = self.get_task_doc(path, self.parse_dos,
-                                  self.additional_fields, self.use_full_uri)
+            d = self.get_task_doc(path)
             if self.mapi_key is not None and d["state"] == "successful":
                 self.calculate_stability(d)
             tid = self._insert_doc(d)
@@ -179,66 +185,42 @@ class VaspToDbTaskDrone(AbstractDrone):
         for k in ("e_above_hull", "decomposes_to"):
             d["analysis"][k] = data[k]
 
-    @classmethod
-    def get_task_doc(cls, path, parse_dos=False, additional_fields=None,
-                     use_full_uri=True):
+    def get_task_doc(self, path):
         """
         Get the entire task doc for a path, including any post-processing.
         """
         logger.info("Getting task doc for base dir :{}".format(path))
-
-        d = None
-        vasprun_files = OrderedDict()
         files = os.listdir(path)
-        if ("relax1" in files and "relax2" in files and
-                os.path.isdir(os.path.join(path, "relax1")) and
-                os.path.isdir(os.path.join(path, "relax2"))):
-            #Materials project style aflow runs.
-            for subtask in ["relax1", "relax2"]:
-                for f in os.listdir(os.path.join(path, subtask)):
-                    if fnmatch(f, "vasprun.xml*"):
-                        vasprun_files[subtask] = os.path.join(subtask, f)
-        elif "STOPCAR" in files:
+        vasprun_files = OrderedDict()
+        if "STOPCAR" in files:
             #Stopped runs. Try to parse as much as possible.
             logger.info(path + " contains stopped run")
-            for subtask in ["relax1", "relax2"]:
-                if subtask in files and \
-                        os.path.isdir(os.path.join(path, subtask)):
-                    for f in os.listdir(os.path.join(path, subtask)):
-                        if fnmatch(f, "vasprun.xml*"):
-                            vasprun_files[subtask] = os.path.join(
-                                subtask, f)
-        else:
-            vasprun_pattern = re.compile("^vasprun.xml([\w\.]*)")
-            for f in files:
-                m = vasprun_pattern.match(f)
-                if m:
-                    fileext = m.group(1)
-                    if fileext.startswith(".relax2"):
-                        fileext = "relax2"
-                    elif fileext.startswith(".relax1"):
-                        fileext = "relax1"
-                    else:
-                        fileext = "standard"
-                    vasprun_files[fileext] = f
-
-        #Need to sort so that relax1 comes before relax2.
-        sorted_vasprun_files = OrderedDict()
-        for k in sorted(vasprun_files.keys()):
-            sorted_vasprun_files[k] = vasprun_files[k]
+        for r in self.runs:
+            if r in files: #try subfolder schema
+                for f in os.listdir(os.path.join(path, r)):
+                    if fnmatch(f, "vasprun.xml*"):
+                        vasprun_files[r] = os.path.join(r, f)
+            else: #try extension schema
+                for f in files:
+                    if fnmatch(f, "vasprun.xml.{}*".format(r)):
+                        vasprun_files[r] = f
+        if len(vasprun_files) == 0:
+            for f in files: #get any vasprun from the folder
+                if fnmatch(f, "vasprun.xml*") and \
+                        f not in vasprun_files.values():
+                    vasprun_files['standard'] = f
 
         if len(vasprun_files) > 0:
-            d = cls.generate_doc(path, sorted_vasprun_files, parse_dos,
-                                 additional_fields)
+            d = self.generate_doc(path, vasprun_files)
             if not d:
-                d = cls.process_killed_run(path)
-            cls.post_process(path, d, use_full_uri)
+                d = self.process_killed_run(path)
+            self.post_process(path, d)
         elif (not (path.endswith("relax1") or
               path.endswith("relax2"))) and contains_vasp_input(path):
             #If not Materials Project style, process as a killed run.
             logger.warning(path + " contains killed run")
-            d = cls.process_killed_run(path)
-            cls.post_process(path, d, use_full_uri)
+            d = self.process_killed_run(path)
+            self.post_process(path, d)
 
         return d
 
@@ -274,7 +256,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                         d["task_id"] = db.counter.find_and_modify(
                             query={"_id": "taskid"},
                             update={"$inc": {"c": 1}}
-                        )["c"]
+                            )["c"]
                     logger.info("Inserting {} with taskid = {}"
                                 .format(d["dir_name"], d["task_id"]))
                 elif self.update_duplicates:
@@ -293,8 +275,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                         .format(d["dir_name"], d["task_id"]))
             return d
 
-    @classmethod
-    def post_process(cls, dir_name, d, use_full_uri=True):
+    def post_process(self, dir_name, d):
         """
         Simple post-processing for various files other than the vasprun.xml.
         Called by generate_task_doc. Modify this if your runs have other
@@ -382,7 +363,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         d["run_stats"] = run_stats
 
         #Convert to full uri path.
-        if use_full_uri:
+        if self.use_full_uri:
             d["dir_name"] = get_uri(dir_name)
 
         if new_tags:
@@ -390,8 +371,7 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         logger.info("Post-processed " + fullpath)
 
-    @classmethod
-    def process_killed_run(cls, dir_name):
+    def process_killed_run(self, dir_name):
         """
         Process a killed vasp run.
         """
@@ -475,8 +455,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                                      "run in {}.".format(dir_name))
         return d
 
-    @classmethod
-    def process_vasprun(cls, dir_name, taskname, filename, parse_dos):
+    def process_vasprun(self, dir_name, taskname, filename):
         """
         Process a vasprun.xml file.
         """
@@ -489,7 +468,8 @@ class VaspToDbTaskDrone(AbstractDrone):
                 vasprun_file)))
         d["cif"] = str(CifWriter(r.final_structure))
         d["density"] = r.final_structure.density
-        if parse_dos:
+        if self.parse_dos and (self.parse_dos != 'final' \
+                               or taskname == self.runs[-1]):
             try:
                 d["dos"] = r.complete_dos.to_dict
             except Exception:
@@ -498,12 +478,10 @@ class VaspToDbTaskDrone(AbstractDrone):
         if taskname == "relax1" or taskname == "relax2":
             d["task"] = {"type": "aflow", "name": taskname}
         else:
-            d["task"] = {"type": "standard", "name": "standard"}
+            d["task"] = {"type": taskname, "name": taskname}
         return d
 
-    @classmethod
-    def generate_doc(cls, dir_name, vasprun_files, parse_dos,
-                     additional_fields):
+    def generate_doc(self, dir_name, vasprun_files):
         """
         Process aflow style runs, where each run is actually a combination of
         two vasp runs.
@@ -513,12 +491,11 @@ class VaspToDbTaskDrone(AbstractDrone):
             #Defensively copy the additional fields first.  This is a MUST.
             #Otherwise, parallel updates will see the same object and inserts
             #will be overridden!!
-            d = {k: v for k, v in additional_fields.items()} \
-                if additional_fields else {}
+            d = {k: v for k, v in self.additional_fields.items()}
             d["dir_name"] = fullpath
             d["schema_version"] = VaspToDbTaskDrone.__version__
             d["calculations"] = [
-                cls.process_vasprun(dir_name, taskname, filename, parse_dos)
+                self.process_vasprun(dir_name, taskname, filename)
                 for taskname, filename in vasprun_files.items()]
             d1 = d["calculations"][0]
             d2 = d["calculations"][-1]
@@ -552,13 +529,12 @@ class VaspToDbTaskDrone(AbstractDrone):
             d["pseudo_potential"] = {"functional": functional.lower(),
                                      "pot_type": pot_type.lower(),
                                      "labels": d2["input"]["potcar"]}
-            if len(d["calculations"]) == 2 or \
+            if len(d["calculations"]) == len(self.runs) or \
                     vasprun_files.keys()[0] != "relax1":
                 d["state"] = "successful" if d2["has_vasp_completed"] \
                     else "unsuccessful"
             else:
                 d["state"] = "stopped"
-
             d["analysis"] = get_basic_analysis_and_error_checks(d)
 
             sg = SymmetryFinder(Structure.from_dict(d["output"]["crystal"]),
@@ -590,11 +566,10 @@ class VaspToDbTaskDrone(AbstractDrone):
            also considered as 2 parts of an aflow style run.
         """
         (parent, subdirs, files) = path
-        if "relax1" in subdirs:
+        if set(self.runs).intersection(subdirs):
             return [parent]
-        if ((not parent.endswith(os.sep + "relax1")) and
-                (not parent.endswith(os.sep + "relax2")) and
-                len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0):
+        if not any([parent.endswith(os.sep + r) for r in self.runs]) and \
+                len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0:
             return [parent]
         return []
 
