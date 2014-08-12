@@ -100,7 +100,7 @@ all settings.
 
 For more advanced use of the "db.json" config file (e.g., specifying aliases,
 defaults, etc., please refer to the following `sample
-<http://pythonhosted.org/pymatgen-db/static/db.json>`_.
+<http://pythonhosted.org/pymatgen-db/_static/db.json>`_.
 
 Inserting calculations
 ----------------------
@@ -114,7 +114,7 @@ To insert an entire directory of runs (where the topmost directory is
     mgdb insert -c db.json dir_name
 
 A sample run has been provided for `download
-<http://pythonhosted.org/pymatgen-db/static/Li2O.zip>`_ for testing
+<http://pythonhosted.org/pymatgen-db/_static/Li2O.zip>`_ for testing
 purposes. Unzip the file and run the above command in the directory.
 
 Materials Genomics UI
