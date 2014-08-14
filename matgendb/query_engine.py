@@ -18,6 +18,7 @@ import itertools
 import logging
 import os
 import gridfs
+import zlib
 from collections import OrderedDict, Iterable
 
 from pymongo import MongoClient
@@ -473,7 +474,12 @@ class QueryEngine(object):
         if dosid != None:
             self._fs = gridfs.GridFS(self.db, 'dos_fs')
             with self._fs.get(dosid) as dosfile:
-                d = json.loads(dosfile.read())
+                s = dosfile.read()
+                try:
+                    d = json.loads(s)
+                except:
+                    s = zlib.decompress(s)
+                    d = json.loads(s)
                 tdos = Dos.from_dict(d)
                 pdoss = {}
                 for i in xrange(len(d['pdos'])):

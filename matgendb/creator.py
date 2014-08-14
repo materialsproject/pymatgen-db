@@ -23,6 +23,8 @@ import string
 import json
 import socket
 import numpy as np
+import zlib
+
 from fnmatch import fnmatch
 from collections import OrderedDict
 
@@ -71,7 +73,7 @@ class VaspToDbTaskDrone(AbstractDrone):
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
-                 parse_dos=False, simulate_mode=False,
+                 parse_dos=False, compress_dos=False, simulate_mode=False,
                  additional_fields=None, update_duplicates=True,
                  mapi_key=None, use_full_uri=True, runs=None):
         """Constructor.
@@ -97,6 +99,9 @@ class VaspToDbTaskDrone(AbstractDrone):
                 Defaults to False. If True, all dos will be inserted into a gridfs
                 collection called dos_fs. If 'final', only the last calculation will
                 be parsed.
+            compress_dos:
+                Whether to compress the DOS data. Valid options are integers 1-9,
+                corresponding to zlib compression level. 1 is usually adequate.
             simulate_mode:
                 Allows one to simulate db insertion without actually performing
                 the insertion.
@@ -139,6 +144,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         if isinstance(parse_dos, basestring) and parse_dos != 'final':
             raise ValueError('Invalid value for parse_dos')
         self.parse_dos = parse_dos
+        self.compress_dos = compress_dos
         self.additional_fields = additional_fields or {}
         self.update_duplicates = update_duplicates
         self.mapi_key = mapi_key
@@ -246,6 +252,9 @@ class VaspToDbTaskDrone(AbstractDrone):
                     for calc in d["calculations"]:
                         if "dos" in calc:
                             dos = json.dumps(calc["dos"], cls=PMGJSONEncoder)
+                            if self.compress_dos:
+                                dos = zlib.compress(dos, self.compress_dos)
+                                calc["dos_compression"] = "zlib"
                             fs = gridfs.GridFS(db, "dos_fs")
                             dosid = fs.put(dos)
                             calc["dos_fs_id"] = dosid

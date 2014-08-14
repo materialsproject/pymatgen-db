@@ -22,6 +22,7 @@ from pymongo.errors import ConnectionFailure
 
 from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.electronic_structure.dos import CompleteDos
 from pymatgen.core.structure import Structure
 
 from matgendb.query_engine import QueryEngine
@@ -61,7 +62,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
         simulate = True if VaspToDbTaskDroneTest.conn is None else False
         drone = VaspToDbTaskDrone(database="creator_unittest",
                                   simulate_mode=simulate,
-                                  parse_dos=True)
+                                  parse_dos=True, compress_dos=1)
         queen = BorgQueen(drone)
         queen.serial_assimilate(os.path.join(test_dir, 'db_test'))
         data = queen.get_data()
@@ -149,6 +150,8 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             s = qe.get_structure_from_id(d[0].entry_id)
             self.assertIsInstance(s, Structure)
             self.assertEqual(s.formula, "Li2 O1")
+
+            self.assertIsInstance(qe.get_dos_from_id(d[0].entry_id), CompleteDos)
 
     @classmethod
     def tearDownClass(cls):
