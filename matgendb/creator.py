@@ -41,6 +41,7 @@ from pymatgen.analysis.bond_valence import BVAnalyzer
 from monty.io import zopen
 from pymatgen.matproj.rest import MPRester
 from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.serializers.json_coders import PMGJSONEncoder
 
 
 logger = logging.getLogger(__name__)
@@ -244,7 +245,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 if self.parse_dos and "calculations" in d:
                     for calc in d["calculations"]:
                         if "dos" in calc:
-                            dos = json.dumps(calc["dos"])
+                            dos = json.dumps(calc["dos"], cls=PMGJSONEncoder)
                             fs = gridfs.GridFS(db, "dos_fs")
                             dosid = fs.put(dos)
                             calc["dos_fs_id"] = dosid

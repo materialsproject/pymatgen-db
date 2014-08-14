@@ -60,7 +60,8 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
         """
         simulate = True if VaspToDbTaskDroneTest.conn is None else False
         drone = VaspToDbTaskDrone(database="creator_unittest",
-                                  simulate_mode=simulate)
+                                  simulate_mode=simulate,
+                                  parse_dos=True)
         queen = BorgQueen(drone)
         queen.serial_assimilate(os.path.join(test_dir, 'db_test'))
         data = queen.get_data()
