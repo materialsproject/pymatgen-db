@@ -228,6 +228,8 @@ class VaspToDbTaskDrone(AbstractDrone):
             logger.warning(path + " contains killed run")
             d = self.process_killed_run(path)
             self.post_process(path, d)
+        else:
+            raise ValueError("No VASP files found!")
 
         return d
 
