@@ -22,7 +22,7 @@ setup(
     name="pymatgen-db",
     packages=find_packages(),
     version="0.4.2",
-    install_requires=["pymatgen>=2.8.8", "monty>=0.1.0",
+    install_requires=["pymatgen>=2.8.8", "monty>=0.4.1",
                       "pymongo>=2.4", "prettytable>=0.7",
                       "django>=1.5", "mongomock>=1.2.0", "smoqe>=0.1.1"],
     package_data={"matgendb": ["*.json"],

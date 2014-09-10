@@ -43,7 +43,7 @@ from pymatgen.analysis.bond_valence import BVAnalyzer
 from monty.io import zopen
 from pymatgen.matproj.rest import MPRester
 from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.serializers.json_coders import PMGJSONEncoder
+from monty.json import MontyEncoder
 
 
 logger = logging.getLogger(__name__)
@@ -253,7 +253,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 if self.parse_dos and "calculations" in d:
                     for calc in d["calculations"]:
                         if "dos" in calc:
-                            dos = json.dumps(calc["dos"], cls=PMGJSONEncoder)
+                            dos = json.dumps(calc["dos"], cls=MontyEncoder)
                             if self.compress_dos:
                                 dos = zlib.compress(dos, self.compress_dos)
                                 calc["dos_compression"] = "zlib"
@@ -595,8 +595,7 @@ class VaspToDbTaskDrone(AbstractDrone):
     def from_dict(cls, d):
         return cls(**d["init_args"])
 
-    @property
-    def to_dict(self):
+    def as_dict(self):
         init_args = {"host": self.host, "port": self.port,
                      "database": self.database, "user": self.user,
                      "password": self.password,
