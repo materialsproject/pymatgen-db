@@ -562,8 +562,11 @@ class VaspToDbTaskDrone(AbstractDrone):
             d["last_updated"] = datetime.datetime.today()
             return d
         except Exception as ex:
+            import traceback
+            print traceback.format_exc(ex)
             logger.error("Error in " + os.path.abspath(dir_name) +
-                         ".\nError msg: " + str(ex))
+                         ".\n" + traceback.format_exc(ex))
+
             return None
 
     def get_valid_paths(self, path):
