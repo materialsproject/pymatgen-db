@@ -541,7 +541,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                                      "pot_type": pot_type.lower(),
                                      "labels": d2["input"]["potcar"]}
             if len(d["calculations"]) == len(self.runs) or \
-                    vasprun_files.keys()[0] != "relax1":
+                    list(vasprun_files.keys())[0] != "relax1":
                 d["state"] = "successful" if d2["has_vasp_completed"] \
                     else "unsuccessful"
             else:
@@ -560,9 +560,9 @@ class VaspToDbTaskDrone(AbstractDrone):
             return d
         except Exception as ex:
             import traceback
-            print(traceback.format_exc(ex))
+            print(traceback.format_exc())
             logger.error("Error in " + os.path.abspath(dir_name) +
-                         ".\n" + traceback.format_exc(ex))
+                         ".\n" + traceback.format_exc())
 
             return None
 
