@@ -16,7 +16,7 @@ __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/25/14'
 
 import os
-#
+import six
 import yaml
 
 # Constants for keys
@@ -179,6 +179,6 @@ def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
     return found
 
 def _as_file(f, mode='r'):
-    if isinstance(f, basestring):
+    if isinstance(f, six.string_types):
         return open(f, mode)
     return f

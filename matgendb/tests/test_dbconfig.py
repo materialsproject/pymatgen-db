@@ -68,7 +68,7 @@ class SettingsTestCase(unittest.TestCase):
             "user": u"guy",
             "password": u"knock-knock"
         }
-        self.tmp = tempfile.NamedTemporaryFile()
+        self.tmp = tempfile.NamedTemporaryFile("r+")
         json.dump(self.cfg, self.tmp)
         self.tmp.flush()
         # reset file to beginning

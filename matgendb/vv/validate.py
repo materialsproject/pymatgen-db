@@ -440,7 +440,7 @@ class Validator(DoesLogging):
                 clause.constraint.value = value         # swap out value, temporarily
             # take length for size
             if op.is_size():
-                if isinstance(fval, basestring) or not hasattr(fval, '__len__'):
+                if isinstance(fval, six.string_types) or not hasattr(fval, '__len__'):
                     reasons.append(ConstraintViolation(clause.constraint, type(fval), 'sequence'))
                     if op.is_variable():
                         clause.constraint.value = var_name      # put original value back

@@ -64,7 +64,8 @@ class Differ(object):
         self._info = [] if info is None else info
         self._filter = fltr if fltr else {}
         self._prop_deltas = {} if deltas is None else deltas
-        self._all_props = list(set(self._props[:] + self._prop_deltas.keys()))
+        self._all_props = list(set(self._props[:] +
+                                   list(self._prop_deltas.keys())))
 
     def diff(self, c1, c2, only_missing=False, only_values=False, allow_dup=False):
         """Perform a difference between the 2 collections.
