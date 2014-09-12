@@ -50,7 +50,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
 
     def test_to_from_dict(self):
         drone = VaspToDbTaskDrone(database="wacky", simulate_mode=True)
-        d = drone.to_dict
+        d = drone.as_dict()
         drone = VaspToDbTaskDrone.from_dict(d)
         self.assertTrue(drone.simulate)
         self.assertEqual(drone.database, "wacky")

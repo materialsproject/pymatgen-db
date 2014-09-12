@@ -56,7 +56,7 @@ class QeTransmuter(StandardTransmuter):
         def get_history(entry):
             return [{"source": source,
                      "criteria": criteria,
-                     "entry": entry.to_dict,
+                     "entry": entry.as_dict(),
                      "datetime": datetime.datetime.utcnow()}]
 
         transformed_structures = [TransformedStructure(

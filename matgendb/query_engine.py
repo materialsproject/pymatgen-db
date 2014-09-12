@@ -314,7 +314,7 @@ class QueryEngine(object):
                 parsed_crit["pretty_formula"] = comp.reduced_formula
             elif key == "unit_cell_formula":
                 comp = Composition(crit)
-                crit = comp.to_dict
+                crit = comp.as_dict()
                 for el, amt in crit.items():
                     parsed_crit["{}.{}".format(self.aliases[key], el)] = amt
                 parsed_crit["nelements"] = len(crit)

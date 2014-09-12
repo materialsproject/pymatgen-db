@@ -85,7 +85,7 @@ class Header:
     def __iter__(self):
         return iter(self._kv)
 
-    def to_dict(self):
+    def as_dict(self):
         return {k: v for k, v in self._kv}
 
 
@@ -291,7 +291,7 @@ class JSONFormatter:
 class ReportJSONEncoder(MongoJSONEncoder):
     def default(self, o):
         if isinstance(o, Header):
-            return o.to_dict()
+            return o.as_dict()
         elif isinstance(o, Table):
             return o.values
         return MongoJSONEncoder.default(self, o)
@@ -327,7 +327,7 @@ class MarkdownFormatter:
     def _append_info_section(self, lines, info):
         if not info:
             return
-        infodict = info.to_dict()
+        infodict = info.as_dict()
         if infodict:
             text = 'Info: {}'.format(self._mapdump(infodict))
             lines.append(text)

@@ -357,7 +357,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 i = 1 if re.search("relax2", filename) else 0
                 taskname = "relax2" if re.search("relax2", filename) else \
                     "relax1"
-                d["calculations"][i]["output"]["outcar"] = outcar.to_dict
+                d["calculations"][i]["output"]["outcar"] = outcar.as_dict()
                 run_stats[taskname] = outcar.run_stats
         except:
             logger.error("Bad OUTCAR for {}.".format(fullpath))
@@ -396,7 +396,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             if fnmatch(f, "INCAR*"):
                 try:
                     incar = Incar.from_file(filename)
-                    d["incar"] = incar.to_dict
+                    d["incar"] = incar.as_dict()
                     d["is_hubbard"] = incar.get("LDAU", False)
                     if d["is_hubbard"]:
                         us = np.array(incar.get("LDAUU", []))
@@ -419,7 +419,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             elif fnmatch(f, "KPOINTS*"):
                 try:
                     kpoints = Kpoints.from_file(filename)
-                    d["kpoints"] = kpoints.to_dict
+                    d["kpoints"] = kpoints.as_dict()
                 except:
                     logger.error("Unable to parse KPOINTS for killed run {}."
                                  .format(dir_name))
@@ -428,7 +428,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                     s = Poscar.from_file(filename).structure
                     comp = s.composition
                     el_amt = s.composition.get_el_amt_dict()
-                    d.update({"unit_cell_formula": comp.to_dict,
+                    d.update({"unit_cell_formula": comp.as_dict(),
                               "reduced_cell_formula": comp.to_reduced_dict,
                               "elements": list(el_amt.keys()),
                               "nelements": len(el_amt),
@@ -436,7 +436,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                               "anonymous_formula": comp.anonymized_formula,
                               "nsites": comp.num_atoms,
                               "chemsys": "-".join(sorted(el_amt.keys()))})
-                    d["poscar"] = s.to_dict
+                    d["poscar"] = s.as_dict()
                 except:
                     logger.error("Unable to parse POSCAR for killed run {}."
                                  .format(dir_name))
@@ -453,7 +453,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             elif fnmatch(f, "OSZICAR"):
                 try:
                     d["oszicar"]["root"] = \
-                        Oszicar(os.path.join(dir_name, f)).to_dict
+                        Oszicar(os.path.join(dir_name, f)).as_dict()
                 except:
                     logger.error("Unable to parse OSZICAR for killed run in {}."
                                  .format(dir_name))
@@ -461,7 +461,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 if os.path.exists(os.path.join(dir_name, f, "OSZICAR")):
                     try:
                         d["oszicar"][f] = Oszicar(
-                            os.path.join(dir_name, f, "OSZICAR")).to_dict
+                            os.path.join(dir_name, f, "OSZICAR")).as_dict()
                     except:
                         logger.error("Unable to parse OSZICAR for killed "
                                      "run in {}.".format(dir_name))
@@ -473,7 +473,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         """
         vasprun_file = os.path.join(dir_name, filename)
         r = Vasprun(vasprun_file)
-        d = r.to_dict
+        d = r.as_dict()
         d["dir_name"] = os.path.abspath(dir_name)
         d["completed_at"] = \
             str(datetime.datetime.fromtimestamp(os.path.getmtime(
@@ -483,7 +483,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         if self.parse_dos and (self.parse_dos != 'final' \
                                or taskname == self.runs[-1]):
             try:
-                d["dos"] = r.complete_dos.to_dict
+                d["dos"] = r.complete_dos.as_dict()
             except Exception:
                 logger.warn("No valid dos data exist in {}.\n Skipping dos"
                             .format(dir_name))
@@ -667,7 +667,7 @@ def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5,
             "coordination_numbers": coord_num,
             "bandgap": gap, "cbm": cbm, "vbm": vbm,
             "is_gap_direct": is_direct,
-            "bv_structure": bv_struct.to_dict}
+            "bv_structure": bv_struct.as_dict()}
 
 
 def contains_vasp_input(dir_name):
@@ -709,7 +709,7 @@ def get_coordination_numbers(d):
         try:
             n = f.get_coordination_number(i)
             number = int(round(n))
-            cn.append({"site": s.to_dict, "coordination": number})
+            cn.append({"site": s.as_dict(), "coordination": number})
         except Exception:
             logger.error("Unable to parse coordination errors")
     return cn
