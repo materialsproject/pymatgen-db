@@ -10,6 +10,8 @@ import json
 import os
 import re
 import time
+from six.moves import filter
+from six.moves import map
 
 # Default schema version
 DEFAULT_VERSION = '1.0.0'
@@ -159,12 +161,13 @@ class Schema(HasMeta):
         elif t == self.IS_DICT:
             # fail if document is missing any required keys
             dkeys = set(doc.keys())
-            skeys = set(filter(lambda k: not self._schema[k].is_optional,  self._schema.iterkeys()))
+            skeys = set(filter(lambda k: not self._schema[k].is_optional,
+                               self._schema.keys()))
             if skeys - dkeys:
                 return self._vresult(path, "missing keys: ({})".format(', '.join(skeys - dkeys)))
             # check each item in document
-            for k, v in doc.iteritems():
-                if self._schema.has_key(k):
+            for k, v in doc.items():
+                if k in self._schema:
                     result = self._schema[k].validate(doc[k], path=path + "." + k)
                     if result is not None:
                         return result
@@ -201,13 +204,13 @@ class Schema(HasMeta):
                   "items": {"type": self._jstype(w0, s[0])}}
         elif w == self.IS_DICT:
             js = {"type": "object",
-                  "properties": {key: self._build_schema(val) for key, val in s.iteritems()}}
-            req = [key for key, val in s.iteritems() if not val.is_optional]
+                  "properties": {key: self._build_schema(val) for key, val in s.items()}}
+            req = [key for key, val in s.items() if not val.is_optional]
             if req:
                 js["required"] = req
         else:
             js = {"type": self._jstype(w, s)}
-        for k, v in self._json_schema_keys.iteritems():
+        for k, v in self._json_schema_keys.items():
             if k not in js:
                 js[k] = v
         return js
@@ -227,7 +230,7 @@ class Schema(HasMeta):
 
     def _vresult(self, path, fmt, *args):
         meta_info = ''
-        if self.meta and self.meta.has_key('desc'):
+        if self.meta and 'desc' in self.meta:
             meta_info = '="{}"'.format(self.meta['desc'])
         return "{}{}: ".format(path, meta_info) + fmt.format(*args)
 
@@ -237,7 +240,7 @@ class Schema(HasMeta):
             return [Schema(value[0])]
         elif t == self.IS_DICT:
             r = {}
-            for k, v in value.iteritems():
+            for k, v in value.items():
                 # skip metadata keys
                 if k.startswith(SPECIAL) and k.endswith(SPECIAL):
                     self.add_meta(k[SPECIAL_LEN:-SPECIAL_LEN], v)

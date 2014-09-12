@@ -19,6 +19,7 @@ import traceback
 # local
 from matgendb.builders import schema, util
 from matgendb import util as dbutil
+import six
 
 ## Logging
 
@@ -221,14 +222,13 @@ class HasExamples(object):
                 fail_fn("Failed to validate sample document: {}".format(result))
 
 
-class Builder(object):
+class Builder(six.with_metaclass(ABCMeta, object)):
     """Abstract base class for all builders
 
     To implement a new builder, inherit from this class and
     define the :meth:`get_items` and :meth:`process_item` methods.
     See the online documentation for details.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, ncores=1):
         """Create new builder for threaded or multiprocess execution.
@@ -414,12 +414,12 @@ class Builder(object):
         _log.debug("run.parallel.multiprocess.start")
         processes = []
         ProcRunner.instance = self
-        for i in xrange(self._ncores):
+        for i in range(self._ncores):
             self._status.running(i)
             proc = multiprocessing.Process(target=ProcRunner.run, args=(i,))
             proc.start()
             processes.append(proc)
-        for i in xrange(self._ncores):
+        for i in range(self._ncores):
             processes[i].join()
             code = processes[i].exitcode
             self._status.success(i) if 0 == code else self._status.fail(i)
@@ -439,7 +439,7 @@ class Builder(object):
                 self.process_item(item)
             except Queue.Empty:
                 break
-            except Exception, err:
+            except Exception as err:
                 _log.error("In _run(): {}".format(err))
                 if _log.isEnabledFor(logging.DEBUG):
                     _log.error(traceback.format_exc())

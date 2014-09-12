@@ -10,6 +10,7 @@ import time
 import unittest
 # Package
 from matgendb.tests.common import ComponentTest, get_component_logger
+from six.moves import map
 
 _log = get_component_logger("comp_incr")
 
@@ -41,7 +42,7 @@ class BuilderComponentTest(ComponentTest):
             "name": "mp-{:d}".format(x)
         })
         # Add first batch of records
-        map(addrec, range(1000))
+        map(addrec, list(range(1000)))
         # Run builder
         self.mgbuild(bld_args)
         # Count records in copied-to collection
@@ -54,7 +55,7 @@ class BuilderComponentTest(ComponentTest):
         for i, newrec in enumerate(m):
             _log.info("Build, #records = {:d}". format(newrec))
             # Add records
-            map(addrec, range(total, total+newrec))
+            map(addrec, list(range(total, total+newrec)))
             # Copy
             t0 = time.time()
             self.mgbuild(bld_args)
@@ -101,7 +102,7 @@ class BuilderComponentTest(ComponentTest):
 
         # Add first batch of records
         nrec = 10
-        map(addrec, range(nrec))
+        map(addrec, list(range(nrec)))
 
         # Run builder
         self.mgbuild(bld_args)
@@ -123,7 +124,7 @@ class BuilderComponentTest(ComponentTest):
             "recid": x, "value": x,
             "group": get_group(x, ngrp)
         })
-        map(addrec, range(rmin, rmax))
+        map(addrec, list(range(rmin, rmax)))
 
         # Re-run builder
         self.mgbuild(bld_args)

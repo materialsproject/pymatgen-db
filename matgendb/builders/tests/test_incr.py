@@ -31,7 +31,7 @@ def clear():
 
 def add_records(n, offs=0):
     obj = None
-    for i in xrange(n):
+    for i in range(n):
         obj = {"n": i + offs,
                "s": "foo-{:d}".format(i)}
         coll.insert(obj)
