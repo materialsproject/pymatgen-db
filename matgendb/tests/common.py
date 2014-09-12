@@ -77,7 +77,7 @@ class ComponentTest(unittest.TestCase):
         try:
             s = subprocess.check_output(self.MGBUILD_CMD + args,
                                         stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError, err:
+        except subprocess.CalledProcessError as err:
             print("ERROR: {}".format(err.output))
             raise
         return s

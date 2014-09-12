@@ -24,7 +24,7 @@ import json
 import socket
 import numpy as np
 import zlib
-
+import six
 from fnmatch import fnmatch
 from collections import OrderedDict
 
@@ -141,7 +141,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.collection = collection
         self.port = port
         self.simulate = simulate_mode
-        if isinstance(parse_dos, basestring) and parse_dos != 'final':
+        if isinstance(parse_dos, six.string_types) and parse_dos != 'final':
             raise ValueError('Invalid value for parse_dos')
         self.parse_dos = parse_dos
         self.compress_dos = compress_dos

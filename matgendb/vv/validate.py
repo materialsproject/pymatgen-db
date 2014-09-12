@@ -390,7 +390,7 @@ class Validator(DoesLogging):
                 self._log.info("collection {}: {:d} records, {:d} bytes, {:d} db-errors"
                                .format(subject, num_rec, nbytes, num_dberr))
                 break
-            except pymongo.errors.PyMongoError, err:
+            except pymongo.errors.PyMongoError as err:
                 num_dberr += 1
                 if num_dberr > self._max_dberr > 0:
                     raise DBError("Too many errors")
@@ -521,7 +521,7 @@ class Validator(DoesLogging):
         "Set aliases and wrap errors in ValueError"
         try:
             self.aliases = new_value
-        except Exception, err:
+        except Exception as err:
             raise ValueError("invalid value: {}".format(err))
 
 class Sampler(DoesLogging):

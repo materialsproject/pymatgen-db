@@ -165,7 +165,7 @@ class JsonWalker(object):
         {'a.b.c': 'foo'} ==> {'a': {'b': {'c': 'foo'}}}
         """
         r = {}
-        for k, v in o.iteritems():
+        for k, v in o.items():
             if isinstance(k, str):
                 k = k.replace('$', '_')
             if "." in k:
