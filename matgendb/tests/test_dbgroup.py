@@ -13,6 +13,7 @@ import tempfile
 import unittest
 from matgendb.dbgroup import ConfigGroup
 from matgendb import dbconfig
+import six
 
 _opj = os.path.join
 
@@ -149,7 +150,7 @@ class ConfigGroupTestCase(unittest.TestCase):
         self.assertEqual(expect, keys)
 
 def dict_subset(a, b):
-    for k in a.iterkeys():
+    for k in six.iterkeys(a):
         if k not in b or b[k] != a[k]:
             return False
     return True

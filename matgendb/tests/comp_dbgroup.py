@@ -17,6 +17,8 @@ import unittest
 from matgendb.tests.common import ComponentTest
 from matgendb.dbconfig import DB_KEY, COLL_KEY
 from matgendb.dbgroup import ConfigGroup
+import six
+from six.moves import map
 
 _log = logging.getLogger("comp_dbgroup")
 _h = logging.StreamHandler(sys.stdout)
@@ -48,7 +50,7 @@ class DBGroupComponentTest(ComponentTest):
     def create_configs(self):
         p = self._tmpdir
         cfg = {"host": "localhost", "port": 27017}
-        for db, collections in self.DB_COLL_CFG.iteritems():
+        for db, collections in six.iteritems(self.DB_COLL_CFG):
             cfg[DB_KEY] = db
             for coll in collections:
                 cfg[COLL_KEY] = coll
@@ -57,7 +59,7 @@ class DBGroupComponentTest(ComponentTest):
                 self._config_names.append("{}.{}".format(db, coll))
 
     def create_dbs(self):
-        for dbname, collections in self.DB_COLL.iteritems():
+        for dbname, collections in six.iteritems(self.DB_COLL):
             db = self._conn[dbname]
             for collname in collections:
                 coll = db[collname]

@@ -13,6 +13,8 @@ import time
 import unittest
 import matgendb.vv.validate as vv
 import matgendb.vv.util as vu
+from six.moves import map
+from six.moves import zip
 
 
 class TestCollectionFilter(unittest.TestCase):

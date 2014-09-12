@@ -106,7 +106,7 @@ class ComponentTest(unittest.TestCase):
         }
 
     def add_records(self, coll, n):
-        for i in xrange(n):
+        for i in range(n):
             coll.insert(self.get_record(i))
 
     def create_configs(self):

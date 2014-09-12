@@ -11,6 +11,7 @@ import time
 # Package
 from matgendb import util
 from matgendb.query_engine import QueryEngine
+import six
 
 _log = logging.getLogger("mg.vv.diff")
 
@@ -137,7 +138,7 @@ class Differ(object):
                 # Extract numeric properties.
                 if has_numprops:
                     pvals = {}
-                    for pkey in self._prop_deltas.iterkeys():
+                    for pkey in six.iterkeys(self._prop_deltas):
                         try:
                             pvals[pkey] = float(rec[pkey])
                         except KeyError:
@@ -331,7 +332,7 @@ class Delta(object):
             return {'delta': {'id': self._json_id}}
         dtype = 'abs' if self._eq else 'pct'
         incl = self._eq
-        self._json_id = IID.next()
+        self._json_id = six.advance_iterator(IID)
         return {
             'delta': {
                 'plus': self._dx,

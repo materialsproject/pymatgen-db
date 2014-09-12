@@ -16,6 +16,7 @@ import sys
 from .util import DoesLogging, total_size
 #from .mquery import *
 from smoqe.query import *
+import six
 
 
 class DBError(Exception):
@@ -85,7 +86,7 @@ class Projection(object):
         :rtype: dict
         """
         d = copy.copy(self._fields)
-        for k, v in self._slices.iteritems():
+        for k, v in six.iteritems(self._slices):
             d[k] = {'$slice': v}
         return d
 
@@ -221,7 +222,7 @@ class ConstraintSpec(DoesLogging):
         """
         sect = []
         # simple 1-level flatten operation
-        for values in self._sections.itervalues():
+        for values in six.itervalues(self._sections):
             for v in values:
                 sect.append(v)
         return iter(sect)
@@ -383,7 +384,7 @@ class Validator(DoesLogging):
         nbytes, num_dberr, num_rec = 0, 0, 0
         while 1:
             try:
-                record = cursor.next()
+                record = six.advance_iterator(cursor)
                 nbytes += total_size(record)
                 num_rec += 1
             except StopIteration:
@@ -471,7 +472,7 @@ class Validator(DoesLogging):
             if sval.constraints is not None:
                 groups = self._process_constraint_expressions(sval.constraints)
                 projection = Projection()
-                for cg in groups.itervalues():
+                for cg in six.itervalues(groups):
                     for c in cg:
                         projection.add(c.field, c.op, c.value)
                         query.add_clause(MongoClause(c))
@@ -482,7 +483,7 @@ class Validator(DoesLogging):
             cond_query = MongoQuery()
             if sval.filters is not None:
                 cond_groups = self._process_constraint_expressions(sval.filters, rev=False)
-                for cg in cond_groups.itervalues():
+                for cg in six.itervalues(cond_groups):
                     for c in cg:
                         cond_query.add_clause(MongoClause(c, rev=False))
             self._sections.append(self.SectionParts(cond_query, query, sval.sampler, report_fields))
@@ -505,13 +506,13 @@ class Validator(DoesLogging):
             groups[field].add_constraint(op, val)
 
         # add existence constraints
-        for cgroup in groups.itervalues():
+        for cgroup in six.itervalues(groups):
             cgroup.add_existence(rev)
 
         # optionally check for conflicts
         if conflict_check:
             # check for conflicts in each group
-            for field_name, group in groups.iteritems():
+            for field_name, group in six.iteritems(groups):
                 conflicts = group.get_conflicts()
                 if conflicts:
                     raise ValueError('Conflicts for field {}: {}'.format(field_name, conflicts))
@@ -618,12 +619,12 @@ class Sampler(DoesLogging):
         n = 0
         while n < n_target:
             try:
-                item = cursor.next()
+                item = six.advance_iterator(cursor)
             except StopIteration:
                 # need to keep looping through data until
                 # we get all our items!
                 cursor.rewind()
-                item = cursor.next()
+                item = six.advance_iterator(cursor)
             if self._keep():
                 yield item
                 n += 1

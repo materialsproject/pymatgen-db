@@ -20,6 +20,8 @@ import logging
 import time
 from sys import getsizeof
 from yaml import load
+import six
+from six.moves import map
 
 TRACE = logging.DEBUG -1
 
@@ -108,7 +110,7 @@ class Timing(object):
     def __exit__(self, type, value, tb):
         elapsed = time.time() - self.begin
         if self._log is not None:
-            nvp = ', '.join(['{}={}'.format(k, v) for k, v in self.kw.iteritems()])
+            nvp = ', '.join(['{}={}'.format(k, v) for k, v in six.iteritems(self.kw)])
             self._log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
         if self.elapsed:
             self.elapsed.value = elapsed
@@ -142,7 +144,7 @@ class JsonWalker(object):
         """
         if isinstance(o, dict):
             d = o if self._dx is None else self._dx(o)
-            return {k: self.walk(v) for k, v in d.iteritems()}
+            return {k: self.walk(v) for k, v in six.iteritems(d)}
         elif isinstance(o, list):
             return [self.walk(v) for v in o]
         else:

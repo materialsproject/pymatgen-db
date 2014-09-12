@@ -13,6 +13,9 @@ import smtplib
 from .util import DoesLogging, JsonWalker
 from ..util import MongoJSONEncoder
 from .diff import Differ, Delta  # for field constants, formatting
+import six
+from six.moves import map
+from six.moves import zip
 
 
 class Report:
@@ -304,7 +307,7 @@ class MarkdownFormatter:
         self._idcol = id_column
 
     def _mapdump(self, d):
-        return ', '.join((('{}={}'.format(k, v) for k, v in d.iteritems())))
+        return ', '.join((('{}={}'.format(k, v) for k, v in six.iteritems(d))))
 
     def _fixed_width(self, values, widths):
         s = ''.join(["{{:{:d}s}}".format(w + 1).format(str(v))
@@ -394,11 +397,11 @@ class Emailer(DoesLogging):
             refused = s.sendmail(self._sender, self._recipients, msg.as_string())
             if refused:
                 self._log.warn("Email to {:d} recipients was refused".format(len(refused)))
-                for person, (code, msg) in refused.iteritems():
+                for person, (code, msg) in six.iteritems(refused):
                     self._log("Email to {p} was refused ({c}): {m}".format(p=person, c=code, m=msg))
             s.quit()
             n_recip = len(self._recipients)
-        except Exception, err:
+        except Exception as err:
             self._log.error("connection to SMTP server failed: {}".format(err))
             n_recip = 0
         return n_recip
@@ -715,5 +718,5 @@ class DiffTextFormatter(DiffFormatter):
         return '\n'.join(lines)
 
     def _record(self, rec):
-        fields = ['{}: {}'.format(k, v) for k, v in rec.iteritems()]
+        fields = ['{}: {}'.format(k, v) for k, v in six.iteritems(rec)]
         return '{' + ', '.join(fields) + '}'

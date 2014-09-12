@@ -32,7 +32,7 @@ def create_record(num):
         'name': recname(num),
         'color': random.choice(("red", "orange", "green", "indigo", "taupe", "mauve")),
         'same': 'yawn',
-        'idlist': range(num),
+        'idlist': list(range(num)),
         'zero': 0,
         'energy': random.random() * 5 - 2.5,
     }
@@ -51,14 +51,14 @@ class MyTestCase(unittest.TestCase):
 
     def setUp(self):
         self.collections, self.engines = ['diff1', 'diff2'], []
-        self.colors = [[None, None] for i in xrange(self.NUM_RECORDS)]
-        self.energies = [[None, None] for i in xrange(self.NUM_RECORDS)]
+        self.colors = [[None, None] for i in range(self.NUM_RECORDS)]
+        self.energies = [[None, None] for i in range(self.NUM_RECORDS)]
         for c in self.collections:
             # Create mock query engine.
             self.engines.append(MockQueryEngine(collection=c, **db_config))
         for ei, engine in enumerate(self.engines):
             engine.collection.remove({})
-            for i in xrange(self.NUM_RECORDS):
+            for i in range(self.NUM_RECORDS):
                 rec = create_record(i)
                 engine.collection.insert(rec)
                 # save some vars for easy double-checking
