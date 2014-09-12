@@ -72,7 +72,7 @@ class DBConfig(object):
             if config_file is not None:
                 try:
                     settings = get_settings(config_file)
-                except Exception, err:
+                except Exception as err:
                     path = _as_file(config_file).name
                     raise ConfigurationFileError(path, err)
         self._cfg.update(settings)

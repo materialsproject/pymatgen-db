@@ -41,6 +41,7 @@ import pymongo
 from enum import Enum
 from matgendb.query_engine import QueryEngine
 from matgendb.builders import util as bld_util
+import six
 
 # Logging
 
@@ -65,9 +66,7 @@ class NoTrackingCollection(Exception):
 ## High level API
 ## --------------
 
-class TrackingInterface(object):
-    __metaclass__ = ABCMeta
-
+class TrackingInterface(six.with_metaclass(ABCMeta, object)):
     @abstractmethod
     def set_mark(self):
         """Set the mark to the current end of the collection. This is saved in the database
@@ -292,7 +291,7 @@ class Mark(object):
         :rtype: dict
         """
         q = {}
-        for field, value in self._pos.iteritems():
+        for field, value in self._pos.items():
             if value is None:
                 q.update({field: {'$exists': True}})
             else:
@@ -358,7 +357,7 @@ class CollectionTracker(object):
             spec = {k: obj[k] for k in (mark.FLD_FLD, mark.FLD_OP)}
             _log.debug("save: upsert-spec={} upsert-obj={}".format(spec, obj))
             self._track.update(spec, obj, upsert=True)
-        except pymongo.errors.PyMongoError, err:
+        except pymongo.errors.PyMongoError as err:
             raise DBError("{}".format(err))
 
     def retrieve(self, operation, field=None):

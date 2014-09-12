@@ -175,7 +175,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             return tid
         except Exception as ex:
             import traceback
-            print traceback.format_exc(ex)
+            print(traceback.format_exc(ex))
             logger.error(traceback.format_exc(ex))
             return False
 
@@ -413,7 +413,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                     else:
                         d["run_type"] = "GGA"
                 except Exception as ex:
-                    print str(ex)
+                    print(str(ex))
                     logger.error("Unable to parse INCAR for killed run {}."
                                  .format(dir_name))
             elif fnmatch(f, "KPOINTS*"):
@@ -529,7 +529,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                           "xc_override": xc}
             vals = sorted(d2["reduced_cell_formula"].values())
             d["anonymous_formula"] = {string.ascii_uppercase[i]: float(vals[i])
-                                      for i in xrange(len(vals))}
+                                      for i in range(len(vals))}
             d["output"] = {
                 "crystal": d2["output"]["crystal"],
                 "final_energy": d2["output"]["final_energy"],
@@ -561,7 +561,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             return d
         except Exception as ex:
             import traceback
-            print traceback.format_exc(ex)
+            print(traceback.format_exc(ex))
             logger.error("Error in " + os.path.abspath(dir_name) +
                          ".\n" + traceback.format_exc(ex))
 

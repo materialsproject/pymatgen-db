@@ -482,10 +482,10 @@ class QueryEngine(object):
                     d = json.loads(s)
                 tdos = Dos.from_dict(d)
                 pdoss = {}
-                for i in xrange(len(d['pdos'])):
+                for i in range(len(d['pdos'])):
                     ados = d['pdos'][i]
                     all_ados = {}
-                    for j in xrange(len(ados)):
+                    for j in range(len(ados)):
                         orb = Orbital.from_vasp_index(j)
                         odos = ados[str(orb)]
                         all_ados[orb] = {Spin.from_int(int(k)): v

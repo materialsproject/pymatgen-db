@@ -9,6 +9,7 @@ import glob
 import os
 import re
 from . import dbconfig, query_engine, util
+from six.moves import filter
 
 # aliases
 _opj = os.path.join
@@ -134,7 +135,7 @@ class ConfigGroup(object):
         delme = []
         if self._is_pattern(name):
             expr = re.compile(self._pattern_to_regex(name))
-            for key, obj in self._cached.iteritems():
+            for key, obj in self._cached.items():
                 if expr.match(key):
                     delme.append(key)
         else:
@@ -168,7 +169,7 @@ class ConfigGroup(object):
             name = self._pattern_to_regex(name)
             # fill 'qe' with all items
             qe = {}
-            for k, v in self._d.re_get(name).iteritems():
+            for k, v in self._d.re_get(name).items():
                 qe[k] = self._get_qe(k, v)
             if not qe:
                 raise KeyError("No configuration found, name='{}' full-regex='{}'"
@@ -230,7 +231,7 @@ class RegexDict(dict):
         if not pattern.endswith("$"):
             pattern += "$"
         expr = re.compile(pattern)
-        return filter(expr.match, self.iterkeys())
+        return filter(expr.match, self.keys())
 
     def re_get(self, pattern):
         """Return values whose key matches `pattern`
@@ -253,6 +254,6 @@ def create_query_engine(config, clazz):
     """
     try:
         qe = clazz(**config.settings)
-    except Exception, err:
+    except Exception as err:
         raise CreateQueryEngineError(clazz, config.settings, err)
     return qe
