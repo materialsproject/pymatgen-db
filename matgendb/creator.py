@@ -175,8 +175,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             return tid
         except Exception as ex:
             import traceback
-            print(traceback.format_exc(ex))
-            logger.error(traceback.format_exc(ex))
+            logger.error(traceback.format_exc())
             return False
 
     def calculate_stability(self, d):
