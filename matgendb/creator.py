@@ -38,7 +38,7 @@ from pymatgen.core.composition import Composition
 from pymatgen.io.vaspio import Vasprun, Incar, Kpoints, Potcar, Poscar, \
     Outcar, Oszicar
 from pymatgen.io.cifio import CifWriter
-from pymatgen.symmetry.finder import SymmetryFinder
+from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from pymatgen.analysis.bond_valence import BVAnalyzer
 from monty.io import zopen
 from pymatgen.matproj.rest import MPRester
@@ -548,8 +548,8 @@ class VaspToDbTaskDrone(AbstractDrone):
                 d["state"] = "stopped"
             d["analysis"] = get_basic_analysis_and_error_checks(d)
 
-            sg = SymmetryFinder(Structure.from_dict(d["output"]["crystal"]),
-                                0.1)
+            sg = SpacegroupAnalyzer(Structure.from_dict(d["output"]["crystal"]),
+                                    0.1)
             d["spacegroup"] = {"symbol": sg.get_spacegroup_symbol(),
                                "number": sg.get_spacegroup_number(),
                                "point_group": sg.get_point_group(),
