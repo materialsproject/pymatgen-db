@@ -4,5 +4,5 @@ pymongo==2.7.2
 prettytable==0.7.2
 django==1.7
 mongomock==1.2.0
-smoqe==0.1.1
+smoqe==0.1.3
 enum34==0.9.23
