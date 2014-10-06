@@ -1,5 +1,5 @@
 pymatgen==3.0.5
-monty==0.5.6
+monty==0.5.9
 pymongo==2.7.2
 prettytable==0.7.2
 django==1.7
