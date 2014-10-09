@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>matgendb.vv.validate &mdash; pymatgen-db 0.4.2 documentation</title>
+    <title>matgendb.vv.validate &mdash; pymatgen-db 0.4.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/proBlue.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.4.2',
+        VERSION:     '0.4.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
-    <link rel="top" title="pymatgen-db 0.4.2 documentation" href="../../../index.html" />
+    <link rel="top" title="pymatgen-db 0.4.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" />
  
 <script type="text/javascript">
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">pymatgen-db 0.4.2 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">pymatgen-db 0.4.3 documentation</a> &raquo;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -73,6 +73,7 @@
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">DoesLogging</span><span class="p">,</span> <span class="n">total_size</span>
 <span class="c">#from .mquery import *</span>
 <span class="kn">from</span> <span class="nn">smoqe.query</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">six</span>
 
 
 <div class="viewcode-block" id="DBError"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.DBError">[docs]</a><span class="k">class</span> <span class="nc">DBError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -142,7 +143,7 @@
 <span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_slices</span><span class="p">):</span>
             <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;$slice&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">d</span>
 
@@ -278,7 +279,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sect</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c"># simple 1-level flatten operation</span>
-        <span class="k">for</span> <span class="n">values</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
                 <span class="n">sect</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="n">sect</span><span class="p">)</span>
@@ -440,14 +441,14 @@
         <span class="n">nbytes</span><span class="p">,</span> <span class="n">num_dberr</span><span class="p">,</span> <span class="n">num_rec</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">record</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">record</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">advance_iterator</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
                 <span class="n">nbytes</span> <span class="o">+=</span> <span class="n">total_size</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
                 <span class="n">num_rec</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;collection {}: {:d} records, {:d} bytes, {:d} db-errors&quot;</span>
                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">num_rec</span><span class="p">,</span> <span class="n">nbytes</span><span class="p">,</span> <span class="n">num_dberr</span><span class="p">))</span>
                 <span class="k">break</span>
-            <span class="k">except</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">PyMongoError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">except</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">PyMongoError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="n">num_dberr</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">num_dberr</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_dberr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">DBError</span><span class="p">(</span><span class="s">&quot;Too many errors&quot;</span><span class="p">)</span>
@@ -496,7 +497,7 @@
                 <span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>         <span class="c"># swap out value, temporarily</span>
             <span class="c"># take length for size</span>
             <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_size</span><span class="p">():</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fval</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fval</span><span class="p">,</span> <span class="s">&#39;__len__&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fval</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fval</span><span class="p">,</span> <span class="s">&#39;__len__&#39;</span><span class="p">):</span>
                     <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ConstraintViolation</span><span class="p">(</span><span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">fval</span><span class="p">),</span> <span class="s">&#39;sequence&#39;</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_variable</span><span class="p">():</span>
                         <span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">var_name</span>      <span class="c"># put original value back</span>
@@ -528,7 +529,7 @@
             <span class="k">if</span> <span class="n">sval</span><span class="o">.</span><span class="n">constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_constraint_expressions</span><span class="p">(</span><span class="n">sval</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
                 <span class="n">projection</span> <span class="o">=</span> <span class="n">Projection</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">cg</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">cg</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="n">groups</span><span class="p">):</span>
                     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cg</span><span class="p">:</span>
                         <span class="n">projection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
                         <span class="n">query</span><span class="o">.</span><span class="n">add_clause</span><span class="p">(</span><span class="n">MongoClause</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
@@ -539,7 +540,7 @@
             <span class="n">cond_query</span> <span class="o">=</span> <span class="n">MongoQuery</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">sval</span><span class="o">.</span><span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">cond_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_constraint_expressions</span><span class="p">(</span><span class="n">sval</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span> <span class="n">rev</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">cg</span> <span class="ow">in</span> <span class="n">cond_groups</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">cg</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="n">cond_groups</span><span class="p">):</span>
                     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cg</span><span class="p">:</span>
                         <span class="n">cond_query</span><span class="o">.</span><span class="n">add_clause</span><span class="p">(</span><span class="n">MongoClause</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">rev</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SectionParts</span><span class="p">(</span><span class="n">cond_query</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">sval</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span> <span class="n">report_fields</span><span class="p">))</span>
@@ -562,13 +563,13 @@
             <span class="n">groups</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
         <span class="c"># add existence constraints</span>
-        <span class="k">for</span> <span class="n">cgroup</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">cgroup</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="n">groups</span><span class="p">):</span>
             <span class="n">cgroup</span><span class="o">.</span><span class="n">add_existence</span><span class="p">(</span><span class="n">rev</span><span class="p">)</span>
 
         <span class="c"># optionally check for conflicts</span>
         <span class="k">if</span> <span class="n">conflict_check</span><span class="p">:</span>
             <span class="c"># check for conflicts in each group</span>
-            <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">groups</span><span class="p">):</span>
                 <span class="n">conflicts</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">get_conflicts</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">conflicts</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Conflicts for field {}: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">conflicts</span><span class="p">))</span>
@@ -578,7 +579,7 @@
         <span class="s">&quot;Set aliases and wrap errors in ValueError&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span> <span class="o">=</span> <span class="n">new_value</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;invalid value: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
 </div></div>
 <div class="viewcode-block" id="Sampler"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Sampler">[docs]</a><span class="k">class</span> <span class="nc">Sampler</span><span class="p">(</span><span class="n">DoesLogging</span><span class="p">):</span>
@@ -675,12 +676,12 @@
         <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">n_target</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">item</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">advance_iterator</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
                 <span class="c"># need to keep looping through data until</span>
                 <span class="c"># we get all our items!</span>
                 <span class="n">cursor</span><span class="o">.</span><span class="n">rewind</span><span class="p">()</span>
-                <span class="n">item</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">advance_iterator</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep</span><span class="p">():</span>
                 <span class="k">yield</span> <span class="n">item</span>
                 <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
@@ -717,14 +718,14 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">pymatgen-db 0.4.2 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">pymatgen-db 0.4.3 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
 
     <div class="footer">
         &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking
