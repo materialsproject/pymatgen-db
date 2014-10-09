@@ -310,14 +310,16 @@ class VaspToDbTaskDrone(AbstractDrone):
         transformations = {}
         filenames = glob.glob(os.path.join(fullpath, "transformations.json*"))
         if len(filenames) >= 1:
-            with zopen(filenames[0], "rb") as f:
+            with zopen(filenames[0], "rt") as f:
                 transformations = json.load(f)
                 try:
                     m = re.match("(\d+)-ICSD",
                                  transformations["history"][0]["source"])
                     if m:
                         d["icsd_id"] = int(m.group(1))
-                except ValueError:
+                except Exception as ex:
+                    logger.warning("Cannot parse ICSD from transformations "
+                                   "file.")
                     pass
         else:
             logger.warning("Transformations file does not exist.")
@@ -517,7 +519,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                              "elements", "nelements", "cif", "density",
                              "is_hubbard", "hubbards", "run_type"]:
                 d[root_key] = d2[root_key]
-            d["chemsys"] = "-".join(sorted(d2["elements"]))    
+            d["chemsys"] = "-".join(sorted(d2["elements"]))
 
             #store any overrides to the exchange correlation functional
             xc = d2["input"]["incar"].get("GGA")
