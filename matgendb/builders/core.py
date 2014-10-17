@@ -301,7 +301,7 @@ class Builder(six.with_metaclass(ABCMeta, object)):
         return [{"Hello": 1}, {"World": 2}]
 
     @abstractmethod
-    def process_item(self, item):
+    def process_item(self, item, index):
         """Implement the analysis for each item of work here.
 
         :param item: One item of work from the queue (i.e., one item from the iterator that
@@ -436,7 +436,7 @@ class Builder(six.with_metaclass(ABCMeta, object)):
         while 1:
             try:
                 item = self._queue.get(timeout=2)
-                self.process_item(item)
+                self.process_item(item, index)
             except Queue.Empty:
                 break
             except Exception as err:
