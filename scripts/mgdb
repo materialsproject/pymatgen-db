@@ -256,11 +256,12 @@ def init_logging(args):
     hndlr = logging.StreamHandler()
     hndlr.setFormatter(logging.Formatter("[%(levelname)-6s] %(asctime)s %(name)s :: %(message)s"))
     _log.addHandler(hndlr)
-    if args.quiet:
+    if 'quiet' in args and args.quiet:
         lvl = logging.CRITICAL
     else:
+        vb = args.vb if 'vb' in args else 0
         # Level:  default      -v            -vv
-        lvl = (logging.WARN, logging.INFO, logging.DEBUG)[min(args.vb, 2)]
+        lvl = (logging.WARN, logging.INFO, logging.DEBUG)[min(vb, 2)]
     _log.setLevel(lvl)
 
 
