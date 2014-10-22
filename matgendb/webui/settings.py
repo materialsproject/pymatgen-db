@@ -4,7 +4,7 @@ import django
 
 # TEMPLATE_DIRS is a tuple if django >= 1.6 
 # See http://stackoverflow.com/questions/20353880/template-dirs-is-missing-in-settings-py-django-1-6
-have_django_ge16 = django.VERSION[0] == 1 and django.VERSION[1] >= 6
+have_django_lt16 = django.VERSION[0] == 1 and django.VERSION[1] < 6
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -108,7 +108,7 @@ TEMPLATE_DIRS = (
     PROJECT_DIR
 )
 
-if have_django_ge16:
+if not have_django_lt16:
     TEMPLATE_DIRS = tuple(TEMPLATE_DIRS)
 
 INSTALLED_APPS = (
