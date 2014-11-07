@@ -17,10 +17,10 @@ import json
 import itertools
 import logging
 import os
-import gridfs
 import zlib
 from collections import OrderedDict, Iterable
 
+from gridfs.grid_file import GridOut
 from pymongo import MongoClient
 from pymatgen import Structure, Composition
 from pymatgen.electronic_structure.core import Orbital, Spin
@@ -472,8 +472,7 @@ class QueryEngine(object):
         for r in self.query(fields, args):
             dosid = r['calculations'][-1]['dos_fs_id']
         if dosid != None:
-            self._fs = gridfs.GridFS(self.db, 'dos_fs')
-            with self._fs.get(dosid) as dosfile:
+            with GridOut(self.db.dos_fs, dosid) as dosfile:
                 s = dosfile.read()
                 try:
                     d = json.loads(s)
