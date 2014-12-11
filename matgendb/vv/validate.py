@@ -12,6 +12,7 @@ __date__ = "1/31/13"
 import pymongo
 import random
 import sys
+import collections
 
 from .util import DoesLogging, total_size
 #from .mquery import *
@@ -24,26 +25,29 @@ class DBError(Exception):
 
 
 def mongo_get(rec, key, default=None):
-    """Get value from dict using MongoDB dot-separated path semantics.
-
+    """
+    Get value from dict using MongoDB dot-separated path semantics.
     For example:
-        get_mongo({'a':{'b':1}, x:2}, 'a.b') -> 1
-        get_mongo({'a':{'b':1}, x:2}, 'x') -> 2
-        get_mongo({'a':{'b':1}, x:2}, 'a.b.c') -> None
+
+    >>> assert mongo_get({'a': {'b': 1}, 'x': 2}, 'a.b') == 1
+    >>> assert mongo_get({'a': {'b': 1}, 'x': 2}, 'x') == 2
+    >>> assert mongo_get({'a': {'b': 1}, 'x': 2}, 'a.b.c') is None
 
     :param rec: mongodb document
     :param key: path to mongo value
     :param default: default to return if not found
     :return: value, potentially nested, or default if not found
-    :raise: ValueError, if record is not a dict or key is invalid.
+    :raise: ValueError, if record is not a dict.
     """
     if not rec:
         return default
-    if not hasattr(rec, 'get'):
+    if not isinstance(rec, collections.Mapping):
         raise ValueError('input record must act like a dict')
     if not '.' in key:
         return rec.get(key, default)
     for key_part in key.split('.'):
+        if not isinstance(rec, collections.Mapping):
+            return default
         if not key_part in rec:
             return default
         rec = rec[key_part]

@@ -78,6 +78,9 @@ class DBConfig(object):
         self._cfg.update(settings)
         normalize_auth(self._cfg)
 
+    def __str__(self):
+        return str(self._cfg)
+
     def copy(self):
         """Return a copy of self (internal settings are copied).
         """
@@ -94,6 +97,15 @@ class DBConfig(object):
     @property
     def port(self):
         return self._cfg.get(PORT_KEY, self.DEFAULT_PORT)
+
+    @property
+    def dbname(self):
+        """Name of the database."""
+        return self._cfg.get(DB_KEY, None)
+
+    @dbname.setter
+    def dbname(self, value):
+        self._cfg[DB_KEY] = value
 
     @property
     def collection(self):
