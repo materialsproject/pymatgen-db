@@ -26,6 +26,7 @@ DB_KEY = "database"
 COLL_KEY = "collection"
 USER_KEY = "user"
 PASS_KEY = "password"
+ALIASES_KEY = "aliases"
 
 class ConfigurationFileError(Exception):
     def __init__(self, filename, err):
@@ -38,10 +39,18 @@ class DBConfig(object):
 
     DEFAULT_PORT = 27017
     DEFAULT_FILE = 'db.json'
+    ALL_SETTINGS = [
+        HOST_KEY,
+        PORT_KEY,
+        DB_KEY,
+        COLL_KEY,
+        ALIASES_KEY,
+    ]
     DEFAULT_SETTINGS = [
         (HOST_KEY, "localhost"),
         (PORT_KEY, DEFAULT_PORT),
-        (DB_KEY, "vasp")
+        (DB_KEY, "vasp"),
+        (ALIASES_KEY, {}),
     ]
 
     def __init__(self, config_file=None, config_dict=None):
