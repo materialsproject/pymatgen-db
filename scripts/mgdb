@@ -27,16 +27,19 @@ from pymatgen.apps.borg.queen import BorgQueen
 
 from matgendb.query_engine import QueryEngine
 from matgendb.creator import VaspToDbTaskDrone
+from matgendb.dbconfig import DBConfig
 from matgendb.util import get_settings, DEFAULT_SETTINGS, MongoJSONEncoder
 
 _log = logging.getLogger("mg")  # parent
 
 def init_db(args):
-    d = DEFAULT_SETTINGS
+    settings = DBConfig.ALL_SETTINGS
+    defaults = dict(DEFAULT_SETTINGS)
     doc = {}
     print("Please supply the following configuration values")
     print("(press Enter if you want to accept the defaults)\n")
-    for k, v in d:
+    for k in settings:
+        v = defaults.get(k, '')
         val = raw_input("Enter {} (default: {}) : ".format(k, v))
         doc[k] = val if val else v
     doc["port"] = int(doc["port"])  # enforce the port as an int
