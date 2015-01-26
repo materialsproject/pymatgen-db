@@ -263,7 +263,7 @@ class QueryEngine(object):
         fields.extend(["task_id", "unit_cell_formula", "energy", "is_hubbard",
                        "hubbards", "pseudo_potential.labels",
                        "pseudo_potential.functional", "run_type",
-                       "input.is_lasph", "input.xc_override"])
+                       "input.is_lasph", "input.xc_override", "input.potcar_spec"])
         for c in self.query(fields, criteria):
             func = c["pseudo_potential.functional"]
             labels = c["pseudo_potential.labels"]
@@ -273,6 +273,7 @@ class QueryEngine(object):
                           "hubbards": c["hubbards"],
                           "potcar_symbols": symbols,
                           "is_lasph": c.get("input.is_lasph") or False,
+                          "potcar_spec": c.get("input.potcar_spec"),
                           "xc_override": c.get("input.xc_override")}
             optional_data = {k: c[k] for k in optional_data}
             if inc_structure:
