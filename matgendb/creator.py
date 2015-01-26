@@ -527,6 +527,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 xc = xc.upper()
             d["input"] = {"crystal": d1["input"]["crystal"],
                           "is_lasph": d2["input"]["incar"].get("LASPH", False),
+                          "potcar_spec": d1["input"].get("potcar_spec"),
                           "xc_override": xc}
             vals = sorted(d2["reduced_cell_formula"].values())
             d["anonymous_formula"] = {string.ascii_uppercase[i]: float(vals[i])
