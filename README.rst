@@ -182,6 +182,8 @@ For more advanced queries, you can use the QueryEngine class for which an
 alias is provided at the root package. Some examples are as follows::
 
     >>> from matgendb import QueryEngine
+    # Depending on your db.json, you may need to supply keyword args below
+    # for `port`, `database`, `collection`, etc.
     >>> qe = QueryEngine()
 
     #Print the task id and formula of all entries in the database.
