@@ -57,7 +57,7 @@ def get_database(config_file=None, settings=None, admin=False):
         user = d["admin_user"] if admin else d["readonly_user"]
         passwd = d["admin_password"] if admin else d["readonly_password"]
         db.authenticate(user, passwd)
-    except (KeyError, TypeError):
+    except (KeyError, TypeError, ValueError):
         _log.warn("No {admin,readonly}_user/password found in config. file, "
                   "accessing DB without authentication")
     return db
