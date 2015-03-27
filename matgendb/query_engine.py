@@ -62,7 +62,7 @@ class QueryEngine(object):
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
                  aliases_config=None, default_properties=None,
-                 connection=None, **ignore):
+                 connection=None, replicaset=None, **ignore):
         """Constructor.
 
         Args:
@@ -118,10 +118,16 @@ class QueryEngine(object):
         """
         self.host = host
         self.port = port
+        self.replicaset = replicaset
         self.database_name = database
         self.collection_name = collection
         if connection is None:
-            self.connection = MongoClient(self.host, self.port)
+            # can't pass replicaset=None to MongoClient (fails validation)
+            if self.replicaset:
+                self.connection = MongoClient(self.host, self.port,
+                                              replicaset=self.replicaset)
+            else:
+                self.connection = MongoClient(self.host, self.port)
         else:
             self.connection = connection
         self.db = self.connection[database]
