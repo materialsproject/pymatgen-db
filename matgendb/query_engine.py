@@ -376,8 +376,7 @@ class QueryEngine(object):
 
         crit = self._parse_criteria(criteria)
         #print("@@ {}.find({}, fields={}, timeout=False)".format(self.collection.name, crit, props))
-        cur = self.collection.find(crit, fields=props,
-                                   timeout=False).skip(index)
+        cur = self.collection.find(crit, props).skip(index)
         if limit is not None:
             cur.limit(limit)
         if distinct_key is not None:
