@@ -147,19 +147,18 @@ def command_build(args):
     :param args: Command-line arguments
     :type args: list
     """
-    # Get builder, optionally in module.
-    bld_arg = args.builder
-    if '.' in bld_arg:
-        bld_path, bld_class = bld_arg.rsplit('.', 1)
-    else:
-        bld_path, bld_class = None, bld_arg
-    builder_class = find_builder(bld_path, bld_class)
+    # Get builder class
+    builder_class = find_builder(args.builder, args.cls)
     if builder_class is None:
-        raise BuilderNotFoundError(bld_arg)
-
+        raise BuilderNotFoundError("{}.{}".format(
+            args.builder, args.cls))
     # Create builder
-    builder = builder_class(ncores=args.num_cores)
-
+    kwargs = dict(ncores=args.num_cores)
+    try:
+        builder = builder_class(**kwargs)
+    except TypeError as err:
+        raise BuilderError("Cannot create object: {}.{}({}): {}".format(
+            args.builder, args.cls, kvp_dict(kwargs), err))
     # Get parameter types
     params = builder.get_parameters()
     if params is None:
@@ -281,7 +280,10 @@ def get_settings(config_file, allow_default=True):
 
 def find_builder(module_name, class_name):
     """Find a builder class.
-    Return class obj, or None if not found.
+
+    :param module_name: Name of module (dotted)
+    :param class_name: Name of builder class.
+    :returnss: class obj, or None if not found.
     """
     try:
         md = importlib.import_module(module_name)
@@ -385,10 +387,9 @@ def main():
         subp = subparsers.add_parser(action, help="run a builder",
                                      parents=[parent_parser])
         subp.set_defaults(func=command_build)
-        subp.add_argument("builder", type=str, metavar="builder", default="",
-                          help="Builder class, relative or absolute import "
-                               "path, e.g. "
-                               "'my.awesome.BigBuilder' or 'BigBuilder'.")
+        subp.add_argument("builder", type=str, metavar="builder", default=None,
+                          help="Builder module, which is found using "
+                               "the module path. e.g., 'my.builders'")
         subp.add_argument("params", nargs="*", metavar="parameter",
                           type=kvp_option,
                           help="Builder parameters, in format <name>=<value>. "
@@ -398,6 +399,9 @@ def main():
                                "incremental mode for this QueryEngine."
                                .format(NOINCR_FLAG))
         iops = csv_list(Operation.__members__.keys())
+        subp.add_argument("-c", "--class", dest="cls", metavar="NAME",
+                          help="Builder class name (default=%(default)s)",
+                          default="Builder")
         subp.add_argument("-i", "--incr", dest="incr", type=incr_option,
                           metavar="OPER[:FIELD]",
                           help="Incremental mode for operation and optional "
