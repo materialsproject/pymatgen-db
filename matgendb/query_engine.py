@@ -69,7 +69,7 @@ class QueryEngine(object):
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
-                 aliases=None, default_criteria=None, default_properties=None,
+                 aliases_config=None, default_properties=None,
                  query_post=None, result_post=None, connection=None, **ignore):
         """Constructor.
 
@@ -116,8 +116,13 @@ class QueryEngine(object):
         self.collection_name = collection
 
         # Aliases and defaults
-        self.aliases = aliases or {}
-        self.default_criteria = default_criteria or {}
+        if aliases_config is None:
+            self.aliases = {}
+            self.default_criteria = {}
+        else:
+            self.aliases = aliases_config["aliases"]
+            self.default_criteria = aliases_config["defaults"]
+
         self.default_properties = default_properties or []
         # Post-processing functions
         self.query_post = query_post or []
