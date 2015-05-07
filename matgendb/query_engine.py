@@ -123,7 +123,6 @@ class QueryEngine(object):
         self.port = port
         self.replicaset = replicaset
         self.database_name = database
-        self.collection_name = collection
         if connection is None:
             # can't pass replicaset=None to MongoClient (fails validation)
             if self.replicaset:
@@ -136,47 +135,17 @@ class QueryEngine(object):
         self.db = self.connection[database]
         if user:
             self.db.authenticate(user, password)
-        self.set_collection(collection=collection)
-        self.set_aliases_and_defaults(aliases_config=aliases_config,
-                                      default_properties=default_properties)
+        self.collection_name = collection
 
-    def set_collection(self, collection):
-        """
-        Switch to another collection. Note that you may have to set the
-        aliases and default properties via set_aliases_and_defaults if the
-        schema of the new collection differs from the current collection.
-
-        Args:
-            collection:
-                Name of collection.
-        """
-        self.collection = self.db[collection]
-
-    def set_aliases_and_defaults(self, aliases_config=None,
-                                 default_properties=None):
-        """
-        Set the alias config and defaults to use. Typically used when
-        switching to a collection with a different schema.
-
-        Args:
-            aliases_config:
-                An alias dict to use. Defaults to None, which means the default
-                aliases defined in "aliases.json" is used. See constructor
-                for format.
-            default_properties:
-                List of property names (strings) to use by default, if no
-                properties are given to the 'properties' argument of
-                query().
-        """
         if aliases_config is None:
             with open(os.path.join(os.path.dirname(__file__),
                                    "aliases.json")) as f:
                 d = json.load(f)
-                self.aliases = d["aliases"]
-                self.default_criteria = d["defaults"]
+                self.aliases = d.get("aliases", {})
+                self.default_criteria = d.get("defaults", {})
         else:
-            self.aliases = aliases_config["aliases"]
-            self.default_criteria = aliases_config["defaults"]
+            self.aliases = aliases_config.get("aliases", {})
+            self.default_criteria = aliases_config.get("defaults", {})
 
         self.default_properties = default_properties or []
         # Post-processing functions
@@ -530,7 +499,6 @@ class QueryResults(Iterable):
     support nearly all cursor like attributes such as count(), explain(),
     hint(), etc. Please see pymongo cursor documentation for details.
     """
-    
     def __init__(self, prop_dict, result_cursor, postprocess=None):
         """Constructor.
 
