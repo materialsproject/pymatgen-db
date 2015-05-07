@@ -70,7 +70,8 @@ class QueryEngine(object):
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
                  aliases_config=None, default_properties=None,
-                 query_post=None, result_post=None, connection=None, **ignore):
+                 query_post=None, result_post=None, 
+                 connection=None, replicaset=None, **ignore):
         """Constructor.
 
         Args:
@@ -82,17 +83,32 @@ class QueryEngine(object):
             collection (str): Collection to query. Defaults to "tasks".
             connection (pymongo.Connection): If given, ignore 'host' and 'port'
                 and use existing connection.
-            aliases (dict): Keys are the incoming property, values are the
-                property it will be translated to. This makes it easier
-                to organize the doc format in a way that is different from the
-                query format.
-            default_criteria (dict): Criteria that should be applied
-                by default to all queries. For example, a collection may
-                contain data from both successful and unsuccessful runs but
-                for most querying purposes, you may want just successful runs
-                only. Note that defaults do not affect explicitly specified
-                criteria, i.e., if you suppy a query for {"state": "killed"},
-                this will override the default for {"state": "successful"}.
+            aliases_config(dict):
+                An alias dict to use. Defaults to None, which means the default
+                aliases defined in "aliases.json" is used. The aliases config
+                should be of the following format::
+
+                    {
+                        "aliases": {
+                            "e_above_hull": "analysis.e_above_hull",
+                            "energy": "output.final_energy",
+                            ....
+                        },
+                        "defaults": {
+                            "state": "successful"
+                        }
+                    }
+                aliases (dict): Keys are the incoming property, values are the
+                    property it will be translated to. This makes it easier
+                    to organize the doc format in a way that is different from the
+                    query format.
+                defaults (dict): Criteria that should be applied
+                    by default to all queries. For example, a collection may
+                    contain data from both successful and unsuccessful runs but
+                    for most querying purposes, you may want just successful runs
+                    only. Note that defaults do not affect explicitly specified
+                    criteria, i.e., if you suppy a query for {"state": "killed"},
+                    this will override the default for {"state": "successful"}.
             default_properties (list): Property names (strings) to use by
                 default, if no `properties` are given to query().
             query_post (list): Functions to post-process the `criteria` passed
@@ -105,20 +121,59 @@ class QueryEngine(object):
         """
         self.host = host
         self.port = port
+        self.replicaset = replicaset
         self.database_name = database
+        self.collection_name = collection
         if connection is None:
-            self.connection = MongoClient(self.host, self.port)
+            # can't pass replicaset=None to MongoClient (fails validation)
+            if self.replicaset:
+                self.connection = MongoClient(self.host, self.port,
+                                              replicaset=self.replicaset)
+            else:
+                self.connection = MongoClient(self.host, self.port)
         else:
             self.connection = connection
         self.db = self.connection[database]
         if user:
             self.db.authenticate(user, password)
-        self.collection_name = collection
+        self.set_collection(collection=collection)
+        self.set_aliases_and_defaults(aliases_config=aliases_config,
+                                      default_properties=default_properties)
 
-        # Aliases and defaults
+    def set_collection(self, collection):
+        """
+        Switch to another collection. Note that you may have to set the
+        aliases and default properties via set_aliases_and_defaults if the
+        schema of the new collection differs from the current collection.
+
+        Args:
+            collection:
+                Name of collection.
+        """
+        self.collection = self.db[collection]
+
+    def set_aliases_and_defaults(self, aliases_config=None,
+                                 default_properties=None):
+        """
+        Set the alias config and defaults to use. Typically used when
+        switching to a collection with a different schema.
+
+        Args:
+            aliases_config:
+                An alias dict to use. Defaults to None, which means the default
+                aliases defined in "aliases.json" is used. See constructor
+                for format.
+            default_properties:
+                List of property names (strings) to use by default, if no
+                properties are given to the 'properties' argument of
+                query().
+        """
         if aliases_config is None:
-            self.aliases = {}
-            self.default_criteria = {}
+            with open(os.path.join(os.path.dirname(__file__),
+                                   "aliases.json")) as f:
+                d = json.load(f)
+                self.aliases = d["aliases"]
+                self.default_criteria = d["defaults"]
         else:
             self.aliases = aliases_config["aliases"]
             self.default_criteria = aliases_config["defaults"]
@@ -229,7 +284,7 @@ class QueryEngine(object):
         fields.extend(["task_id", "unit_cell_formula", "energy", "is_hubbard",
                        "hubbards", "pseudo_potential.labels",
                        "pseudo_potential.functional", "run_type",
-                       "input.is_lasph", "input.xc_override"])
+                       "input.is_lasph", "input.xc_override", "input.potcar_spec"])
         for c in self.query(fields, criteria):
             func = c["pseudo_potential.functional"]
             labels = c["pseudo_potential.labels"]
@@ -239,6 +294,7 @@ class QueryEngine(object):
                           "hubbards": c["hubbards"],
                           "potcar_symbols": symbols,
                           "is_lasph": c.get("input.is_lasph") or False,
+                          "potcar_spec": c.get("input.potcar_spec"),
                           "xc_override": c.get("input.xc_override")}
             optional_data = {k: c[k] for k in optional_data}
             if inc_structure:
@@ -345,7 +401,9 @@ class QueryEngine(object):
             cur.limit(limit)
         if distinct_key is not None:
             cur = cur.distinct(distinct_key)
-        return QueryListResults(prop_dict, cur, postprocess=self.result_post)
+            return QueryListResults(prop_dict, cur, postprocess=self.result_post)
+        else:
+            return QueryResults(prop_dict, cur, postprocess=self.result_post)
 
     def _parse_properties(self, properties):
         """Make list of properties into 2 things:
@@ -472,6 +530,7 @@ class QueryResults(Iterable):
     support nearly all cursor like attributes such as count(), explain(),
     hint(), etc. Please see pymongo cursor documentation for details.
     """
+    
     def __init__(self, prop_dict, result_cursor, postprocess=None):
         """Constructor.
 
