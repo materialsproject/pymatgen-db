@@ -19,6 +19,7 @@ import itertools
 import logging
 import gridfs
 import zlib
+import os
 from collections import OrderedDict, Iterable
 
 from pymongo import MongoClient
