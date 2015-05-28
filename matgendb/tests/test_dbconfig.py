@@ -66,7 +66,8 @@ class SettingsTestCase(unittest.TestCase):
             "port": 27017,
             "database": u"foo",
             "user": u"guy",
-            "password": u"knock-knock"
+            "password": u"knock-knock",
+            "aliases": {},
         }
         self.tmp = tempfile.NamedTemporaryFile("r+")
         json.dump(self.cfg, self.tmp)

@@ -62,7 +62,7 @@ class QueryEngine(object):
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
                  aliases_config=None, default_properties=None,
-                 connection=None, **ignore):
+                 connection=None, replicaset=None, **ignore):
         """Constructor.
 
         Args:
@@ -118,10 +118,16 @@ class QueryEngine(object):
         """
         self.host = host
         self.port = port
+        self.replicaset = replicaset
         self.database_name = database
         self.collection_name = collection
         if connection is None:
-            self.connection = MongoClient(self.host, self.port)
+            # can't pass replicaset=None to MongoClient (fails validation)
+            if self.replicaset:
+                self.connection = MongoClient(self.host, self.port,
+                                              replicaset=self.replicaset)
+            else:
+                self.connection = MongoClient(self.host, self.port)
         else:
             self.connection = connection
         self.db = self.connection[database]
@@ -263,7 +269,7 @@ class QueryEngine(object):
         fields.extend(["task_id", "unit_cell_formula", "energy", "is_hubbard",
                        "hubbards", "pseudo_potential.labels",
                        "pseudo_potential.functional", "run_type",
-                       "input.is_lasph", "input.xc_override"])
+                       "input.is_lasph", "input.xc_override", "input.potcar_spec"])
         for c in self.query(fields, criteria):
             func = c["pseudo_potential.functional"]
             labels = c["pseudo_potential.labels"]
@@ -273,6 +279,7 @@ class QueryEngine(object):
                           "hubbards": c["hubbards"],
                           "potcar_symbols": symbols,
                           "is_lasph": c.get("input.is_lasph") or False,
+                          "potcar_spec": c.get("input.potcar_spec"),
                           "xc_override": c.get("input.xc_override")}
             optional_data = {k: c[k] for k in optional_data}
             if inc_structure:
@@ -369,8 +376,7 @@ class QueryEngine(object):
 
         crit = self._parse_criteria(criteria)
         #print("@@ {}.find({}, fields={}, timeout=False)".format(self.collection.name, crit, props))
-        cur = self.collection.find(crit, fields=props,
-                                   timeout=False).skip(index)
+        cur = self.collection.find(crit, props).skip(index)
         if limit is not None:
             cur.limit(limit)
         if distinct_key is not None:

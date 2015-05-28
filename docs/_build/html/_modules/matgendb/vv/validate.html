@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>matgendb.vv.validate &mdash; pymatgen-db 0.4.3 documentation</title>
+    <title>matgendb.vv.validate &mdash; pymatgen-db 0.4.5 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/proBlue.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.4.3',
+        VERSION:     '0.4.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
-    <link rel="top" title="pymatgen-db 0.4.3 documentation" href="../../../index.html" />
+    <link rel="top" title="pymatgen-db 0.4.5 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" />
  
 <script type="text/javascript">
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">pymatgen-db 0.4.3 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">pymatgen-db 0.4.5 documentation</a> &raquo;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -69,6 +69,7 @@
 <span class="kn">import</span> <span class="nn">pymongo</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">collections</span>
 
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">DoesLogging</span><span class="p">,</span> <span class="n">total_size</span>
 <span class="c">#from .mquery import *</span>
@@ -81,26 +82,29 @@
 
 </div>
 <div class="viewcode-block" id="mongo_get"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.mongo_get">[docs]</a><span class="k">def</span> <span class="nf">mongo_get</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Get value from dict using MongoDB dot-separated path semantics.</span>
-
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get value from dict using MongoDB dot-separated path semantics.</span>
 <span class="sd">    For example:</span>
-<span class="sd">        get_mongo({&#39;a&#39;:{&#39;b&#39;:1}, x:2}, &#39;a.b&#39;) -&gt; 1</span>
-<span class="sd">        get_mongo({&#39;a&#39;:{&#39;b&#39;:1}, x:2}, &#39;x&#39;) -&gt; 2</span>
-<span class="sd">        get_mongo({&#39;a&#39;:{&#39;b&#39;:1}, x:2}, &#39;a.b.c&#39;) -&gt; None</span>
+
+<span class="sd">    &gt;&gt;&gt; assert mongo_get({&#39;a&#39;: {&#39;b&#39;: 1}, &#39;x&#39;: 2}, &#39;a.b&#39;) == 1</span>
+<span class="sd">    &gt;&gt;&gt; assert mongo_get({&#39;a&#39;: {&#39;b&#39;: 1}, &#39;x&#39;: 2}, &#39;x&#39;) == 2</span>
+<span class="sd">    &gt;&gt;&gt; assert mongo_get({&#39;a&#39;: {&#39;b&#39;: 1}, &#39;x&#39;: 2}, &#39;a.b.c&#39;) is None</span>
 
 <span class="sd">    :param rec: mongodb document</span>
 <span class="sd">    :param key: path to mongo value</span>
 <span class="sd">    :param default: default to return if not found</span>
 <span class="sd">    :return: value, potentially nested, or default if not found</span>
-<span class="sd">    :raise: ValueError, if record is not a dict or key is invalid.</span>
+<span class="sd">    :raise: ValueError, if record is not a dict.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">rec</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">default</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="s">&#39;get&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;input record must act like a dict&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">rec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">key_part</span> <span class="ow">in</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">default</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key_part</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">default</span>
         <span class="n">rec</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">key_part</span><span class="p">]</span>
@@ -718,7 +722,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">pymatgen-db 0.4.3 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">pymatgen-db 0.4.5 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
