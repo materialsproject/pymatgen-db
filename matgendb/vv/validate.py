@@ -11,6 +11,7 @@ __date__ = "1/31/13"
 
 import pymongo
 import random
+import re
 import sys
 import collections
 
@@ -23,6 +24,44 @@ import six
 class DBError(Exception):
     pass
 
+class ValidatorSyntaxError(Exception):
+    "Syntax error in configuration of Validator"
+    def __init__(self, target, desc):
+        msg = 'Invalid syntax: {} -> "{}"'.format(desc, target)
+        Exception.__init__(self, msg)
+
+class PythonMethod(object):
+    """Encapsulate an external Python method that will be run on our target
+    MongoDB collection to perform arbitrary types of validation.
+    """
+    _PATTERN = re.compile(r'\s*(@\w+)(\s+\w+)*')
+
+    CANNOT_COMBINE_ERR = 'Call to a Python method cannot be combined '
+    'with any other constraints'
+    BAD_CONSTRAINT_ERR = 'Invalid constraint (must be: @<method> [<param> ..])'
+
+    @classmethod
+    def constraint_is_method(cls, text):
+        """Check from the text of the constraint whether it is
+        a Python method, as opposed to a 'normal' constraint.
+
+        :return: True if it is, False if not
+        """
+        m = cls._PATTERN.match(text)
+        return m is not None
+
+    def __init__(self, text):
+        """Create new instance from a raw constraint string.
+
+        :raises: ValidatorSyntaxerror
+        """
+        if not self._PATTERN.match(text):
+            raise ValidatorSyntaxError(text, self.BAD_CONSTRAINT_ERR)
+        tokens = re.split('@?\s+', text)
+        if len(tokens) < 1:
+            raise ValidatorSyntaxError(text, self.BAD_CONSTRAINT_ERR)
+        self.method = tokens[0]
+        self.params = tokens[1:]
 
 def mongo_get(rec, key, default=None):
     """
@@ -353,6 +392,7 @@ class Validator(DoesLogging):
         :type subject: str
         :return: Sets of constraint violation, one for each constraint_section
         :rtype: ConstraintViolationGroup
+        :raises: ValidatorSyntaxError
         """
         self._spec = constraint_spec
         self._progress.set_subject(subject)
@@ -374,10 +414,16 @@ class Validator(DoesLogging):
         :return: Group of constraint violations, if any, otherwise None
         :rtype: ConstraintViolationGroup or None
         """
-        query = parts.cond.to_mongo(disjunction=False)
-        query.update(parts.body.to_mongo())
         cvgroup = ConstraintViolationGroup()
         cvgroup.subject = subject
+
+        # If the constraint is an 'import' of code, treat it differently here
+        if self._is_python(parts):
+            num_found = self._run_python(cvgroup, coll, parts)
+            return None if num_found == 0 else cvgroup
+
+        query = parts.cond.to_mongo(disjunction=False)
+        query.update(parts.body.to_mongo())
         cvgroup.condition = parts.cond.to_mongo(disjunction=False)
         self._log.debug('Query spec: {}'.format(query))
         self._log.debug('Query fields: {}'.format(parts.report_fields))
@@ -467,30 +513,49 @@ class Validator(DoesLogging):
         :type constraint_spec: ConstraintSpec
         """
         self._sections = []
-        # loopover each condition on the records
+
+        # For each condition in the spec
+
         for sval in constraint_spec:
-            report_fields = self._base_report_fields.copy()
+            rpt_fld = self._base_report_fields.copy()
             #print("@@ CONDS = {}".format(sval.filters))
             #print("@@ MAIN = {}".format(sval.constraints))
-            query = MongoQuery()
-            if sval.constraints is not None:
-                groups = self._process_constraint_expressions(sval.constraints)
-                projection = Projection()
-                for cg in six.itervalues(groups):
-                    for c in cg:
-                        projection.add(c.field, c.op, c.value)
-                        query.add_clause(MongoClause(c))
-                    if self._add_exists:
-                        for c in cg.existence_constraints:
-                            query.add_clause(MongoClause(c, exists_main=True))
-                report_fields.update(projection.to_mongo())
+
+            # Constraints
+
+            # If the constraint is an external call to Python code
+            if self._is_python(sval.constraints):
+                query, proj = self._process_python(sval.constraints)
+                rpt_fld.update(proj.to_mongo())
+
+            # All other constraints, e.g. 'foo > 12'
+            else:
+                query = MongoQuery()
+                if sval.constraints is not None:
+                    groups = self._process_constraint_expressions(sval.constraints)
+                    projection = Projection()
+                    for cg in six.itervalues(groups):
+                        for c in cg:
+                            projection.add(c.field, c.op, c.value)
+                            query.add_clause(MongoClause(c))
+                        if self._add_exists:
+                            for c in cg.existence_constraints:
+                                query.add_clause(MongoClause(c, exists_main=True))
+                    rpt_fld.update(projection.to_mongo())
+
+            # Filters
+
             cond_query = MongoQuery()
             if sval.filters is not None:
                 cond_groups = self._process_constraint_expressions(sval.filters, rev=False)
                 for cg in six.itervalues(cond_groups):
                     for c in cg:
                         cond_query.add_clause(MongoClause(c, rev=False))
-            self._sections.append(self.SectionParts(cond_query, query, sval.sampler, report_fields))
+
+            # Done. Add a new 'SectionPart' for the filter and constraint
+
+            result = self.SectionParts(cond_query, query, sval.sampler, rpt_fld)
+            self._sections.append(result)
 
     def _process_constraint_expressions(self, expr_list, conflict_check=True, rev=True):
         """Create and return constraints from expressions in expr_list.
@@ -521,6 +586,33 @@ class Validator(DoesLogging):
                 if conflicts:
                     raise ValueError('Conflicts for field {}: {}'.format(field_name, conflicts))
         return groups
+
+    def _is_python(self, constraint_list):
+        """Check whether constraint is an import of Python code.
+
+        :param constraint_list: List of raw constraints from YAML file
+        :type constraint_list: list(str)
+        :return: True if this refers to an import of code, False otherwise
+        :raises: ValidatorSyntaxError
+        """
+        if len(constraint_list) == 1 and \
+                PythonMethod.constraint_is_method(constraint_list[0]):
+            return True
+        if len(constraint_list) > 1 and \
+                any(filter(PythonMethod.constraint_is_method, constraint_list)):
+            condensed_list = '/'.join(constraint_list)
+            err = PythonMethod.CANNOT_COMBINE_ERR
+            raise ValidatorSyntaxError(condensed_list, err)
+        return False
+
+    def _process_python(self, expr_list):
+        """Create a wrapper for a call to some external Python code.
+
+        :param expr_list: The expressions
+        :return: Tuple of (query, field-projection)
+        :rtype: (PythonMethod, Projection)
+        """
+        return None, None
 
     def set_aliases(self, new_value):
         "Set aliases and wrap errors in ValueError"
