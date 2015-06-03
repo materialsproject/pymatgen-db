@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>matgendb.vv.validate &mdash; pymatgen-db 0.4.5 documentation</title>
+    <title>matgendb.vv.validate &mdash; pymatgen-db 0.4.6 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/proBlue.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.4.5',
+        VERSION:     '0.4.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
-    <link rel="top" title="pymatgen-db 0.4.5 documentation" href="../../../index.html" />
+    <link rel="top" title="pymatgen-db 0.4.6 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" />
  
 <script type="text/javascript">
@@ -34,8 +34,8 @@
 </script>
 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,15 +44,15 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">pymatgen-db 0.4.5 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 0.4.6 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for matgendb.vv.validate</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -166,27 +166,27 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_expected</span> <span class="o">=</span> <span class="n">expected</span>
 
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ConstraintViolation.field"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ConstraintViolation.field">[docs]</a>    <span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">name</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ConstraintViolation.op"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ConstraintViolation.op">[docs]</a>    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c">#return str(self._constraint.op)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">display_op</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ConstraintViolation.got_value"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ConstraintViolation.got_value">[docs]</a>    <span class="k">def</span> <span class="nf">got_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">got_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_got</span>
-</div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">expected_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expected</span>
 
     <span class="nd">@expected_value.setter</span>
-<div class="viewcode-block" id="ConstraintViolation.expected_value"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ConstraintViolation.expected_value">[docs]</a>    <span class="k">def</span> <span class="nf">expected_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">expected_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_expected</span> <span class="o">=</span> <span class="n">value</span>
 
-</div></div>
+</div>
 <div class="viewcode-block" id="NullConstraintViolation"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.NullConstraintViolation">[docs]</a><span class="k">class</span> <span class="nc">NullConstraintViolation</span><span class="p">(</span><span class="n">ConstraintViolation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Empty constraint violation, for when there are no constraints.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -236,9 +236,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_total</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ProgressMeter.count"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ProgressMeter.count">[docs]</a>    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total</span>
-</div>
+
 <div class="viewcode-block" id="ProgressMeter.set_subject"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ProgressMeter.set_subject">[docs]</a>    <span class="k">def</span> <span class="nf">set_subject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subj</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="n">subj</span>
 </div>
@@ -330,18 +330,18 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span>
 </div>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ConstraintSpecSection.sampler"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ConstraintSpecSection.sampler">[docs]</a>    <span class="k">def</span> <span class="nf">sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ConstraintSpecSection.filters"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ConstraintSpecSection.filters">[docs]</a>    <span class="k">def</span> <span class="nf">filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="ConstraintSpecSection.constraints"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.ConstraintSpecSection.constraints">[docs]</a>    <span class="k">def</span> <span class="nf">constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span>
 
-</div></div>
+</div>
 <div class="viewcode-block" id="Validator"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Validator">[docs]</a><span class="k">class</span> <span class="nc">Validator</span><span class="p">(</span><span class="n">DoesLogging</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Validate a collection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -628,9 +628,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;unrecognized distribution: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">distrib</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Sampler.is_empty"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.validate.Sampler.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty</span>
-</div>
+
     <span class="k">def</span> <span class="nf">_keep_runif</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">&gt;=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -694,9 +694,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -713,7 +713,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -722,14 +722,14 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">pymatgen-db 0.4.5 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 0.4.6 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
 
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

@@ -66,6 +66,6 @@ def setver():
 
 def release():
     setver()
-    test()
+    #test()
     makedoc()
     publish()
