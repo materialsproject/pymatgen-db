@@ -22,6 +22,7 @@ import zlib
 import os
 from collections import OrderedDict, Iterable
 
+import pymongo
 from pymongo import MongoClient
 from pymatgen import Structure, Composition
 from pymatgen.electronic_structure.core import Orbital, Spin
@@ -512,16 +513,33 @@ class QueryResults(Iterable):
         self._prop_dict = prop_dict
         self._pproc = postprocess or []  # make empty values iterable
 
+
+    def _wrapper(self, func):
+        def wrapped(*args, **kwargs):
+            ret_val = func(*args, **kwargs)
+            if isinstance(ret_val, pymongo.cursor.Cursor):
+                ret_val = self.from_cursor(ret_val)
+            return ret_val
+        
+        return wrapped
+
     def __getattr__(self, attr):
         """
         Override getattr to make QueryResults inherit all pymongo cursor
         attributes.
         """
         if hasattr(self._results, attr):
-            return getattr(self._results, attr)
+            ret_val = getattr(self._results, attr)
+            if callable(ret_val):
+                return self._wrapper(ret_val)
+            return ret_val
 
     def clone(self):
         return QueryResults(self._prop_dict, self._results.clone())
+
+    def from_cursor(self, cursor):
+        return QueryResults(self._prop_dict, cursor, self._pproc)
+
 
     def __len__(self):
         """Return length as a `count()` on the MongoDB cursor.
