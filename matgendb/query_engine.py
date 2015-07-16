@@ -381,14 +381,21 @@ class QueryEngine(object):
         (1) list of aliased fields for a mongodb query
         (2) dictionary, keyed by aliased field, for display
         """
-        props = []
+        props = {}
+        # TODO: clean up prop_dict?
         prop_dict = OrderedDict()
         for p in properties:
             if p in self.aliases:
-                props.append(self.aliases[p])
+                if isinstance(properties, dict):
+                    props[self.aliases[p]] = properties[p]
+                else:
+                    props[self.aliases[p]] = 1
                 prop_dict[p] = self.aliases[p].split(".")
             else:
-                props.append(p)
+                if isinstance(properties, dict):
+                    props[p] = properties[p]
+                else:
+                    props[p] = 1
                 prop_dict[p] = p.split(".")
         return props, prop_dict
 
