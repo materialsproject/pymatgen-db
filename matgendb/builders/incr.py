@@ -118,23 +118,12 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
         if self.collection is not None:
             self.collection.set_tracking(is_tracked)
 
-    @property
-    def collection_name(self):
+    def set_collection(self, collection):
         """Override base class to make this a tracked collection.
-        See :meth:`@collection_name.setter`
         """
-        return self._collection_name
-
-    @collection_name.setter
-    def collection_name(self, value):
-        """Switch to another collection.
-        Note that you may have to set the aliases and default properties if the
-        schema of the new collection differs from the current collection.
-        """
-        self._collection_name = value
-        self._mongo_coll = self.db[value]
-        self.collection = TrackedCollection(self._mongo_coll, operation=self._t_op,
-                                            field=self._t_field)
+        coll = self.db[collection]
+        self.collection = TrackedCollection(coll, operation=self._t_op, field=self._t_field)
+        return self.collection
 
     def set_mark(self):
         """See :meth:`TrackingInterface.set_mark`
