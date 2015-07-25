@@ -15,7 +15,7 @@ The main class is TrackedQueryEngine. Usage example::
     # or
     qe.collection.set_mark()
     # Just be sure not to set the `qe.collection` attribute directly,
-    # always use `qe.set_collection("new_name")`.
+    # always use `qe.collection_name = "new_name" (which calls a setter)`.
 
 ## Low-level API ##
 
@@ -100,7 +100,7 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
         """Constructor.
         """
         self._tracking_off = False
-        # Set these first because QueryEngine.__init__ calls overridden `set_collection()`.
+        # Set these first because QueryEngine.__init__ calls overridden `collection_name setter()`.
         assert track_field
         self._t_op, self._t_field = track_operation, track_field
         self.collection = None
@@ -118,12 +118,23 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
         if self.collection is not None:
             self.collection.set_tracking(is_tracked)
 
-    def set_collection(self, collection):
+    @property
+    def collection_name(self):
         """Override base class to make this a tracked collection.
+        See :meth:`@collection_name.setter`
         """
-        coll = self.db[collection]
-        self.collection = TrackedCollection(coll, operation=self._t_op, field=self._t_field)
-        return self.collection
+        return self._collection_name
+
+    @collection_name.setter
+    def collection_name(self, value):
+        """Switch to another collection.
+        Note that you may have to set the aliases and default properties if the
+        schema of the new collection differs from the current collection.
+        """
+        self._collection_name = value
+        self._mongo_coll = self.db[value]
+        self.collection = TrackedCollection(self._mongo_coll, operation=self._t_op,
+                                            field=self._t_field)
 
     def set_mark(self):
         """See :meth:`TrackingInterface.set_mark`
