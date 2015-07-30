@@ -610,22 +610,24 @@ class QueryResults(Iterable):
     def _mapped_result(self, r):
         """Transform/map a result.
         """
-        if self._prop_dict is None:
-            return r
+        if not self._prop_dict:
+            result = r
+        else:
+            result = dict()
+            for k, v in self._prop_dict.items():
+                try:
+                    data = r[v[0]]
+                    for j in range(1, len(v)):
+                        if isinstance(data, list):
+                            data = [d[v[j]] for d in data]
+                        else:
+                            data = data[v[j]]
+                    result[k] = data
+                except (IndexError, KeyError, ValueError):
+                    result[k] = None
+
         for func in self._pproc:
-            func(r)
-        result = dict()
-        for k, v in self._prop_dict.items():
-            try:
-                data = r[v[0]]
-                for j in range(1, len(v)):
-                    if isinstance(data, list):
-                        data = [d[v[j]] for d in data]
-                    else:
-                        data = data[v[j]]
-                result[k] = data
-            except (IndexError, KeyError, ValueError):
-                result[k] = None
+            func(result)
         return result
 
     def _result_generator(self):
