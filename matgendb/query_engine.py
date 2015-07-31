@@ -610,10 +610,15 @@ class QueryResults(Iterable):
     def _mapped_result(self, r):
         """Transform/map a result.
         """
+        # Apply result_post funcs for pulling out sandbox properties
+        for func in self._pproc:
+            func(r)
+        # If we haven't asked for specific properties, just return object
         if not self._prop_dict:
             result = r
         else:
             result = dict()
+            # Map aliased keys back to original key
             for k, v in self._prop_dict.items():
                 try:
                     data = r[v[0]]
@@ -626,8 +631,7 @@ class QueryResults(Iterable):
                 except (IndexError, KeyError, ValueError):
                     result[k] = None
 
-        for func in self._pproc:
-            func(result)
+
         return result
 
     def _result_generator(self):

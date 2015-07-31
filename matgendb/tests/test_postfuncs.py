@@ -82,7 +82,7 @@ class SandboxTest(unittest.TestCase):
             self.assertTrue('sbxd' in rec)
             n += 1
         # should find all tasks
-        self.failUnlessEqual(n, self.N)
+        self.assertEqual(n, self.N)
 
 
 
@@ -110,7 +110,7 @@ class SandboxTest(unittest.TestCase):
                          query_post=[self.qtx], result_post=[self.rtx])
         result = self._test_find(qe, 
                                  criteria={'e_above_hull': {'$lte': 0.0}},
-                                 properties=['e_above_hull', 'sbxd'])
+                                 properties=['e_above_hull', 'sbxd', 'add_fake_field'])
 
 
     def _test_find(self, qe, properties, criteria):
@@ -120,12 +120,11 @@ class SandboxTest(unittest.TestCase):
         n = 0
         for rec in cursor:
             pprint.pprint("RESULT: {}".format(rec))
-            self.failIf(rec['e_above_hull'] >= 0)
-            self.assertTrue('add_fake_field' in rec)
-            self.failIf(rec['add_fake_field'] != 'test value')
+            self.assertTrue(rec['e_above_hull'] < 0)
+            self.assertEqual(rec['add_fake_field'], 'test value')
             n += 1
         # should find all tasks
-        self.failUnlessEqual(n, self.N)
+        self.assertEqual(n, self.N)
 
 
     @unittest.skipUnless(has_mongo, 'requires MongoDB server')
