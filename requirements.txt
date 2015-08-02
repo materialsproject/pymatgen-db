@@ -1,6 +1,6 @@
-pymatgen==3.0.5
-monty==0.5.9
-pymongo==3.0.2
+pymatgen==3.1.4
+monty==0.6.5
+pymongo==3.0.3
 prettytable==0.7.2
 django==1.7
 mongomock==1.2.0
