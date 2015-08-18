@@ -33,6 +33,10 @@ Other pages
 Change Log
 ==========
 
+Version 0.4.8
+-------------
+* Update pymatgen version and other dependencies.
+
 Version 0.4.1
 -------------
 
