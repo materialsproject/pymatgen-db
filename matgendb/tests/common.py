@@ -42,8 +42,8 @@ class MockQueryEngine(QueryEngine):
         self.host = host
         self.port = port
         self.database_name = database
+        # colllection name is now a @property. the setter will set "self.collection" internally
         self.collection_name = collection
-        self.set_collection(collection=collection)
         self.set_aliases_and_defaults(aliases_config=aliases_config,
                                       default_properties=default_properties)
 

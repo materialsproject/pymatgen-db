@@ -21,6 +21,7 @@ import gridfs
 import zlib
 from collections import OrderedDict, Iterable
 
+import pymongo
 from pymongo import MongoClient
 from pymatgen import Structure, Composition
 from pymatgen.electronic_structure.core import Orbital, Spin
@@ -59,31 +60,31 @@ class QueryEngine(object):
     USER_KEY = 'user'
     PASSWORD_KEY = 'password'
 
+    # Aliases and defaults
+    aliases = None            #: See `aliases` arg to constructor
+    default_criteria = None   #: See `default_criteria` arg to constructor
+    default_properties = None #: See `default_properties` arg to constructor
+    # Post-processing operations
+    query_post = None         #: See `query_post` arg to constructor
+    result_post = None        #: See `result_post` arg to constructor
+
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
                  aliases_config=None, default_properties=None,
+                 query_post=None, result_post=None, 
                  connection=None, replicaset=None, **ignore):
         """Constructor.
 
         Args:
-            host:
-                Hostname of database machine. Defaults to 127.0.0.1 or
-                localhost.
-            port:
-                Port for db access. Defaults to mongo's default of 27017.
-            database:
-                Actual database to access. Defaults to "vasp".
-            user:
-                User for db access. Defaults to None, which means no
-                authentication.
-            password:
-                Password for db access. Defaults to None, which means no
-                authentication.
-            collection:
-                Collection to query. Defaults to "tasks".
-            connection:
-                If given, ignore 'host' and 'port' and use existing connection.
-            aliases_config:
+            host (str): Hostname of database machine.
+            port (int): Port for db access.
+            database (str): Name of database to access.
+            user (str): User for db access. `None` means no authentication.
+            password (str): Password for db access. `None` means no auth.
+            collection (str): Collection to query. Defaults to "tasks".
+            connection (pymongo.Connection): If given, ignore 'host' and 'port'
+                and use existing connection.
+            aliases_config(dict):
                 An alias dict to use. Defaults to None, which means the default
                 aliases defined in "aliases.json" is used. The aliases config
                 should be of the following format::
@@ -98,29 +99,31 @@ class QueryEngine(object):
                             "state": "successful"
                         }
                     }
-
-                The "aliases" key defines mappings, which makes it easier to
-                query for certain nested quantities. While Mongo does make it
-                easy to map collections, it is sometimes beneficial to
-                organize the doc format in a way that is different from the
-                query format.
-                The "defaults" key specifies criteria that should be applied
-                by default to all queries. For example, a collection may
-                contain data from both successful and unsuccessful runs but
-                for most querying purposes, you may want just successful runs
-                only. Note that defaults do not affect explicitly specified
-                criteria, i.e., if you suppy a query for {"state": "killed"},
-                this will override the default for {"state": "successful"}.
-            default_properties:
-                List of property names (strings) to use by default, if no
-                properties are given to the 'properties' argument of
-                query().
+                aliases (dict): Keys are the incoming property, values are the
+                    property it will be translated to. This makes it easier
+                    to organize the doc format in a way that is different from the
+                    query format.
+                defaults (dict): Criteria that should be applied
+                    by default to all queries. For example, a collection may
+                    contain data from both successful and unsuccessful runs but
+                    for most querying purposes, you may want just successful runs
+                    only. Note that defaults do not affect explicitly specified
+                    criteria, i.e., if you suppy a query for {"state": "killed"},
+                    this will override the default for {"state": "successful"}.
+            default_properties (list): Property names (strings) to use by
+                default, if no `properties` are given to query().
+            query_post (list): Functions to post-process the `criteria` passed
+                to `query()`, after aliases are resolved.
+                Function takes two args, the criteria dict and list of
+                result properties. Both may be modified in-place.
+            result_post (list): Functions to post-process the cursor records.
+                Function takes one arg, the document for the current record,
+                that is modified in-place.
         """
         self.host = host
         self.port = port
         self.replicaset = replicaset
         self.database_name = database
-        self.collection_name = collection
         if connection is None:
             # can't pass replicaset=None to MongoClient (fails validation)
             if self.replicaset:
@@ -133,12 +136,30 @@ class QueryEngine(object):
         self.db = self.connection[database]
         if user:
             self.db.authenticate(user, password)
-        self.set_collection(collection=collection)
+        self.collection_name = collection
         self.set_aliases_and_defaults(aliases_config=aliases_config,
                                       default_properties=default_properties)
+        # Post-processing functions
+        self.query_post = query_post or []
+        self.result_post = result_post or []
+
+    @property
+    def collection_name(self):
+        return self._collection_name
+
+    @collection_name.setter
+    def collection_name(self, value):
+        """Switch to another collection.
+        Note that you may have to set the aliases and default properties if the
+        schema of the new collection differs from the current collection.
+        """
+        self._collection_name = value
+        self.collection = self.db[value]
 
     def set_collection(self, collection):
         """
+        To Be Deprecated: this should be replaced with the @property collection_name
+        
         Switch to another collection. Note that you may have to set the
         aliases and default properties via set_aliases_and_defaults if the
         schema of the new collection differs from the current collection.
@@ -147,8 +168,10 @@ class QueryEngine(object):
             collection:
                 Name of collection.
         """
-        self.collection = self.db[collection]
+        # Use the @property setter collection_name setter above
+        self.collection_name = collection
 
+        
     def set_aliases_and_defaults(self, aliases_config=None,
                                  default_properties=None):
         """
@@ -169,17 +192,18 @@ class QueryEngine(object):
             with open(os.path.join(os.path.dirname(__file__),
                                    "aliases.json")) as f:
                 d = json.load(f)
-                self.aliases = d["aliases"]
-                self.defaults = d["defaults"]
+                self.aliases = d.get("aliases", {})
+                self.default_criteria = d.get("defaults", {})
         else:
-            self.aliases = aliases_config["aliases"]
-            self.defaults = aliases_config["defaults"]
+            self.aliases = aliases_config.get("aliases", {})
+            self.default_criteria = aliases_config.get("defaults", {})
         # set default properties
         if default_properties is None:
             self._default_props, self._default_prop_dict = None, None
         else:
             self._default_props, self._default_prop_dict = \
                 self._parse_properties(default_properties)
+            
 
     def __enter__(self):
         """Allows for use with the 'with' context manager"""
@@ -311,7 +335,7 @@ class QueryEngine(object):
         if criteria is None:
             return dict()
         parsed_crit = dict()
-        for k, v in self.defaults.items():
+        for k, v in self.default_criteria.items():
             if k not in criteria:
                 parsed_crit[self.aliases.get(k, k)] = v
 
@@ -375,29 +399,40 @@ class QueryEngine(object):
             props, prop_dict = None, None
 
         crit = self._parse_criteria(criteria)
-        #print("@@ {}.find({}, projection={}, timeout=False)".format(self.collection.name, crit, props))
+        if self.query_post:
+            for func in self.query_post:
+                func(crit, props)
+        print("@@ {}.find({}, {})".format(self.collection.name, crit, props))
         cur = self.collection.find(crit, props).skip(index)
         if limit is not None:
             cur.limit(limit)
         if distinct_key is not None:
             cur = cur.distinct(distinct_key)
-            return QueryListResults(prop_dict, cur)
+            return QueryListResults(prop_dict, cur, postprocess=self.result_post)
         else:
-            return QueryResults(prop_dict, cur)
+            return QueryResults(prop_dict, cur, postprocess=self.result_post)
 
     def _parse_properties(self, properties):
         """Make list of properties into 2 things:
-        (1) list of aliased fields for a mongodb query
+        (1) dictionary of { 'aliased-field': 1, ... } for a mongodb query eg. {''}
         (2) dictionary, keyed by aliased field, for display
         """
-        props = []
+        props = {}
+        # TODO: clean up prop_dict?
         prop_dict = OrderedDict()
+        # We use a dict instead of list to provide for a richer syntax
         for p in properties:
             if p in self.aliases:
-                props.append(self.aliases[p])
+                if isinstance(properties, dict):
+                    props[self.aliases[p]] = properties[p]
+                else:
+                    props[self.aliases[p]] = 1
                 prop_dict[p] = self.aliases[p].split(".")
             else:
-                props.append(p)
+                if isinstance(properties, dict):
+                    props[p] = properties[p]
+                else:
+                    props[p] = 1
                 prop_dict[p] = p.split(".")
         return props, prop_dict
 
@@ -510,23 +545,60 @@ class QueryResults(Iterable):
     support nearly all cursor like attributes such as count(), explain(),
     hint(), etc. Please see pymongo cursor documentation for details.
     """
+    def __init__(self, prop_dict, result_cursor, postprocess=None):
+        """Constructor.
 
-    def __init__(self, prop_dict, result_cursor):
+        :param prop_dict: Properties
+        :param result_cursor: Iterable returning records
+        :param postprocess: List of functions, each taking a record and
+            modifying it in-place, or None, or an empty list
+        """
         self._results = result_cursor
         self._prop_dict = prop_dict
+        self._pproc = postprocess or []  # make empty values iterable
+
+    
+    def _wrapper(self, func):
+        """
+        This function wraps all callable objects returned by self.__getattr__.
+        If the result is a cursor, wrap it into a QueryResults object
+        so that you can invoke postprocess functions in self._pproc
+        """
+        def wrapped(*args, **kwargs):
+            ret_val = func(*args, **kwargs)
+            if isinstance(ret_val, pymongo.cursor.Cursor):
+                ret_val = self.from_cursor(ret_val)
+            return ret_val
+        
+        return wrapped
 
     def __getattr__(self, attr):
         """
         Override getattr to make QueryResults inherit all pymongo cursor
         attributes.
+        Wrap any callable object with _wrapper to intercept cursors and wrap them
+        as a QueryResults object.
         """
         if hasattr(self._results, attr):
-            return getattr(self._results, attr)
+            ret_val = getattr(self._results, attr)
+            # wrap callable objects to convert returned cursors into QueryResults
+            if callable(ret_val):
+                return self._wrapper(ret_val)
+            return ret_val
 
     def clone(self):
         return QueryResults(self._prop_dict, self._results.clone())
 
+    def from_cursor(self, cursor):
+        """
+        Create a QueryResults object from a cursor object
+        """
+        return QueryResults(self._prop_dict, cursor, self._pproc)
+
+
     def __len__(self):
+        """Return length as a `count()` on the MongoDB cursor.
+        """
         return self._results.count()
 
     def __getitem__(self, i):
@@ -536,20 +608,30 @@ class QueryResults(Iterable):
         return self._result_generator()
 
     def _mapped_result(self, r):
-        if self._prop_dict is None:
-            return r
-        result = dict()
-        for k, v in self._prop_dict.items():
-            try:
-                data = r[v[0]]
-                for j in range(1, len(v)):
-                    if isinstance(data, list):
-                        data = [d[v[j]] for d in data]
-                    else:
-                        data = data[v[j]]
-                result[k] = data
-            except (IndexError, KeyError, ValueError):
-                result[k] = None
+        """Transform/map a result.
+        """
+        # Apply result_post funcs for pulling out sandbox properties
+        for func in self._pproc:
+            func(r)
+        # If we haven't asked for specific properties, just return object
+        if not self._prop_dict:
+            result = r
+        else:
+            result = dict()
+            # Map aliased keys back to original key
+            for k, v in self._prop_dict.items():
+                try:
+                    data = r[v[0]]
+                    for j in range(1, len(v)):
+                        if isinstance(data, list):
+                            data = [d[v[j]] for d in data]
+                        else:
+                            data = data[v[j]]
+                    result[k] = data
+                except (IndexError, KeyError, ValueError):
+                    result[k] = None
+
+
         return result
 
     def _result_generator(self):
@@ -560,12 +642,17 @@ class QueryResults(Iterable):
 class QueryListResults(QueryResults):
     """Set of QueryResults on a list instead of a MongoDB cursor.
     """
-
     def clone(self):
         return QueryResults(self._prop_dict, self._results[:])
 
     def __len__(self):
-        return len(self._results)
+        """Return length of iterable, as a list if possible; otherwise,
+        fall back to the superclass' implementation.
+        """
+        if hasattr(self._results, '__len__'):
+            return len(self._results)
+        else:
+            return QueryResults.__len__(self)
 
 
 class QueryError(Exception):
