@@ -402,8 +402,8 @@ class QueryEngine(object):
         if self.query_post:
             for func in self.query_post:
                 func(crit, props)
-        print("@@ {}.find({}, {}, timeout=False)".format(self.collection.name, crit, props))
-        cur = self.collection.find(crit, props, timeout=False).skip(index)
+        print("@@ {}.find({}, {})".format(self.collection.name, crit, props))
+        cur = self.collection.find(crit, props).skip(index)
         if limit is not None:
             cur.limit(limit)
         if distinct_key is not None:
