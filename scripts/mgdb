@@ -21,7 +21,7 @@ import webbrowser
 import time
 import argparse
 
-from pymongo import Connection, ASCENDING
+from pymongo import MongoClient, ASCENDING
 
 from pymatgen.apps.borg.queen import BorgQueen
 
@@ -78,7 +78,7 @@ def update_db(args):
 
 def optimize_indexes(args):
     d = get_settings(args.config_file)
-    c = Connection(d["host"], d["port"])
+    c = MongoClient(d["host"], d["port"])
     db = c[d["database"]]
     db.authenticate(d["admin_user"], d["admin_password"])
     coll = db[d["collection"]]
