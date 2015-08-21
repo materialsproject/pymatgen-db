@@ -33,6 +33,10 @@ Other pages
 Change Log
 ==========
 
+Version 0.5.0
+-------------
+* Updated scripts for new MongoClient.
+
 Version 0.4.8
 -------------
 * Update pymatgen version and other dependencies.
