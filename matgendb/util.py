@@ -94,15 +94,21 @@ def csv_list(l):
     return ', '.join(map(str, l))
 
 
+def quotable(v):
+    if isinstance(v, int) or isinstance(v, float):
+        return str(v)
+    return "'{}'".format(v)
+
 def csv_dict(d):
     """Format dict to a string with comma-separated values.
     """
     if len(d) == 0:
         return "{}"
-    return "{" + ', '.join(["'{}': '{}'".format(k, v) for k, v in six.iteritems(d)]) + "}"
+    return "{" + ', '.join(["'{}': {}".format(k, quotable(v))
+                            for k, v in six.iteritems(d)]) + "}"
 
 def kvp_dict(d):
     """Format dict to key=value pairs.
     """
     return ', '.join(
-        ["{}='{}'".format(k, v) for k, v in six.iteritems(d)])
+        ["{}={}".format(k, quotable(v)) for k, v in six.iteritems(d)])

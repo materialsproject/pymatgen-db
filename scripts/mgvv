@@ -20,7 +20,8 @@ import traceback
 import yaml
 # local module
 from matgendb.util import get_settings, get_collection
-from matgendb.vv.validate import ConstraintSpec, Validator, DBError
+from matgendb.vv.validate import ConstraintSpec, Validator
+from matgendb.vv.validate import ValidatorSyntaxError, DBError
 from matgendb.vv import report
 from matgendb.vv.util import Timing, ElapsedTime, letter_num
 from matgendb.vv.util import YamlConfig, args_kvp_nodup, args_list
@@ -68,6 +69,11 @@ class ArgumentError(Exception):
         Exception.__init__(self, msg)
         self.msg = msg
 
+class InputSyntaxError(Exception):
+    "Error with syntax of some input file."
+    def __init__(self, target, desc):
+        msg = 'Syntax error in "{}": {}'.format(target, desc)
+        Exception.__init__(self, msg)
 
 # Utility functions
 # -----------------
@@ -403,7 +409,8 @@ def command_validate(args, formatters):
                             .format(fmt, textlist(formatters.keys())))
 
     # Run validation for each collection
-    validator = Validator(aliases=aliases, max_violations=args.limit, max_dberrors=10, add_exists=args.must_exist)
+    validator = Validator(aliases=aliases, max_violations=args.limit,
+                              max_dberrors=10, add_exists=args.must_exist)
     if args.progress > 0:
         validator.set_progress(args.progress)
     elapsed = ElapsedTime()
@@ -423,7 +430,14 @@ def command_validate(args, formatters):
                     break
                     #sect = get_constraint_sections(constraint_spec)
                 vsect = 0
-                for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
+                try:
+                    vresult = validator.validate(coll, cspec, subject=coll_name)
+                except ValidatorSyntaxError as err:
+                    target = 'Collection = {}, Constraint section = {}'.format(
+                        coll.name, err)
+                    raise InputSyntaxError(target, 'Invalid constraint syntax')
+
+            for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
                     if len(vgroup) == 0:
                         continue
                     vsect += 1
