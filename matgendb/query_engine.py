@@ -71,7 +71,7 @@ class QueryEngine(object):
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
                  aliases_config=None, default_properties=None,
-                 query_post=None, result_post=None, 
+                 query_post=None, result_post=None,
                  connection=None, replicaset=None, **ignore):
         """Constructor.
 
@@ -159,7 +159,7 @@ class QueryEngine(object):
     def set_collection(self, collection):
         """
         To Be Deprecated: this should be replaced with the @property collection_name
-        
+
         Switch to another collection. Note that you may have to set the
         aliases and default properties via set_aliases_and_defaults if the
         schema of the new collection differs from the current collection.
@@ -171,7 +171,7 @@ class QueryEngine(object):
         # Use the @property setter collection_name setter above
         self.collection_name = collection
 
-        
+
     def set_aliases_and_defaults(self, aliases_config=None,
                                  default_properties=None):
         """
@@ -203,7 +203,7 @@ class QueryEngine(object):
         else:
             self._default_props, self._default_prop_dict = \
                 self._parse_properties(default_properties)
-            
+
 
     def __enter__(self):
         """Allows for use with the 'with' context manager"""
@@ -402,7 +402,6 @@ class QueryEngine(object):
         if self.query_post:
             for func in self.query_post:
                 func(crit, props)
-        print("@@ {}.find({}, {})".format(self.collection.name, crit, props))
         cur = self.collection.find(crit, props).skip(index)
         if limit is not None:
             cur.limit(limit)
@@ -557,7 +556,7 @@ class QueryResults(Iterable):
         self._prop_dict = prop_dict
         self._pproc = postprocess or []  # make empty values iterable
 
-    
+
     def _wrapper(self, func):
         """
         This function wraps all callable objects returned by self.__getattr__.
@@ -569,7 +568,7 @@ class QueryResults(Iterable):
             if isinstance(ret_val, pymongo.cursor.Cursor):
                 ret_val = self.from_cursor(ret_val)
             return ret_val
-        
+
         return wrapped
 
     def __getattr__(self, attr):
