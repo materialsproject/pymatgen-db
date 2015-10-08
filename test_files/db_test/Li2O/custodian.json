@@ -31,7 +31,7 @@
                 "constrain_total_magmom": false, 
                 "name": "MIT", 
                 "@class": "MITVaspInputSet", 
-                "@module": "pymatgen.io.vaspio_set"
+                "@module": "pymatgen.io.vasp.sets"
             }, 
             "gzipped": false, 
             "backup": true, 
