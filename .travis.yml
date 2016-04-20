@@ -5,6 +5,8 @@ python:
   - "3.4"
 # command to install dependencies
 sudo: false
+env:
+    - MP_FAKEMONGO=true
 addons:
   apt:
     packages:
@@ -26,5 +28,6 @@ notifications:
   email:
     recipients:
       - shyuep@gmail.com
+      - dkgunter@lbl.gov
     on_success: change
     on_failure: always
