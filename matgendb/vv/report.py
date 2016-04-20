@@ -362,9 +362,18 @@ class Emailer(DoesLogging):
         :param: port SMTP server port (None for default)
         """
         DoesLogging.__init__(self, 'mg.emailer')
-        self._sender, self._recipients, self._subject = sender, recipients, subject
+        self._sender, self._recipients, self._subject = (sender, recipients,
+                                                         subject)
         self._server, self._port = server, port
         self._message = ""
+
+    @property
+    def subject(self):
+        return self._subject
+
+    @subject.setter
+    def subject(self, value):
+        self._subject = value
 
     def send(self, text, fmt):
         """Send the email message.
