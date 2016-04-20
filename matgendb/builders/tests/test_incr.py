@@ -17,7 +17,7 @@ COLLECTION = 'my_collection'
 DATABASE = 'db'
 
 # Global collection object
-conn = mongomock.Connection()
+conn = mongomock.MongoClient()
 db = conn[DATABASE]
 coll = db.my_collection
 # Hacks for mongomock deficiencies

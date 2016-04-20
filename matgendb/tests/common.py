@@ -20,23 +20,44 @@ import pymongo
 from matgendb.query_engine import QueryEngine
 from matgendb.builders.incr import CollectionTracker
 
+_log = logging.getLogger('matgendb.tests')
+
+def has_mongo():
+    """Determine if MongoDB is up and usable
+    """
+    if os.environ.get('MP_FAKEMONGO'):
+        mongo = False
+    else:
+        try:
+            pymongo.MongoClient()
+            mongo = True
+        except:
+            mongo = False
+    return mongo
 
 class MockQueryEngine(QueryEngine):
     """Mock (fake) QueryEngine, unless a real connection works.
+    You can disable the attempt to do a real connection
+    by setting MP_FAKEMONGO to anything
     """
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
                  aliases_config=None, default_properties=None):
-        try:
-            QueryEngine.__init__(self, host=host, port=port, database=database,
-                                 user=user, password=password, collection=collection,
-                                 aliases_config=aliases_config,
-                                 default_properties=default_properties)
-            print("@@ connected to real Mongo")
-            return  # actully connected! not mocked..
-        except:
-            pass
-        self.connection = MongoClient(self.host, self.port)
+        if has_mongo():
+            try:
+                QueryEngine.__init__(self, host=host, port=port,
+                                     database=database,
+                                     user=user, password=password,
+                                     collection=collection,
+                                     aliases_config=aliases_config,
+                                     default_properties=default_properties)
+                _log.warning("Connected to real MongoDB at {}:{}".format(host, port))
+                return  # actully connected! not mocked..
+            except:
+                _log.debug("Connection to real MongoDB at {}:{} failed. "
+                           "This is normal; using mock."
+                           .format(host, port))
+        self.connection = MongoClient(host, port)
         self.db = self.connection[database]
         self._user, self._password = user, password
         self.host = host
