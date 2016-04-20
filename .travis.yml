@@ -27,7 +27,7 @@ script: nosetests
 notifications:
   email:
     recipients:
-      - shyuep@gmail.com
+#      - shyuep@gmail.com
       - dkgunter@lbl.gov
     on_success: change
     on_failure: always
