@@ -70,7 +70,8 @@ class ArgumentError(Exception):
         self.msg = msg
 
 class InputSyntaxError(Exception):
-    "Error with syntax of some input file."
+    """Error with syntax of some input file.
+    """
     def __init__(self, target, desc):
         msg = 'Syntax error in "{}": {}'.format(target, desc)
         Exception.__init__(self, msg)
@@ -224,12 +225,14 @@ def command_diff(args):
                                     .format(field, err))
 
     # Instantiate main class.
-    df = diff.Differ(key=args.key, info=args.info, props=args.properties, fltr=fltr, deltas=deltas)
+    df = diff.Differ(key=args.key, info=args.info, props=args.properties,
+                     fltr=fltr, deltas=deltas)
 
     # Run diff.
     t0 = time.time()
     try:
-        r = df.diff(args.old, args.new, only_missing=args.missonly, only_values=args.changeonly)
+        r = df.diff(args.old, args.new, only_missing=args.missonly,
+                    only_values=args.changeonly)
     except Exception as err:
         if _log.getEffectiveLevel() in (logging.DEBUG,):
             exc_str = traceback.format_exc()
@@ -307,11 +310,11 @@ def command_validate(args, formatters):
     fname = args.config_file if args.config_file else "db.json"
     try:
         config = get_settings(args.config_file)
-    except ValueError, err:
+    except ValueError as err:
         raise ArgumentError('Cannot parse configuration "{}": {}'.format(fname, err))
     try:
         conn = pymongo.MongoClient(config['host'], config['port'])
-    except pymongo.errors.ConnectionFailure, err:
+    except pymongo.errors.ConnectionFailure as err:
         raise ArgumentError('Cannot connect to server: {}'.format(err))
     db_key = 'database'
     if not db_key in config:
@@ -372,7 +375,7 @@ def command_validate(args, formatters):
         try:
             astr = constraints.get(ALIASES_KEY, {})
             aliases = dict(map(nvpstr, astr))
-        except ValueError, err:
+        except ValueError as err:
             raise ArgumentError('aliases should be list of name=value, got "{}": {}'.format(astr, err))
         except AttributeError:
             if constraints is None:
@@ -425,7 +428,7 @@ def command_validate(args, formatters):
             try:
                 try:
                     cspec = ConstraintSpec(constraint_spec_cfg)
-                except ValueError, err:
+                except ValueError as err:
                     _log.error('processing constraints for {}: {}'.format(coll_name, err))
                     break
                     #sect = get_constraint_sections(constraint_spec)
@@ -437,7 +440,7 @@ def command_validate(args, formatters):
                         coll.name, err)
                     raise InputSyntaxError(target, 'Invalid constraint syntax')
 
-            for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
+                for vnum, vgroup in enumerate(validator.validate(coll, cspec, subject=coll_name)):
                     if len(vgroup) == 0:
                         continue
                     vsect += 1
@@ -456,10 +459,10 @@ def command_validate(args, formatters):
                                    viol.got_value))
                     table.sortby('Id')
                     rpt_sect.add_section(report.ReportSection(sect_hdr, table))
-            except DBError, err:
+            except DBError as err:
                 _log.error('validating collecton {}: DB error: {}'.format(coll_name, err))
                 break
-            except ValueError, err:
+            except ValueError as err:
                 _log.error('validating collecton {}: {}'.format(coll_name, err))
                 break
             rpt.add_section(rpt_sect)
@@ -474,6 +477,8 @@ def command_validate(args, formatters):
         formatter = formatter_class()
         text = formatter.format(rpt)
         if emailer:
+            if rpt.is_empty():
+                emailer.subject = "{}: No Issues".format(emailer.subject)
             msgfmt = 'text/plain'
             for mt in ((report.HTMLFormatter, 'text/html'),
                        (report.JSONFormatter, 'text/plain')):

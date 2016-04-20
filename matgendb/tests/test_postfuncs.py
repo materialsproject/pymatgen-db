@@ -6,18 +6,9 @@ import uuid
 import unittest
 import pprint
 from matgendb.query_engine import QueryEngine, QueryResults
+from matgendb.tests import common
 
-
-
-# Determine if MongoDB is up and usable
-has_mongo = False
-try:
-    conn = pymongo.MongoClient()
-    has_mongo = True
-except:
-    pass
-
-
+has_mongo = common.has_mongo()
 
 class SandboxTest(unittest.TestCase):
 

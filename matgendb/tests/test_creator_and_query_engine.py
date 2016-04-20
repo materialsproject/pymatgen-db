@@ -27,20 +27,27 @@ from pymatgen.core.structure import Structure
 
 from matgendb.query_engine import QueryEngine
 from matgendb.creator import VaspToDbTaskDrone
+from matgendb.tests import common
 
 test_dir = os.path.join(os.path.dirname(__file__), "..", "..",
                         'test_files')
 
+has_mongo = common.has_mongo()
 
 class VaspToDbTaskDroneTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        try:
-            cls.conn = MongoClient()
-        except ConnectionFailure:
+        if has_mongo:
+            try:
+                cls.conn = MongoClient()
+            except ConnectionFailure:
+                cls.conn = None
+        else:
             cls.conn = None
 
+
+    @unittest.skipUnless(has_mongo, "MongoDB connection required")
     def test_get_valid_paths(self):
         drone = VaspToDbTaskDrone(simulate_mode=True)
         all_paths = []
@@ -48,6 +55,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             all_paths.extend(drone.get_valid_paths(path))
         self.assertEqual(len(all_paths), 6)
 
+    @unittest.skipUnless(has_mongo, "MongoDB connection required")
     def test_to_from_dict(self):
         drone = VaspToDbTaskDrone(database="wacky", simulate_mode=True)
         d = drone.as_dict()
@@ -55,6 +63,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
         self.assertTrue(drone.simulate)
         self.assertEqual(drone.database, "wacky")
 
+    @unittest.skipUnless(has_mongo, "MongoDB connection required")
     def test_assimilate(self):
         """Borg assimilation code.
         This takes too long for a unit test!
