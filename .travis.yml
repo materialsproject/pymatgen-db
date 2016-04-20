@@ -7,6 +7,9 @@ python:
 sudo: false
 env:
     - MP_FAKEMONGO=true
+cache:
+    - pip
+    - apt
 addons:
   apt:
     packages:
