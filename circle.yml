@@ -1,9 +1,11 @@
 dependencies:
   override:
-    - pip install numpy
+    - pip install numpy --upgrade
     - pip install -r requirements.txt
+    - pip install coveralls coverage --upgrade
     - python setup.py install
 test:
   override:
     - mv matgendb mgdb
-    - nosetests
+    - nosetests --config=nose.cfg --cover-html --cover-html-dir=$CIRCLE_ARTIFACTS
+    - coveralls
