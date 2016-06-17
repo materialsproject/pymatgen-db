@@ -11,15 +11,13 @@ __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Dec 1, 2012"
 
-import os
 import datetime
 import logging
 import multiprocessing
 import json
 import sys
-import webbrowser
-import time
 import argparse
+import six
 
 from pymongo import MongoClient, ASCENDING
 
@@ -40,7 +38,7 @@ def init_db(args):
     print("(press Enter if you want to accept the defaults)\n")
     for k in settings:
         v = defaults.get(k, '')
-        val = raw_input("Enter {} (default: {}) : ".format(k, v))
+        val = six.raw_input("Enter {} (default: {}) : ".format(k, v))
         doc[k] = val if val else v
     doc["port"] = int(doc["port"])  # enforce the port as an int
     with open(args.config_file, "w") as f:
@@ -87,9 +85,9 @@ def optimize_indexes(args):
     for key in ['unit_cell_formula', 'reduced_cell_formula', 'chemsys',
                 'nsites', 'pretty_formula', 'analysis.e_above_hull',
                 "icsd_ids"]:
-        print "Building {} index".format(key)
+        print("Building {} index".format(key))
         coll.ensure_index(key)
-    print "Building nelements and elements compound index"
+    print("Building nelements and elements compound index")
     compound_index = [('nelements', ASCENDING), ('elements', ASCENDING)]
     coll.ensure_index(compound_index)
     coll.ensure_index(compound_index)
@@ -128,22 +126,6 @@ def query_db(args):
         for r in qe.query(properties=props, criteria=criteria):
             t.add_row([r[p] for p in props])
         print(t)
-
-
-def run_server(args):
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
-    os.environ["MGDB_CONFIG"] = json.dumps(get_settings(args.config_file))
-    import django
-    django.setup()
-    from django.core.management import call_command
-    from multiprocessing import Process
-    p1 = Process(target=call_command,
-                 args=("runserver",  "{}:{}".format(args.host, args.port)))
-    p1.start()
-    if not args.nobrowser:
-        time.sleep(2)
-        webbrowser.open("http://{}:{}".format(args.host, args.port))
-    p1.join()
 
 
 class StatsCommands(object):
@@ -373,19 +355,6 @@ if __name__ == "__main__":
                                                                          StatsCommands.FORMAT_CLEAN],
                         default="yaml", dest="output_format")
     pstats.set_defaults(func=db_stats)
-
-    # The 'runserver' subcommand.
-    pserve = subparsers.add_parser("runserver",
-                                   help="Run a server to the database.",
-                                   parents=[parent_vb, parent_cfg])
-    pserve.add_argument("--nobrowser", dest="nobrowser", action="store_true",
-                        help="Don't automatically open a browser window "
-                             "(e.g. for shell-based servers)")
-    pserve.add_argument("--port", dest="port", type=int, default=8000,
-                        help="Port to run the server on (default: 8000)")
-    pserve.add_argument("--host", dest="host", type=str, default="127.0.0.1",
-                        help="Host to run the server on (default: 127.0.0.1)")
-    pserve.set_defaults(func=run_server)
 
     # Parse args
     args = parser.parse_args()
