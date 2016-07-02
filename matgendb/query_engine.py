@@ -526,9 +526,9 @@ class QueryEngine(object):
                     ados = d['pdos'][i]
                     all_ados = {}
                     for j in range(len(ados)):
-                        orb = Orbital.from_vasp_index(j)
+                        orb = Orbital(j)
                         odos = ados[str(orb)]
-                        all_ados[orb] = {Spin.from_int(int(k)): v
+                        all_ados[orb] = {Spin(int(k)): v
                                          for k, v
                                          in odos['densities'].items()}
                     pdoss[structure[i]] = all_ados
