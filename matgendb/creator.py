@@ -151,7 +151,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.use_full_uri = use_full_uri
         self.runs = runs or ["relax1", "relax2"]
         if not simulate_mode:
-            conn = MongoClient(self.host, self.port, j=True)
+            conn = MongoClient(self.host, self.port)
             db = conn[self.database]
             if self.user:
                 db.authenticate(self.user, self.password)
