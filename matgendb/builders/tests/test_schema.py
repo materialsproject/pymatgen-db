@@ -5,7 +5,7 @@ __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '11/1/13'
 
 import unittest
-from .. import schema
+from matgendb.builders import schema
 
 # most basic schema
 basic = {
@@ -84,7 +84,7 @@ class JsonSchemaTests(unittest.TestCase):
                 "lastName": {"type": "string"},
                 "age": {"type": "integer"}
             },
-            "required": ["firstName", "lastName"]
+            "required": ["lastName", "firstName"]
         }
         # alt. is reverse of 'required'
         self.example_js2 = self.example_js
