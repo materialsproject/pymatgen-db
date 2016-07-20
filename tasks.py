@@ -16,15 +16,17 @@ __date__ = "Apr 29, 2012"
 import glob
 import os
 
-from fabric.api import local, lcd
+from invoke import task
+from monty.os import cd
 from matgendb import __version__ as ver
 
 
-def makedoc():
+@task
+def makedoc(ctx):
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
-    with lcd("docs"):
-        local("sphinx-apidoc -o . -f ../matgendb")
-        local("rm matgendb*.tests.rst")
+    with cd("docs"):
+        ctx.run("sphinx-apidoc -o . -f ../matgendb")
+        ctx.run("rm matgendb*.tests.rst")
         for f in glob.glob("docs/*.rst"):
             if f.startswith('docs/matgendb') and f.endswith('rst'):
                 newoutput = []
@@ -48,24 +50,29 @@ def makedoc():
                 with open(f, 'w') as fid:
                     fid.write("".join(newoutput))
 
-        local("make html")
-        local("cp favicon.ico _build/html/_static/favicon.ico")
+        ctx.run("make html")
+        ctx.run("cp favicon.ico _build/html/_static/favicon.ico")
 
 
-def publish():
-    local("python setup.py release")
+@task
+def publish(ctx):
+    ctx.run("python setup.py release")
 
 
-def test():
-    local("nosetests")
+@task
+def test(ctx):
+    ctx.run("nosetests")
 
 
-def setver():
-    local("sed s/version=.*,/version=\\\"{}\\\",/ setup.py > newsetup".format(ver))
-    local("mv newsetup setup.py")
+@task
+def setver(ctx):
+    ctx.run("sed s/version=.*,/version=\\\"{}\\\",/ setup.py > newsetup".format(ver))
+    ctx.run("mv newsetup setup.py")
 
-def release():
-    setver()
-    #test()
-    makedoc()
-    publish()
+
+@task
+def release(ctx):
+    setver(ctx)
+    #test(ctx)
+    makedoc(ctx)
+    publish(ctx)
