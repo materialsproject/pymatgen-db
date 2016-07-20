@@ -100,9 +100,7 @@ class JsonSchemaTests(unittest.TestCase):
     def test_create_js(self):
         for ex in (self.example_mine, self.example_mine_nounder):
             s = schema.Schema(ex)
-            if s.json_schema() not in (self.example_js, self.example_js2):
-                self.fail("json-schema output:\n  {}\ndoes not match expected:\n  {}"
-                          .format(s.json_schema, self.example_js))
+            self.assertIn(s.json_schema(), (self.example_js, self.example_js2))
 
 if __name__ == '__main__':
     unittest.main()
