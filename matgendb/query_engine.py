@@ -519,7 +519,7 @@ class QueryEngine(object):
                     d = json.loads(s)
                 except:
                     s = zlib.decompress(s)
-                    d = json.loads(s)
+                    d = json.loads(s.decode("utf-8"))
                 tdos = Dos.from_dict(d)
                 pdoss = {}
                 for i in range(len(d['pdos'])):
@@ -534,6 +534,7 @@ class QueryEngine(object):
                     pdoss[structure[i]] = all_ados
                 return CompleteDos(structure, tdos, pdoss)
         return None
+
 
 class QueryResults(Iterable):
     """
