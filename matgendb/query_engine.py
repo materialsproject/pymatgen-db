@@ -403,8 +403,8 @@ class QueryEngine(object):
         if self.query_post:
             for func in self.query_post:
                 func(crit, props)
-        cur = self.collection.find(crit, props, **kwargs)
-        
+        cur = self.collection.find(filter=crit, projection=props, **kwargs)
+
         if distinct_key is not None:
             cur = cur.distinct(distinct_key)
             return QueryListResults(prop_dict, cur, postprocess=self.result_post)
