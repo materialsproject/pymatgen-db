@@ -361,7 +361,8 @@ class QueryEngine(object):
         """
         return self.collection.ensure_index(key, unique=unique)
 
-    def query(self, properties=None, criteria=None, index=0, limit=None, distinct_key=None):
+    def query(self, properties=None, criteria=None, distinct_key=None,
+              **kwargs):
         """
         Convenience method for database access.  All properties and criteria
         can be specified using simplified names defined in Aliases.  You can
@@ -385,9 +386,9 @@ class QueryEngine(object):
 
         :param properties: Properties to query for. Defaults to None which means all supported properties.
         :param criteria: Criteria to query for as a dict.
-        :parm index: Similar definition to pymongo.collection.find method.
-        :param limit: Similar definition to pymongo.collection.find method.
         :param distinct_key: If not None, the key for which to get distinct results
+        :param \*\*kwargs: Other kwargs supported by pymongo.collection.find.
+            Useful examples are limit, skip, sort, etc.
         :return: A QueryResults Iterable, which is somewhat like pymongo's
             cursor except that it performs mapping. In general, the dev does
             not need to concern himself with the form. It is sufficient to know
@@ -402,9 +403,8 @@ class QueryEngine(object):
         if self.query_post:
             for func in self.query_post:
                 func(crit, props)
-        cur = self.collection.find(crit, props).skip(index)
-        if limit is not None:
-            cur.limit(limit)
+        cur = self.collection.find(crit, props, **kwargs)
+        
         if distinct_key is not None:
             cur = cur.distinct(distinct_key)
             return QueryListResults(prop_dict, cur, postprocess=self.result_post)
