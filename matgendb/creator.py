@@ -254,7 +254,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                         if "dos" in calc:
                             dos = json.dumps(calc["dos"], cls=MontyEncoder)
                             if self.compress_dos:
-                                dos = zlib.compress(bytes(dos, 'utf-8'),
+                                dos = zlib.compress(dos.encode('utf-8'),
                                                     self.compress_dos)
                                 calc["dos_compression"] = "zlib"
                             fs = gridfs.GridFS(db, "dos_fs")
