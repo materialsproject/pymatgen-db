@@ -186,15 +186,15 @@ class TrackedCollection(object):
             _log.info("tracked_find.end, tracking=off")
             return self._coll_find(*args, **kwargs)
         # otherwise do somethin' real
-        # fish 'spec' out of args or kwargs
+        # fish 'filter' out of args or kwargs
         if len(args) > 0:
-            spec = args[0]
+            filt = args[0]
         else:
-            if 'spec' not in kwargs:
-                kwargs['spec'] = {}
-            spec = kwargs['spec']
-        # update spec with tracker query
-        spec.update(self._mark.query)
+            if 'filter' not in kwargs:
+                kwargs['filter'] = {}
+            filt = kwargs['filter']
+        # update filter with tracker query
+        filt.update(self._mark.query)
         # delegate to "real" find()
         _log.info("tracked_find.end, call: {}.find(args={} kwargs={})".format(self._coll.name, args, kwargs))
         return self._coll_find(*args, **kwargs)
@@ -363,11 +363,11 @@ class CollectionTracker(object):
         self._check_exists()
         obj = mark.as_dict()
         try:
-            # Make a 'spec' to find/update existing record, which uses
+            # Make a 'filter' to find/update existing record, which uses
             # the field name and operation (but not the position).
-            spec = {k: obj[k] for k in (mark.FLD_FLD, mark.FLD_OP)}
-            _log.debug("save: upsert-spec={} upsert-obj={}".format(spec, obj))
-            self._track.update(spec, obj, upsert=True)
+            filt = {k: obj[k] for k in (mark.FLD_FLD, mark.FLD_OP)}
+            _log.debug("save: upsert-spec={} upsert-obj={}".format(filt, obj))
+            self._track.update(filt, obj, upsert=True)
         except pymongo.errors.PyMongoError as err:
             raise DBError("{}".format(err))
 
