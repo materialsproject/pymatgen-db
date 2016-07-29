@@ -87,7 +87,7 @@ class JsonSchemaTests(unittest.TestCase):
             "required": ["lastName", "firstName"]
         }
         # alt. is reverse of 'required'
-        self.example_js2 = self.example_js
+        self.example_js2 = self.example_js.copy()
         self.example_js2["required"] = list(reversed(self.example_js["required"]))
         #
         self.example_mine = {
