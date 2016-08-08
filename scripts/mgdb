@@ -30,6 +30,7 @@ from matgendb.util import get_settings, DEFAULT_SETTINGS, MongoJSONEncoder
 
 _log = logging.getLogger("mg")  # parent
 
+
 def init_db(args):
     settings = DBConfig.ALL_SETTINGS
     defaults = dict(DEFAULT_SETTINGS)
@@ -41,6 +42,10 @@ def init_db(args):
         val = six.moves.input("Enter {} (default: {}) : ".format(k, v))
         doc[k] = val if val else v
     doc["port"] = int(doc["port"])  # enforce the port as an int
+    for k in ["admin_user", "admin_password"]:
+        v = defaults.get(k, '')
+        val = six.moves.input("Enter {} (default: {}) : ".format(k, v))
+        doc[k] = val if val else v
     with open(args.config_file, "w") as f:
         json.dump(doc, f, indent=4, sort_keys=True)
     print("\nConfiguration written to {}!".format(args.config_file))
@@ -69,7 +74,7 @@ def update_db(args):
     _log.info("Using {} cpus...".format(ncpus))
     queen = BorgQueen(drone, number_of_drones=ncpus)
     queen.parallel_assimilate(args.directory)
-    tids = map(int, filter(lambda x: x, queen.get_data()))
+    tids = list(map(int, filter(lambda x: x, queen.get_data())))
     _log.info("Db upate completed at {}.".format(datetime.datetime.now()))
     _log.info("{} new task ids inserted.".format(len(tids)))
 
