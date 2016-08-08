@@ -38,7 +38,7 @@ def init_db(args):
     print("(press Enter if you want to accept the defaults)\n")
     for k in settings:
         v = defaults.get(k, '')
-        val = six.raw_input("Enter {} (default: {}) : ".format(k, v))
+        val = six.moves.input("Enter {} (default: {}) : ".format(k, v))
         doc[k] = val if val else v
     doc["port"] = int(doc["port"])  # enforce the port as an int
     with open(args.config_file, "w") as f:
