@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+    matgendb.alchemy.tests
 
 Submodules
 ----------

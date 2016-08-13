@@ -24,7 +24,7 @@ for parent, dirs, files in os.walk(os.path.join("matgendb", "webui",
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="0.5.1",
+    version="0.6.1",
     install_requires=["pymatgen>=3.2.3", "monty>=0.7.0",
                       "pymongo>=2.8", "prettytable",
                       "django", "mongomock", "smoqe", "enum34"],

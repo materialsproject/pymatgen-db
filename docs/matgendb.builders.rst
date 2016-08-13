@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
     matgendb.builders.examples
+    matgendb.builders.tests
 
 Submodules
 ----------

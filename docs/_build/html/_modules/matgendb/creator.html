@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>matgendb.creator &mdash; pymatgen-db 0.5.1 documentation</title>
+    <title>matgendb.creator &mdash; pymatgen-db 0.6.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/proBlue.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.5.1',
+        VERSION:     '0.6.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
-    <link rel="top" title="pymatgen-db 0.5.1 documentation" href="../../index.html" />
+    <link rel="top" title="pymatgen-db 0.6.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" />
  
 <script type="text/javascript">
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pymatgen-db 0.5.1 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pymatgen-db 0.6.1 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -55,21 +55,21 @@
           <div class="body" role="main">
             
   <h1>Source code for matgendb.creator</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
+<span></span><span class="ch">#!/usr/bin/env python</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module defines a Drone to assimilate vasp data and insert it into a</span>
 <span class="sd">Mongo database.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
 
-<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s">&quot;Copyright 2012, The Materials Project&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;2.0.0&quot;</span>
-<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s">&quot;Shyue Ping Ong&quot;</span>
-<span class="n">__email__</span> <span class="o">=</span> <span class="s">&quot;shyue@mit.edu&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s">&quot;Mar 18, 2012&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Shyue Ping Ong&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2012, The Materials Project&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;2.0.0&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Shyue Ping Ong&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;shyue@mit.edu&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;Mar 18, 2012&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -79,28 +79,28 @@
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">socket</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">zlib</span>
 <span class="kn">import</span> <span class="nn">six</span>
-<span class="kn">from</span> <span class="nn">fnmatch</span> <span class="kn">import</span> <span class="n">fnmatch</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
-<span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+<span class="kn">from</span> <span class="nn">pymongo</span> <span class="k">import</span> <span class="n">MongoClient</span>
 <span class="kn">import</span> <span class="nn">gridfs</span>
 
-<span class="kn">from</span> <span class="nn">pymatgen.apps.borg.hive</span> <span class="kn">import</span> <span class="n">AbstractDrone</span>
-<span class="kn">from</span> <span class="nn">pymatgen.analysis.structure_analyzer</span> <span class="kn">import</span> <span class="n">VoronoiCoordFinder</span>
-<span class="kn">from</span> <span class="nn">pymatgen.core.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
-<span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="kn">import</span> <span class="n">Composition</span>
-<span class="kn">from</span> <span class="nn">pymatgen.io.vasp</span> <span class="kn">import</span> <span class="n">Vasprun</span><span class="p">,</span> <span class="n">Incar</span><span class="p">,</span> <span class="n">Kpoints</span><span class="p">,</span> <span class="n">Potcar</span><span class="p">,</span> <span class="n">Poscar</span><span class="p">,</span> \
+<span class="kn">from</span> <span class="nn">pymatgen.apps.borg.hive</span> <span class="k">import</span> <span class="n">AbstractDrone</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.structure_analyzer</span> <span class="k">import</span> <span class="n">VoronoiCoordFinder</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.structure</span> <span class="k">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.composition</span> <span class="k">import</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">pymatgen.io.vasp</span> <span class="k">import</span> <span class="n">Vasprun</span><span class="p">,</span> <span class="n">Incar</span><span class="p">,</span> <span class="n">Kpoints</span><span class="p">,</span> <span class="n">Potcar</span><span class="p">,</span> <span class="n">Poscar</span><span class="p">,</span> \
     <span class="n">Outcar</span><span class="p">,</span> <span class="n">Oszicar</span>
-<span class="kn">from</span> <span class="nn">pymatgen.io.cif</span> <span class="kn">import</span> <span class="n">CifWriter</span>
-<span class="kn">from</span> <span class="nn">pymatgen.symmetry.analyzer</span> <span class="kn">import</span> <span class="n">SpacegroupAnalyzer</span>
-<span class="kn">from</span> <span class="nn">pymatgen.analysis.bond_valence</span> <span class="kn">import</span> <span class="n">BVAnalyzer</span>
-<span class="kn">from</span> <span class="nn">monty.io</span> <span class="kn">import</span> <span class="n">zopen</span>
-<span class="kn">from</span> <span class="nn">pymatgen.matproj.rest</span> <span class="kn">import</span> <span class="n">MPRester</span>
-<span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span>
-<span class="kn">from</span> <span class="nn">monty.json</span> <span class="kn">import</span> <span class="n">MontyEncoder</span>
+<span class="kn">from</span> <span class="nn">pymatgen.io.cif</span> <span class="k">import</span> <span class="n">CifWriter</span>
+<span class="kn">from</span> <span class="nn">pymatgen.symmetry.analyzer</span> <span class="k">import</span> <span class="n">SpacegroupAnalyzer</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.bond_valence</span> <span class="k">import</span> <span class="n">BVAnalyzer</span>
+<span class="kn">from</span> <span class="nn">monty.io</span> <span class="k">import</span> <span class="n">zopen</span>
+<span class="kn">from</span> <span class="nn">pymatgen.matproj.rest</span> <span class="k">import</span> <span class="n">MPRester</span>
+<span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="k">import</span> <span class="n">ComputedEntry</span>
+<span class="kn">from</span> <span class="nn">monty.json</span> <span class="k">import</span> <span class="n">MontyEncoder</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
@@ -125,14 +125,14 @@
 <span class="sd">           also considered as 2 parts of an aflow style run.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c"># Version of this db creator document.</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;2.0.0&quot;</span>
+    <span class="c1"># Version of this db creator document.</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;2.0.0&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">27017</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s">&quot;vasp&quot;</span><span class="p">,</span>
-                 <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s">&quot;tasks&quot;</span><span class="p">,</span>
-                 <span class="n">parse_dos</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">compress_dos</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">simulate_mode</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                 <span class="n">additional_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">update_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">mapi_key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_full_uri</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">runs</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">27017</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s2">&quot;vasp&quot;</span><span class="p">,</span>
+                 <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s2">&quot;tasks&quot;</span><span class="p">,</span>
+                 <span class="n">parse_dos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compress_dos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">simulate_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">additional_fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">update_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">mapi_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_full_uri</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">runs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
 <span class="sd">        Args:</span>
@@ -198,22 +198,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="n">collection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">simulate</span> <span class="o">=</span> <span class="n">simulate_mode</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parse_dos</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">)</span> <span class="ow">and</span> <span class="n">parse_dos</span> <span class="o">!=</span> <span class="s">&#39;final&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid value for parse_dos&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parse_dos</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">)</span> <span class="ow">and</span> <span class="n">parse_dos</span> <span class="o">!=</span> <span class="s1">&#39;final&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid value for parse_dos&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span> <span class="o">=</span> <span class="n">parse_dos</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress_dos</span> <span class="o">=</span> <span class="n">compress_dos</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">additional_fields</span> <span class="o">=</span> <span class="n">additional_fields</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_duplicates</span> <span class="o">=</span> <span class="n">update_duplicates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mapi_key</span> <span class="o">=</span> <span class="n">mapi_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_full_uri</span> <span class="o">=</span> <span class="n">use_full_uri</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">runs</span> <span class="o">=</span> <span class="n">runs</span> <span class="ow">or</span> <span class="p">[</span><span class="s">&quot;relax1&quot;</span><span class="p">,</span> <span class="s">&quot;relax2&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runs</span> <span class="o">=</span> <span class="n">runs</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;relax1&quot;</span><span class="p">,</span> <span class="s2">&quot;relax2&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">simulate_mode</span><span class="p">:</span>
-            <span class="n">conn</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
             <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">db</span><span class="o">.</span><span class="n">counter</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;taskid&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">db</span><span class="o">.</span><span class="n">counter</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;taskid&quot;</span><span class="p">,</span> <span class="s">&quot;c&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">db</span><span class="o">.</span><span class="n">counter</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="s2">&quot;taskid&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">counter</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="s2">&quot;taskid&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 
 <div class="viewcode-block" id="VaspToDbTaskDrone.assimilate"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.assimilate">[docs]</a>    <span class="k">def</span> <span class="nf">assimilate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -226,121 +226,122 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_task_doc</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapi_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;successful&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapi_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;successful&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">calculate_stability</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="n">tid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_insert_doc</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">tid</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">traceback</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
-            <span class="k">return</span> <span class="bp">False</span>
-</div>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
 <div class="viewcode-block" id="VaspToDbTaskDrone.calculate_stability"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.calculate_stability">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_stability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">MPRester</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapi_key</span><span class="p">)</span>
-        <span class="n">functional</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;pseudo_potential&quot;</span><span class="p">][</span><span class="s">&quot;functional&quot;</span><span class="p">]</span>
-        <span class="n">syms</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">functional</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;pseudo_potential&quot;</span><span class="p">][</span><span class="s">&quot;labels&quot;</span><span class="p">]]</span>
-        <span class="n">entry</span> <span class="o">=</span> <span class="n">ComputedEntry</span><span class="p">(</span><span class="n">Composition</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;unit_cell_formula&quot;</span><span class="p">]),</span>
-                              <span class="n">d</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;final_energy&quot;</span><span class="p">],</span>
-                              <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;hubbards&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;hubbards&quot;</span><span class="p">],</span>
-                                          <span class="s">&quot;potcar_symbols&quot;</span><span class="p">:</span> <span class="n">syms</span><span class="p">})</span>
+        <span class="n">functional</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;pseudo_potential&quot;</span><span class="p">][</span><span class="s2">&quot;functional&quot;</span><span class="p">]</span>
+        <span class="n">syms</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">functional</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;pseudo_potential&quot;</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">]]</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ComputedEntry</span><span class="p">(</span><span class="n">Composition</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;unit_cell_formula&quot;</span><span class="p">]),</span>
+                              <span class="n">d</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;final_energy&quot;</span><span class="p">],</span>
+                              <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;hubbards&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hubbards&quot;</span><span class="p">],</span>
+                                          <span class="s2">&quot;potcar_symbols&quot;</span><span class="p">:</span> <span class="n">syms</span><span class="p">})</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">get_stability</span><span class="p">([</span><span class="n">entry</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;e_above_hull&quot;</span><span class="p">,</span> <span class="s">&quot;decomposes_to&quot;</span><span class="p">):</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-</div>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;e_above_hull&quot;</span><span class="p">,</span> <span class="s2">&quot;decomposes_to&quot;</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;analysis&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="VaspToDbTaskDrone.get_task_doc"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.get_task_doc">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the entire task doc for a path, including any post-processing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Getting task doc for base dir :{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting task doc for base dir :</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
         <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">vasprun_files</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="k">if</span> <span class="s">&quot;STOPCAR&quot;</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-            <span class="c">#Stopped runs. Try to parse as much as possible.</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s">&quot; contains stopped run&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;STOPCAR&quot;</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="c1">#Stopped runs. Try to parse as much as possible.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot; contains stopped run&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span> <span class="c">#try subfolder schema</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span> <span class="c1">#try subfolder schema</span>
                 <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">r</span><span class="p">)):</span>
-                    <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;vasprun.xml*&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;vasprun.xml*&quot;</span><span class="p">):</span>
                         <span class="n">vasprun_files</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span> <span class="c">#try extension schema</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1">#try extension schema</span>
                 <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;vasprun.xml.{}*&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;vasprun.xml.</span><span class="si">{}</span><span class="s2">*&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">)):</span>
                         <span class="n">vasprun_files</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vasprun_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span> <span class="c">#get any vasprun from the folder</span>
-                <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;vasprun.xml*&quot;</span><span class="p">)</span> <span class="ow">and</span> \
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span> <span class="c1">#get any vasprun from the folder</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;vasprun.xml*&quot;</span><span class="p">)</span> <span class="ow">and</span> \
                         <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vasprun_files</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                    <span class="n">vasprun_files</span><span class="p">[</span><span class="s">&#39;standard&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+                    <span class="n">vasprun_files</span><span class="p">[</span><span class="s1">&#39;standard&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vasprun_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_doc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">vasprun_files</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">:</span>
                 <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_killed_run</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;relax1&quot;</span><span class="p">)</span> <span class="ow">or</span>
-              <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;relax2&quot;</span><span class="p">)))</span> <span class="ow">and</span> <span class="n">contains_vasp_input</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-            <span class="c">#If not Materials Project style, process as a killed run.</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s">&quot; contains killed run&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;relax1&quot;</span><span class="p">)</span> <span class="ow">or</span>
+              <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;relax2&quot;</span><span class="p">)))</span> <span class="ow">and</span> <span class="n">contains_vasp_input</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="c1">#If not Materials Project style, process as a killed run.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot; contains killed run&quot;</span><span class="p">)</span>
             <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_killed_run</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">post_process</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No VASP files found!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No VASP files found!&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">d</span>
-</div>
+        <span class="k">return</span> <span class="n">d</span></div>
+
     <span class="k">def</span> <span class="nf">_insert_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulate</span><span class="p">:</span>
-            <span class="c"># Perform actual insertion into db. Because db connections cannot</span>
-            <span class="c"># be pickled, every insertion needs to create a new connection</span>
-            <span class="c"># to the db.</span>
+            <span class="c1"># Perform actual insertion into db. Because db connections cannot</span>
+            <span class="c1"># be pickled, every insertion needs to create a new connection</span>
+            <span class="c1"># to the db.</span>
             <span class="n">conn</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
             <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
             <span class="n">coll</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">]</span>
 
-            <span class="c"># Insert dos data into gridfs and then remove it from the dict.</span>
-            <span class="c"># DOS data tends to be above the 4Mb limit for mongo docs. A ref</span>
-            <span class="c"># to the dos file is in the dos_fs_id.</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s">&quot;dir_name&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">]},</span>
-                                   <span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">,</span> <span class="s">&quot;task_id&quot;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_duplicates</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span> <span class="ow">and</span> <span class="s">&quot;calculations&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">calc</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">]:</span>
-                        <span class="k">if</span> <span class="s">&quot;dos&quot;</span> <span class="ow">in</span> <span class="n">calc</span><span class="p">:</span>
-                            <span class="n">dos</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">calc</span><span class="p">[</span><span class="s">&quot;dos&quot;</span><span class="p">],</span> <span class="n">cls</span><span class="o">=</span><span class="n">MontyEncoder</span><span class="p">)</span>
+            <span class="c1"># Insert dos data into gridfs and then remove it from the dict.</span>
+            <span class="c1"># DOS data tends to be above the 4Mb limit for mongo docs. A ref</span>
+            <span class="c1"># to the dos file is in the dos_fs_id.</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;dir_name&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]},</span>
+                                   <span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">,</span> <span class="s2">&quot;task_id&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_duplicates</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span> <span class="ow">and</span> <span class="s2">&quot;calculations&quot;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">calc</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="s2">&quot;dos&quot;</span> <span class="ow">in</span> <span class="n">calc</span><span class="p">:</span>
+                            <span class="n">dos</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">calc</span><span class="p">[</span><span class="s2">&quot;dos&quot;</span><span class="p">],</span> <span class="n">cls</span><span class="o">=</span><span class="n">MontyEncoder</span><span class="p">)</span>
                             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress_dos</span><span class="p">:</span>
-                                <span class="n">dos</span> <span class="o">=</span> <span class="n">zlib</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">dos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress_dos</span><span class="p">)</span>
-                                <span class="n">calc</span><span class="p">[</span><span class="s">&quot;dos_compression&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;zlib&quot;</span>
-                            <span class="n">fs</span> <span class="o">=</span> <span class="n">gridfs</span><span class="o">.</span><span class="n">GridFS</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s">&quot;dos_fs&quot;</span><span class="p">)</span>
+                                <span class="n">dos</span> <span class="o">=</span> <span class="n">zlib</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">dos</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">compress_dos</span><span class="p">)</span>
+                                <span class="n">calc</span><span class="p">[</span><span class="s2">&quot;dos_compression&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;zlib&quot;</span>
+                            <span class="n">fs</span> <span class="o">=</span> <span class="n">gridfs</span><span class="o">.</span><span class="n">GridFS</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s2">&quot;dos_fs&quot;</span><span class="p">)</span>
                             <span class="n">dosid</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">dos</span><span class="p">)</span>
-                            <span class="n">calc</span><span class="p">[</span><span class="s">&quot;dos_fs_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dosid</span>
-                            <span class="k">del</span> <span class="n">calc</span><span class="p">[</span><span class="s">&quot;dos&quot;</span><span class="p">]</span>
+                            <span class="n">calc</span><span class="p">[</span><span class="s2">&quot;dos_fs_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dosid</span>
+                            <span class="k">del</span> <span class="n">calc</span><span class="p">[</span><span class="s2">&quot;dos&quot;</span><span class="p">]</span>
 
-                <span class="n">d</span><span class="p">[</span><span class="s">&quot;last_updated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="s">&quot;task_id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]):</span>
-                        <span class="n">d</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">counter</span><span class="o">.</span><span class="n">find_and_modify</span><span class="p">(</span>
-                            <span class="n">query</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="s">&quot;taskid&quot;</span><span class="p">},</span>
-                            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;$inc&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;c&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
-                            <span class="p">)[</span><span class="s">&quot;c&quot;</span><span class="p">]</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Inserting {} with taskid = {}&quot;</span>
-                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]))</span>
+                <span class="n">d</span><span class="p">[</span><span class="s2">&quot;last_updated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;task_id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]):</span>
+                        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">counter</span><span class="o">.</span><span class="n">find_and_modify</span><span class="p">(</span>
+                            <span class="n">query</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="s2">&quot;taskid&quot;</span><span class="p">},</span>
+                            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;$inc&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
+                            <span class="p">)[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Inserting </span><span class="si">{}</span><span class="s2"> with taskid = </span><span class="si">{}</span><span class="s2">&quot;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]))</span>
                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_duplicates</span><span class="p">:</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Updating {} with taskid = {}&quot;</span>
-                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]))</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating </span><span class="si">{}</span><span class="s2"> with taskid = </span><span class="si">{}</span><span class="s2">&quot;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]))</span>
 
-                <span class="n">coll</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&quot;dir_name&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">]},</span> <span class="p">{</span><span class="s">&quot;$set&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">},</span>
-                            <span class="n">upsert</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]</span>
+                <span class="n">coll</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;dir_name&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]},</span> <span class="p">{</span><span class="s2">&quot;$set&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">},</span>
+                            <span class="n">upsert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Skipping duplicate {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">]))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping duplicate </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Simulated insert into database for {} with task_id {}&quot;</span>
-                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;task_id&quot;</span><span class="p">]))</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Simulated insert into database for </span><span class="si">{}</span><span class="s2"> with task_id </span><span class="si">{}</span><span class="s2">&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]))</span>
             <span class="k">return</span> <span class="n">d</span>
 
 <div class="viewcode-block" id="VaspToDbTaskDrone.post_process"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.post_process">[docs]</a>    <span class="k">def</span> <span class="nf">post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
@@ -355,176 +356,176 @@
 <span class="sd">            d:</span>
 <span class="sd">                Current doc generated.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Post-processing dir:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Post-processing dir:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
 
         <span class="n">fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
 
-        <span class="c"># VASP input generated by pymatgen&#39;s alchemy has a</span>
-        <span class="c"># transformations.json file that keeps track of the origin of a</span>
-        <span class="c"># particular structure. This is extremely useful for tracing back a</span>
-        <span class="c"># result. If such a file is found, it is inserted into the task doc</span>
-        <span class="c"># as d[&quot;transformations&quot;]</span>
+        <span class="c1"># VASP input generated by pymatgen&#39;s alchemy has a</span>
+        <span class="c1"># transformations.json file that keeps track of the origin of a</span>
+        <span class="c1"># particular structure. This is extremely useful for tracing back a</span>
+        <span class="c1"># result. If such a file is found, it is inserted into the task doc</span>
+        <span class="c1"># as d[&quot;transformations&quot;]</span>
         <span class="n">transformations</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">filenames</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="s">&quot;transformations.json*&quot;</span><span class="p">))</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="s2">&quot;transformations.json*&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">zopen</span><span class="p">(</span><span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">zopen</span><span class="p">(</span><span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">transformations</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&quot;(\d+)-ICSD&quot;</span><span class="p">,</span>
-                                 <span class="n">transformations</span><span class="p">[</span><span class="s">&quot;history&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;source&quot;</span><span class="p">])</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;(\d+)-ICSD&quot;</span><span class="p">,</span>
+                                 <span class="n">transformations</span><span class="p">[</span><span class="s2">&quot;history&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;source&quot;</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-                        <span class="n">d</span><span class="p">[</span><span class="s">&quot;icsd_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;icsd_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Cannot parse ICSD from transformations &quot;</span>
-                                   <span class="s">&quot;file.&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cannot parse ICSD from transformations &quot;</span>
+                                   <span class="s2">&quot;file.&quot;</span><span class="p">)</span>
                     <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Transformations file does not exist.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Transformations file does not exist.&quot;</span><span class="p">)</span>
 
-        <span class="n">other_parameters</span> <span class="o">=</span> <span class="n">transformations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;other_parameters&quot;</span><span class="p">)</span>
-        <span class="n">new_tags</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">other_parameters</span> <span class="o">=</span> <span class="n">transformations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;other_parameters&quot;</span><span class="p">)</span>
+        <span class="n">new_tags</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">other_parameters</span><span class="p">:</span>
-            <span class="c"># We don&#39;t want to leave tags or authors in the</span>
-            <span class="c"># transformations file because they&#39;d be copied into</span>
-            <span class="c"># every structure generated after this one.</span>
-            <span class="n">new_tags</span> <span class="o">=</span> <span class="n">other_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;tags&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-            <span class="n">new_author</span> <span class="o">=</span> <span class="n">other_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;author&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="c1"># We don&#39;t want to leave tags or authors in the</span>
+            <span class="c1"># transformations file because they&#39;d be copied into</span>
+            <span class="c1"># every structure generated after this one.</span>
+            <span class="n">new_tags</span> <span class="o">=</span> <span class="n">other_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">new_author</span> <span class="o">=</span> <span class="n">other_parameters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">new_author</span><span class="p">:</span>
-                <span class="n">d</span><span class="p">[</span><span class="s">&quot;author&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_author</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">other_parameters</span><span class="p">:</span>  <span class="c"># if dict is now empty remove it</span>
-                <span class="n">transformations</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;other_parameters&quot;</span><span class="p">)</span>
+                <span class="n">d</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_author</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">other_parameters</span><span class="p">:</span>  <span class="c1"># if dict is now empty remove it</span>
+                <span class="n">transformations</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;other_parameters&quot;</span><span class="p">)</span>
 
-        <span class="n">d</span><span class="p">[</span><span class="s">&quot;transformations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformations</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;transformations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformations</span>
 
-        <span class="c"># Calculations done using custodian has a custodian.json,</span>
-        <span class="c"># which tracks the jobs performed and any errors detected and fixed.</span>
-        <span class="c"># This is useful for tracking what has actually be done to get a</span>
-        <span class="c"># result. If such a file is found, it is inserted into the task doc</span>
-        <span class="c"># as d[&quot;custodian&quot;]</span>
-        <span class="n">filenames</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="s">&quot;custodian.json*&quot;</span><span class="p">))</span>
+        <span class="c1"># Calculations done using custodian has a custodian.json,</span>
+        <span class="c1"># which tracks the jobs performed and any errors detected and fixed.</span>
+        <span class="c1"># This is useful for tracking what has actually be done to get a</span>
+        <span class="c1"># result. If such a file is found, it is inserted into the task doc</span>
+        <span class="c1"># as d[&quot;custodian&quot;]</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="s2">&quot;custodian.json*&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">zopen</span><span class="p">(</span><span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">d</span><span class="p">[</span><span class="s">&quot;custodian&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">zopen</span><span class="p">(</span><span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="s2">&quot;custodian&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-        <span class="c"># Parse OUTCAR for additional information and run stats that are</span>
-        <span class="c"># generally not in vasprun.xml.</span>
+        <span class="c1"># Parse OUTCAR for additional information and run stats that are</span>
+        <span class="c1"># generally not in vasprun.xml.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">run_stats</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="s">&quot;OUTCAR*&quot;</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="s2">&quot;OUTCAR*&quot;</span><span class="p">)):</span>
                 <span class="n">outcar</span> <span class="o">=</span> <span class="n">Outcar</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;relax2&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
-                <span class="n">taskname</span> <span class="o">=</span> <span class="s">&quot;relax2&quot;</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;relax2&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="k">else</span> \
-                    <span class="s">&quot;relax1&quot;</span>
-                <span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;outcar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outcar</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;relax2&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">taskname</span> <span class="o">=</span> <span class="s2">&quot;relax2&quot;</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;relax2&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="k">else</span> \
+                    <span class="s2">&quot;relax1&quot;</span>
+                <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;outcar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outcar</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
                 <span class="n">run_stats</span><span class="p">[</span><span class="n">taskname</span><span class="p">]</span> <span class="o">=</span> <span class="n">outcar</span><span class="o">.</span><span class="n">run_stats</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Bad OUTCAR for {}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fullpath</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Bad OUTCAR for </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fullpath</span><span class="p">))</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">overall_run_stats</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;Total CPU time used (sec)&quot;</span><span class="p">,</span> <span class="s">&quot;User time (sec)&quot;</span><span class="p">,</span>
-                        <span class="s">&quot;System time (sec)&quot;</span><span class="p">,</span> <span class="s">&quot;Elapsed time (sec)&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Total CPU time used (sec)&quot;</span><span class="p">,</span> <span class="s2">&quot;User time (sec)&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;System time (sec)&quot;</span><span class="p">,</span> <span class="s2">&quot;Elapsed time (sec)&quot;</span><span class="p">]:</span>
                 <span class="n">overall_run_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                                               <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">run_stats</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
-            <span class="n">run_stats</span><span class="p">[</span><span class="s">&quot;overall&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overall_run_stats</span>
+            <span class="n">run_stats</span><span class="p">[</span><span class="s2">&quot;overall&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overall_run_stats</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Bad run stats for {}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fullpath</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Bad run stats for </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fullpath</span><span class="p">))</span>
 
-        <span class="n">d</span><span class="p">[</span><span class="s">&quot;run_stats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_stats</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;run_stats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_stats</span>
 
-        <span class="c">#Convert to full uri path.</span>
+        <span class="c1">#Convert to full uri path.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_full_uri</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_uri</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_uri</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">new_tags</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;tags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_tags</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;tags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_tags</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Post-processed &quot;</span> <span class="o">+</span> <span class="n">fullpath</span><span class="p">)</span>
-</div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Post-processed &quot;</span> <span class="o">+</span> <span class="n">fullpath</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="VaspToDbTaskDrone.process_killed_run"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.process_killed_run">[docs]</a>    <span class="k">def</span> <span class="nf">process_killed_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process a killed vasp run.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Processing Killed run &quot;</span> <span class="o">+</span> <span class="n">fullpath</span><span class="p">)</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;dir_name&quot;</span><span class="p">:</span> <span class="n">fullpath</span><span class="p">,</span> <span class="s">&quot;state&quot;</span><span class="p">:</span> <span class="s">&quot;killed&quot;</span><span class="p">,</span> <span class="s">&quot;oszicar&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing Killed run &quot;</span> <span class="o">+</span> <span class="n">fullpath</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dir_name&quot;</span><span class="p">:</span> <span class="n">fullpath</span><span class="p">,</span> <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;killed&quot;</span><span class="p">,</span> <span class="s2">&quot;oszicar&quot;</span><span class="p">:</span> <span class="p">{}}</span>
 
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dir_name</span><span class="p">):</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;INCAR*&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;INCAR*&quot;</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">incar</span> <span class="o">=</span> <span class="n">Incar</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;incar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;is_hubbard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LDAU&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;is_hubbard&quot;</span><span class="p">]:</span>
-                        <span class="n">us</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LDAUU&quot;</span><span class="p">,</span> <span class="p">[]))</span>
-                        <span class="n">js</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LDAUJ&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;incar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;is_hubbard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LDAU&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;is_hubbard&quot;</span><span class="p">]:</span>
+                        <span class="n">us</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LDAUU&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+                        <span class="n">js</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LDAUJ&quot;</span><span class="p">,</span> <span class="p">[]))</span>
                         <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">us</span> <span class="o">-</span> <span class="n">js</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="n">d</span><span class="p">[</span><span class="s">&quot;is_hubbard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
-                            <span class="n">d</span><span class="p">[</span><span class="s">&quot;hubbards&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;is_hubbard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hubbards&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">d</span><span class="p">[</span><span class="s">&quot;hubbards&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-                    <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;is_hubbard&quot;</span><span class="p">]:</span>
-                        <span class="n">d</span><span class="p">[</span><span class="s">&quot;run_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;GGA+U&quot;</span>
-                    <span class="k">elif</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LHFCALC&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">):</span>
-                        <span class="n">d</span><span class="p">[</span><span class="s">&quot;run_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;HF&quot;</span>
+                        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hubbards&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;is_hubbard&quot;</span><span class="p">]:</span>
+                        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;run_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;GGA+U&quot;</span>
+                    <span class="k">elif</span> <span class="n">incar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LHFCALC&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;run_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HF&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">d</span><span class="p">[</span><span class="s">&quot;run_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;GGA&quot;</span>
+                        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;run_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;GGA&quot;</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-                    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to parse INCAR for killed run {}.&quot;</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to parse INCAR for killed run </span><span class="si">{}</span><span class="s2">.&quot;</span>
                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;KPOINTS*&quot;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;KPOINTS*&quot;</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">kpoints</span> <span class="o">=</span> <span class="n">Kpoints</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;kpoints&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kpoints</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;kpoints&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kpoints</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
                 <span class="k">except</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to parse KPOINTS for killed run {}.&quot;</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to parse KPOINTS for killed run </span><span class="si">{}</span><span class="s2">.&quot;</span>
                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;POSCAR*&quot;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;POSCAR*&quot;</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">s</span> <span class="o">=</span> <span class="n">Poscar</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">structure</span>
                     <span class="n">comp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">composition</span>
                     <span class="n">el_amt</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">get_el_amt_dict</span><span class="p">()</span>
-                    <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&quot;unit_cell_formula&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">as_dict</span><span class="p">(),</span>
-                              <span class="s">&quot;reduced_cell_formula&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">to_reduced_dict</span><span class="p">,</span>
-                              <span class="s">&quot;elements&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">el_amt</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-                              <span class="s">&quot;nelements&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">el_amt</span><span class="p">),</span>
-                              <span class="s">&quot;pretty_formula&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">,</span>
-                              <span class="s">&quot;anonymous_formula&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">anonymized_formula</span><span class="p">,</span>
-                              <span class="s">&quot;nsites&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span>
-                              <span class="s">&quot;chemsys&quot;</span><span class="p">:</span> <span class="s">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">el_amt</span><span class="o">.</span><span class="n">keys</span><span class="p">()))})</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;poscar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;unit_cell_formula&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">as_dict</span><span class="p">(),</span>
+                              <span class="s2">&quot;reduced_cell_formula&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">to_reduced_dict</span><span class="p">,</span>
+                              <span class="s2">&quot;elements&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">el_amt</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                              <span class="s2">&quot;nelements&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">el_amt</span><span class="p">),</span>
+                              <span class="s2">&quot;pretty_formula&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">reduced_formula</span><span class="p">,</span>
+                              <span class="s2">&quot;anonymous_formula&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">anonymized_formula</span><span class="p">,</span>
+                              <span class="s2">&quot;nsites&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span>
+                              <span class="s2">&quot;chemsys&quot;</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">el_amt</span><span class="o">.</span><span class="n">keys</span><span class="p">()))})</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;poscar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
                 <span class="k">except</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to parse POSCAR for killed run {}.&quot;</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to parse POSCAR for killed run </span><span class="si">{}</span><span class="s2">.&quot;</span>
                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;POTCAR*&quot;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;POTCAR*&quot;</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">potcar</span> <span class="o">=</span> <span class="n">Potcar</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;pseudo_potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                        <span class="s">&quot;functional&quot;</span><span class="p">:</span> <span class="n">potcar</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-                        <span class="s">&quot;pot_type&quot;</span><span class="p">:</span> <span class="s">&quot;paw&quot;</span><span class="p">,</span>
-                        <span class="s">&quot;labels&quot;</span><span class="p">:</span> <span class="n">potcar</span><span class="o">.</span><span class="n">symbols</span><span class="p">}</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;pseudo_potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;functional&quot;</span><span class="p">:</span> <span class="n">potcar</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                        <span class="s2">&quot;pot_type&quot;</span><span class="p">:</span> <span class="s2">&quot;paw&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">potcar</span><span class="o">.</span><span class="n">symbols</span><span class="p">}</span>
                 <span class="k">except</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to parse POTCAR for killed run in {}.&quot;</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to parse POTCAR for killed run in </span><span class="si">{}</span><span class="s2">.&quot;</span>
                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&quot;OSZICAR&quot;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;OSZICAR&quot;</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">d</span><span class="p">[</span><span class="s">&quot;oszicar&quot;</span><span class="p">][</span><span class="s">&quot;root&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;oszicar&quot;</span><span class="p">][</span><span class="s2">&quot;root&quot;</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="n">Oszicar</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
                 <span class="k">except</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to parse OSZICAR for killed run in {}.&quot;</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to parse OSZICAR for killed run in </span><span class="si">{}</span><span class="s2">.&quot;</span>
                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&quot;relax\d&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s">&quot;OSZICAR&quot;</span><span class="p">)):</span>
+            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;relax\d&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s2">&quot;OSZICAR&quot;</span><span class="p">)):</span>
                     <span class="k">try</span><span class="p">:</span>
-                        <span class="n">d</span><span class="p">[</span><span class="s">&quot;oszicar&quot;</span><span class="p">][</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">Oszicar</span><span class="p">(</span>
-                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s">&quot;OSZICAR&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+                        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;oszicar&quot;</span><span class="p">][</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">Oszicar</span><span class="p">(</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s2">&quot;OSZICAR&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
                     <span class="k">except</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to parse OSZICAR for killed &quot;</span>
-                                     <span class="s">&quot;run in {}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">d</span>
-</div>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to parse OSZICAR for killed &quot;</span>
+                                     <span class="s2">&quot;run in </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
 <div class="viewcode-block" id="VaspToDbTaskDrone.process_vasprun"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.process_vasprun">[docs]</a>    <span class="k">def</span> <span class="nf">process_vasprun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">,</span> <span class="n">taskname</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process a vasprun.xml file.</span>
@@ -532,25 +533,25 @@
         <span class="n">vasprun_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">Vasprun</span><span class="p">(</span><span class="n">vasprun_file</span><span class="p">)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
-        <span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
-        <span class="n">d</span><span class="p">[</span><span class="s">&quot;completed_at&quot;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;completed_at&quot;</span><span class="p">]</span> <span class="o">=</span> \
             <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span>
                 <span class="n">vasprun_file</span><span class="p">)))</span>
-        <span class="n">d</span><span class="p">[</span><span class="s">&quot;cif&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CifWriter</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">final_structure</span><span class="p">))</span>
-        <span class="n">d</span><span class="p">[</span><span class="s">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">final_structure</span><span class="o">.</span><span class="n">density</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span> <span class="o">!=</span> <span class="s">&#39;final&#39;</span> \
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;cif&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CifWriter</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">final_structure</span><span class="p">))</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">final_structure</span><span class="o">.</span><span class="n">density</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span> <span class="o">!=</span> <span class="s1">&#39;final&#39;</span> \
                                <span class="ow">or</span> <span class="n">taskname</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">d</span><span class="p">[</span><span class="s">&quot;dos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">complete_dos</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+                <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">complete_dos</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;No valid dos data exist in {}.</span><span class="se">\n</span><span class="s"> Skipping dos&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No valid dos data exist in </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2"> Skipping dos&quot;</span>
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dir_name</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">taskname</span> <span class="o">==</span> <span class="s">&quot;relax1&quot;</span> <span class="ow">or</span> <span class="n">taskname</span> <span class="o">==</span> <span class="s">&quot;relax2&quot;</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;task&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;aflow&quot;</span><span class="p">,</span> <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="n">taskname</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">taskname</span> <span class="o">==</span> <span class="s2">&quot;relax1&quot;</span> <span class="ow">or</span> <span class="n">taskname</span> <span class="o">==</span> <span class="s2">&quot;relax2&quot;</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;aflow&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">taskname</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;task&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="n">taskname</span><span class="p">,</span> <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="n">taskname</span><span class="p">}</span>
-        <span class="k">return</span> <span class="n">d</span>
-</div>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;task&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">taskname</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">taskname</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
 <div class="viewcode-block" id="VaspToDbTaskDrone.generate_doc"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.generate_doc">[docs]</a>    <span class="k">def</span> <span class="nf">generate_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">,</span> <span class="n">vasprun_files</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process aflow style runs, where each run is actually a combination of</span>
@@ -558,74 +559,74 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fullpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span>
-            <span class="c">#Defensively copy the additional fields first.  This is a MUST.</span>
-            <span class="c">#Otherwise, parallel updates will see the same object and inserts</span>
-            <span class="c">#will be overridden!!</span>
+            <span class="c1">#Defensively copy the additional fields first.  This is a MUST.</span>
+            <span class="c1">#Otherwise, parallel updates will see the same object and inserts</span>
+            <span class="c1">#will be overridden!!</span>
             <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">additional_fields</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fullpath</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;schema_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">VaspToDbTaskDrone</span><span class="o">.</span><span class="n">__version__</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fullpath</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;schema_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">VaspToDbTaskDrone</span><span class="o">.</span><span class="n">__version__</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">process_vasprun</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">taskname</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">taskname</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">vasprun_files</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
-            <span class="n">d1</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">d2</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">d1</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">d2</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-            <span class="c">#Now map some useful info to the root level.</span>
-            <span class="k">for</span> <span class="n">root_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;completed_at&quot;</span><span class="p">,</span> <span class="s">&quot;nsites&quot;</span><span class="p">,</span> <span class="s">&quot;unit_cell_formula&quot;</span><span class="p">,</span>
-                             <span class="s">&quot;reduced_cell_formula&quot;</span><span class="p">,</span> <span class="s">&quot;pretty_formula&quot;</span><span class="p">,</span>
-                             <span class="s">&quot;elements&quot;</span><span class="p">,</span> <span class="s">&quot;nelements&quot;</span><span class="p">,</span> <span class="s">&quot;cif&quot;</span><span class="p">,</span> <span class="s">&quot;density&quot;</span><span class="p">,</span>
-                             <span class="s">&quot;is_hubbard&quot;</span><span class="p">,</span> <span class="s">&quot;hubbards&quot;</span><span class="p">,</span> <span class="s">&quot;run_type&quot;</span><span class="p">]:</span>
+            <span class="c1">#Now map some useful info to the root level.</span>
+            <span class="k">for</span> <span class="n">root_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;completed_at&quot;</span><span class="p">,</span> <span class="s2">&quot;nsites&quot;</span><span class="p">,</span> <span class="s2">&quot;unit_cell_formula&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;reduced_cell_formula&quot;</span><span class="p">,</span> <span class="s2">&quot;pretty_formula&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;elements&quot;</span><span class="p">,</span> <span class="s2">&quot;nelements&quot;</span><span class="p">,</span> <span class="s2">&quot;cif&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;is_hubbard&quot;</span><span class="p">,</span> <span class="s2">&quot;hubbards&quot;</span><span class="p">,</span> <span class="s2">&quot;run_type&quot;</span><span class="p">]:</span>
                 <span class="n">d</span><span class="p">[</span><span class="n">root_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">d2</span><span class="p">[</span><span class="n">root_key</span><span class="p">]</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;chemsys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">d2</span><span class="p">[</span><span class="s">&quot;elements&quot;</span><span class="p">]))</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;chemsys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">d2</span><span class="p">[</span><span class="s2">&quot;elements&quot;</span><span class="p">]))</span>
 
-            <span class="c">#store any overrides to the exchange correlation functional</span>
-            <span class="n">xc</span> <span class="o">=</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;incar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;GGA&quot;</span><span class="p">)</span>
+            <span class="c1">#store any overrides to the exchange correlation functional</span>
+            <span class="n">xc</span> <span class="o">=</span> <span class="n">d2</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;incar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GGA&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">xc</span><span class="p">:</span>
                 <span class="n">xc</span> <span class="o">=</span> <span class="n">xc</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;crystal&quot;</span><span class="p">:</span> <span class="n">d1</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;crystal&quot;</span><span class="p">],</span>
-                          <span class="s">&quot;is_lasph&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;incar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;LASPH&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">),</span>
-                          <span class="s">&quot;potcar_spec&quot;</span><span class="p">:</span> <span class="n">d1</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;potcar_spec&quot;</span><span class="p">),</span>
-                          <span class="s">&quot;xc_override&quot;</span><span class="p">:</span> <span class="n">xc</span><span class="p">}</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d2</span><span class="p">[</span><span class="s">&quot;reduced_cell_formula&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;anonymous_formula&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="nb">float</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;crystal&quot;</span><span class="p">:</span> <span class="n">d1</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;crystal&quot;</span><span class="p">],</span>
+                          <span class="s2">&quot;is_lasph&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;incar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LASPH&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                          <span class="s2">&quot;potcar_spec&quot;</span><span class="p">:</span> <span class="n">d1</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;potcar_spec&quot;</span><span class="p">),</span>
+                          <span class="s2">&quot;xc_override&quot;</span><span class="p">:</span> <span class="n">xc</span><span class="p">}</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d2</span><span class="p">[</span><span class="s2">&quot;reduced_cell_formula&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;anonymous_formula&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="nb">float</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                                       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">))}</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s">&quot;crystal&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;crystal&quot;</span><span class="p">],</span>
-                <span class="s">&quot;final_energy&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;final_energy&quot;</span><span class="p">],</span>
-                <span class="s">&quot;final_energy_per_atom&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;final_energy_per_atom&quot;</span><span class="p">]}</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;aflow&quot;</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;potcar_type&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;_&quot;</span><span class="p">)</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;crystal&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;crystal&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;final_energy&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;final_energy&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;final_energy_per_atom&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;final_energy_per_atom&quot;</span><span class="p">]}</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;aflow&quot;</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">d2</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;potcar_type&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
             <span class="n">pot_type</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">functional</span> <span class="o">=</span> <span class="s">&quot;lda&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pot_type</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;pseudo_potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;functional&quot;</span><span class="p">:</span> <span class="n">functional</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-                                     <span class="s">&quot;pot_type&quot;</span><span class="p">:</span> <span class="n">pot_type</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-                                     <span class="s">&quot;labels&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;potcar&quot;</span><span class="p">]}</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">)</span> <span class="ow">or</span> \
-                    <span class="nb">list</span><span class="p">(</span><span class="n">vasprun_files</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;relax1&quot;</span><span class="p">:</span>
-                <span class="n">d</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;successful&quot;</span> <span class="k">if</span> <span class="n">d2</span><span class="p">[</span><span class="s">&quot;has_vasp_completed&quot;</span><span class="p">]</span> \
-                    <span class="k">else</span> <span class="s">&quot;unsuccessful&quot;</span>
+            <span class="n">functional</span> <span class="o">=</span> <span class="s2">&quot;lda&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pot_type</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;pseudo_potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;functional&quot;</span><span class="p">:</span> <span class="n">functional</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                                     <span class="s2">&quot;pot_type&quot;</span><span class="p">:</span> <span class="n">pot_type</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                                     <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">d2</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;potcar&quot;</span><span class="p">]}</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">)</span> <span class="ow">or</span> \
+                    <span class="nb">list</span><span class="p">(</span><span class="n">vasprun_files</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;relax1&quot;</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;successful&quot;</span> <span class="k">if</span> <span class="n">d2</span><span class="p">[</span><span class="s2">&quot;has_vasp_completed&quot;</span><span class="p">]</span> \
+                    <span class="k">else</span> <span class="s2">&quot;unsuccessful&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">d</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;stopped&quot;</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_basic_analysis_and_error_checks</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                <span class="n">d</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;stopped&quot;</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;analysis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_basic_analysis_and_error_checks</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-            <span class="n">sg</span> <span class="o">=</span> <span class="n">SpacegroupAnalyzer</span><span class="p">(</span><span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;crystal&quot;</span><span class="p">]),</span>
+            <span class="n">sg</span> <span class="o">=</span> <span class="n">SpacegroupAnalyzer</span><span class="p">(</span><span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;crystal&quot;</span><span class="p">]),</span>
                                     <span class="mf">0.1</span><span class="p">)</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;spacegroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;symbol&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_spacegroup_symbol</span><span class="p">(),</span>
-                               <span class="s">&quot;number&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_spacegroup_number</span><span class="p">(),</span>
-                               <span class="s">&quot;point_group&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_point_group</span><span class="p">(),</span>
-                               <span class="s">&quot;source&quot;</span><span class="p">:</span> <span class="s">&quot;spglib&quot;</span><span class="p">,</span>
-                               <span class="s">&quot;crystal_system&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_crystal_system</span><span class="p">(),</span>
-                               <span class="s">&quot;hall&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_hall</span><span class="p">()}</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;last_updated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;spacegroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_spacegroup_symbol</span><span class="p">(),</span>
+                               <span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_spacegroup_number</span><span class="p">(),</span>
+                               <span class="s2">&quot;point_group&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_point_group</span><span class="p">(),</span>
+                               <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;spglib&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;crystal_system&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_crystal_system</span><span class="p">(),</span>
+                               <span class="s2">&quot;hall&quot;</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">get_hall</span><span class="p">()}</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;last_updated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">d</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">traceback</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Error in &quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span> <span class="o">+</span>
-                         <span class="s">&quot;.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error in &quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">dir_name</span><span class="p">)</span> <span class="o">+</span>
+                         <span class="s2">&quot;.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
 
-            <span class="k">return</span> <span class="bp">None</span>
-</div>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
 <div class="viewcode-block" id="VaspToDbTaskDrone.get_valid_paths"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.get_valid_paths">[docs]</a>    <span class="k">def</span> <span class="nf">get_valid_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        There are some restrictions on the valid directory structures:</span>
@@ -641,94 +642,94 @@
         <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">subdirs</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">parent</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">parent</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">])</span> <span class="ow">and</span> \
-                <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s">&quot;vasprun.xml*&quot;</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;vasprun.xml*&quot;</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">parent</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">[]</span>
-</div>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
 <div class="viewcode-block" id="VaspToDbTaskDrone.convert"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">d</span>
-</div>
+        <span class="k">return</span> <span class="n">d</span></div>
+
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;VaspToDbDictDrone&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;VaspToDbDictDrone&quot;</span>
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="VaspToDbTaskDrone.from_dict"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;init_args&quot;</span><span class="p">])</span>
-</div>
-<div class="viewcode-block" id="VaspToDbTaskDrone.as_dict"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">init_args</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="s">&quot;port&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
-                     <span class="s">&quot;database&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                     <span class="s">&quot;password&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
-                     <span class="s">&quot;collection&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span>
-                     <span class="s">&quot;parse_dos&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span><span class="p">,</span>
-                     <span class="s">&quot;simulate_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulate</span><span class="p">,</span>
-                     <span class="s">&quot;additional_fields&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">additional_fields</span><span class="p">,</span>
-                     <span class="s">&quot;update_duplicates&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_duplicates</span><span class="p">}</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
-                  <span class="s">&quot;init_args&quot;</span><span class="p">:</span> <span class="n">init_args</span><span class="p">,</span> <span class="s">&quot;version&quot;</span><span class="p">:</span> <span class="n">__version__</span><span class="p">}</span>
-        <span class="k">return</span> <span class="n">output</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;init_args&quot;</span><span class="p">])</span></div>
 
-</div></div>
+<div class="viewcode-block" id="VaspToDbTaskDrone.as_dict"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.VaspToDbTaskDrone.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">init_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                     <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                     <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+                     <span class="s2">&quot;collection&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span>
+                     <span class="s2">&quot;parse_dos&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_dos</span><span class="p">,</span>
+                     <span class="s2">&quot;simulate_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulate</span><span class="p">,</span>
+                     <span class="s2">&quot;additional_fields&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">additional_fields</span><span class="p">,</span>
+                     <span class="s2">&quot;update_duplicates&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_duplicates</span><span class="p">}</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                  <span class="s2">&quot;init_args&quot;</span><span class="p">:</span> <span class="n">init_args</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">__version__</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">output</span></div></div>
+
+
 <div class="viewcode-block" id="get_basic_analysis_and_error_checks"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.get_basic_analysis_and_error_checks">[docs]</a><span class="k">def</span> <span class="nf">get_basic_analysis_and_error_checks</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">max_force_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                                         <span class="n">volume_change_threshold</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
 
-    <span class="n">initial_vol</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;crystal&quot;</span><span class="p">][</span><span class="s">&quot;lattice&quot;</span><span class="p">][</span><span class="s">&quot;volume&quot;</span><span class="p">]</span>
-    <span class="n">final_vol</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;crystal&quot;</span><span class="p">][</span><span class="s">&quot;lattice&quot;</span><span class="p">][</span><span class="s">&quot;volume&quot;</span><span class="p">]</span>
+    <span class="n">initial_vol</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;crystal&quot;</span><span class="p">][</span><span class="s2">&quot;lattice&quot;</span><span class="p">][</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span>
+    <span class="n">final_vol</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;crystal&quot;</span><span class="p">][</span><span class="s2">&quot;lattice&quot;</span><span class="p">][</span><span class="s2">&quot;volume&quot;</span><span class="p">]</span>
     <span class="n">delta_vol</span> <span class="o">=</span> <span class="n">final_vol</span> <span class="o">-</span> <span class="n">initial_vol</span>
     <span class="n">percent_delta_vol</span> <span class="o">=</span> <span class="n">delta_vol</span> <span class="o">/</span> <span class="n">initial_vol</span>
     <span class="n">coord_num</span> <span class="o">=</span> <span class="n">get_coordination_numbers</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-    <span class="n">calc</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">gap</span> <span class="o">=</span> <span class="n">calc</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;bandgap&quot;</span><span class="p">]</span>
-    <span class="n">cbm</span> <span class="o">=</span> <span class="n">calc</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;cbm&quot;</span><span class="p">]</span>
-    <span class="n">vbm</span> <span class="o">=</span> <span class="n">calc</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;vbm&quot;</span><span class="p">]</span>
-    <span class="n">is_direct</span> <span class="o">=</span> <span class="n">calc</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;is_gap_direct&quot;</span><span class="p">]</span>
+    <span class="n">calc</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">gap</span> <span class="o">=</span> <span class="n">calc</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;bandgap&quot;</span><span class="p">]</span>
+    <span class="n">cbm</span> <span class="o">=</span> <span class="n">calc</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;cbm&quot;</span><span class="p">]</span>
+    <span class="n">vbm</span> <span class="o">=</span> <span class="n">calc</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;vbm&quot;</span><span class="p">]</span>
+    <span class="n">is_direct</span> <span class="o">=</span> <span class="n">calc</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;is_gap_direct&quot;</span><span class="p">]</span>
 
     <span class="n">warning_msgs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">error_msgs</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">percent_delta_vol</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">volume_change_threshold</span><span class="p">:</span>
-        <span class="n">warning_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;Volume change &gt; {}%&quot;</span>
+        <span class="n">warning_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Volume change &gt; </span><span class="si">{}</span><span class="s2">%&quot;</span>
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">volume_change_threshold</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
 
-    <span class="n">bv_struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;crystal&quot;</span><span class="p">])</span>
+    <span class="n">bv_struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;crystal&quot;</span><span class="p">])</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">bva</span> <span class="o">=</span> <span class="n">BVAnalyzer</span><span class="p">()</span>
         <span class="n">bv_struct</span> <span class="o">=</span> <span class="n">bva</span><span class="o">.</span><span class="n">get_oxi_state_decorated_structure</span><span class="p">(</span><span class="n">bv_struct</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Valence cannot be determined due to {e}.&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Valence cannot be determined due to </span><span class="si">{e}</span><span class="s2">.&quot;</span>
                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">=</span><span class="n">e</span><span class="p">))</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;BVAnalyzer error {e}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;BVAnalyzer error </span><span class="si">{e}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)))</span>
 
-    <span class="n">max_force</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;successful&quot;</span> <span class="ow">and</span> \
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;input&quot;</span><span class="p">][</span><span class="s">&quot;parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;NSW&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c"># handle the max force and max force error</span>
+    <span class="n">max_force</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;successful&quot;</span> <span class="ow">and</span> \
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NSW&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># handle the max force and max force error</span>
         <span class="n">max_force</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-                        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s">&quot;calculations&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s">&quot;output&quot;</span><span class="p">]</span>
-                        <span class="p">[</span><span class="s">&quot;ionic_steps&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s">&quot;forces&quot;</span><span class="p">]])</span>
+                        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;calculations&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+                        <span class="p">[</span><span class="s2">&quot;ionic_steps&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;forces&quot;</span><span class="p">]])</span>
 
         <span class="k">if</span> <span class="n">max_force</span> <span class="o">&gt;</span> <span class="n">max_force_threshold</span><span class="p">:</span>
-            <span class="n">error_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;Final max force exceeds {} eV&quot;</span>
+            <span class="n">error_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Final max force exceeds </span><span class="si">{}</span><span class="s2"> eV&quot;</span>
                               <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_force_threshold</span><span class="p">))</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;error&quot;</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
 
-        <span class="n">s</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;crystal&quot;</span><span class="p">])</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;crystal&quot;</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
-            <span class="n">error_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;Bad structure (atoms are too close!)&quot;</span><span class="p">)</span>
-            <span class="n">d</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;error&quot;</span>
+            <span class="n">error_msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Bad structure (atoms are too close!)&quot;</span><span class="p">)</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="s">&quot;delta_volume&quot;</span><span class="p">:</span> <span class="n">delta_vol</span><span class="p">,</span>
-            <span class="s">&quot;max_force&quot;</span><span class="p">:</span> <span class="n">max_force</span><span class="p">,</span>
-            <span class="s">&quot;percent_delta_volume&quot;</span><span class="p">:</span> <span class="n">percent_delta_vol</span><span class="p">,</span>
-            <span class="s">&quot;warnings&quot;</span><span class="p">:</span> <span class="n">warning_msgs</span><span class="p">,</span>
-            <span class="s">&quot;errors&quot;</span><span class="p">:</span> <span class="n">error_msgs</span><span class="p">,</span>
-            <span class="s">&quot;coordination_numbers&quot;</span><span class="p">:</span> <span class="n">coord_num</span><span class="p">,</span>
-            <span class="s">&quot;bandgap&quot;</span><span class="p">:</span> <span class="n">gap</span><span class="p">,</span> <span class="s">&quot;cbm&quot;</span><span class="p">:</span> <span class="n">cbm</span><span class="p">,</span> <span class="s">&quot;vbm&quot;</span><span class="p">:</span> <span class="n">vbm</span><span class="p">,</span>
-            <span class="s">&quot;is_gap_direct&quot;</span><span class="p">:</span> <span class="n">is_direct</span><span class="p">,</span>
-            <span class="s">&quot;bv_structure&quot;</span><span class="p">:</span> <span class="n">bv_struct</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;delta_volume&quot;</span><span class="p">:</span> <span class="n">delta_vol</span><span class="p">,</span>
+            <span class="s2">&quot;max_force&quot;</span><span class="p">:</span> <span class="n">max_force</span><span class="p">,</span>
+            <span class="s2">&quot;percent_delta_volume&quot;</span><span class="p">:</span> <span class="n">percent_delta_vol</span><span class="p">,</span>
+            <span class="s2">&quot;warnings&quot;</span><span class="p">:</span> <span class="n">warning_msgs</span><span class="p">,</span>
+            <span class="s2">&quot;errors&quot;</span><span class="p">:</span> <span class="n">error_msgs</span><span class="p">,</span>
+            <span class="s2">&quot;coordination_numbers&quot;</span><span class="p">:</span> <span class="n">coord_num</span><span class="p">,</span>
+            <span class="s2">&quot;bandgap&quot;</span><span class="p">:</span> <span class="n">gap</span><span class="p">,</span> <span class="s2">&quot;cbm&quot;</span><span class="p">:</span> <span class="n">cbm</span><span class="p">,</span> <span class="s2">&quot;vbm&quot;</span><span class="p">:</span> <span class="n">vbm</span><span class="p">,</span>
+            <span class="s2">&quot;is_gap_direct&quot;</span><span class="p">:</span> <span class="n">is_direct</span><span class="p">,</span>
+            <span class="s2">&quot;bv_structure&quot;</span><span class="p">:</span> <span class="n">bv_struct</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()}</span></div>
 
-</div>
+
 <div class="viewcode-block" id="contains_vasp_input"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.contains_vasp_input">[docs]</a><span class="k">def</span> <span class="nf">contains_vasp_input</span><span class="p">(</span><span class="n">dir_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks if a directory contains valid VASP input.</span>
@@ -741,13 +742,13 @@
 <span class="sd">        True if directory contains all four VASP input files (INCAR, POSCAR,</span>
 <span class="sd">        KPOINTS and POTCAR).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;INCAR&quot;</span><span class="p">,</span> <span class="s">&quot;POSCAR&quot;</span><span class="p">,</span> <span class="s">&quot;POTCAR&quot;</span><span class="p">,</span> <span class="s">&quot;KPOINTS&quot;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;INCAR&quot;</span><span class="p">,</span> <span class="s2">&quot;POSCAR&quot;</span><span class="p">,</span> <span class="s2">&quot;POTCAR&quot;</span><span class="p">,</span> <span class="s2">&quot;KPOINTS&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span> <span class="ow">and</span> \
-                <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span> <span class="o">+</span> <span class="s">&quot;.orig&quot;</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">return</span> <span class="bp">True</span>
+                <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="n">f</span> <span class="o">+</span> <span class="s2">&quot;.orig&quot;</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
 
-</div>
+
 <div class="viewcode-block" id="get_coordination_numbers"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.get_coordination_numbers">[docs]</a><span class="k">def</span> <span class="nf">get_coordination_numbers</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper method to get the coordination number of all sites in the final</span>
@@ -761,19 +762,19 @@
 <span class="sd">        Coordination numbers as a list of dict of [{&quot;site&quot;: site_dict,</span>
 <span class="sd">        &quot;coordination&quot;: number}, ...].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">structure</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&quot;output&quot;</span><span class="p">][</span><span class="s">&quot;crystal&quot;</span><span class="p">])</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;crystal&quot;</span><span class="p">])</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">VoronoiCoordFinder</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
     <span class="n">cn</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure</span><span class="o">.</span><span class="n">sites</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">n</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get_coordination_number</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
-            <span class="n">cn</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&quot;site&quot;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">(),</span> <span class="s">&quot;coordination&quot;</span><span class="p">:</span> <span class="n">number</span><span class="p">})</span>
+            <span class="n">cn</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;site&quot;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">(),</span> <span class="s2">&quot;coordination&quot;</span><span class="p">:</span> <span class="n">number</span><span class="p">})</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Unable to parse coordination errors&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">cn</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to parse coordination errors&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cn</span></div>
 
-</div>
+
 <div class="viewcode-block" id="get_uri"><a class="viewcode-back" href="../../matgendb.html#matgendb.creator.get_uri">[docs]</a><span class="k">def</span> <span class="nf">get_uri</span><span class="p">(</span><span class="n">dir_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the URI path for a directory. This allows files hosted on</span>
@@ -791,7 +792,7 @@
         <span class="n">hostname</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyaddr</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="n">hostname</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span>
-    <span class="k">return</span> <span class="s">&quot;{}:{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">fullpath</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">fullpath</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -802,14 +803,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -825,14 +823,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pymatgen-db 0.5.1 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pymatgen-db 0.6.1 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
         &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

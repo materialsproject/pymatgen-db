@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+    matgendb.vv.tests
 
 Submodules
 ----------

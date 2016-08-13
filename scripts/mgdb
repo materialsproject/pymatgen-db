@@ -42,7 +42,8 @@ def init_db(args):
         val = six.moves.input("Enter {} (default: {}) : ".format(k, v))
         doc[k] = val if val else v
     doc["port"] = int(doc["port"])  # enforce the port as an int
-    for k in ["admin_user", "admin_password"]:
+    for k in ["admin_user", "admin_password", "readonly_user",
+              "readonly_password"]:
         v = defaults.get(k, '')
         val = six.moves.input("Enter {} (default: {}) : ".format(k, v))
         doc[k] = val if val else v

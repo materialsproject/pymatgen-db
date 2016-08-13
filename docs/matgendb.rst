@@ -8,8 +8,8 @@ Subpackages
 
     matgendb.alchemy
     matgendb.builders
+    matgendb.tests
     matgendb.vv
-    matgendb.webui
 
 Submodules
 ----------
