@@ -45,12 +45,11 @@ All required python dependencies should be automatically taken care of if you
 install pymatgen-db using easy_install or pip. Otherwise, these packages should
 be available on `PyPI <http://pypi.python.org>`_.
 
-1. Python 2.7+ required. New default modules such as json are used, as well as
-   new unittest features in Python 2.7.
-2. pymatgen 2.5+, including all dependencies associated with it. Please refer
+1. Python 2.7+ or 3.5+ required.
+2. Pymatgen 4+, including all dependencies associated with it. Please refer
    to the `pymatgen docs <http://pythonhosted.org//pymatgen>`_ for detailed
    installation instructions.
-3. pymongo 2.4+: For interfacing with MongoDb.
+3. Pymongo 3.3+: For interfacing with MongoDb.
 4. MongoDB 2.2+: Get it at the `MongoDB`_ website.
 
 Usage
@@ -84,7 +83,6 @@ After your server is up, you should create a database config file by running
 the following command::
 
     mgdb init -c db.json
-
 
 This will prompt you for a few parameters to create a database config file,
 which will make it much easier to use mgdb in future. Note that the config file
