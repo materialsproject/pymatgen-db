@@ -4,11 +4,6 @@ Project-style `MongoDB`_ databases for management of materials data. A query
 engine is also provided to enable the easy translation of MongoDB docs to
 useful pymatgen objects for analysis purposes.
 
-Pymatgen-db also provides a clean and intuitive web ui (the
-`Materials Genomics UI`_) for exploring Mongo collections. While the design
-originates for the purpose of exploring collections generated using
-pymatgen-db, it can be used to explore any Mongo database and collection.
-
 Getting pymatgen-db
 ===================
 
