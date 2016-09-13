@@ -13,7 +13,7 @@ with open("README.rst") as f:
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="0.6.1",
+    version="0.6.2",
     install_requires=["pymatgen>=3.2.3", "monty>=0.9.0",
                       "pymongo>=2.8", "prettytable", "mongomock", "smoqe", "enum34"],
     package_data={"matgendb": ["*.json"]},

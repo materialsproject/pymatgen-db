@@ -8,8 +8,8 @@ pymatgen objects for analysis purposes.
 """
 
 __author__ = "Shyue Ping Ong, Dan Gunter"
-__date__ = "Aug 8 2016"
-__version__ = "0.6.1"
+__date__ = "Aug 13 2016"
+__version__ = "0.6.2"
 
 
 from .query_engine import QueryEngine

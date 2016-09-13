@@ -27,6 +27,10 @@ Other pages
 Change Log
 ==========
 
+v0.6.2
+------
+* Minor bug fixes.
+
 v0.6.1
 ------
 * Removed Materials Genomics UI. Pls use Flamyngo as an alternative.
