@@ -49,9 +49,10 @@ def get_settings(config_file):
     cfg = DBConfig(config_file)
     return cfg.settings
 
-def get_database(config_file=None, settings=None, admin=False):
+
+def get_database(config_file=None, settings=None, admin=False, **kwargs):
     d = get_settings(config_file) if settings is None else settings
-    conn = MongoClient(host=d["host"], port=d["port"])
+    conn = MongoClient(host=d["host"], port=d["port"], **kwargs)
     db = conn[d["database"]]
     try:
         user = d["admin_user"] if admin else d["readonly_user"]
