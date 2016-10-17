@@ -1,3 +1,6 @@
+v0.6.2
+------
+1. Update dependency versions.
 
 v0.5.0
 ------
