@@ -100,7 +100,7 @@ def optimize_indexes(args):
 
 
 def query_db(args):
-    from prettytable import PrettyTable
+    from tabulate import tabulate
     d = get_settings(args.config_file)
     qe = QueryEngine(host=d["host"], port=d["port"], database=d["database"],
                      user=d["readonly_user"], password=d["readonly_password"],
@@ -127,11 +127,10 @@ def query_db(args):
         for r in qe.query(properties=props, criteria=criteria):
             print(json.dumps(r, cls=MongoJSONEncoder))
     else:
-        t = PrettyTable(props)
-        t.float_format = "4.4"
+        t = []
         for r in qe.query(properties=props, criteria=criteria):
-            t.add_row([r[p] for p in props])
-        print(t)
+            t.append([r[p] for p in props])
+        print(tabulate(t, headers=props))
 
 
 class StatsCommands(object):
