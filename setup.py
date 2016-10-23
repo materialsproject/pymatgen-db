@@ -14,6 +14,7 @@ setup(
     name="pymatgen-db",
     packages=find_packages(),
     version="0.6.4",
+    setup_requires=["numpy"],
     install_requires=["pymatgen>=4.4.9", "monty>=0.9.6",
                       "pymongo>=2.8", "mongomock", "smoqe",
                       "enum34"],
