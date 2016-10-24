@@ -14,7 +14,6 @@ from abc import ABCMeta, abstractmethod
 import copy
 import logging
 import multiprocessing
-import Queue
 import traceback
 # local
 from matgendb.builders import schema, util

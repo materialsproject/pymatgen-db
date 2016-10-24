@@ -22,13 +22,13 @@ from matgendb import __version__ as ver
 
 
 @task
-def makedoc(ctx):
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "matgendb.webui.settings")
+def make_doc(ctx):
     with cd("docs"):
-        ctx.run("sphinx-apidoc -o . -f ../matgendb")
+        ctx.run("cp ../CHANGES.rst change_log.rst")
+        ctx.run("sphinx-apidoc -d 6 -o . -f ../matgendb")
         ctx.run("rm matgendb*.tests.rst")
-        for f in glob.glob("docs/*.rst"):
-            if f.startswith('docs/matgendb') and f.endswith('rst'):
+        for f in glob.glob("*.rst"):
+            if f.startswith('matgendb') and f.endswith('rst'):
                 newoutput = []
                 suboutput = []
                 subpackage = False
@@ -42,16 +42,31 @@ def makedoc(ctx):
                         else:
                             if not clean.endswith("tests"):
                                 suboutput.append(line)
-                            if clean.startswith("matgendb") and not clean.endswith("tests"):
+                            if clean.startswith("pymatgen") and not clean.endswith("tests"):
                                 newoutput.extend(suboutput)
                                 subpackage = False
                                 suboutput = []
 
                 with open(f, 'w') as fid:
                     fid.write("".join(newoutput))
-
         ctx.run("make html")
-        ctx.run("cp favicon.ico _build/html/_static/favicon.ico")
+        ctx.run("cp _static/* _build/html/_static")
+
+        # This makes sure pymatgen.org works to redirect to the Gihub page
+        ctx.run("echo \"pymatgen.org\" > _build/html/CNAME")
+        # Avoid ths use of jekyll so that _dir works as intended.
+        ctx.run("touch _build/html/.nojekyll")
+
+
+@task
+def update_doc(ctx):
+    with cd("docs/_build/html/"):
+        ctx.run("git pull")
+    make_doc(ctx)
+    with cd("docs/_build/html/"):
+        ctx.run("git add .")
+        ctx.run("git commit -a -m \"Update dev docs\"")
+        ctx.run("git push origin gh-pages")
 
 
 @task
