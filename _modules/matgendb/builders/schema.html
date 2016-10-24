@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb.builders.schema &#8212; pymatgen-db 0.6.4 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="pymatgen-db 0.6.4 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for matgendb.builders.schema</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility module for schema validation, for builder testing</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Dan Gunter &lt;dkgunter@lbl.gov&gt;&#39;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s1">&#39;11/1/13&#39;</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">filter</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">map</span>
+
+<span class="c1"># Default schema version</span>
+<span class="n">DEFAULT_VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0.0&#39;</span>
+
+<span class="c1"># Indicates any version</span>
+<span class="n">ANY_VERSION</span> <span class="o">=</span> <span class="s2">&quot;*.*.*&quot;</span>
+
+<span class="c1"># denotes optional field/scalar</span>
+<span class="n">OPTIONAL_FLAG</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span>
+
+<span class="c1"># marker of specialness</span>
+<span class="n">SPECIAL</span> <span class="o">=</span> <span class="s1">&#39;__&#39;</span>
+<span class="n">SPECIAL_LEN</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">SPECIAL</span><span class="p">)</span>
+
+<span class="c1"># Regex for values</span>
+<span class="c1"># Note that the special prefix/suffix is optional</span>
+<span class="n">VALUE_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(?:</span><span class="si">{spec}</span><span class="s2">)?([a-zA-Z]+)(?:</span><span class="si">{spec}</span><span class="s2">)?\s*(.*)&quot;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="n">SPECIAL</span><span class="p">))</span>
+
+<span class="c1"># Global obj with all collected schemas</span>
+<span class="n">schemata</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="SchemaError"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.SchemaError">[docs]</a><span class="k">class</span> <span class="nc">SchemaError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class of all errors raised by schema creation or validation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SchemaTypeError"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.SchemaTypeError">[docs]</a><span class="k">class</span> <span class="nc">SchemaTypeError</span><span class="p">(</span><span class="n">SchemaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typename</span><span class="p">):</span>
+        <span class="n">SchemaError</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;bad type (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">typename</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SchemaPathError"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.SchemaPathError">[docs]</a><span class="k">class</span> <span class="nc">SchemaPathError</span><span class="p">(</span><span class="n">SchemaError</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SchemaParseError"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.SchemaParseError">[docs]</a><span class="k">class</span> <span class="nc">SchemaParseError</span><span class="p">(</span><span class="n">SchemaError</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="add_schemas"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.add_schemas">[docs]</a><span class="k">def</span> <span class="nf">add_schemas</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add schemas from files in &#39;path&#39;.</span>
+
+<span class="sd">    :param path: Path with schema files. Schemas are named by their file,</span>
+<span class="sd">                 with the extension stripped. e.g., if path is &quot;/tmp/foo&quot;,</span>
+<span class="sd">                 then the schema in &quot;/tmp/foo/bar.json&quot; will be named &quot;bar&quot;.</span>
+<span class="sd">    :type path: str</span>
+<span class="sd">    :param ext: File extension that identifies schema files</span>
+<span class="sd">    :type ext: str</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    :raise: SchemaPathError, if no such path. SchemaParseError, if a schema</span>
+<span class="sd">            is not valid JSON.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">SchemaPathError</span><span class="p">()</span>
+    <span class="n">filepat</span> <span class="o">=</span> <span class="s2">&quot;*.&quot;</span> <span class="o">+</span> <span class="n">ext</span> <span class="k">if</span> <span class="n">ext</span> <span class="k">else</span> <span class="s2">&quot;*&quot;</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filepat</span><span class="p">)):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">schema</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SchemaParseError</span><span class="p">(</span><span class="s2">&quot;error parsing &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">schemata</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get schema by name</span>
+
+<span class="sd">    :param name: name of schema</span>
+<span class="sd">    :type name: str</span>
+<span class="sd">    :return: new schema</span>
+<span class="sd">    :rtype: Schema</span>
+<span class="sd">    :raise: KeyError, if schema is not found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">schemata</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="load_schema"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.load_schema">[docs]</a><span class="k">def</span> <span class="nf">load_schema</span><span class="p">(</span><span class="n">file_or_fp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load schema from file.</span>
+
+<span class="sd">    :param file_or_fp: File name or file object</span>
+<span class="sd">    :type file_or_fp: str, file</span>
+<span class="sd">    :raise: IOError if file cannot be opened or read, ValueError if</span>
+<span class="sd">            file is not valid JSON or JSON is not a valid schema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_or_fp</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file_or_fp</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">file_or_fp</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">schema</span></div>
+
+<span class="c1">## Validator classes</span>
+
+
+<div class="viewcode-block" id="HasMeta"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.HasMeta">[docs]</a><span class="k">class</span> <span class="nc">HasMeta</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mix-in class to handle metadata.</span>
+<span class="sd">    Adds the &#39;meta&#39; class attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">FIELD_SEP</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span>
+    <span class="n">KV_SEP</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create with new metadata (which may be empty).</span>
+<span class="sd">        The metadata should be dict-like (i.e. __getitem__ and __setitem__) or</span>
+<span class="sd">        be a string in the format &quot;name1: value1, name2: value2, ...&quot;, where the</span>
+<span class="sd">        white space is optional.</span>
+
+<span class="sd">        :param meta: Init with this metadata.</span>
+<span class="sd">        :type meta: str or dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+            <span class="c1"># build a dict from key-value pairs</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FIELD_SEP</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">fld</span><span class="p">:</span> <span class="n">fld</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">parts</span><span class="p">)}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># assume dict-like</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">meta</span>
+
+<div class="viewcode-block" id="HasMeta.add_meta"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.HasMeta.add_meta">[docs]</a>    <span class="k">def</span> <span class="nf">add_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div></div>
+
+
+<div class="viewcode-block" id="Schema"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.Schema">[docs]</a><span class="k">class</span> <span class="nc">Schema</span><span class="p">(</span><span class="n">HasMeta</span><span class="p">):</span>
+
+    <span class="c1"># enum for navigating hierarchies</span>
+    <span class="n">IS_LIST</span><span class="p">,</span> <span class="n">IS_DICT</span><span class="p">,</span> <span class="n">IS_SCALAR</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">HasMeta</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_optional</span> <span class="o">=</span> <span class="n">optional</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_schema</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_schema_keys</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Schema.validate"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.Schema.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;(root)&quot;</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whatis</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;type mismatch: </span><span class="si">{}</span><span class="s2"> != </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typestr</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_LIST</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;[0]&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_DICT</span><span class="p">:</span>
+            <span class="c1"># fail if document is missing any required keys</span>
+            <span class="n">dkeys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">skeys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">is_optional</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="n">skeys</span> <span class="o">-</span> <span class="n">dkeys</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;missing keys: (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">skeys</span> <span class="o">-</span> <span class="n">dkeys</span><span class="p">)))</span>
+            <span class="c1"># check each item in document</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">result</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">pass</span>  <span class="c1"># do nothing for &#39;extra&#39; keys</span>
+                    <span class="c1">#return self._vresult(path, &quot;missing key: {}&quot;, k)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bad value &#39;</span><span class="si">{}</span><span class="s2">&#39; for type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                     <span class="n">doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Schema.json_schema"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.Schema.json_schema">[docs]</a>    <span class="k">def</span> <span class="nf">json_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">add_keys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert our compact schema representation to the standard, but more verbose,</span>
+<span class="sd">        JSON Schema standard.</span>
+
+<span class="sd">        Example JSON schema: http://json-schema.org/examples.html</span>
+<span class="sd">        Core standard: http://json-schema.org/latest/json-schema-core.html</span>
+
+<span class="sd">        :param add_keys: Key, default value pairs to add in,</span>
+<span class="sd">                         e.g. description=&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_schema_keys</span> <span class="o">=</span> <span class="n">add_keys</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_json_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_schema</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_schema</span></div>
+
+    <span class="k">def</span> <span class="nf">_build_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Recursive schema builder, called by `json_schema`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whatis</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_LIST</span><span class="p">:</span>
+            <span class="n">w0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whatis</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jstype</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">])}}</span>
+        <span class="k">elif</span> <span class="n">w</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_DICT</span><span class="p">:</span>
+            <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_schema</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">items</span><span class="p">()}}</span>
+            <span class="n">req</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="o">.</span><span class="n">is_optional</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">req</span><span class="p">:</span>
+                <span class="n">js</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">req</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jstype</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">s</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_schema_keys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">js</span><span class="p">:</span>
+                <span class="n">js</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">js</span>
+
+    <span class="k">def</span> <span class="nf">_jstype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stype</span><span class="p">,</span> <span class="n">sval</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get JavaScript name for given data type, called by `_build_schema`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">stype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_LIST</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;array&quot;</span>
+        <span class="k">if</span> <span class="n">stype</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_DICT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;object&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sval</span><span class="p">,</span> <span class="n">Scalar</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sval</span><span class="o">.</span><span class="n">jstype</span>
+        <span class="c1"># it is a Schema, so return type of contents</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">sval</span><span class="o">.</span><span class="n">_schema</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jstype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_whatis</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_vresult</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">meta_info</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="ow">and</span> <span class="s1">&#39;desc&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
+            <span class="n">meta_info</span> <span class="o">=</span> <span class="s1">&#39;=&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">meta_info</span><span class="p">)</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whatis</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_LIST</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Schema</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_DICT</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># skip metadata keys</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">SPECIAL</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">SPECIAL</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_meta</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="n">SPECIAL_LEN</span><span class="p">:</span><span class="o">-</span><span class="n">SPECIAL_LEN</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="c1"># look for optional flag at start of key</span>
+                <span class="n">opt_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_optional</span>
+                <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">OPTIONAL_FLAG</span><span class="p">:</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="n">opt_flag</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;@class&#39;</span><span class="p">,</span> <span class="s1">&#39;@module&#39;</span><span class="p">):</span>  <span class="c1"># optionalize the cruft</span>
+                    <span class="n">opt_flag</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># parse value and assign</span>
+                <span class="n">r</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="n">opt_flag</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">r</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">optional</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_optional</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">OPTIONAL_FLAG</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">optional</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">vinfo</span> <span class="o">=</span> <span class="n">VALUE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">vinfo</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bad type format, must be __&lt;type&gt;__ got </span><span class="si">{}</span><span class="s2">&quot;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">dtype</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">vinfo</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">Scalar</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="n">optional</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_whatis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_LIST</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_DICT</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_SCALAR</span>
+
+    <span class="k">def</span> <span class="nf">_typestr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span> <span class="s2">&quot;scalar&quot;</span><span class="p">)[</span><span class="n">t</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typestr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;document::</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_is_datetime</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="ow">or</span> \
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">struct_time</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Scalar"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.schema.Scalar">[docs]</a><span class="k">class</span> <span class="nc">Scalar</span><span class="p">(</span><span class="n">HasMeta</span><span class="p">):</span>
+    <span class="c1"># For each typecode, a function that returns True/False on whether</span>
+    <span class="c1"># its argument matches.</span>
+
+    <span class="n">TYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">basestring</span><span class="p">),</span>
+        <span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">or</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;datetime&#39;</span><span class="p">:</span> <span class="n">_is_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">_is_datetime</span><span class="p">,</span>
+        <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;array&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span>
+        <span class="s1">&#39;object&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_optional</span> <span class="o">=</span> <span class="n">optional</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">typecode</span>
+        <span class="n">HasMeta</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TYPES</span><span class="p">[</span><span class="n">typecode</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SchemaTypeError</span><span class="p">(</span><span class="n">typecode</span><span class="p">)</span>
+
+    <span class="n">JSTYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;datetime&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;string&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;float&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">jstype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return JavaScript type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">JSTYPES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;scalar::</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

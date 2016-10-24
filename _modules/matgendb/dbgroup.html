@@ -1,0 +1,370 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb.dbgroup &#8212; pymatgen-db 0.6.4 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="pymatgen-db 0.6.4 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for matgendb.dbgroup</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Create and access groups of databases,</span>
+<span class="sd">each configured from different settings.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Dan Gunter &lt;dkgunter@lbl.gov&gt;&#39;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s1">&#39;4/29/14&#39;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">dbconfig</span><span class="p">,</span> <span class="n">query_engine</span><span class="p">,</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">filter</span>
+
+<span class="c1"># aliases</span>
+<span class="n">_opj</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span>
+<span class="n">_opx</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span>
+
+<div class="viewcode-block" id="CreateQueryEngineError"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.CreateQueryEngineError">[docs]</a><span class="k">class</span> <span class="nc">CreateQueryEngineError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;creating query engine, class=</span><span class="si">{cls}</span><span class="s2"> settings=</span><span class="si">{s}</span><span class="s2">: </span><span class="si">{m}</span><span class="s2">&quot;</span>\
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cls</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">util</span><span class="o">.</span><span class="n">csv_dict</span><span class="p">(</span><span class="n">settings</span><span class="p">),</span> <span class="n">m</span><span class="o">=</span><span class="n">err</span><span class="p">)</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigGroup"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.ConfigGroup">[docs]</a><span class="k">class</span> <span class="nc">ConfigGroup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convenient storage and access to a group</span>
+<span class="sd">    of database configurations.</span>
+
+<span class="sd">    Will automatically instantiate these configurations,</span>
+<span class="sd">    as query engines, on-demand.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SEP</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>  <span class="c1"># Separator between collection names</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qe_class</span><span class="o">=</span><span class="n">query_engine</span><span class="o">.</span><span class="n">QueryEngine</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">=</span> <span class="n">RegexDict</span><span class="p">()</span>   <span class="c1"># Main object store</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_class</span> <span class="o">=</span> <span class="n">qe_class</span>  <span class="c1"># Class to used for building QEs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span> <span class="o">=</span> <span class="kc">None</span>        <span class="c1"># Prefix to namespace all lookups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached</span> <span class="o">=</span> <span class="p">{}</span>       <span class="c1"># cached QE objs</span>
+
+<div class="viewcode-block" id="ConfigGroup.add_path"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.ConfigGroup.add_path">[docs]</a>    <span class="k">def</span> <span class="nf">add_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;*.json&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add configuration file(s)</span>
+<span class="sd">        in `path`. The path can be a single file or a directory.</span>
+<span class="sd">        If path is a directory, then `pattern`</span>
+<span class="sd">        (Unix glob-style) will be used to get a list of all config</span>
+<span class="sd">        files in the directory.</span>
+
+<span class="sd">        The name given to each file is the database name</span>
+<span class="sd">        and collection name (if any) combined with a &#39;.&#39;.</span>
+
+<span class="sd">        :param path: File or directory name</span>
+<span class="sd">        :return: self, for chaining</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">configs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">_opj</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
+                <span class="n">cfg</span> <span class="o">=</span> <span class="n">dbconfig</span><span class="o">.</span><span class="n">DBConfig</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+                <span class="n">cs</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">settings</span>
+                <span class="k">if</span> <span class="n">dbconfig</span><span class="o">.</span><span class="n">DB_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cs</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No database in &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">dbconfig</span><span class="o">.</span><span class="n">COLL_KEY</span> <span class="ow">in</span> <span class="n">cs</span><span class="p">:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cs</span><span class="p">[</span><span class="n">dbconfig</span><span class="o">.</span><span class="n">DB_KEY</span><span class="p">],</span>
+                                          <span class="n">cs</span><span class="p">[</span><span class="n">dbconfig</span><span class="o">.</span><span class="n">COLL_KEY</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">cs</span><span class="p">[</span><span class="n">dbconfig</span><span class="o">.</span><span class="n">DB_KEY</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ConfigGroup.add"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.ConfigGroup.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a configuration object.</span>
+
+<span class="sd">        :param name: Name for later retrieval</span>
+<span class="sd">        :param cfg: Configuration object</span>
+<span class="sd">        :param expand: Flag for adding sub-configs for each sub-collection.</span>
+<span class="sd">                       See discussion in method doc.</span>
+<span class="sd">        :return: self, for chaining</span>
+<span class="sd">        :raises: CreateQueryEngineError (only if expand=True)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span>
+        <span class="k">if</span> <span class="n">expand</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ConfigGroup.expand"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.ConfigGroup.expand">[docs]</a>    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Expand config for `name` by adding a sub-configuration for every</span>
+<span class="sd">        dot-separated collection &quot;below&quot; the given one (or all, if none given).</span>
+
+<span class="sd">        For example, for a database &#39;mydb&#39; with collections</span>
+<span class="sd">            [&#39;spiderman.amazing&#39;, &#39;spiderman.spectacular&#39;, &#39;spiderman2&#39;]</span>
+<span class="sd">        and a configuration</span>
+<span class="sd">            {&#39;host&#39;:&#39;foo&#39;, &#39;database&#39;:&#39;mydb&#39;, &#39;collection&#39;:&#39;spiderman&#39;}</span>
+<span class="sd">        then `expand(&quot;mydb.spiderman&quot;)` would add keys for &#39;spiderman.amazing&#39;</span>
+<span class="sd">        and &#39;spiderman.spectacular&#39;, but *not* &#39;spiderman2&#39;.</span>
+
+<span class="sd">        :param name: Name, or glob-style pattern, for DB configurations.</span>
+<span class="sd">        :type name: basestring</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        :raises: KeyError (if no such configuration)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pattern</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pattern_to_regex</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">cfg_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">expr</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">cfg_name</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_expand</span><span class="p">(</span><span class="n">cfg_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_expand</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform real work of `expand()` function.&quot;&quot;&quot;</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">collection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">base_coll</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">base_coll</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">collection</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">SEP</span>
+        <span class="n">qe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_qe</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
+        <span class="n">coll</span><span class="p">,</span> <span class="n">db</span> <span class="o">=</span> <span class="n">qe</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span> <span class="n">qe</span><span class="o">.</span><span class="n">db</span>
+        <span class="n">cur_coll</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">coll_name</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">collection_names</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">coll_name</span> <span class="o">==</span> <span class="n">cur_coll</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">coll_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">base_coll</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">ex_cfg</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">ex_cfg</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="n">coll_name</span>
+            <span class="n">group_name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">SEP</span> <span class="o">+</span> <span class="n">coll_name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">base_coll</span><span class="p">):]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group_name</span><span class="p">,</span> <span class="n">ex_cfg</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConfigGroup.uncache"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.ConfigGroup.uncache">[docs]</a>    <span class="k">def</span> <span class="nf">uncache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove all created query engines that match `name` from</span>
+<span class="sd">        the cache (this disconnects from MongoDB, which is the point).</span>
+
+<span class="sd">        :param name: Name used for :meth:`add`, or pattern</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">delme</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pattern</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pattern_to_regex</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">expr</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                    <span class="n">delme</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached</span><span class="p">:</span>
+                <span class="n">delme</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">delme</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dict-style lookup by name for</span>
+<span class="sd">        query engine objects. If the input is a pattern,</span>
+<span class="sd">        this will return a dict where keys are the names and values</span>
+<span class="sd">        are the QueryEngine objects. Otherwise, will return a</span>
+<span class="sd">        QueryEngine object. Raises a KeyError if there are no</span>
+<span class="sd">        results (in either case).</span>
+
+<span class="sd">        If this is the first time this query engine</span>
+<span class="sd">        has been asked for, then it will instantiate the query engine.</span>
+<span class="sd">        Errors here will raise CreateQueryEngineError.</span>
+
+<span class="sd">        :param name: Name to look for; if it</span>
+<span class="sd">                     ends in &#39;*&#39; then use it as a prefix</span>
+<span class="sd">                     and return all matching items.</span>
+<span class="sd">        :return: Single or multiple results (as dict)</span>
+<span class="sd">        :raises: KeyError, CreateQueryEngineError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">orig_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span> <span class="o">+</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pattern</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pattern_to_regex</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="c1"># fill &#39;qe&#39; with all items</span>
+            <span class="n">qe</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="o">.</span><span class="n">re_get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">qe</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_qe</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">qe</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;No configuration found, name=&#39;</span><span class="si">{}</span><span class="s2">&#39; full-regex=&#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span>
+                               <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">orig_name</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">qe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_qe</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">qe</span>
+
+<div class="viewcode-block" id="ConfigGroup.keys"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.ConfigGroup.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConfigGroup.set_prefix"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.ConfigGroup.set_prefix">[docs]</a>    <span class="k">def</span> <span class="nf">set_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set prefix to use as a namespace for item lookup.</span>
+<span class="sd">        A dot (.) will be automatically added to the given string.</span>
+
+<span class="sd">        :param prefix: Prefix, or None to unset</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">SEP</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_is_pattern</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="ow">and</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_pattern_to_regex</span><span class="p">(</span><span class="n">pat</span><span class="p">):</span>
+        <span class="n">pat</span> <span class="o">=</span> <span class="n">pat</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">ConfigGroup</span><span class="o">.</span><span class="n">SEP</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">ConfigGroup</span><span class="o">.</span><span class="n">SEP</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pat</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.*&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">_get_qe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate a query engine, or retrieve a cached one.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">qe</span> <span class="o">=</span> <span class="n">create_query_engine</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">qe</span>
+        <span class="k">return</span> <span class="n">qe</span></div>
+
+
+<div class="viewcode-block" id="RegexDict"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.RegexDict">[docs]</a><span class="k">class</span> <span class="nc">RegexDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extend standard dict to include</span>
+<span class="sd">    a function that finds values based on a</span>
+<span class="sd">    regular expression for the key. For example:</span>
+
+<span class="sd">       d = RegexDict(tweedledee=1, tweedledum=2)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RegexDict.re_keys"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.RegexDict.re_keys">[docs]</a>    <span class="k">def</span> <span class="nf">re_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find keys matching `pattern`.</span>
+
+<span class="sd">        :param pattern: Regular expression</span>
+<span class="sd">        :return: Matching keys or empty list</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pattern</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;$&quot;</span><span class="p">):</span>
+            <span class="n">pattern</span> <span class="o">+=</span> <span class="s2">&quot;$&quot;</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">filter</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">match</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="RegexDict.re_get"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.RegexDict.re_get">[docs]</a>    <span class="k">def</span> <span class="nf">re_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return values whose key matches `pattern`</span>
+
+<span class="sd">        :param pattern: Regular expression</span>
+<span class="sd">        :return: Found values, as a dict.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">re_keys</span><span class="p">(</span><span class="n">pattern</span><span class="p">)}</span></div></div>
+
+<div class="viewcode-block" id="create_query_engine"><a class="viewcode-back" href="../../matgendb.html#matgendb.dbgroup.create_query_engine">[docs]</a><span class="k">def</span> <span class="nf">create_query_engine</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">clazz</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create and return new query engine object from the</span>
+<span class="sd">    given `DBConfig` object.</span>
+
+<span class="sd">    :param config: Database configuration</span>
+<span class="sd">    :type config: dbconfig.DBConfig</span>
+<span class="sd">    :param clazz: Class to use for creating query engine. Should</span>
+<span class="sd">                  act like query_engine.QueryEngine.</span>
+<span class="sd">    :type clazz: class</span>
+<span class="sd">    :return: New query engine</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">qe</span> <span class="o">=</span> <span class="n">clazz</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CreateQueryEngineError</span><span class="p">(</span><span class="n">clazz</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">qe</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

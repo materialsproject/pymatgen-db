@@ -1,0 +1,499 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb.vv.diff &#8212; pymatgen-db 0.6.4 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="pymatgen-db 0.6.4 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for matgendb.vv.diff</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Diff collections, as sets</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Dan Gunter &lt;dkgunter@lbl.gov&gt;&#39;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s1">&#39;3/29/13&#39;</span>
+
+<span class="c1"># System</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="c1"># Package</span>
+<span class="kn">from</span> <span class="nn">matgendb</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="k">import</span> <span class="n">QueryEngine</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;mg.vv.diff&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="IID"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.diff.IID">[docs]</a><span class="k">class</span> <span class="nc">IID</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">_value</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="IID.next"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.diff.IID.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">_value</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_value</span></div></div>
+
+
+<div class="viewcode-block" id="Differ"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.diff.Differ">[docs]</a><span class="k">class</span> <span class="nc">Differ</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate difference between two collections, based solely on a</span>
+<span class="sd">    selected key.</span>
+
+<span class="sd">    As noted in :func:`diff`, this will not work with huge datasets, as it stores</span>
+<span class="sd">    all the keys in memory in order to do a &quot;set difference&quot; using Python sets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: Keys in result dictionary.</span>
+    <span class="n">MISSING</span><span class="p">,</span> <span class="n">NEW</span><span class="p">,</span> <span class="n">CHANGED</span> <span class="o">=</span> <span class="s1">&#39;missing&#39;</span><span class="p">,</span> <span class="s1">&#39;additional&#39;</span><span class="p">,</span> <span class="s1">&#39;different&#39;</span>
+
+    <span class="c1">#: CHANGED result fields</span>
+    <span class="n">CHANGED_MATCH_KEY</span> <span class="o">=</span> <span class="s2">&quot;match type&quot;</span>
+    <span class="n">CHANGED_MATCH_DELTA</span> <span class="o">=</span> <span class="s2">&quot;delta&quot;</span>
+    <span class="n">CHANGED_MATCH_EXACT</span> <span class="o">=</span> <span class="s2">&quot;exact&quot;</span>
+    <span class="n">CHANGED_OLD</span> <span class="o">=</span> <span class="s2">&quot;old&quot;</span>
+    <span class="n">CHANGED_NEW</span> <span class="o">=</span> <span class="s2">&quot;new&quot;</span>
+    <span class="n">CHANGED_DELTA</span> <span class="o">=</span> <span class="s2">&quot;delta&quot;</span>
+
+    <span class="c1">#: for missing property</span>
+    <span class="n">NO_PROPERTY</span> <span class="o">=</span> <span class="s2">&quot;__MISSING__&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="n">props</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fltr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deltas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param key: Field to use for identifying records</span>
+<span class="sd">        :param props: List of fields to use for matching records</span>
+<span class="sd">        :param info: List of extra fields to retrieve from (and show) for each record.</span>
+<span class="sd">        :param fltr: Filter for records, a MongoDB query expression</span>
+<span class="sd">        :param deltas: {prop: delta} to check. &#39;prop&#39; is a string, &#39;delta&#39; is an instance of :class:`Delta`.</span>
+<span class="sd">                       Any key for &#39;prop&#39; not in parameter &#39;props&#39; will get added.</span>
+<span class="sd">        :type deltas: dict</span>
+<span class="sd">        :raise: ValueError if some delta does not parse.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_key_field</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_props</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">props</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">props</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_info</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="n">fltr</span> <span class="k">if</span> <span class="n">fltr</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prop_deltas</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">deltas</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">deltas</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_props</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_props</span><span class="p">[:]</span> <span class="o">+</span>
+                                   <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_deltas</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+
+<div class="viewcode-block" id="Differ.diff"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.diff.Differ.diff">[docs]</a>    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">only_missing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">only_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_dup</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform a difference between the 2 collections.</span>
+<span class="sd">        The first collection is treated as the previous one, and the second</span>
+<span class="sd">        is treated as the new one.</span>
+
+<span class="sd">        Note: this is not &#39;big data&#39;-ready; we assume all the records can fit in memory.</span>
+
+<span class="sd">        :param c1: Collection (1) config file, or QueryEngine object</span>
+<span class="sd">        :type c1: str or QueryEngine</span>
+<span class="sd">        :param c2: Collection (2) config file, or QueryEngine object</span>
+<span class="sd">        :type c2: str or QueryEngine</span>
+<span class="sd">        :param only_missing: Only find and return self.MISSING; ignore &#39;new&#39; keys</span>
+<span class="sd">        :param only_values: Only find and return self.CHANGED; ignore new or missing keys</span>
+<span class="sd">        :param allow_dup: Allow duplicate keys, otherwise fail with ValueError</span>
+<span class="sd">        :return: dict with keys self.MISSING, self.NEW (unless only_missing is True), &amp; self.CHANGED,</span>
+<span class="sd">                 each a list of records with the key and</span>
+<span class="sd">                 any other fields given to the constructor &#39;info&#39; argument.</span>
+<span class="sd">                 The meaning is: &#39;missing&#39; are keys that are in c1 not found in c2</span>
+<span class="sd">                 &#39;new&#39; is keys found in c2 that are not found in c1, and &#39;changed&#39; are records</span>
+<span class="sd">                 with the same key that have different &#39;props&#39; values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Connect.</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;connect.start&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">QueryEngine</span><span class="p">):</span>
+            <span class="n">engines</span> <span class="o">=</span> <span class="p">[</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">engines</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">cfg</span> <span class="ow">in</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">:</span>
+                <span class="n">settings</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">dbconfig</span><span class="o">.</span><span class="n">normalize_auth</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+                    <span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Config file </span><span class="si">{}</span><span class="s2"> does not have a username/password&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cfg</span><span class="p">))</span>
+                <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;aliases_config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;aliases&quot;</span><span class="p">:</span> <span class="p">{},</span> <span class="s2">&quot;defaults&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+                <span class="n">engine</span> <span class="o">=</span> <span class="n">QueryEngine</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+                <span class="n">engines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;connect.end&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Query DB.</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(),</span> <span class="nb">set</span><span class="p">()]</span>
+        <span class="n">eqprops</span> <span class="o">=</span> <span class="p">[{},</span> <span class="p">{}]</span>
+        <span class="n">numprops</span> <span class="o">=</span> <span class="p">[{},</span> <span class="p">{}]</span>
+
+        <span class="c1"># Build query fields.</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_info</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_props</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_key_field</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>  <span class="c1"># explicitly remove _id if not given</span>
+            <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Initialize for query loop.</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># per-key information</span>
+        <span class="n">has_info</span><span class="p">,</span> <span class="n">has_props</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_props</span><span class="p">)</span>
+        <span class="n">has_numprops</span><span class="p">,</span> <span class="n">has_eqprops</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_deltas</span><span class="p">),</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_props</span><span class="p">)</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;query.start query=</span><span class="si">{}</span><span class="s2"> fields=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">,</span> <span class="n">fields</span><span class="p">))</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Main query loop.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coll</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">engines</span><span class="p">):</span>
+            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;collection </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">count</span><span class="p">,</span> <span class="n">missing_props</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">coll</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">criteria</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="n">fields</span><span class="p">):</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># Extract key from record.</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_key_field</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">_log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Key &#39;</span><span class="si">{}</span><span class="s2">&#39; not found in record: </span><span class="si">{}</span><span class="s2">. Abort.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_key_field</span><span class="p">,</span> <span class="n">rec</span><span class="p">))</span>
+                    <span class="k">return</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_dup</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate key: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="c1"># Extract numeric properties.</span>
+                <span class="k">if</span> <span class="n">has_numprops</span><span class="p">:</span>
+                    <span class="n">pvals</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">pkey</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_deltas</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">pvals</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">pkey</span><span class="p">])</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="c1">#print(&quot;@@ missing {} on {}&quot;.format(pkey, rec))</span>
+                            <span class="n">missing_props</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">continue</span>
+                        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not a number: collection=</span><span class="si">{c}</span><span class="s2"> key=</span><span class="si">{k}</span><span class="s2"> </span><span class="si">{p}</span><span class="s2">=&#39;</span><span class="si">{v}</span><span class="s2">&#39;&quot;</span>
+                                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;old&quot;</span><span class="p">,</span> <span class="s2">&quot;new&quot;</span><span class="p">)[</span><span class="n">i</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">pkey</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">rec</span><span class="p">[</span><span class="n">pkey</span><span class="p">]))</span>
+                    <span class="n">numprops</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pvals</span>
+                <span class="c1"># Extract properties for exact match.</span>
+                <span class="k">if</span> <span class="n">has_eqprops</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">propval</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([(</span><span class="n">p</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">p</span><span class="p">]))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_props</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                        <span class="n">missing_props</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="c1">#print(&quot;@@ missing {} on {}&quot;.format(pkey, rec))</span>
+                        <span class="k">continue</span>
+                    <span class="n">eqprops</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">propval</span>
+
+                <span class="c1"># Extract informational fields.</span>
+                <span class="k">if</span> <span class="n">has_info</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+                        <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">:</span>
+                        <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+            <span class="c1"># Stop if we don&#39;t have properties on any record at all</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">count</span> <span class="o">==</span> <span class="n">missing_props</span><span class="p">:</span>
+                <span class="n">_log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Missing one or more properties on all </span><span class="si">{:d}</span><span class="s2"> records&quot;</span>
+                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
+                <span class="k">return</span> <span class="p">{}</span>
+            <span class="c1"># ..but only issue a warning for partially missing properties.</span>
+            <span class="k">elif</span> <span class="n">missing_props</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Missing one or more properties for </span><span class="si">{:d}</span><span class="s2">/</span><span class="si">{:d}</span><span class="s2"> records&quot;</span>
+                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">missing_props</span><span class="p">,</span> <span class="n">count</span><span class="p">))</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;query.end sec=</span><span class="si">{:f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
+
+        <span class="c1"># Compute missing and new keys.</span>
+        <span class="k">if</span> <span class="n">only_values</span><span class="p">:</span>
+            <span class="n">missing</span><span class="p">,</span> <span class="n">new</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;compute_difference.start&quot;</span><span class="p">)</span>
+            <span class="n">missing</span><span class="p">,</span> <span class="n">new</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">only_missing</span><span class="p">:</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;compute_difference.end&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Compute mis-matched properties.</span>
+        <span class="k">if</span> <span class="n">has_props</span><span class="p">:</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_changed_props</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">eqprops</span><span class="p">,</span> <span class="n">numprops</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span>
+                                          <span class="n">has_eqprops</span><span class="o">=</span><span class="n">has_eqprops</span><span class="p">,</span> <span class="n">has_numprops</span><span class="o">=</span><span class="n">has_numprops</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Build result.</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;build_result.begin&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">only_values</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MISSING</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
+                <span class="n">rec</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_key_field</span><span class="p">:</span> <span class="n">key</span><span class="p">}</span>
+                <span class="k">if</span> <span class="n">has_info</span><span class="p">:</span>
+                    <span class="n">rec</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">{}))</span>
+                <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MISSING</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">only_missing</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">NEW</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">new</span><span class="p">:</span>
+                    <span class="n">rec</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_key_field</span><span class="p">:</span> <span class="n">key</span><span class="p">}</span>
+                    <span class="k">if</span> <span class="n">has_info</span><span class="p">:</span>
+                        <span class="n">rec</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">{}))</span>
+                    <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">NEW</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">CHANGED</span><span class="p">]</span> <span class="o">=</span> <span class="n">changed</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;build_result.end&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="k">def</span> <span class="nf">_changed_props</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eqprops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">numprops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">has_numprops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">has_eqprops</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">_up</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">or</span> <span class="n">d</span>   <span class="c1"># functional dict.update()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="c1"># Numeric property comparisons.</span>
+            <span class="k">if</span> <span class="n">has_numprops</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">pkey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_deltas</span><span class="p">:</span>
+                    <span class="n">oldval</span><span class="p">,</span> <span class="n">newval</span> <span class="o">=</span> <span class="n">numprops</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">pkey</span><span class="p">],</span> <span class="n">numprops</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">pkey</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_deltas</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span><span class="o">.</span><span class="n">cmp</span><span class="p">(</span><span class="n">oldval</span><span class="p">,</span> <span class="n">newval</span><span class="p">):</span>
+                        <span class="n">change</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_MATCH_KEY</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_MATCH_DELTA</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_field</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;property&quot;</span><span class="p">:</span> <span class="n">pkey</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_OLD</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">oldval</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_NEW</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">newval</span><span class="p">),</span>
+                                  <span class="s2">&quot;rule&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_deltas</span><span class="p">[</span><span class="n">pkey</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_DELTA</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">newval</span> <span class="o">-</span> <span class="n">oldval</span><span class="p">)}</span>
+                        <span class="n">changed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_up</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">if</span> <span class="n">info</span> <span class="k">else</span> <span class="n">change</span><span class="p">)</span>
+            <span class="c1"># Exact property comparison.</span>
+            <span class="k">if</span> <span class="n">has_eqprops</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">eqprops</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">eqprops</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">key</span><span class="p">]:</span>
+                    <span class="n">change</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_MATCH_KEY</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_MATCH_EXACT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_field</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_OLD</span><span class="p">:</span> <span class="n">eqprops</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">key</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHANGED_NEW</span><span class="p">:</span> <span class="n">eqprops</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">key</span><span class="p">]}</span>
+                    <span class="n">changed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_up</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">if</span> <span class="n">info</span> <span class="k">else</span> <span class="n">change</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">changed</span></div>
+
+
+<div class="viewcode-block" id="Delta"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.diff.Delta">[docs]</a><span class="k">class</span> <span class="nc">Delta</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delta between two properties.</span>
+
+<span class="sd">    Syntax:</span>
+<span class="sd">        +-       Change in sign, 0 not included</span>
+<span class="sd">        +-=      Change in sign, + to 0 or - to 0 included</span>
+<span class="sd">        +-X      abs(new - old) &gt; X</span>
+<span class="sd">        +X-Y     (new - old) &gt; X or (old - new) &gt; Y</span>
+<span class="sd">        +-X=     abs(new - old) &gt;= X</span>
+<span class="sd">        +X-Y=    (new - old) &gt;= X or (old - new) &gt;= Y</span>
+<span class="sd">        +X[=]   Just look in &#39;+&#39; direction</span>
+<span class="sd">        -Y[=]   Just look in &#39;-&#39; direction</span>
+<span class="sd">        ...%     Instead of (v2 - v1), use 100*(v2 - v1)/v1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_num</span> <span class="o">=</span> <span class="s2">&quot;\d+(\.\d+)?&quot;</span>
+    <span class="n">_expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(?:&quot;</span>
+                       <span class="s2">&quot;\+(?P&lt;X&gt;</span><span class="si">{n}</span><span class="s2">)?-(?P&lt;Y&gt;</span><span class="si">{n}</span><span class="s2">)?|&quot;</span>  <span class="c1"># both + and -</span>
+                       <span class="s2">&quot;\+(?P&lt;X2&gt;</span><span class="si">{n}</span><span class="s2">)?|&quot;</span>              <span class="c1"># only +</span>
+                       <span class="s2">&quot;-(?P&lt;Y2&gt;</span><span class="si">{n}</span><span class="s2">)?&quot;</span>                <span class="c1"># only -</span>
+                       <span class="s2">&quot;)&quot;</span>
+                       <span class="s2">&quot;(?P&lt;eq&gt;=)?(?P&lt;pct&gt;%)?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">_num</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param s: Expression string</span>
+<span class="sd">        :type s: str</span>
+<span class="sd">        :raises: ValueError if it doesn&#39;t match the syntax</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Match expression.</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expr</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad syntax for delta &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">span</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">span</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Junk at end of delta &#39;</span><span class="si">{}</span><span class="s2">&#39;: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">p</span><span class="p">:]))</span>
+
+        <span class="c1"># Save a copy of orig.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_orig_expr</span> <span class="o">=</span> <span class="n">s</span>
+
+        <span class="c1"># Initialize parsed values.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pct</span> <span class="o">=</span> <span class="kc">False</span>           <span class="c1"># %change</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eq</span> <span class="o">=</span> <span class="kc">False</span>            <span class="c1"># &gt;=,&lt;= instead of &gt;, &lt;</span>
+
+        <span class="c1"># Set parsed values.</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+        <span class="c1">#print(&quot;@@ expr :: {}&quot;.format(d))</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">((</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">))):</span>
+            <span class="c1"># Change in sign only</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eq</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;eq&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing value for negative delta &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;X2&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Positive only</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;X2&#39;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;Y2&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Negative only</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Y2&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Both</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eq</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;eq&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pct</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;pct&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="c1">#print(&quot;@@ dx,dy eq,pct = {},{}  {},{}&quot;.format(self._dx, self._dy, self._eq, self._pct))</span>
+
+        <span class="c1"># Pre-calculate comparison function.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sign</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cmp_sign</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pct</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cmp_val_pct</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cmp_val_abs</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># for repeated serialization</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig_expr</span>
+
+<div class="viewcode-block" id="Delta.as_json"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.diff.Delta.as_json">[docs]</a>    <span class="k">def</span> <span class="nf">as_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_id</span><span class="p">:</span>
+            <span class="c1"># only serialize fully the first time</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;delta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_id</span><span class="p">}}</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;abs&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq</span> <span class="k">else</span> <span class="s1">&#39;pct&#39;</span>
+        <span class="n">incl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_id</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">advance_iterator</span><span class="p">(</span><span class="n">IID</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;delta&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;plus&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span><span class="p">,</span>
+                <span class="s1">&#39;minus&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">,</span>
+                <span class="s1">&#39;endpoints&#39;</span><span class="p">:</span> <span class="n">incl</span><span class="p">,</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_id</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Delta.cmp"><a class="viewcode-back" href="../../../matgendb.vv.html#matgendb.vv.diff.Delta.cmp">[docs]</a>    <span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare numeric values with delta expression.</span>
+
+<span class="sd">        Returns True if delta matches (is as large or larger than) this class&#39; expression.</span>
+
+<span class="sd">        Delta is computed as (new - old).</span>
+
+<span class="sd">        :param old: Old value</span>
+<span class="sd">        :type old: float</span>
+<span class="sd">        :param new: New value</span>
+<span class="sd">        :type new: float</span>
+<span class="sd">        :return: True if delta between old and new is large enough, False otherwise</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cmp</span><span class="p">(</span><span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_cmp_sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&gt;=</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_cmp_val_abs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cmp_val</span><span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_cmp_val_pct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cmp_val</span><span class="p">(</span><span class="mf">100.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_cmp_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="n">oor</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># oor = out-of-range</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">oor</span> <span class="o">|=</span> <span class="n">delta</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">oor</span> <span class="o">|=</span> <span class="n">delta</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">oor</span> <span class="o">|=</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">oor</span> <span class="o">|=</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span>
+        <span class="k">return</span> <span class="n">oor</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

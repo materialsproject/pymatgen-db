@@ -1,0 +1,1337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb package &#8212; pymatgen-db 0.6.4 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="pymatgen-db 0.6.4 documentation" href="index.html" />
+    <link rel="next" title="matgendb.alchemy package" href="matgendb.alchemy.html" />
+    <link rel="prev" title="Database configuration" href="dbconfig.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="matgendb.alchemy.html" title="matgendb.alchemy package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dbconfig.html" title="Database configuration"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="matgendb-package">
+<h1>matgendb package<a class="headerlink" href="#matgendb-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="matgendb.alchemy.html">matgendb.alchemy package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.alchemy.html#subpackages">Subpackages</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.alchemy.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.alchemy.html#module-matgendb.alchemy.transmuters">matgendb.alchemy.transmuters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.alchemy.html#module-matgendb.alchemy">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="matgendb.builders.html">matgendb.builders package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="matgendb.builders.examples.html">matgendb.builders.examples package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="matgendb.builders.examples.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="matgendb.builders.examples.html#module-matgendb.builders.examples.copy_builder">matgendb.builders.examples.copy_builder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="matgendb.builders.examples.html#module-matgendb.builders.examples.file_builders">matgendb.builders.examples.file_builders module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="matgendb.builders.examples.html#module-matgendb.builders.examples.maxvalue_builder">matgendb.builders.examples.maxvalue_builder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="matgendb.builders.examples.html#module-matgendb.builders.examples">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.html#module-matgendb.builders.core">matgendb.builders.core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.html#module-matgendb.builders.incr">matgendb.builders.incr module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.html#module-matgendb.builders.schema">matgendb.builders.schema module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.html#module-matgendb.builders.util">matgendb.builders.util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.html#module-matgendb.builders">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="matgendb.vv.html">matgendb.vv package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.vv.html#subpackages">Subpackages</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.vv.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.vv.html#module-matgendb.vv.diff">matgendb.vv.diff module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.vv.html#module-matgendb.vv.report">matgendb.vv.report module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.vv.html#module-matgendb.vv.util">matgendb.vv.util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.vv.html#module-matgendb.vv.validate">matgendb.vv.validate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.vv.html#module-matgendb.vv">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-matgendb.creator">
+<span id="matgendb-creator-module"></span><h2>matgendb.creator module<a class="headerlink" href="#module-matgendb.creator" title="Permalink to this headline">¶</a></h2>
+<p>This module defines a Drone to assimilate vasp data and insert it into a
+Mongo database.</p>
+<dl class="class">
+<dt id="matgendb.creator.VaspToDbTaskDrone">
+<em class="property">class </em><code class="descname">VaspToDbTaskDrone</code><span class="sig-paren">(</span><em>host='127.0.0.1'</em>, <em>port=27017</em>, <em>database='vasp'</em>, <em>user=None</em>, <em>password=None</em>, <em>collection='tasks'</em>, <em>parse_dos=False</em>, <em>compress_dos=False</em>, <em>simulate_mode=False</em>, <em>additional_fields=None</em>, <em>update_duplicates=True</em>, <em>mapi_key=None</em>, <em>use_full_uri=True</em>, <em>runs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pymatgen.apps.borg.hive.AbstractDrone</span></code></p>
+<p>VaspToDbTaskDrone assimilates directories containing vasp input to
+inserted db tasks. This drone is meant ot be used with pymatgen&#8217;s
+BorgQueen to assimilate entire directory structures and insert them into
+a database using Python&#8217;s multiprocessing. The current format assumes
+standard VASP relaxation runs. If you have other kinds of runs,
+you may design your own Drone class based on this one.</p>
+<p>There are some restrictions on the valid directory structures:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>There can be only one vasp run in each directory. Nested directories
+are fine.</li>
+<li>Directories designated &#8220;relax1&#8221;, &#8220;relax2&#8221; are considered to be
+2 parts of an aflow style run.</li>
+<li>Directories containing vasp output with &#8221;.relax1&#8221; and &#8221;.relax2&#8221; are
+also considered as 2 parts of an aflow style run.</li>
+</ol>
+</div></blockquote>
+<p>Constructor.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>host:</dt>
+<dd>Hostname of database machine. Defaults to 127.0.0.1 or
+localhost.</dd>
+<dt>port:</dt>
+<dd>Port for db access. Defaults to mongo&#8217;s default of 27017.</dd>
+<dt>database:</dt>
+<dd>Actual database to access. Defaults to &#8220;vasp&#8221;.</dd>
+<dt>user:</dt>
+<dd>User for db access. Requires write access. Defaults to None,
+which means no authentication.</dd>
+<dt>password:</dt>
+<dd>Password for db access. Requires write access. Defaults to
+None, which means no authentication.</dd>
+<dt>collection:</dt>
+<dd>Collection to query. Defaults to &#8220;tasks&#8221;.</dd>
+<dt>parse_dos:</dt>
+<dd>Whether to parse the DOS data. Options are True, False, and &#8216;final&#8217;
+Defaults to False. If True, all dos will be inserted into a gridfs
+collection called dos_fs. If &#8216;final&#8217;, only the last calculation will
+be parsed.</dd>
+<dt>compress_dos:</dt>
+<dd>Whether to compress the DOS data. Valid options are integers 1-9,
+corresponding to zlib compression level. 1 is usually adequate.</dd>
+<dt>simulate_mode:</dt>
+<dd>Allows one to simulate db insertion without actually performing
+the insertion.</dd>
+<dt>additional_fields:</dt>
+<dd>Dict specifying additional fields to append to each doc
+inserted into the collection. For example, allows one to add
+an author or tags to a whole set of runs for example.</dd>
+<dt>update_duplicates:</dt>
+<dd>If True, if a duplicate path exists in the collection, the
+entire doc is updated. Else, duplicates are skipped.</dd>
+<dt>mapi_key:</dt>
+<dd><p class="first">A Materials API key. If this key is supplied,
+the insertion code will attempt to use the Materials REST API
+to calculate stability data for inserted calculations.
+Stability assessment requires a large quantity of materials
+data. E.g., to compute the stability of a new LixFeyOz
+calculation, you need to the energies of all known
+phases in the Li-Fe-O chemical system. Using
+the Materials API, we can obtain the pre-calculated data from
+the Materials Project.</p>
+<p class="last">Go to www.materialsproject.org/profile to generate or obtain
+your API key.</p>
+</dd>
+<dt>use_full_uri:</dt>
+<dd>Whether to use full uri path (including hostname) for the
+directory name. Defaults to True. If False, only the abs
+path will be used.</dd>
+<dt>runs:</dt>
+<dd>Ordered list of runs to look for e.g. [&#8220;relax1&#8221;, &#8220;relax2&#8221;].
+Automatically detects whether the runs are stored in the
+subfolder or file extension schema.</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.as_dict">
+<code class="descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.assimilate">
+<code class="descname">assimilate</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.assimilate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.assimilate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses vasp runs. Then insert the result into the db. and return the
+task_id or doc of the insertion.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>If in simulate_mode, the entire doc is returned for debugging
+purposes. Else, only the task_id of the inserted doc is returned.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.calculate_stability">
+<code class="descname">calculate_stability</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.calculate_stability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.calculate_stability" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.convert">
+<code class="descname">convert</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="matgendb.creator.VaspToDbTaskDrone.from_dict">
+<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.generate_doc">
+<code class="descname">generate_doc</code><span class="sig-paren">(</span><em>dir_name</em>, <em>vasprun_files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.generate_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.generate_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process aflow style runs, where each run is actually a combination of
+two vasp runs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.get_task_doc">
+<code class="descname">get_task_doc</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.get_task_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.get_task_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the entire task doc for a path, including any post-processing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.get_valid_paths">
+<code class="descname">get_valid_paths</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.get_valid_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.get_valid_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>There are some restrictions on the valid directory structures:</p>
+<ol class="arabic simple">
+<li>There can be only one vasp run in each directory. Nested directories
+are fine.</li>
+<li>Directories designated &#8220;relax1&#8221;, &#8220;relax2&#8221; are considered to be 2
+parts of an aflow style run.</li>
+<li>Directories containing vasp output with &#8221;.relax1&#8221; and &#8221;.relax2&#8221; are
+also considered as 2 parts of an aflow style run.</li>
+</ol>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.post_process">
+<code class="descname">post_process</code><span class="sig-paren">(</span><em>dir_name</em>, <em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.post_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.post_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple post-processing for various files other than the vasprun.xml.
+Called by generate_task_doc. Modify this if your runs have other
+kinds of processing requirements.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>dir_name:</dt>
+<dd>The dir_name.</dd>
+<dt>d:</dt>
+<dd>Current doc generated.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.process_killed_run">
+<code class="descname">process_killed_run</code><span class="sig-paren">(</span><em>dir_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.process_killed_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.process_killed_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a killed vasp run.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.creator.VaspToDbTaskDrone.process_vasprun">
+<code class="descname">process_vasprun</code><span class="sig-paren">(</span><em>dir_name</em>, <em>taskname</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#VaspToDbTaskDrone.process_vasprun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.VaspToDbTaskDrone.process_vasprun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a vasprun.xml file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.creator.contains_vasp_input">
+<code class="descname">contains_vasp_input</code><span class="sig-paren">(</span><em>dir_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#contains_vasp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.contains_vasp_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a directory contains valid VASP input.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>dir_name:</dt>
+<dd>Directory name to check.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>True if directory contains all four VASP input files (INCAR, POSCAR,
+KPOINTS and POTCAR).</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.creator.get_basic_analysis_and_error_checks">
+<code class="descname">get_basic_analysis_and_error_checks</code><span class="sig-paren">(</span><em>d</em>, <em>max_force_threshold=0.5</em>, <em>volume_change_threshold=0.2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#get_basic_analysis_and_error_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.get_basic_analysis_and_error_checks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matgendb.creator.get_coordination_numbers">
+<code class="descname">get_coordination_numbers</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#get_coordination_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.get_coordination_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method to get the coordination number of all sites in the final
+structure from a run.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>d:</dt>
+<dd>Run dict generated by VaspToDbTaskDrone.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>Coordination numbers as a list of dict of [{&#8220;site&#8221;: site_dict,
+&#8220;coordination&#8221;: number}, ...].</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.creator.get_uri">
+<code class="descname">get_uri</code><span class="sig-paren">(</span><em>dir_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/creator.html#get_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.creator.get_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the URI path for a directory. This allows files hosted on
+different file servers to have distinct locations.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>dir_name:</dt>
+<dd>A directory name.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>Full URI path, e.g., fileserver.host.com:/full/path/of/dir_name.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.dbconfig">
+<span id="matgendb-dbconfig-module"></span><h2>matgendb.dbconfig module<a class="headerlink" href="#module-matgendb.dbconfig" title="Permalink to this headline">¶</a></h2>
+<p>Database configuration functions.</p>
+<p>Main class is DBConfig, which encapsulates a database configuration
+passed in as a file or object. For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cfg1</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="p">()</span>  <span class="c1"># use defaults</span>
+<span class="n">cfg2</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="p">(</span><span class="s2">&quot;/path/to/myfile.json&quot;</span><span class="p">)</span>  <span class="c1"># read from file</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/other/file.json&quot;</span><span class="p">)</span>
+<span class="n">cfg3</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="c1"># read from file object</span>
+<span class="c1"># access dict of parsed conf. settings</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">cfg1</span><span class="o">.</span><span class="n">settings</span>
+</pre></div>
+</div>
+<dl class="exception">
+<dt id="matgendb.dbconfig.ConfigurationFileError">
+<em class="property">exception </em><code class="descname">ConfigurationFileError</code><span class="sig-paren">(</span><em>filename</em>, <em>err</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbconfig.html#ConfigurationFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbconfig.ConfigurationFileError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.dbconfig.DBConfig">
+<em class="property">class </em><code class="descname">DBConfig</code><span class="sig-paren">(</span><em>config_file=None</em>, <em>config_dict=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbconfig.html#DBConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbconfig.DBConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Database configuration.</p>
+<p>Constructor.</p>
+<p>Settings are created from config_dict, if given,
+or parsed config_file, if given, otherwise
+the DEFAULT_FILE is tried and if that is not present
+the DEFAULT_SETTINGS are used without modification.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config_file</strong> (<em>file or str path</em>) &#8211; Read configuration from this file.</li>
+<li><strong>config_dict</strong> &#8211; Set configuration from this dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ConfigurationFileError if cannot read/parse config_file</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.ALL_SETTINGS">
+<code class="descname">ALL_SETTINGS</code><em class="property"> = ['host', 'port', 'database', 'collection', 'aliases']</em><a class="headerlink" href="#matgendb.dbconfig.DBConfig.ALL_SETTINGS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.DEFAULT_FILE">
+<code class="descname">DEFAULT_FILE</code><em class="property"> = 'db.json'</em><a class="headerlink" href="#matgendb.dbconfig.DBConfig.DEFAULT_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.DEFAULT_PORT">
+<code class="descname">DEFAULT_PORT</code><em class="property"> = 27017</em><a class="headerlink" href="#matgendb.dbconfig.DBConfig.DEFAULT_PORT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.DEFAULT_SETTINGS">
+<code class="descname">DEFAULT_SETTINGS</code><em class="property"> = [('host', 'localhost'), ('port', 27017), ('database', 'vasp'), ('aliases', {})]</em><a class="headerlink" href="#matgendb.dbconfig.DBConfig.DEFAULT_SETTINGS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.collection">
+<code class="descname">collection</code><a class="headerlink" href="#matgendb.dbconfig.DBConfig.collection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.dbconfig.DBConfig.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbconfig.html#DBConfig.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbconfig.DBConfig.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of self (internal settings are copied).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.dbname">
+<code class="descname">dbname</code><a class="headerlink" href="#matgendb.dbconfig.DBConfig.dbname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the database.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.host">
+<code class="descname">host</code><a class="headerlink" href="#matgendb.dbconfig.DBConfig.host" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.password">
+<code class="descname">password</code><a class="headerlink" href="#matgendb.dbconfig.DBConfig.password" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.port">
+<code class="descname">port</code><a class="headerlink" href="#matgendb.dbconfig.DBConfig.port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.settings">
+<code class="descname">settings</code><a class="headerlink" href="#matgendb.dbconfig.DBConfig.settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.dbconfig.DBConfig.user">
+<code class="descname">user</code><a class="headerlink" href="#matgendb.dbconfig.DBConfig.user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.dbconfig.auth_aliases">
+<code class="descname">auth_aliases</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbconfig.html#auth_aliases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbconfig.auth_aliases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpret user/password aliases.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.dbconfig.get_settings">
+<code class="descname">get_settings</code><span class="sig-paren">(</span><em>infile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbconfig.html#get_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbconfig.get_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read settings from input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>infile</strong> (<em>file or str path</em>) &#8211; Input file for JSON settings.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Settings parsed from file</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.dbconfig.normalize_auth">
+<code class="descname">normalize_auth</code><span class="sig-paren">(</span><em>settings</em>, <em>admin=True</em>, <em>readonly=True</em>, <em>readonly_first=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbconfig.html#normalize_auth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbconfig.normalize_auth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the readonly/admin user and password to simple user/password,
+as expected by QueryEngine. If return value is true, then
+admin or readonly password will be in keys &#8220;user&#8221; and &#8220;password&#8221;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>settings</strong> (<em>dict</em>) &#8211; Connection settings</li>
+<li><strong>admin</strong> &#8211; Check for admin password</li>
+<li><strong>readonly</strong> &#8211; Check for readonly password</li>
+<li><strong>readonly_first</strong> &#8211; Check for readonly password before admin</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Whether user/password were found</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.dbgroup">
+<span id="matgendb-dbgroup-module"></span><h2>matgendb.dbgroup module<a class="headerlink" href="#module-matgendb.dbgroup" title="Permalink to this headline">¶</a></h2>
+<p>Create and access groups of databases,
+each configured from different settings.</p>
+<dl class="class">
+<dt id="matgendb.dbgroup.ConfigGroup">
+<em class="property">class </em><code class="descname">ConfigGroup</code><span class="sig-paren">(</span><em>qe_class=&lt;class 'matgendb.query_engine.QueryEngine'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#ConfigGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.ConfigGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Convenient storage and access to a group
+of database configurations.</p>
+<p>Will automatically instantiate these configurations,
+as query engines, on-demand.</p>
+<dl class="attribute">
+<dt id="matgendb.dbgroup.ConfigGroup.SEP">
+<code class="descname">SEP</code><em class="property"> = '.'</em><a class="headerlink" href="#matgendb.dbgroup.ConfigGroup.SEP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.dbgroup.ConfigGroup.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>name</em>, <em>cfg</em>, <em>expand=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#ConfigGroup.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.ConfigGroup.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a configuration object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> &#8211; Name for later retrieval</li>
+<li><strong>cfg</strong> &#8211; Configuration object</li>
+<li><strong>expand</strong> &#8211; Flag for adding sub-configs for each sub-collection.
+See discussion in method doc.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">self, for chaining</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">CreateQueryEngineError (only if expand=True)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.dbgroup.ConfigGroup.add_path">
+<code class="descname">add_path</code><span class="sig-paren">(</span><em>path</em>, <em>pattern='*.json'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#ConfigGroup.add_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.ConfigGroup.add_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add configuration file(s)
+in <cite>path</cite>. The path can be a single file or a directory.
+If path is a directory, then <cite>pattern</cite>
+(Unix glob-style) will be used to get a list of all config
+files in the directory.</p>
+<p>The name given to each file is the database name
+and collection name (if any) combined with a &#8216;.&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; File or directory name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">self, for chaining</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.dbgroup.ConfigGroup.expand">
+<code class="descname">expand</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#ConfigGroup.expand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.ConfigGroup.expand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand config for <cite>name</cite> by adding a sub-configuration for every
+dot-separated collection &#8220;below&#8221; the given one (or all, if none given).</p>
+<dl class="docutils">
+<dt>For example, for a database &#8216;mydb&#8217; with collections</dt>
+<dd>[&#8216;spiderman.amazing&#8217;, &#8216;spiderman.spectacular&#8217;, &#8216;spiderman2&#8217;]</dd>
+<dt>and a configuration</dt>
+<dd>{&#8216;host&#8217;:&#8217;foo&#8217;, &#8216;database&#8217;:&#8217;mydb&#8217;, &#8216;collection&#8217;:&#8217;spiderman&#8217;}</dd>
+</dl>
+<p>then <cite>expand(&#8220;mydb.spiderman&#8221;)</cite> would add keys for &#8216;spiderman.amazing&#8217;
+and &#8216;spiderman.spectacular&#8217;, but <em>not</em> &#8216;spiderman2&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>basestring</em>) &#8211; Name, or glob-style pattern, for DB configurations.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">KeyError (if no such configuration)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.dbgroup.ConfigGroup.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#ConfigGroup.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.ConfigGroup.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.dbgroup.ConfigGroup.set_prefix">
+<code class="descname">set_prefix</code><span class="sig-paren">(</span><em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#ConfigGroup.set_prefix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.ConfigGroup.set_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set prefix to use as a namespace for item lookup.
+A dot (.) will be automatically added to the given string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>prefix</strong> &#8211; Prefix, or None to unset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.dbgroup.ConfigGroup.uncache">
+<code class="descname">uncache</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#ConfigGroup.uncache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.ConfigGroup.uncache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all created query engines that match <cite>name</cite> from
+the cache (this disconnects from MongoDB, which is the point).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; Name used for <a class="reference internal" href="#matgendb.dbgroup.ConfigGroup.add" title="matgendb.dbgroup.ConfigGroup.add"><code class="xref py py-meth docutils literal"><span class="pre">add()</span></code></a>, or pattern</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.dbgroup.CreateQueryEngineError">
+<em class="property">exception </em><code class="descname">CreateQueryEngineError</code><span class="sig-paren">(</span><em>cls</em>, <em>settings</em>, <em>err</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#CreateQueryEngineError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.CreateQueryEngineError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.dbgroup.RegexDict">
+<em class="property">class </em><code class="descname">RegexDict</code><a class="reference internal" href="_modules/matgendb/dbgroup.html#RegexDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.RegexDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">dict</span></code></p>
+<p>Extend standard dict to include
+a function that finds values based on a
+regular expression for the key. For example:</p>
+<blockquote>
+<div>d = RegexDict(tweedledee=1, tweedledum=2)</div></blockquote>
+<dl class="method">
+<dt id="matgendb.dbgroup.RegexDict.re_get">
+<code class="descname">re_get</code><span class="sig-paren">(</span><em>pattern</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#RegexDict.re_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.RegexDict.re_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return values whose key matches <cite>pattern</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> &#8211; Regular expression</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Found values, as a dict.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.dbgroup.RegexDict.re_keys">
+<code class="descname">re_keys</code><span class="sig-paren">(</span><em>pattern</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#RegexDict.re_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.RegexDict.re_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find keys matching <cite>pattern</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> &#8211; Regular expression</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Matching keys or empty list</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.dbgroup.create_query_engine">
+<code class="descname">create_query_engine</code><span class="sig-paren">(</span><em>config</em>, <em>clazz</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/dbgroup.html#create_query_engine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.dbgroup.create_query_engine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and return new query engine object from the
+given <cite>DBConfig</cite> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference internal" href="#matgendb.dbconfig.DBConfig" title="matgendb.dbconfig.DBConfig"><em>dbconfig.DBConfig</em></a>) &#8211; Database configuration</li>
+<li><strong>clazz</strong> (<em>class</em>) &#8211; Class to use for creating query engine. Should
+act like query_engine.QueryEngine.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">New query engine</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.query_engine">
+<span id="matgendb-query-engine-module"></span><h2>matgendb.query_engine module<a class="headerlink" href="#module-matgendb.query_engine" title="Permalink to this headline">¶</a></h2>
+<p>This module provides a QueryEngine that simplifies queries for Mongo databases
+generated using hive.</p>
+<dl class="class">
+<dt id="matgendb.query_engine.QueryEngine">
+<em class="property">class </em><code class="descname">QueryEngine</code><span class="sig-paren">(</span><em>host='127.0.0.1'</em>, <em>port=27017</em>, <em>database='vasp'</em>, <em>user=None</em>, <em>password=None</em>, <em>collection='tasks'</em>, <em>aliases_config=None</em>, <em>default_properties=None</em>, <em>query_post=None</em>, <em>result_post=None</em>, <em>connection=None</em>, <em>replicaset=None</em>, <em>**ignore</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>This class defines a QueryEngine interface to a Mongo Collection based on
+a set of aliases. This query engine also provides convenient translation
+between various pymatgen objects and database objects.</p>
+<p>The major difference between the QueryEngine&#8217;s query() method and pymongo&#8217;s
+find() method is the treatment of nested fields. QueryEngine&#8217;s query
+will map the final result to a root level string, while pymmongo will
+return the doc as is. For example, let&#8217;s say you have a document
+that is of the following form:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Using pymongo.find({}, fields=[&#8220;a.b&#8221;]), you will get a doc where you need
+to do doc[&#8220;a&#8221;][&#8220;b&#8221;] to access the final result (1). Using
+QueryEngine.query(properties=[&#8220;a.b&#8221;], you will obtain a result that can be
+accessed simply as doc[&#8220;a.b&#8221;].</p>
+<p>Constructor.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">host (str): Hostname of database machine.
+port (int): Port for db access.
+database (str): Name of database to access.
+user (str): User for db access. <cite>None</cite> means no authentication.
+password (str): Password for db access. <cite>None</cite> means no auth.
+collection (str): Collection to query. Defaults to &#8220;tasks&#8221;.
+connection (pymongo.Connection): If given, ignore &#8216;host&#8217; and &#8216;port&#8217;</p>
+<blockquote>
+<div>and use existing connection.</div></blockquote>
+<dl class="last docutils">
+<dt>aliases_config(dict):</dt>
+<dd><p class="first">An alias dict to use. Defaults to None, which means the default
+aliases defined in &#8220;aliases.json&#8221; is used. The aliases config
+should be of the following format:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;aliases&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;e_above_hull&quot;</span><span class="p">:</span> <span class="s2">&quot;analysis.e_above_hull&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="s2">&quot;output.final_energy&quot;</span><span class="p">,</span>
+        <span class="o">....</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;defaults&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;successful&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="last docutils">
+<dt>aliases (dict): Keys are the incoming property, values are the</dt>
+<dd>property it will be translated to. This makes it easier
+to organize the doc format in a way that is different from the
+query format.</dd>
+<dt>defaults (dict): Criteria that should be applied</dt>
+<dd>by default to all queries. For example, a collection may
+contain data from both successful and unsuccessful runs but
+for most querying purposes, you may want just successful runs
+only. Note that defaults do not affect explicitly specified
+criteria, i.e., if you suppy a query for {&#8220;state&#8221;: &#8220;killed&#8221;},
+this will override the default for {&#8220;state&#8221;: &#8220;successful&#8221;}.</dd>
+</dl>
+</dd>
+<dt>default_properties (list): Property names (strings) to use by</dt>
+<dd>default, if no <cite>properties</cite> are given to query().</dd>
+<dt>query_post (list): Functions to post-process the <cite>criteria</cite> passed</dt>
+<dd>to <cite>query()</cite>, after aliases are resolved.
+Function takes two args, the criteria dict and list of
+result properties. Both may be modified in-place.</dd>
+<dt>result_post (list): Functions to post-process the cursor records.</dt>
+<dd>Function takes one arg, the document for the current record,
+that is modified in-place.</dd>
+</dl>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.ALIASES_CONFIG_KEY">
+<code class="descname">ALIASES_CONFIG_KEY</code><em class="property"> = 'aliases_config'</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.ALIASES_CONFIG_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.COLLECTION_KEY">
+<code class="descname">COLLECTION_KEY</code><em class="property"> = 'collection'</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.COLLECTION_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.DB_KEY">
+<code class="descname">DB_KEY</code><em class="property"> = 'database'</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.DB_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.HOST_KEY">
+<code class="descname">HOST_KEY</code><em class="property"> = 'host'</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.HOST_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.PASSWORD_KEY">
+<code class="descname">PASSWORD_KEY</code><em class="property"> = 'password'</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.PASSWORD_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.PORT_KEY">
+<code class="descname">PORT_KEY</code><em class="property"> = 'port'</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.PORT_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.USER_KEY">
+<code class="descname">USER_KEY</code><em class="property"> = 'user'</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.USER_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.aliases">
+<code class="descname">aliases</code><em class="property"> = None</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.aliases" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>aliases</cite> arg to constructor</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnects the connection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.collection_name">
+<code class="descname">collection_name</code><a class="headerlink" href="#matgendb.query_engine.QueryEngine.collection_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.default_criteria">
+<code class="descname">default_criteria</code><em class="property"> = None</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.default_criteria" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>default_criteria</cite> arg to constructor</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.default_properties">
+<code class="descname">default_properties</code><em class="property"> = None</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.default_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>default_properties</cite> arg to constructor</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.ensure_index">
+<code class="descname">ensure_index</code><span class="sig-paren">(</span><em>key</em>, <em>unique=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.ensure_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.ensure_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for pymongo.Collection.ensure_index</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="matgendb.query_engine.QueryEngine.from_config">
+<em class="property">static </em><code class="descname">from_config</code><span class="sig-paren">(</span><em>config_file</em>, <em>use_admin=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a QueryEngine from a JSON config file generated using mgdb
+init.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>config_file:</dt>
+<dd>Filename of config file.</dd>
+<dt>use_admin:</dt>
+<dd>If True, the admin user and password in the config file is
+used. Otherwise, the readonly_user and password is used.
+Defaults to False.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>QueryEngine</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.get_dos_from_id">
+<code class="descname">get_dos_from_id</code><span class="sig-paren">(</span><em>task_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.get_dos_from_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.get_dos_from_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides the get_dos_from_id for the MIT gridfs format.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.get_entries">
+<code class="descname">get_entries</code><span class="sig-paren">(</span><em>criteria</em>, <em>inc_structure=False</em>, <em>optional_data=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.get_entries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.get_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ComputedEntries satisfying a particular criteria.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The get_entries_in_system and get_entries  methods should be used
+with care. In essence, all entries, GGA, GGA+U or otherwise,
+are returned.  The dataset is very heterogeneous and not
+directly comparable.  It is highly recommended that you perform
+post-processing using pymatgen.entries.compatibility.</p>
+</div>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>criteria:</dt>
+<dd>Criteria obeying the same syntax as query.</dd>
+<dt>inc_structure:</dt>
+<dd>Optional parameter as to whether to include a structure with
+the ComputedEntry. Defaults to False. Use with care - including
+structures with a large number of entries can potentially slow
+down your code to a crawl.</dd>
+<dt>optional_data:</dt>
+<dd>Optional data to include with the entry. This allows the data
+to be access via entry.data[key].</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>List of pymatgen.entries.ComputedEntries satisfying criteria.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.get_entries_in_system">
+<code class="descname">get_entries_in_system</code><span class="sig-paren">(</span><em>elements</em>, <em>inc_structure=False</em>, <em>optional_data=None</em>, <em>additional_criteria=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.get_entries_in_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.get_entries_in_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all entries in a chemical system, e.g. Li-Fe-O will return all
+Li-O, Fe-O, Li-Fe, Li-Fe-O compounds.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The get_entries_in_system and get_entries  methods should be used
+with care. In essence, all entries, GGA, GGA+U or otherwise,
+are returned.  The dataset is very heterogeneous and not
+directly comparable.  It is highly recommended that you perform
+post-processing using pymatgen.entries.compatibility.</p>
+</div>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>elements:</dt>
+<dd>Sequence of element symbols, e.g. [&#8216;Li&#8217;,&#8217;Fe&#8217;,&#8217;O&#8217;]</dd>
+<dt>inc_structure:</dt>
+<dd>Optional parameter as to whether to include a structure with
+the ComputedEntry. Defaults to False. Use with care - including
+structures with a large number of entries can potentially slow
+down your code to a crawl.</dd>
+<dt>optional_data:</dt>
+<dd>Optional data to include with the entry. This allows the data
+to be access via entry.data[key].</dd>
+<dt>additional_criteria:</dt>
+<dd>Added ability to provide additional criteria other than just
+the chemical system.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>List of ComputedEntries in the chemical system.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.get_structure_from_id">
+<code class="descname">get_structure_from_id</code><span class="sig-paren">(</span><em>task_id</em>, <em>final_structure=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.get_structure_from_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.get_structure_from_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a structure from the database given the task id.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>task_id:</dt>
+<dd>The task_id to query for.</dd>
+<dt>final_structure:</dt>
+<dd>Whether to obtain the final or initial structure. Defaults to
+True.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.query">
+<code class="descname">query</code><span class="sig-paren">(</span><em>properties=None</em>, <em>criteria=None</em>, <em>distinct_key=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method for database access.  All properties and criteria
+can be specified using simplified names defined in Aliases.  You can
+use the supported_properties property to get the list of supported
+properties.</p>
+<p>Results are returned as an iterator of dicts to ensure memory and cpu
+efficiency.</p>
+<p>Note that the dict returned have keys also in the simplified names
+form, not in the mongo format. For example, if you query for
+&#8220;analysis.e_above_hull&#8221;, the returned result must be accessed as
+r[&#8216;analysis.e_above_hull&#8217;] instead of mongo&#8217;s
+r[&#8216;analysis&#8217;][&#8216;e_above_hull&#8217;]. This is a <em>feature</em> of the query engine
+to allow simple access to deeply nested docs without having to resort
+to some recursion to go deep into the result.</p>
+<p>However, if you query for &#8216;analysis&#8217;, the entire &#8216;analysis&#8217; key is
+returned as r[&#8216;analysis&#8217;] and then the subkeys can be accessed in the
+usual form, i.e., r[&#8216;analysis&#8217;][&#8216;e_above_hull&#8217;]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>properties</strong> &#8211; Properties to query for. Defaults to None which means all supported properties.</li>
+<li><strong>criteria</strong> &#8211; Criteria to query for as a dict.</li>
+<li><strong>distinct_key</strong> &#8211; If not None, the key for which to get distinct results</li>
+<li><strong>**kwargs</strong> &#8211; Other kwargs supported by pymongo.collection.find.
+Useful examples are limit, skip, sort, etc.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A QueryResults Iterable, which is somewhat like pymongo&#8217;s
+cursor except that it performs mapping. In general, the dev does
+not need to concern himself with the form. It is sufficient to know
+that the results are in the form of an iterable of dicts.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.query_one">
+<code class="descname">query_one</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.query_one"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.query_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first document from <a class="reference internal" href="#matgendb.query_engine.QueryEngine.query" title="matgendb.query_engine.QueryEngine.query"><code class="xref py py-meth docutils literal"><span class="pre">query()</span></code></a>, with same parameters.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.query_post">
+<code class="descname">query_post</code><em class="property"> = None</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.query_post" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>query_post</cite> arg to constructor</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.query_engine.QueryEngine.result_post">
+<code class="descname">result_post</code><em class="property"> = None</em><a class="headerlink" href="#matgendb.query_engine.QueryEngine.result_post" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>result_post</cite> arg to constructor</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.set_aliases_and_defaults">
+<code class="descname">set_aliases_and_defaults</code><span class="sig-paren">(</span><em>aliases_config=None</em>, <em>default_properties=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.set_aliases_and_defaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.set_aliases_and_defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the alias config and defaults to use. Typically used when
+switching to a collection with a different schema.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>aliases_config:</dt>
+<dd>An alias dict to use. Defaults to None, which means the default
+aliases defined in &#8220;aliases.json&#8221; is used. See constructor
+for format.</dd>
+<dt>default_properties:</dt>
+<dd>List of property names (strings) to use by default, if no
+properties are given to the &#8216;properties&#8217; argument of
+query().</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryEngine.set_collection">
+<code class="descname">set_collection</code><span class="sig-paren">(</span><em>collection</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryEngine.set_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryEngine.set_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>To Be Deprecated: this should be replaced with the &#64;property collection_name</p>
+<p>Switch to another collection. Note that you may have to set the
+aliases and default properties via set_aliases_and_defaults if the
+schema of the new collection differs from the current collection.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>collection:</dt>
+<dd>Name of collection.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.query_engine.QueryError">
+<em class="property">exception </em><code class="descname">QueryError</code><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Exception class for errors occuring during queries.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.query_engine.QueryListResults">
+<em class="property">class </em><code class="descname">QueryListResults</code><span class="sig-paren">(</span><em>prop_dict</em>, <em>result_cursor</em>, <em>postprocess=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryListResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryListResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.query_engine.QueryResults" title="matgendb.query_engine.QueryResults"><code class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryResults</span></code></a></p>
+<p>Set of QueryResults on a list instead of a MongoDB cursor.</p>
+<p>Constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>prop_dict</strong> &#8211; Properties</li>
+<li><strong>result_cursor</strong> &#8211; Iterable returning records</li>
+<li><strong>postprocess</strong> &#8211; List of functions, each taking a record and
+modifying it in-place, or None, or an empty list</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matgendb.query_engine.QueryListResults.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryListResults.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryListResults.clone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.query_engine.QueryResults">
+<em class="property">class </em><code class="descname">QueryResults</code><span class="sig-paren">(</span><em>prop_dict</em>, <em>result_cursor</em>, <em>postprocess=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">collections.abc.Iterable</span></code></p>
+<p>Iterable wrapper for results from QueryEngine.
+Like pymongo&#8217;s cursor, this object should generally not be instantiated,
+but should be obtained from a queryengine.
+It delegates many attributes to the underlying pymongo cursor, and should
+support nearly all cursor like attributes such as count(), explain(),
+hint(), etc. Please see pymongo cursor documentation for details.</p>
+<p>Constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>prop_dict</strong> &#8211; Properties</li>
+<li><strong>result_cursor</strong> &#8211; Iterable returning records</li>
+<li><strong>postprocess</strong> &#8211; List of functions, each taking a record and
+modifying it in-place, or None, or an empty list</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matgendb.query_engine.QueryResults.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryResults.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryResults.clone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.query_engine.QueryResults.from_cursor">
+<code class="descname">from_cursor</code><span class="sig-paren">(</span><em>cursor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/query_engine.html#QueryResults.from_cursor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.query_engine.QueryResults.from_cursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a QueryResults object from a cursor object</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.util">
+<span id="matgendb-util-module"></span><h2>matgendb.util module<a class="headerlink" href="#module-matgendb.util" title="Permalink to this headline">¶</a></h2>
+<p>Utility functions used across scripts.</p>
+<dl class="class">
+<dt id="matgendb.util.MongoJSONEncoder">
+<em class="property">class </em><code class="descname">MongoJSONEncoder</code><span class="sig-paren">(</span><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#MongoJSONEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.MongoJSONEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<p>Constructor for JSONEncoder, with sensible defaults.</p>
+<p>If skipkeys is false, then it is a TypeError to attempt
+encoding of keys that are not str, int, float or None.  If
+skipkeys is True, such items are simply skipped.</p>
+<p>If ensure_ascii is true, the output is guaranteed to be str
+objects with all incoming non-ASCII characters escaped.  If
+ensure_ascii is false, the output can contain non-ASCII characters.</p>
+<p>If check_circular is true, then lists, dicts, and custom encoded
+objects will be checked for circular references during encoding to
+prevent an infinite recursion (which would cause an OverflowError).
+Otherwise, no such check takes place.</p>
+<p>If allow_nan is true, then NaN, Infinity, and -Infinity will be
+encoded as such.  This behavior is not JSON specification compliant,
+but is consistent with most JavaScript based encoders and decoders.
+Otherwise, it will be a ValueError to encode such floats.</p>
+<p>If sort_keys is true, then the output of dictionaries will be
+sorted by key; this is useful for regression tests to ensure
+that JSON serializations can be compared on a day-to-day basis.</p>
+<p>If indent is a non-negative integer, then JSON array
+elements and object members will be pretty-printed with that
+indent level.  An indent level of 0 will only insert newlines.
+None is the most compact representation.</p>
+<p>If specified, separators should be an (item_separator, key_separator)
+tuple.  The default is (&#8216;, &#8216;, &#8216;: &#8216;) if <em>indent</em> is <code class="docutils literal"><span class="pre">None</span></code> and
+(&#8216;,&#8217;, &#8216;: &#8216;) otherwise.  To get the most compact JSON representation,
+you should specify (&#8216;,&#8217;, &#8216;:&#8217;) to eliminate whitespace.</p>
+<p>If specified, default is a function that gets called for objects
+that can&#8217;t otherwise be serialized.  It should return a JSON encodable
+version of the object or raise a <code class="docutils literal"><span class="pre">TypeError</span></code>.</p>
+<dl class="method">
+<dt id="matgendb.util.MongoJSONEncoder.default">
+<code class="descname">default</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#MongoJSONEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.MongoJSONEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.util.collection_keys">
+<code class="descname">collection_keys</code><span class="sig-paren">(</span><em>coll</em>, <em>sep='.'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#collection_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.collection_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of all (including nested) keys in a collection.
+Examines the first document in the collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sep</strong> &#8211; Separator for nested keys</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.util.csv_dict">
+<code class="descname">csv_dict</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#csv_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.csv_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format dict to a string with comma-separated values.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.util.csv_list">
+<code class="descname">csv_list</code><span class="sig-paren">(</span><em>l</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#csv_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.csv_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format list to a string with comma-separated values.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.util.get_collection">
+<code class="descname">get_collection</code><span class="sig-paren">(</span><em>config_file</em>, <em>admin=False</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#get_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.get_collection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matgendb.util.get_database">
+<code class="descname">get_database</code><span class="sig-paren">(</span><em>config_file=None</em>, <em>settings=None</em>, <em>admin=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#get_database"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.get_database" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matgendb.util.get_settings">
+<code class="descname">get_settings</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#get_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.get_settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matgendb.util.kvp_dict">
+<code class="descname">kvp_dict</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#kvp_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.kvp_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format dict to key=value pairs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.util.quotable">
+<code class="descname">quotable</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/util.html#quotable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.util.quotable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-matgendb">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-matgendb" title="Permalink to this headline">¶</a></h2>
+<p>Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
+materials analysis library. It enables the creation of Materials
+Project-style MongoDB databases for management of materials data and
+provides a clean and intuitive web ui for exploring that data. A query engine
+is also provided to enable the easy translation of MongoDB docs to useful
+pymatgen objects for analysis purposes.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">matgendb package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-matgendb.creator">matgendb.creator module</a></li>
+<li><a class="reference internal" href="#module-matgendb.dbconfig">matgendb.dbconfig module</a></li>
+<li><a class="reference internal" href="#module-matgendb.dbgroup">matgendb.dbgroup module</a></li>
+<li><a class="reference internal" href="#module-matgendb.query_engine">matgendb.query_engine module</a></li>
+<li><a class="reference internal" href="#module-matgendb.util">matgendb.util module</a></li>
+<li><a class="reference internal" href="#module-matgendb">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="dbconfig.html" title="previous chapter">Database configuration</a></li>
+      <li>Next: <a href="matgendb.alchemy.html" title="next chapter">matgendb.alchemy package</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/matgendb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,1305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb.builders package &#8212; pymatgen-db 0.6.4 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="pymatgen-db 0.6.4 documentation" href="index.html" />
+    <link rel="up" title="matgendb package" href="matgendb.html" />
+    <link rel="next" title="matgendb.builders.examples package" href="matgendb.builders.examples.html" />
+    <link rel="prev" title="matgendb.alchemy package" href="matgendb.alchemy.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="matgendb.builders.examples.html" title="matgendb.builders.examples package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="matgendb.alchemy.html" title="matgendb.alchemy package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="matgendb.html" accesskey="U">matgendb package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="matgendb-builders-package">
+<h1>matgendb.builders package<a class="headerlink" href="#matgendb-builders-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="matgendb.builders.examples.html">matgendb.builders.examples package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.examples.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.examples.html#module-matgendb.builders.examples.copy_builder">matgendb.builders.examples.copy_builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.examples.html#module-matgendb.builders.examples.file_builders">matgendb.builders.examples.file_builders module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.examples.html#module-matgendb.builders.examples.maxvalue_builder">matgendb.builders.examples.maxvalue_builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matgendb.builders.examples.html#module-matgendb.builders.examples">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-matgendb.builders.core">
+<span id="matgendb-builders-core-module"></span><h2>matgendb.builders.core module<a class="headerlink" href="#module-matgendb.builders.core" title="Permalink to this headline">¶</a></h2>
+<p>Shared code for builders.</p>
+<p>For developers implementing a new builder,
+you should inherit from <a class="reference internal" href="#matgendb.builders.core.Builder" title="matgendb.builders.core.Builder"><code class="xref py py-class docutils literal"><span class="pre">Builder</span></code></a>.</p>
+<dl class="exception">
+<dt id="matgendb.builders.core.BuildError">
+<em class="property">exception </em><code class="descname">BuildError</code><span class="sig-paren">(</span><em>who</em>, <em>why</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#BuildError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.BuildError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.core.Builder">
+<em class="property">class </em><code class="descname">Builder</code><span class="sig-paren">(</span><em>ncores=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Abstract base class for all builders</p>
+<p>To implement a new builder, inherit from this class and
+define the <a class="reference internal" href="#matgendb.builders.core.Builder.get_items" title="matgendb.builders.core.Builder.get_items"><code class="xref py py-meth docutils literal"><span class="pre">get_items()</span></code></a> and <a class="reference internal" href="#matgendb.builders.core.Builder.process_item" title="matgendb.builders.core.Builder.process_item"><code class="xref py py-meth docutils literal"><span class="pre">process_item()</span></code></a> methods.
+See the online documentation for details.</p>
+<p>Create new builder for threaded or multiprocess execution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ncores</strong> (<em>int</em>) &#8211; Desired number of threads or processes to run</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">ValueError for bad &#8216;config&#8217; arg</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matgendb.builders.core.Builder.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to database with given configuration, which may be a dict or
+a path to a pymatgen-db configuration.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.Builder.finalize">
+<code class="descname">finalize</code><span class="sig-paren">(</span><em>had_errors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform any cleanup actions after all items have been processed.
+Subclasses may choose not to implement this, in which case it is a no-op.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>had_errors</strong> (<em>bool</em>) &#8211; True if the run itself had errors.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if nothing went wrong, else False</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.Builder.get_items">
+<code class="descname">get_items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder.get_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder.get_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform one-time setup at the top of a run, returning
+an iterator on items to use as input.</p>
+<p>If get_parameters() doesn&#8217;t return None, this method is used to
+discover the names and types of this function&#8217;s parameters.
+Otherwise, the docstring of this function is used.
+This docstring must use the &#8216;:&#8217; version of the restructured
+text style. For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyBuilder</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :param source: The input porous materials collection</span>
+<span class="sd">    :type source: QueryEngine</span>
+<span class="sd">    :param target: The output materials collection</span>
+<span class="sd">    :type target: QueryEngine</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+</pre></div>
+</div>
+<p>More details on the parameters is in <code class="xref py py-meth docutils literal"><span class="pre">get_items_parameters()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">iterator</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.Builder.get_parameters">
+<code class="descname">get_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder.get_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return key/value pairs that will be passed to get_items().</p>
+<p>This is an alternative to the use of special docstrings as described
+in <a class="reference internal" href="#matgendb.builders.core.Builder.get_items" title="matgendb.builders.core.Builder.get_items"><code class="xref py py-meth docutils literal"><span class="pre">get_items()</span></code></a>.</p>
+<p>If the type of the argument is &#8216;QueryEngine&#8217;, then the driver program
+will add options for, and create, a matgendb.query_engine.QueryEngine
+instance. The value given for this argument will be interpreted as
+the MongoDB collection name.</p>
+<p>Some other basic Python types &#8211; list, dict, int, float &#8211; are
+automatically parsed. If an empty value is supplied for these, then
+None will be passed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">{&#8216;param_name&#8217;: {&#8216;type&#8217;: &#8216;param_type&#8217;, &#8216;desc&#8217;:&#8217;description&#8217;},
+&#8216;param2_name&#8217;: {&#8216;type&#8217;: &#8216;param2_type&#8217;, &#8216;desc&#8217;:&#8217;descr2&#8217;}, ..}</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.Builder.process_item">
+<code class="descname">process_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder.process_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder.process_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the analysis for each item of work here.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>item</strong> (<em>object</em>) &#8211; One item of work from the queue (i.e., one item from the iterator that
+was returned by the <cite>setup</cite> method).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Status code, 0 for OK</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.Builder.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>user_kw=None</em>, <em>build_kw=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the builder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>user_kw</strong> (<em>dict</em>) &#8211; keywords from user</li>
+<li><strong>build_kw</strong> (<em>dict</em>) &#8211; internal settings</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Number of items processed</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.Builder.shared_dict">
+<code class="descname">shared_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder.shared_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder.shared_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get dict that can be shared between parallel processes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.Builder.shared_list">
+<code class="descname">shared_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Builder.shared_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Builder.shared_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list that can be shared between parallel processes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.core.BuilderStatus">
+<em class="property">class </em><code class="descname">BuilderStatus</code><span class="sig-paren">(</span><em>num</em>, <em>builder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#BuilderStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.BuilderStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Status of a Builder object run.</p>
+<dl class="attribute">
+<dt id="matgendb.builders.core.BuilderStatus.FAILURE">
+<code class="descname">FAILURE</code><em class="property"> = -1</em><a class="headerlink" href="#matgendb.builders.core.BuilderStatus.FAILURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.core.BuilderStatus.RUNNING">
+<code class="descname">RUNNING</code><em class="property"> = 1</em><a class="headerlink" href="#matgendb.builders.core.BuilderStatus.RUNNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.core.BuilderStatus.SUCCESS">
+<code class="descname">SUCCESS</code><em class="property"> = 2</em><a class="headerlink" href="#matgendb.builders.core.BuilderStatus.SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.core.BuilderStatus.WAIT">
+<code class="descname">WAIT</code><em class="property"> = 0</em><a class="headerlink" href="#matgendb.builders.core.BuilderStatus.WAIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.BuilderStatus.fail">
+<code class="descname">fail</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#BuilderStatus.fail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.BuilderStatus.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set state of a single process or thread to &#8216;failure&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>i</strong> &#8211; Index of process or thread.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.BuilderStatus.has_failures">
+<code class="descname">has_failures</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#BuilderStatus.has_failures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.BuilderStatus.has_failures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether there are any failures in the states.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.BuilderStatus.running">
+<code class="descname">running</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#BuilderStatus.running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.BuilderStatus.running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set state of a single process or thread to &#8216;running&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>i</strong> &#8211; Index of process or thread.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.BuilderStatus.success">
+<code class="descname">success</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#BuilderStatus.success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.BuilderStatus.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set state of a single process or thread to &#8216;success&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>i</strong> &#8211; Index of process or thread.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.core.Collections">
+<em class="property">class </em><code class="descname">Collections</code><span class="sig-paren">(</span><em>db</em>, <em>version=1</em>, <em>prefix=None</em>, <em>task_suffix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Collections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Collections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Interface to normalized names for collections.</p>
+<p>After initialization with a MongoDB database and optional parameters,
+you can access collections in <cite>known_collections</cite> as attributes.</p>
+<p>Set collections from database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>db</strong> (<em>dict-like object</em>) &#8211; MongoDB database, but really anything that acts like a dict. If None, it will be ignored.</li>
+<li><strong>version</strong> (<em>int</em>) &#8211; Version of naming scheme for the collections</li>
+<li><strong>prefix</strong> (<em>str</em>) &#8211; Prefix string to put before collection names, e.g. &#8220;dahn&#8221;. Full
+collection name will be &lt;prefix&gt;.&lt;name&gt;; don&#8217;t include &#8216;.&#8217; in the input.</li>
+<li><strong>task_suffix</strong> (<em>str</em>) &#8211; Add this suffix to the tasks collection. Used for merged collections for sandboxes.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body"><p class="first last">ValueError if <cite>version</cite> is not known</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.builders.core.Collections.MAX_VER">
+<code class="descname">MAX_VER</code><em class="property"> = 1</em><a class="headerlink" href="#matgendb.builders.core.Collections.MAX_VER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.core.Collections.MIN_VER">
+<code class="descname">MIN_VER</code><em class="property"> = 1</em><a class="headerlink" href="#matgendb.builders.core.Collections.MIN_VER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.core.Collections.database">
+<code class="descname">database</code><a class="headerlink" href="#matgendb.builders.core.Collections.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current database object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Current database object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.Collections.get_collection_name">
+<code class="descname">get_collection_name</code><span class="sig-paren">(</span><em>alias</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#Collections.get_collection_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.Collections.get_collection_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.core.Collections.known_collections">
+<code class="descname">known_collections</code><em class="property"> = ['tasks', 'materials', 'diffraction_patterns', 'electrodes', 'conversion_electrodes', 'bandstructures', 'icsd', 'phase_diagrams', 'brototypes', 'electronic_structure']</em><a class="headerlink" href="#matgendb.builders.core.Collections.known_collections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection names that are accessible as attributes
+of an instance of this class</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.core.HasExamples">
+<em class="property">class </em><code class="descname">HasExamples</code><a class="reference internal" href="_modules/matgendb/builders/core.html#HasExamples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.HasExamples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Mix-in class for checking the output of a builder.</p>
+<p>This is a way to get some static checking of the schema of inserted documents,
+without imposing the burden of schema-checking every single document.
+The check is static in the sense that it will only be run by the unit tests.</p>
+<blockquote>
+<div>See the</div></blockquote>
+<p><cite>pymatpro.db.builders.test.test_porous_builder</cite> module for an example of
+how to use this to perform unit tests.</p>
+<dl class="method">
+<dt id="matgendb.builders.core.HasExamples.examples">
+<code class="descname">examples</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#HasExamples.examples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.HasExamples.examples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return example document(s) for collection(s).</p>
+<p>This must be implemented in subclasses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of pairs (doc, collection_name)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list(dict,str)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.core.HasExamples.validate_examples">
+<code class="descname">validate_examples</code><span class="sig-paren">(</span><em>fail_fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#HasExamples.validate_examples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.HasExamples.validate_examples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the examples against the schema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fail_fn</strong> (<em>function(str)</em>) &#8211; Pass failure messages to this function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.core.ProcRunner">
+<em class="property">class </em><code class="descname">ProcRunner</code><a class="reference internal" href="_modules/matgendb/builders/core.html#ProcRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.ProcRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>This is a work-around to the limitation of multiprocessing that the
+function executed in the new module cannot be a method of a class.
+We simply set the instance (self) into the class before forking each
+process, and the class&#8217; method calls the instance method for us.</p>
+<dl class="attribute">
+<dt id="matgendb.builders.core.ProcRunner.instance">
+<code class="descname">instance</code><em class="property"> = None</em><a class="headerlink" href="#matgendb.builders.core.ProcRunner.instance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="matgendb.builders.core.ProcRunner.run">
+<em class="property">classmethod </em><code class="descname">run</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#ProcRunner.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.ProcRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.core.alphadump">
+<code class="descname">alphadump</code><span class="sig-paren">(</span><em>d</em>, <em>indent=2</em>, <em>depth=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#alphadump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.alphadump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump a dict to a str,
+with keys in alphabetical order.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.core.merge_tasks">
+<code class="descname">merge_tasks</code><span class="sig-paren">(</span><em>core_collections</em>, <em>sandbox_collections</em>, <em>id_prefix</em>, <em>new_tasks</em>, <em>batch_size=100</em>, <em>wipe=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#merge_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.merge_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge core and sandbox collections into a temporary collection in the sandbox.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>core_collections</strong> (<a class="reference internal" href="#matgendb.builders.core.Collections" title="matgendb.builders.core.Collections"><em>Collections</em></a>) &#8211; Core collection info</li>
+<li><strong>sandbox_collections</strong> (<a class="reference internal" href="#matgendb.builders.core.Collections" title="matgendb.builders.core.Collections"><em>Collections</em></a>) &#8211; Sandbox collection info</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.core.parse_fn_docstring">
+<code class="descname">parse_fn_docstring</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/core.html#parse_fn_docstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.core.parse_fn_docstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameter and return types from function&#8217;s docstring.</p>
+<p>Docstrings must use this format:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">:</span><span class="n">param</span> <span class="n">foo</span><span class="p">:</span> <span class="n">What</span> <span class="ow">is</span> <span class="n">foo</span>
+<span class="p">:</span><span class="nb">type</span> <span class="n">foo</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">:</span><span class="k">return</span><span class="p">:</span> <span class="n">What</span> <span class="ow">is</span> <span class="n">returned</span>
+<span class="p">:</span><span class="n">rtype</span><span class="p">:</span> <span class="n">double</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A map of names, each with keys &#8216;type&#8217; and &#8216;desc&#8217;.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple(dict)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.builders.incr">
+<span id="matgendb-builders-incr-module"></span><h2>matgendb.builders.incr module<a class="headerlink" href="#module-matgendb.builders.incr" title="Permalink to this headline">¶</a></h2>
+<p>Incremental builders.</p>
+<p>## High-level API ##</p>
+<p>The main class is TrackedQueryEngine. Usage example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.incr</span> <span class="k">import</span> <span class="o">*</span>
+<span class="n">qe</span> <span class="o">=</span> <span class="n">TrackedQueryEngine</span><span class="p">(</span><span class="n">track_operation</span><span class="o">=</span><span class="n">Operation</span><span class="o">.</span><span class="n">copy</span><span class="p">,</span>
+                        <span class="n">track_field</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="o">...</span><span class="n">other</span> <span class="n">kw</span><span class="o">...</span><span class="p">)</span>
+<span class="c1"># That&#39;s it! Use as you normally would.</span>
+<span class="c1"># The collection &#39;inside&#39; the qe will be tracked, so</span>
+<span class="c1"># when you are done using the QE instance, you can call either</span>
+<span class="n">qe</span><span class="o">.</span><span class="n">set_mark</span><span class="p">()</span>
+<span class="c1"># or</span>
+<span class="n">qe</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">set_mark</span><span class="p">()</span>
+<span class="c1"># Just be sure not to set the `qe.collection` attribute directly,</span>
+<span class="c1"># always use `qe.collection_name = &quot;new_name&quot; (which calls a setter)`.</span>
+</pre></div>
+</div>
+<p>## Low-level API ##</p>
+<p>The main classes are Mark and CollectionTracker. Usage example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.incr</span> <span class="k">import</span> <span class="o">*</span>
+<span class="n">collection</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">MongoClient</span><span class="p">()</span><span class="o">.</span><span class="n">mydb</span><span class="o">.</span><span class="n">mycollection</span>
+<span class="c1"># Init tracker</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">CollectionTracker</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<span class="c1"># Save mark for copy operation</span>
+<span class="n">tracker</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">Mark</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">Operation</span><span class="o">.</span><span class="n">copy</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">))</span>
+<span class="c1"># Retrieve mark for copy operation</span>
+<span class="n">mark</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">Operation</span><span class="o">.</span><span class="n">copy</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+<span class="c1"># Update mark position, and print mark</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mark</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="matgendb.builders.incr.CollectionTracker">
+<em class="property">class </em><code class="descname">CollectionTracker</code><span class="sig-paren">(</span><em>coll</em>, <em>create=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#CollectionTracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.CollectionTracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Track which records are &#8216;new&#8217; in a MongoDB collection
+with respect to a given operation.</p>
+<p>Constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>coll</strong> (<em>pymongo.collection.Collection</em>) &#8211; Collection to track</li>
+<li><strong>create</strong> (<em>bool</em>) &#8211; Create tracking collection, if not present. Otherwise the tracking
+collection can be manually created with <a class="reference internal" href="#matgendb.builders.incr.CollectionTracker.create" title="matgendb.builders.incr.CollectionTracker.create"><code class="xref py py-meth docutils literal"><span class="pre">create()</span></code></a>, later.
+If the collection is not created, <a class="reference internal" href="#matgendb.builders.incr.CollectionTracker.save" title="matgendb.builders.incr.CollectionTracker.save"><code class="xref py py-meth docutils literal"><span class="pre">save()</span></code></a> and <a class="reference internal" href="#matgendb.builders.incr.CollectionTracker.retrieve" title="matgendb.builders.incr.CollectionTracker.retrieve"><code class="xref py py-meth docutils literal"><span class="pre">retrieve()</span></code></a> will
+raise a <cite>NoTrackingCollection</cite> exception.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.builders.incr.CollectionTracker.TRACKING_NAME">
+<code class="descname">TRACKING_NAME</code><em class="property"> = 'tracker'</em><a class="headerlink" href="#matgendb.builders.incr.CollectionTracker.TRACKING_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sub-collection name, added as &#8221;.&lt;TRACKING_NAME&gt;&#8221; to the
+name of the target collection to create the tracking collection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.CollectionTracker.create">
+<code class="descname">create</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#CollectionTracker.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.CollectionTracker.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create tracking collection.
+Does nothing if tracking collection already exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.CollectionTracker.retrieve">
+<code class="descname">retrieve</code><span class="sig-paren">(</span><em>operation</em>, <em>field=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#CollectionTracker.retrieve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.CollectionTracker.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a position in this collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>operation</strong> (<a class="reference internal" href="#matgendb.builders.incr.Operation" title="matgendb.builders.incr.Operation"><code class="xref py py-class docutils literal"><span class="pre">Operation</span></code></a>) &#8211; Name of an operation</li>
+<li><strong>field</strong> (<em>str</em>) &#8211; Name of field for sort order</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The position for this operation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#matgendb.builders.incr.Mark" title="matgendb.builders.incr.Mark">Mark</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">NoTrackingCollection</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.CollectionTracker.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>mark</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#CollectionTracker.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.CollectionTracker.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a position in this collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mark</strong> (<a class="reference internal" href="#matgendb.builders.incr.Mark" title="matgendb.builders.incr.Mark"><em>Mark</em></a>) &#8211; The position to save</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">DBError, NoTrackingCollection</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.CollectionTracker.tracking_collection">
+<code class="descname">tracking_collection</code><a class="headerlink" href="#matgendb.builders.incr.CollectionTracker.tracking_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return current tracking collection, or None if it does not exist.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.CollectionTracker.tracking_collection_name">
+<code class="descname">tracking_collection_name</code><a class="headerlink" href="#matgendb.builders.incr.CollectionTracker.tracking_collection_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.builders.incr.DBError">
+<em class="property">exception </em><code class="descname">DBError</code><a class="reference internal" href="_modules/matgendb/builders/incr.html#DBError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.DBError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Generic database error.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.incr.Mark">
+<em class="property">class </em><code class="descname">Mark</code><span class="sig-paren">(</span><em>collection=None</em>, <em>operation=None</em>, <em>field=None</em>, <em>pos=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#Mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.Mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>The position in a collection for the last record that was
+processed by a given operation.</p>
+<p>Constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>collection</strong> (<em>pymongo.collection.Collection</em>) &#8211; Collection to track</li>
+<li><strong>operation</strong> (<a class="reference internal" href="#matgendb.builders.incr.Operation" title="matgendb.builders.incr.Operation"><em>Operation</em></a>) &#8211; Operation for this mark.</li>
+<li><strong>field</strong> (<em>str</em>) &#8211; Name of field to determine highest record</li>
+<li><strong>pos</strong> (<em>dict</em>) &#8211; Optional query for position</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.builders.incr.Mark.FLD_FLD">
+<code class="descname">FLD_FLD</code><em class="property"> = 'field'</em><a class="headerlink" href="#matgendb.builders.incr.Mark.FLD_FLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.Mark.FLD_MARK">
+<code class="descname">FLD_MARK</code><em class="property"> = 'mark'</em><a class="headerlink" href="#matgendb.builders.incr.Mark.FLD_MARK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.Mark.FLD_OP">
+<code class="descname">FLD_OP</code><em class="property"> = 'operation'</em><a class="headerlink" href="#matgendb.builders.incr.Mark.FLD_OP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.Mark.as_dict">
+<code class="descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#Mark.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.Mark.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation as a dict for JSON serialization.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="matgendb.builders.incr.Mark.from_dict">
+<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>coll</em>, <em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#Mark.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.Mark.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct from dict</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>coll</strong> &#8211; Collection for the mark</li>
+<li><strong>d</strong> (<em>dict</em>) &#8211; Input</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">new instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#matgendb.builders.incr.Mark" title="matgendb.builders.incr.Mark">Mark</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.Mark.pos">
+<code class="descname">pos</code><a class="headerlink" href="#matgendb.builders.incr.Mark.pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.Mark.query">
+<code class="descname">query</code><a class="headerlink" href="#matgendb.builders.incr.Mark.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>A mongdb query expression to find all records with higher values
+for this mark&#8217;s fields in the collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.Mark.to_dict">
+<code class="descname">to_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matgendb.builders.incr.Mark.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation as a dict for JSON serialization.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.Mark.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#Mark.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.Mark.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the position of the mark in the collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">this object, for chaining</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#matgendb.builders.incr.Mark" title="matgendb.builders.incr.Mark">Mark</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.builders.incr.NoTrackingCollection">
+<em class="property">exception </em><code class="descname">NoTrackingCollection</code><a class="reference internal" href="_modules/matgendb/builders/incr.html#NoTrackingCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.NoTrackingCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Raised if no tracking collection is present,
+but some operation is requested on that collection.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.incr.Operation">
+<em class="property">class </em><code class="descname">Operation</code><a class="reference internal" href="_modules/matgendb/builders/incr.html#Operation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.Operation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<p>Enumeration of collection operations.</p>
+<dl class="attribute">
+<dt id="matgendb.builders.incr.Operation.build">
+<code class="descname">build</code><em class="property"> = &lt;Operation.build: 2&gt;</em><a class="headerlink" href="#matgendb.builders.incr.Operation.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.Operation.copy">
+<code class="descname">copy</code><em class="property"> = &lt;Operation.copy: 1&gt;</em><a class="headerlink" href="#matgendb.builders.incr.Operation.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.Operation.other">
+<code class="descname">other</code><em class="property"> = &lt;Operation.other: 99&gt;</em><a class="headerlink" href="#matgendb.builders.incr.Operation.other" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.incr.TrackedCollection">
+<em class="property">class </em><code class="descname">TrackedCollection</code><span class="sig-paren">(</span><em>coll</em>, <em>operation=None</em>, <em>field=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackedCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackedCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Wrapper on a pymongo collection to make <a href="#id1"><span class="problematic" id="id2">`</span></a>find&#8217; operations start
+after the &#8220;tracking&#8221; mark.</p>
+<dl class="method">
+<dt id="matgendb.builders.incr.TrackedCollection.findall">
+<code class="descname">findall</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackedCollection.findall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackedCollection.findall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call non-tracked <code class="docutils literal"><span class="pre">find()</span></code> operation with same args.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.TrackedCollection.set_mark">
+<code class="descname">set_mark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackedCollection.set_mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackedCollection.set_mark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.TrackedCollection.set_tracking">
+<code class="descname">set_tracking</code><span class="sig-paren">(</span><em>is_tracked</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackedCollection.set_tracking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackedCollection.set_tracking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set whether find() transparently starts from after the
+mark (True), or whether it ignores the tracking info and acts like
+a normal <code class="docutils literal"><span class="pre">find()</span></code> operation (False).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>is_tracked</strong> &#8211; Whether to use tracking info</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.TrackedCollection.tracked_find">
+<code class="descname">tracked_find</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackedCollection.tracked_find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackedCollection.tracked_find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replacement for regular <code class="docutils literal"><span class="pre">find()</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.incr.TrackedQueryEngine">
+<em class="property">class </em><code class="descname">TrackedQueryEngine</code><span class="sig-paren">(</span><em>track_operation=None</em>, <em>track_field=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackedQueryEngine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackedQueryEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><code class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></code></a>, <a class="reference internal" href="#matgendb.builders.incr.TrackingInterface" title="matgendb.builders.incr.TrackingInterface"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.incr.TrackingInterface</span></code></a></p>
+<p>A QueryEngine subclass that only examines records
+past the last &#8216;mark&#8217; that was set for the
+given operation and field.</p>
+<p>The concrete result is that for an object, <code class="docutils literal"><span class="pre">t</span></code>, the
+<code class="docutils literal"><span class="pre">t.find()</span></code> method will start <em>past</em> the &#8220;mark&#8221;.</p>
+<p>To go around this transparent change, use the <code class="docutils literal"><span class="pre">t.findall</span></code>
+instead.</p>
+<p>Constructor.</p>
+<dl class="attribute">
+<dt id="matgendb.builders.incr.TrackedQueryEngine.collection_name">
+<code class="descname">collection_name</code><a class="headerlink" href="#matgendb.builders.incr.TrackedQueryEngine.collection_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override base class to make this a tracked collection.
+See <code class="xref py py-meth docutils literal"><span class="pre">&#64;collection_name.setter()</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.incr.TrackedQueryEngine.set_mark">
+<code class="descname">set_mark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackedQueryEngine.set_mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackedQueryEngine.set_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#matgendb.builders.incr.TrackingInterface.set_mark" title="matgendb.builders.incr.TrackingInterface.set_mark"><code class="xref py py-meth docutils literal"><span class="pre">TrackingInterface.set_mark()</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.incr.TrackedQueryEngine.tracking">
+<code class="descname">tracking</code><a class="headerlink" href="#matgendb.builders.incr.TrackedQueryEngine.tracking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether tracking is really enabled.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.incr.TrackingInterface">
+<em class="property">class </em><code class="descname">TrackingInterface</code><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackingInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackingInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="matgendb.builders.incr.TrackingInterface.set_mark">
+<code class="descname">set_mark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#TrackingInterface.set_mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.TrackingInterface.set_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the mark to the current end of the collection. This is saved in the database
+so it is available for later operations.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.incr.UnTrackedQueryEngine">
+<em class="property">class </em><code class="descname">UnTrackedQueryEngine</code><span class="sig-paren">(</span><em>host='127.0.0.1'</em>, <em>port=27017</em>, <em>database='vasp'</em>, <em>user=None</em>, <em>password=None</em>, <em>collection='tasks'</em>, <em>aliases_config=None</em>, <em>default_properties=None</em>, <em>query_post=None</em>, <em>result_post=None</em>, <em>connection=None</em>, <em>replicaset=None</em>, <em>**ignore</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#UnTrackedQueryEngine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.UnTrackedQueryEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><code class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></code></a>, <a class="reference internal" href="#matgendb.builders.incr.TrackingInterface" title="matgendb.builders.incr.TrackingInterface"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.incr.TrackingInterface</span></code></a></p>
+<p>A QE that has the interface for tracking, but does nothing for it.
+Allows for callers to do same operations regardless of whether tracking is
+activated or not.</p>
+<p>Constructor.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">host (str): Hostname of database machine.
+port (int): Port for db access.
+database (str): Name of database to access.
+user (str): User for db access. <cite>None</cite> means no authentication.
+password (str): Password for db access. <cite>None</cite> means no auth.
+collection (str): Collection to query. Defaults to &#8220;tasks&#8221;.
+connection (pymongo.Connection): If given, ignore &#8216;host&#8217; and &#8216;port&#8217;</p>
+<blockquote>
+<div>and use existing connection.</div></blockquote>
+<dl class="last docutils">
+<dt>aliases_config(dict):</dt>
+<dd><p class="first">An alias dict to use. Defaults to None, which means the default
+aliases defined in &#8220;aliases.json&#8221; is used. The aliases config
+should be of the following format:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;aliases&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;e_above_hull&quot;</span><span class="p">:</span> <span class="s2">&quot;analysis.e_above_hull&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="s2">&quot;output.final_energy&quot;</span><span class="p">,</span>
+        <span class="o">....</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;defaults&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;successful&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="last docutils">
+<dt>aliases (dict): Keys are the incoming property, values are the</dt>
+<dd>property it will be translated to. This makes it easier
+to organize the doc format in a way that is different from the
+query format.</dd>
+<dt>defaults (dict): Criteria that should be applied</dt>
+<dd>by default to all queries. For example, a collection may
+contain data from both successful and unsuccessful runs but
+for most querying purposes, you may want just successful runs
+only. Note that defaults do not affect explicitly specified
+criteria, i.e., if you suppy a query for {&#8220;state&#8221;: &#8220;killed&#8221;},
+this will override the default for {&#8220;state&#8221;: &#8220;successful&#8221;}.</dd>
+</dl>
+</dd>
+<dt>default_properties (list): Property names (strings) to use by</dt>
+<dd>default, if no <cite>properties</cite> are given to query().</dd>
+<dt>query_post (list): Functions to post-process the <cite>criteria</cite> passed</dt>
+<dd>to <cite>query()</cite>, after aliases are resolved.
+Function takes two args, the criteria dict and list of
+result properties. Both may be modified in-place.</dd>
+<dt>result_post (list): Functions to post-process the cursor records.</dt>
+<dd>Function takes one arg, the document for the current record,
+that is modified in-place.</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
+<dt id="matgendb.builders.incr.UnTrackedQueryEngine.set_mark">
+<code class="descname">set_mark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/incr.html#UnTrackedQueryEngine.set_mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.incr.UnTrackedQueryEngine.set_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does nothing and returns None.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.builders.schema">
+<span id="matgendb-builders-schema-module"></span><h2>matgendb.builders.schema module<a class="headerlink" href="#module-matgendb.builders.schema" title="Permalink to this headline">¶</a></h2>
+<p>Utility module for schema validation, for builder testing</p>
+<dl class="class">
+<dt id="matgendb.builders.schema.HasMeta">
+<em class="property">class </em><code class="descname">HasMeta</code><span class="sig-paren">(</span><em>meta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#HasMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.HasMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Mix-in class to handle metadata.
+Adds the &#8216;meta&#8217; class attribute.</p>
+<p>Create with new metadata (which may be empty).
+The metadata should be dict-like (i.e. __getitem__ and __setitem__) or
+be a string in the format &#8220;name1: value1, name2: value2, ...&#8221;, where the
+white space is optional.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>meta</strong> (<em>str or dict</em>) &#8211; Init with this metadata.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="matgendb.builders.schema.HasMeta.FIELD_SEP">
+<code class="descname">FIELD_SEP</code><em class="property"> = ','</em><a class="headerlink" href="#matgendb.builders.schema.HasMeta.FIELD_SEP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.schema.HasMeta.KV_SEP">
+<code class="descname">KV_SEP</code><em class="property"> = ':'</em><a class="headerlink" href="#matgendb.builders.schema.HasMeta.KV_SEP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.schema.HasMeta.add_meta">
+<code class="descname">add_meta</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#HasMeta.add_meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.HasMeta.add_meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.schema.Scalar">
+<em class="property">class </em><code class="descname">Scalar</code><span class="sig-paren">(</span><em>typecode</em>, <em>optional=False</em>, <em>meta=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#Scalar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.Scalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.builders.schema.HasMeta" title="matgendb.builders.schema.HasMeta"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.schema.HasMeta</span></code></a></p>
+<dl class="attribute">
+<dt id="matgendb.builders.schema.Scalar.JSTYPES">
+<code class="descname">JSTYPES</code><em class="property"> = {'datetime': 'string', 'string': 'string', 'float': 'number', 'null': 'null', 'int': 'integer', 'bool': 'boolean', 'date': 'string'}</em><a class="headerlink" href="#matgendb.builders.schema.Scalar.JSTYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.schema.Scalar.TYPES">
+<code class="descname">TYPES</code><em class="property"> = {'object': &lt;function Scalar.&lt;lambda&gt;&gt;, 'array': &lt;function Scalar.&lt;lambda&gt;&gt;, 'datetime': &lt;function _is_datetime&gt;, 'string': &lt;function Scalar.&lt;lambda&gt;&gt;, 'float': &lt;function Scalar.&lt;lambda&gt;&gt;, 'null': &lt;function Scalar.&lt;lambda&gt;&gt;, 'date': &lt;function _is_datetime&gt;, 'bool': &lt;function Scalar.&lt;lambda&gt;&gt;, 'int': &lt;function Scalar.&lt;lambda&gt;&gt;}</em><a class="headerlink" href="#matgendb.builders.schema.Scalar.TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.schema.Scalar.jstype">
+<code class="descname">jstype</code><a class="headerlink" href="#matgendb.builders.schema.Scalar.jstype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return JavaScript type.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matgendb.builders.schema.Schema">
+<em class="property">class </em><code class="descname">Schema</code><span class="sig-paren">(</span><em>schema</em>, <em>optional=False</em>, <em>meta=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#Schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.Schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.builders.schema.HasMeta" title="matgendb.builders.schema.HasMeta"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.schema.HasMeta</span></code></a></p>
+<dl class="attribute">
+<dt id="matgendb.builders.schema.Schema.IS_DICT">
+<code class="descname">IS_DICT</code><em class="property"> = 1</em><a class="headerlink" href="#matgendb.builders.schema.Schema.IS_DICT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.schema.Schema.IS_LIST">
+<code class="descname">IS_LIST</code><em class="property"> = 0</em><a class="headerlink" href="#matgendb.builders.schema.Schema.IS_LIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matgendb.builders.schema.Schema.IS_SCALAR">
+<code class="descname">IS_SCALAR</code><em class="property"> = 2</em><a class="headerlink" href="#matgendb.builders.schema.Schema.IS_SCALAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.schema.Schema.json_schema">
+<code class="descname">json_schema</code><span class="sig-paren">(</span><em>**add_keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#Schema.json_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.Schema.json_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert our compact schema representation to the standard, but more verbose,
+JSON Schema standard.</p>
+<p>Example JSON schema: <a class="reference external" href="http://json-schema.org/examples.html">http://json-schema.org/examples.html</a>
+Core standard: <a class="reference external" href="http://json-schema.org/latest/json-schema-core.html">http://json-schema.org/latest/json-schema-core.html</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>add_keys</strong> &#8211; Key, default value pairs to add in,
+e.g. description=&#8221;&#8220;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.schema.Schema.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><em>doc</em>, <em>path='(root)'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#Schema.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.Schema.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.builders.schema.SchemaError">
+<em class="property">exception </em><code class="descname">SchemaError</code><a class="reference internal" href="_modules/matgendb/builders/schema.html#SchemaError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.SchemaError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Base class of all errors raised by schema creation or validation.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.builders.schema.SchemaParseError">
+<em class="property">exception </em><code class="descname">SchemaParseError</code><a class="reference internal" href="_modules/matgendb/builders/schema.html#SchemaParseError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.SchemaParseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.builders.schema.SchemaError" title="matgendb.builders.schema.SchemaError"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.schema.SchemaError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.builders.schema.SchemaPathError">
+<em class="property">exception </em><code class="descname">SchemaPathError</code><a class="reference internal" href="_modules/matgendb/builders/schema.html#SchemaPathError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.SchemaPathError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.builders.schema.SchemaError" title="matgendb.builders.schema.SchemaError"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.schema.SchemaError</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="matgendb.builders.schema.SchemaTypeError">
+<em class="property">exception </em><code class="descname">SchemaTypeError</code><span class="sig-paren">(</span><em>typename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#SchemaTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.SchemaTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#matgendb.builders.schema.SchemaError" title="matgendb.builders.schema.SchemaError"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.schema.SchemaError</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.schema.add_schemas">
+<code class="descname">add_schemas</code><span class="sig-paren">(</span><em>path</em>, <em>ext='json'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#add_schemas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.add_schemas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add schemas from files in &#8216;path&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>str</em>) &#8211; Path with schema files. Schemas are named by their file,
+with the extension stripped. e.g., if path is &#8220;/tmp/foo&#8221;,
+then the schema in &#8220;/tmp/foo/bar.json&#8221; will be named &#8220;bar&#8221;.</li>
+<li><strong>ext</strong> (<em>str</em>) &#8211; File extension that identifies schema files</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raise:</th><td class="field-body"><p class="first last">SchemaPathError, if no such path. SchemaParseError, if a schema
+is not valid JSON.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.schema.get_schema">
+<code class="descname">get_schema</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#get_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.get_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get schema by name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) &#8211; name of schema</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">new schema</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#matgendb.builders.schema.Schema" title="matgendb.builders.schema.Schema">Schema</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">KeyError, if schema is not found</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.schema.load_schema">
+<code class="descname">load_schema</code><span class="sig-paren">(</span><em>file_or_fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/schema.html#load_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.schema.load_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load schema from file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_or_fp</strong> (<em>str, file</em>) &#8211; File name or file object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">IOError if file cannot be opened or read, ValueError if
+file is not valid JSON or JSON is not a valid schema.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.builders.util">
+<span id="matgendb-builders-util-module"></span><h2>matgendb.builders.util module<a class="headerlink" href="#module-matgendb.builders.util" title="Permalink to this headline">¶</a></h2>
+<p>Common utility functions for the database functions</p>
+<dl class="function">
+<dt id="matgendb.builders.util.get_builder_log">
+<code class="descname">get_builder_log</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/util.html#get_builder_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.util.get_builder_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a logging object, in the right place in the
+hierarchy, for a given builder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) &#8211; Builder name, e.g. &#8216;my_builder&#8217;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New logger</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">logging.Logger</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.util.get_schema_dir">
+<code class="descname">get_schema_dir</code><span class="sig-paren">(</span><em>db_version=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/util.html#get_schema_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.util.get_schema_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get path to directory with schemata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>db_version</strong> (<em>int</em>) &#8211; Version of the database</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Path</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.util.get_schema_file">
+<code class="descname">get_schema_file</code><span class="sig-paren">(</span><em>db_version=1</em>, <em>db='mg_core'</em>, <em>collection='materials'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/util.html#get_schema_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.util.get_schema_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get file with appropriate schema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>db_version</strong> (<em>int</em>) &#8211; Version of the database</li>
+<li><strong>db</strong> (<em>str</em>) &#8211; Name of database, e.g. &#8216;mg_core&#8217;</li>
+<li><strong>collection</strong> (<em>str</em>) &#8211; Name of collection, e.g. &#8216;materials&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">File with schema</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">file</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body"><p class="first last">IOError, if file is not found or not accessible</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="matgendb.builders.util.get_test_dir">
+<code class="descname">get_test_dir</code><span class="sig-paren">(</span><em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/util.html#get_test_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.util.get_test_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get path to subdirectory with test files related
+to a given class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; Name of class</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Path</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.builders">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-matgendb.builders" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">matgendb.builders package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders.core">matgendb.builders.core module</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders.incr">matgendb.builders.incr module</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders.schema">matgendb.builders.schema module</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders.util">matgendb.builders.util module</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="matgendb.html">matgendb package</a><ul>
+      <li>Previous: <a href="matgendb.alchemy.html" title="previous chapter">matgendb.alchemy package</a></li>
+      <li>Next: <a href="matgendb.builders.examples.html" title="next chapter">matgendb.builders.examples package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/matgendb.builders.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

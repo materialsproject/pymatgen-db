@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb.builders.examples package &#8212; pymatgen-db 0.6.4 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="pymatgen-db 0.6.4 documentation" href="index.html" />
+    <link rel="up" title="matgendb.builders package" href="matgendb.builders.html" />
+    <link rel="next" title="matgendb.vv package" href="matgendb.vv.html" />
+    <link rel="prev" title="matgendb.builders package" href="matgendb.builders.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="matgendb.vv.html" title="matgendb.vv package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="matgendb.builders.html" title="matgendb.builders package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="matgendb.html" >matgendb package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="matgendb.builders.html" accesskey="U">matgendb.builders package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="matgendb-builders-examples-package">
+<h1>matgendb.builders.examples package<a class="headerlink" href="#matgendb-builders-examples-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-matgendb.builders.examples.copy_builder">
+<span id="matgendb-builders-examples-copy-builder-module"></span><h2>matgendb.builders.examples.copy_builder module<a class="headerlink" href="#module-matgendb.builders.examples.copy_builder" title="Permalink to this headline">¶</a></h2>
+<p>Simple &#8220;copy&#8221; builder.</p>
+<p>Copies from one collection to another.
+With the optional incremental feature, running twice will only copy the new records, i.e.
+running twice in succession will cause the second run to do nothing.</p>
+<p>To run:</p>
+<p>mgbuild</p>
+<dl class="class">
+<dt id="matgendb.builders.examples.copy_builder.CopyBuilder">
+<em class="property">class </em><code class="descname">CopyBuilder</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/copy_builder.html#CopyBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.copy_builder.CopyBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="matgendb.builders.html#matgendb.builders.core.Builder" title="matgendb.builders.core.Builder"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></a></p>
+<p>Copy from one MongoDB collection to another.</p>
+<dl class="method">
+<dt id="matgendb.builders.examples.copy_builder.CopyBuilder.get_items">
+<code class="descname">get_items</code><span class="sig-paren">(</span><em>source=None</em>, <em>target=None</em>, <em>crit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/copy_builder.html#CopyBuilder.get_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.copy_builder.CopyBuilder.get_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy records from source to target collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>source</strong> (<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><em>QueryEngine</em></a>) &#8211; Input collection</li>
+<li><strong>target</strong> (<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><em>QueryEngine</em></a>) &#8211; Output collection</li>
+<li><strong>crit</strong> (<em>dict</em>) &#8211; Filter criteria, e.g. &#8220;{ &#8216;flag&#8217;: True }&#8221;.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.examples.copy_builder.CopyBuilder.process_item">
+<code class="descname">process_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/copy_builder.html#CopyBuilder.process_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.copy_builder.CopyBuilder.process_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.builders.examples.file_builders">
+<span id="matgendb-builders-examples-file-builders-module"></span><h2>matgendb.builders.examples.file_builders module<a class="headerlink" href="#module-matgendb.builders.examples.file_builders" title="Permalink to this headline">¶</a></h2>
+<p>Example builders that read or write files.</p>
+<dl class="class">
+<dt id="matgendb.builders.examples.file_builders.FileCounter">
+<em class="property">class </em><code class="descname">FileCounter</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/file_builders.html#FileCounter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.file_builders.FileCounter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="matgendb.builders.html#matgendb.builders.core.Builder" title="matgendb.builders.core.Builder"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></a></p>
+<p>Count lines and characters in a file.</p>
+<dl class="method">
+<dt id="matgendb.builders.examples.file_builders.FileCounter.finalize">
+<code class="descname">finalize</code><span class="sig-paren">(</span><em>errors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/file_builders.html#FileCounter.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.file_builders.FileCounter.finalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.examples.file_builders.FileCounter.get_items">
+<code class="descname">get_items</code><span class="sig-paren">(</span><em>input_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/file_builders.html#FileCounter.get_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.file_builders.FileCounter.get_items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.examples.file_builders.FileCounter.get_parameters">
+<code class="descname">get_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/file_builders.html#FileCounter.get_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.file_builders.FileCounter.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.examples.file_builders.FileCounter.process_item">
+<code class="descname">process_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/file_builders.html#FileCounter.process_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.file_builders.FileCounter.process_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.builders.examples.maxvalue_builder">
+<span id="matgendb-builders-examples-maxvalue-builder-module"></span><h2>matgendb.builders.examples.maxvalue_builder module<a class="headerlink" href="#module-matgendb.builders.examples.maxvalue_builder" title="Permalink to this headline">¶</a></h2>
+<p>Build a derived collection with the maximum
+value from each &#8216;group&#8217; defined in the source
+collection.</p>
+<dl class="class">
+<dt id="matgendb.builders.examples.maxvalue_builder.MaxValueBuilder">
+<em class="property">class </em><code class="descname">MaxValueBuilder</code><span class="sig-paren">(</span><em>ncores=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/maxvalue_builder.html#MaxValueBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.maxvalue_builder.MaxValueBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="matgendb.builders.html#matgendb.builders.core.Builder" title="matgendb.builders.core.Builder"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></a></p>
+<p>Example of incremental builder that requires
+some custom logic for incremental case.</p>
+<p>Create new builder for threaded or multiprocess execution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ncores</strong> (<em>int</em>) &#8211; Desired number of threads or processes to run</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">ValueError for bad &#8216;config&#8217; arg</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matgendb.builders.examples.maxvalue_builder.MaxValueBuilder.finalize">
+<code class="descname">finalize</code><span class="sig-paren">(</span><em>errs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/maxvalue_builder.html#MaxValueBuilder.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.maxvalue_builder.MaxValueBuilder.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update target collection with calculated maximum values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.examples.maxvalue_builder.MaxValueBuilder.get_items">
+<code class="descname">get_items</code><span class="sig-paren">(</span><em>source=None</em>, <em>target=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/maxvalue_builder.html#MaxValueBuilder.get_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.maxvalue_builder.MaxValueBuilder.get_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all records from source collection to add to target.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>source</strong> (<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><em>QueryEngine</em></a>) &#8211; Input collection</li>
+<li><strong>target</strong> (<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><em>QueryEngine</em></a>) &#8211; Output collection</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="matgendb.builders.examples.maxvalue_builder.MaxValueBuilder.process_item">
+<code class="descname">process_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/maxvalue_builder.html#MaxValueBuilder.process_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.maxvalue_builder.MaxValueBuilder.process_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate new maximum value for each group,
+for &#8220;new&#8221; items only.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-matgendb.builders.examples">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-matgendb.builders.examples" title="Permalink to this headline">¶</a></h2>
+<p>Description.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">matgendb.builders.examples package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders.examples.copy_builder">matgendb.builders.examples.copy_builder module</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders.examples.file_builders">matgendb.builders.examples.file_builders module</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders.examples.maxvalue_builder">matgendb.builders.examples.maxvalue_builder module</a></li>
+<li><a class="reference internal" href="#module-matgendb.builders.examples">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="matgendb.html">matgendb package</a><ul>
+  <li><a href="matgendb.builders.html">matgendb.builders package</a><ul>
+      <li>Previous: <a href="matgendb.builders.html" title="previous chapter">matgendb.builders package</a></li>
+      <li>Next: <a href="matgendb.vv.html" title="next chapter">matgendb.vv package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/matgendb.builders.examples.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

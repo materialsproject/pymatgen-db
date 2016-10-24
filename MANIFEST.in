@@ -1,6 +1,0 @@
-include *.rst LICENSE *.cfg ez_setup.py VERSION
-recursive-include matgendb *
-recursive-include scripts *
-prune */*/tests
-prune */*/*/tests
-prune *.psd

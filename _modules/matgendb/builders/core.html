@@ -1,0 +1,641 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>matgendb.builders.core &#8212; pymatgen-db 0.6.4 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="top" title="pymatgen-db 0.6.4 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for matgendb.builders.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Shared code for builders.</span>
+
+<span class="sd">For developers implementing a new builder,</span>
+<span class="sd">you should inherit from :class:`Builder`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Dan Gunter &lt;dkgunter@lbl.gov&gt;&#39;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s1">&#39;5/29/13&#39;</span>
+
+<span class="c1">## Imports</span>
+
+<span class="c1"># system</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="c1"># local</span>
+<span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">schema</span><span class="p">,</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">matgendb</span> <span class="k">import</span> <span class="n">util</span> <span class="k">as</span> <span class="n">dbutil</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="c1">## Logging</span>
+
+<span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;core&quot;</span><span class="p">)</span>
+
+<span class="c1">## Exceptions</span>
+
+
+<div class="viewcode-block" id="BuildError"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.BuildError">[docs]</a><span class="k">class</span> <span class="nc">BuildError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">who</span><span class="p">,</span> <span class="n">why</span><span class="p">):</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Builder </span><span class="si">{}</span><span class="s2"> failed: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">who</span><span class="p">,</span> <span class="n">why</span><span class="p">)</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">)</span></div>
+
+<span class="c1">## Versioning (experimental)</span>
+
+<span class="n">DB_VERSION</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1">## Functions</span>
+
+
+<div class="viewcode-block" id="parse_fn_docstring"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.parse_fn_docstring">[docs]</a><span class="k">def</span> <span class="nf">parse_fn_docstring</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get parameter and return types from function&#39;s docstring.</span>
+
+<span class="sd">    Docstrings must use this format::</span>
+
+<span class="sd">       :param foo: What is foo</span>
+<span class="sd">       :type foo: int</span>
+<span class="sd">       :return: What is returned</span>
+<span class="sd">       :rtype: double</span>
+
+<span class="sd">    :return: A map of names, each with keys &#39;type&#39; and &#39;desc&#39;.</span>
+<span class="sd">    :rtype: tuple(dict)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">__doc__</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">return_</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+    <span class="n">param_order</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:param&quot;</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># skip &#39;param &#39;</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;desc&#39;</span><span class="p">:</span> <span class="n">desc</span><span class="o">.</span><span class="n">strip</span><span class="p">()}</span>
+            <span class="n">param_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:type&quot;</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># skip &#39;type &#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;type&#39; without &#39;param&#39; for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:return&quot;</span><span class="p">):</span>
+            <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">return_</span><span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:rtype&quot;</span><span class="p">):</span>
+            <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">return_</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">params</span> <span class="c1">#, return_</span></div>
+
+<span class="c1">## Classes</span>
+
+
+<div class="viewcode-block" id="Collections"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Collections">[docs]</a><span class="k">class</span> <span class="nc">Collections</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interface to normalized names for collections.</span>
+<span class="sd">    </span>
+<span class="sd">    After initialization with a MongoDB database and optional parameters,</span>
+<span class="sd">    you can access collections in `known_collections` as attributes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#: Collection names that are accessible as attributes</span>
+    <span class="c1">#: of an instance of this class</span>
+    <span class="n">known_collections</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;tasks&#39;</span><span class="p">,</span> <span class="s1">&#39;materials&#39;</span><span class="p">,</span> <span class="s1">&#39;diffraction_patterns&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;electrodes&#39;</span><span class="p">,</span> <span class="s1">&#39;conversion_electrodes&#39;</span><span class="p">,</span> <span class="s1">&#39;bandstructures&#39;</span><span class="p">,</span> <span class="s1">&#39;icsd&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;phase_diagrams&#39;</span><span class="p">,</span> <span class="s1">&#39;brototypes&#39;</span><span class="p">,</span> <span class="s1">&#39;electronic_structure&#39;</span><span class="p">]</span>
+
+    <span class="n">MIN_VER</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">MAX_VER</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">task_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set collections from database.</span>
+
+<span class="sd">        :param db: MongoDB database, but really anything that acts like a dict. If None, it will be ignored.</span>
+<span class="sd">        :type db: dict-like object</span>
+<span class="sd">        :param version: Version of naming scheme for the collections</span>
+<span class="sd">        :type version: int</span>
+<span class="sd">        :param prefix: Prefix string to put before collection names, e.g. &quot;dahn&quot;. Full</span>
+<span class="sd">                       collection name will be &lt;prefix&gt;.&lt;name&gt;; don&#39;t include &#39;.&#39; in the input.</span>
+<span class="sd">        :type prefix: str</span>
+<span class="sd">        :param task_suffix: Add this suffix to the tasks collection. Used for merged collections for sandboxes.</span>
+<span class="sd">        :type task_suffix: str</span>
+<span class="sd">        :raise: ValueError if `version` is not known</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_VER</span> <span class="o">&lt;=</span> <span class="n">version</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_VER</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad version (</span><span class="si">{v:d}</span><span class="s2">) not in range </span><span class="si">{v0}</span><span class="s2"> .. </span><span class="si">{v1}</span><span class="s2"> &quot;</span><span class="o">.</span>
+                             <span class="nb">format</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_VER</span><span class="p">,</span> <span class="n">v1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_VER</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coll</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_collections</span><span class="p">:</span>
+                <span class="n">full_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">prefix</span> <span class="k">else</span> <span class="n">name</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;tasks&#39;</span> <span class="ow">and</span> <span class="n">task_suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">full_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">full_name</span><span class="p">,</span> <span class="n">task_suffix</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_coll</span><span class="p">[</span><span class="n">full_name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">db</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_db</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known_collections</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_db</span> <span class="o">=</span> <span class="n">db</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">:</span>
+            <span class="n">coll_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+            <span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coll</span><span class="p">[</span><span class="n">coll_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">coll</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_coll</span><span class="p">[</span><span class="n">coll_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="p">[</span><span class="n">coll_name</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">coll</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Collections.get_collection_name"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Collections.get_collection_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_collection_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alias</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">database</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the current database object.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Current database object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db</span></div>
+
+
+<div class="viewcode-block" id="merge_tasks"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.merge_tasks">[docs]</a><span class="k">def</span> <span class="nf">merge_tasks</span><span class="p">(</span><span class="n">core_collections</span><span class="p">,</span> <span class="n">sandbox_collections</span><span class="p">,</span> <span class="n">id_prefix</span><span class="p">,</span> <span class="n">new_tasks</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">wipe</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Merge core and sandbox collections into a temporary collection in the sandbox.</span>
+
+<span class="sd">    :param core_collections: Core collection info</span>
+<span class="sd">    :type core_collections: Collections</span>
+<span class="sd">    :param sandbox_collections: Sandbox collection info</span>
+<span class="sd">    :type sandbox_collections: Collections</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">sandbox_collections</span><span class="p">)</span>
+    <span class="c1"># create/clear target collection</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">database</span><span class="p">[</span><span class="n">new_tasks</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">wipe</span><span class="p">:</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;merge_tasks.wipe.begin&quot;</span><span class="p">)</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">merged</span><span class="o">.</span><span class="n">database</span><span class="p">[</span><span class="s1">&#39;counter&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;merge_tasks.wipe.end&quot;</span><span class="p">)</span>
+    <span class="c1"># perform the merge</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">core_collections</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">find</span><span class="p">():</span>
+        <span class="n">batch</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span><span class="p">:</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">batch</span><span class="p">:</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">sandbox_collections</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">find</span><span class="p">():</span>
+        <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;task_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_prefix</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;task_id&#39;</span><span class="p">])</span>
+        <span class="n">batch</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span> <span class="o">==</span> <span class="n">batch_size</span><span class="p">:</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">batch</span><span class="p">:</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HasExamples"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.HasExamples">[docs]</a><span class="k">class</span> <span class="nc">HasExamples</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mix-in class for checking the output of a builder.</span>
+
+<span class="sd">    This is a way to get some static checking of the schema of inserted documents,</span>
+<span class="sd">    without imposing the burden of schema-checking every single document.</span>
+<span class="sd">    The check is static in the sense that it will only be run by the unit tests.</span>
+
+<span class="sd">     See the</span>
+<span class="sd">    `pymatpro.db.builders.test.test_porous_builder` module for an example of</span>
+<span class="sd">    how to use this to perform unit tests.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HasExamples.examples"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.HasExamples.examples">[docs]</a>    <span class="k">def</span> <span class="nf">examples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return example document(s) for collection(s).</span>
+
+<span class="sd">        This must be implemented in subclasses.</span>
+
+<span class="sd">        :return: List of pairs (doc, collection_name)</span>
+<span class="sd">        :rtype: list(dict,str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="HasExamples.validate_examples"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.HasExamples.validate_examples">[docs]</a>    <span class="k">def</span> <span class="nf">validate_examples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fail_fn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check the examples against the schema.</span>
+
+<span class="sd">        :param fail_fn: Pass failure messages to this function</span>
+<span class="sd">        :type fail_fn: function(str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">collection</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">examples</span><span class="p">():</span>
+            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;validating example in collection </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">collection</span><span class="p">))</span>
+            <span class="n">sch</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>  <span class="c1"># with more err. checking</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">sch</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;validation result: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;OK&quot;</span> <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">result</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">fail_fn</span><span class="p">(</span><span class="s2">&quot;Failed to validate sample document: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="Builder"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder">[docs]</a><span class="k">class</span> <span class="nc">Builder</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract base class for all builders</span>
+
+<span class="sd">    To implement a new builder, inherit from this class and</span>
+<span class="sd">    define the :meth:`get_items` and :meth:`process_item` methods.</span>
+<span class="sd">    See the online documentation for details.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncores</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create new builder for threaded or multiprocess execution.</span>
+
+<span class="sd">        :param ncores: Desired number of threads or processes to run</span>
+<span class="sd">        :type ncores: int</span>
+<span class="sd">        :raise: ValueError for bad &#39;config&#39; arg</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sequential</span> <span class="o">=</span> <span class="p">(</span><span class="n">ncores</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sequential</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_seq</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_seq</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mgr</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncores</span> <span class="o">=</span> <span class="n">ncores</span> <span class="k">if</span> <span class="n">ncores</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">15</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_parallel_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_parallel_multiprocess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="n">BuilderStatus</span><span class="p">(</span><span class="n">ncores</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="c1"># ----------------------------</span>
+    <span class="c1"># Override these in subclasses</span>
+    <span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="Builder.get_parameters"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder.get_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return key/value pairs that will be passed to get_items().</span>
+
+<span class="sd">        This is an alternative to the use of special docstrings as described</span>
+<span class="sd">        in :meth:`get_items`.</span>
+
+<span class="sd">        If the type of the argument is &#39;QueryEngine&#39;, then the driver program</span>
+<span class="sd">        will add options for, and create, a matgendb.query_engine.QueryEngine</span>
+<span class="sd">        instance. The value given for this argument will be interpreted as</span>
+<span class="sd">        the MongoDB collection name.</span>
+
+<span class="sd">        Some other basic Python types -- list, dict, int, float -- are</span>
+<span class="sd">        automatically parsed. If an empty value is supplied for these, then</span>
+<span class="sd">        None will be passed.</span>
+
+<span class="sd">        :return: {&#39;param_name&#39;: {&#39;type&#39;: &#39;param_type&#39;, &#39;desc&#39;:&#39;description&#39;},</span>
+<span class="sd">                  &#39;param2_name&#39;: {&#39;type&#39;: &#39;param2_type&#39;, &#39;desc&#39;:&#39;descr2&#39;}, ..}</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># means: use docstring</span></div>
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="Builder.get_items"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder.get_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform one-time setup at the top of a run, returning</span>
+<span class="sd">        an iterator on items to use as input.</span>
+
+<span class="sd">        If get_parameters() doesn&#39;t return None, this method is used to</span>
+<span class="sd">        discover the names and types of this function&#39;s parameters.</span>
+<span class="sd">        Otherwise, the docstring of this function is used.</span>
+<span class="sd">        This docstring must use the &#39;:&#39; version of the restructured</span>
+<span class="sd">        text style. For example::</span>
+
+<span class="sd">            class MyBuilder(Builder):</span>
+<span class="sd">                def get_items(self, source=None, target=None):</span>
+<span class="sd">                &#39;&#39;&#39;</span>
+<span class="sd">                :param source: The input porous materials collection</span>
+<span class="sd">                :type source: QueryEngine</span>
+<span class="sd">                :param target: The output materials collection</span>
+<span class="sd">                :type target: QueryEngine</span>
+<span class="sd">                &#39;&#39;&#39;</span>
+
+<span class="sd">        More details on the parameters is in :meth:`get_items_parameters`.</span>
+
+<span class="sd">        :return: iterator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[{</span><span class="s2">&quot;Hello&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;World&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]</span></div>
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="Builder.process_item"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder.process_item">[docs]</a>    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement the analysis for each item of work here.</span>
+
+<span class="sd">        :param item: One item of work from the queue (i.e., one item from the iterator that</span>
+<span class="sd">                     was returned by the `setup` method).</span>
+<span class="sd">        :type item: object</span>
+<span class="sd">        :return: Status code, 0 for OK</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Builder.finalize"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">had_errors</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform any cleanup actions after all items have been processed.</span>
+<span class="sd">        Subclasses may choose not to implement this, in which case it is a no-op.</span>
+
+<span class="sd">        :param had_errors: True if the run itself had errors.</span>
+<span class="sd">        :type had_errors: bool</span>
+<span class="sd">        :return: True if nothing went wrong, else False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="c1"># -----------------------------</span>
+    <span class="c1"># Utility methods</span>
+    <span class="c1"># -----------------------------</span>
+
+<div class="viewcode-block" id="Builder.shared_dict"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder.shared_dict">[docs]</a>    <span class="k">def</span> <span class="nf">shared_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get dict that can be shared between parallel processes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mgr</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Builder.shared_list"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder.shared_list">[docs]</a>    <span class="k">def</span> <span class="nf">shared_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get list that can be shared between parallel processes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mgr</span><span class="o">.</span><span class="n">list</span><span class="p">()</span></div>
+
+    <span class="c1"># -----------------------------</span>
+    <span class="c1"># Public/internal</span>
+    <span class="c1"># -----------------------------</span>
+
+<div class="viewcode-block" id="Builder.run"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_kw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">build_kw</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run the builder.</span>
+
+<span class="sd">        :param user_kw: keywords from user</span>
+<span class="sd">        :type user_kw: dict</span>
+<span class="sd">        :param build_kw: internal settings</span>
+<span class="sd">        :type build_kw: dict</span>
+<span class="sd">        :return: Number of items processed</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user_kw</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">user_kw</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">user_kw</span>
+        <span class="n">build_kw</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">build_kw</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">build_kw</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_items</span><span class="p">(</span><span class="o">**</span><span class="n">user_kw</span><span class="p">),</span> <span class="o">**</span><span class="n">build_kw</span><span class="p">)</span>
+        <span class="n">finalized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">has_failures</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">finalized</span><span class="p">:</span>
+            <span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Finalization failed&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span></div>
+
+<div class="viewcode-block" id="Builder.connect"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.Builder.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Connect to database with given configuration, which may be a dict or</span>
+<span class="sd">        a path to a pymatgen-db configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">dbutil</span><span class="o">.</span><span class="n">get_database</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">dbutil</span><span class="o">.</span><span class="n">get_database</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Configuration, &#39;</span><span class="si">{}</span><span class="s2">&#39;,  must be a path to &quot;</span>
+                             <span class="s2">&quot;a configuration file or dict&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">conn</span></div>
+
+    <span class="c1"># -----------------------------</span>
+
+    <span class="k">def</span> <span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build the output, in chunks.</span>
+
+<span class="sd">        :return: Number of items processed</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;_build, chunk_size=</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">))</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;_build, first item&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">chunk_size</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_run_parallel_fn</span><span class="p">()</span>  <span class="c1"># process the chunk</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">has_failures</span><span class="p">():</span>
+                    <span class="k">break</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="c1"># process final chunk</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_parallel_fn</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">has_failures</span><span class="p">():</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">def</span> <span class="nf">_run_parallel_multiprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run processes from queue</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;run.parallel.multiprocess.start&quot;</span><span class="p">)</span>
+        <span class="n">processes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ProcRunner</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncores</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">running</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">ProcRunner</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">i</span><span class="p">,))</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proc</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncores</span><span class="p">):</span>
+            <span class="n">processes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">processes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">exitcode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">code</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;run.parallel.multiprocess.end states=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run method for one thread or process</span>
+<span class="sd">        Just pull an item off the queue and process it,</span>
+<span class="sd">        until the queue is empty.</span>
+
+<span class="sd">        :param index: Sequential index of this process or thread</span>
+<span class="sd">        :type index: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process_item</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">Queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;In _run(): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">_log</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                    <span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                <span class="k">raise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span></div>
+
+
+<div class="viewcode-block" id="BuilderStatus"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.BuilderStatus">[docs]</a><span class="k">class</span> <span class="nc">BuilderStatus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Status of a Builder object run.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># States</span>
+    <span class="n">WAIT</span><span class="p">,</span> <span class="n">RUNNING</span><span class="p">,</span> <span class="n">SUCCESS</span><span class="p">,</span> <span class="n">FAILURE</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="c1"># For printing.</span>
+    <span class="n">_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="n">WAIT</span><span class="p">:</span> <span class="s2">&quot;wait&quot;</span><span class="p">,</span> <span class="n">RUNNING</span><span class="p">:</span> <span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="n">SUCCESS</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">,</span> <span class="n">FAILURE</span><span class="p">:</span> <span class="s2">&quot;fail&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">builder</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bld</span> <span class="o">=</span> <span class="n">builder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bld</span><span class="o">.</span><span class="n">shared_list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_states</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">WAIT</span><span class="p">]</span> <span class="o">*</span> <span class="n">num</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BuilderStatus.running"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.BuilderStatus.running">[docs]</a>    <span class="k">def</span> <span class="nf">running</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set state of a single process or thread to &#39;running&#39;.</span>
+
+<span class="sd">        :param i: Index of process or thread.</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BuilderStatus.success"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.BuilderStatus.success">[docs]</a>    <span class="k">def</span> <span class="nf">success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set state of a single process or thread to &#39;success&#39;.</span>
+
+<span class="sd">        :param i: Index of process or thread.</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BuilderStatus.fail"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.BuilderStatus.fail">[docs]</a>    <span class="k">def</span> <span class="nf">fail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set state of a single process or thread to &#39;failure&#39;.</span>
+
+<span class="sd">        :param i: Index of process or thread.</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAILURE</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BuilderStatus.has_failures"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.BuilderStatus.has_failures">[docs]</a>    <span class="k">def</span> <span class="nf">has_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Whether there are any failures in the states.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAILURE</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_states</span></div>
+
+    <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_states</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_states</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_NAMES</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_states</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ProcRunner"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.ProcRunner">[docs]</a><span class="k">class</span> <span class="nc">ProcRunner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is a work-around to the limitation of multiprocessing that the</span>
+<span class="sd">    function executed in the new module cannot be a method of a class.</span>
+<span class="sd">    We simply set the instance (self) into the class before forking each</span>
+<span class="sd">    process, and the class&#39; method calls the instance method for us.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">instance</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ProcRunner.run"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.ProcRunner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="alphadump"><a class="viewcode-back" href="../../../matgendb.builders.html#matgendb.builders.core.alphadump">[docs]</a><span class="k">def</span> <span class="nf">alphadump</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dump a dict to a str,</span>
+<span class="sd">    with keys in alphabetical order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">indent</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">k</span><span class="p">,</span>
+            <span class="n">alphadump</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+            <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span>
+            <span class="n">sep</span><span class="p">)</span>
+         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>
