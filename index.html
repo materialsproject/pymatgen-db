@@ -231,7 +231,7 @@ postprocessing and analysis).</p>
 </div>
 <p>The format of the configuration file <cite>db.json</cite> is given <a class="reference internal" href="dbconfig.html"><span class="doc">on this page</span></a>.</p>
 <p>For more advanced queries, you can use the
-<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><code class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></code></a> class for which a default
+<code class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></code> class for which a default
 alias is provided at the root package. Some examples are as follows:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matgendb</span> <span class="k">import</span> <span class="n">QueryEngine</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qe</span> <span class="o">=</span> <span class="n">QueryEngine</span><span class="p">()</span>
@@ -260,9 +260,9 @@ ComputedEntries.</p>
 it is perfectly extensible to any kind of data, e.g., other kinds of VASP runs
 (bandstructure, NEB, etc.) or just any form of data in general. Developers
 looking to adapt pymatgen-db for other purposes should look at the
-<a class="reference internal" href="matgendb.html#matgendb.creator.VaspToDbTaskDrone" title="matgendb.creator.VaspToDbTaskDrone"><code class="xref py py-class docutils literal"><span class="pre">matgendb.creator.VaspToDbTaskDrone</span></code></a> class as an example and write
+<code class="xref py py-class docutils literal"><span class="pre">matgendb.creator.VaspToDbTaskDrone</span></code> class as an example and write
 similar drones for their needs. The
-<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><code class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></code></a> can generally be applied to any
+<code class="xref py py-class docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></code> can generally be applied to any
 Mongo collection, with suitable specification of aliases if desired.</p>
 </div>
 </div>

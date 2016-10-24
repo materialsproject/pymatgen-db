@@ -27,9 +27,6 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="pymatgen-db 0.6.4 documentation" href="index.html" />
-    <link rel="up" title="matgendb.builders package" href="matgendb.builders.html" />
-    <link rel="next" title="matgendb.vv package" href="matgendb.vv.html" />
-    <link rel="prev" title="matgendb.builders package" href="matgendb.builders.html" />
 
    
   
@@ -53,15 +50,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="matgendb.vv.html" title="matgendb.vv package"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="matgendb.builders.html" title="matgendb.builders package"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="matgendb.html" >matgendb package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="matgendb.builders.html" accesskey="U">matgendb.builders package</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.6.4 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -86,7 +75,7 @@ running twice in succession will cause the second run to do nothing.</p>
 <dl class="class">
 <dt id="matgendb.builders.examples.copy_builder.CopyBuilder">
 <em class="property">class </em><code class="descname">CopyBuilder</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/copy_builder.html#CopyBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.copy_builder.CopyBuilder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="matgendb.builders.html#matgendb.builders.core.Builder" title="matgendb.builders.core.Builder"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></p>
 <p>Copy from one MongoDB collection to another.</p>
 <dl class="method">
 <dt id="matgendb.builders.examples.copy_builder.CopyBuilder.get_items">
@@ -97,8 +86,8 @@ running twice in succession will cause the second run to do nothing.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>source</strong> (<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><em>QueryEngine</em></a>) &#8211; Input collection</li>
-<li><strong>target</strong> (<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><em>QueryEngine</em></a>) &#8211; Output collection</li>
+<li><strong>source</strong> (<em>QueryEngine</em>) &#8211; Input collection</li>
+<li><strong>target</strong> (<em>QueryEngine</em>) &#8211; Output collection</li>
 <li><strong>crit</strong> (<em>dict</em>) &#8211; Filter criteria, e.g. &#8220;{ &#8216;flag&#8217;: True }&#8221;.</li>
 </ul>
 </td>
@@ -121,7 +110,7 @@ running twice in succession will cause the second run to do nothing.</p>
 <dl class="class">
 <dt id="matgendb.builders.examples.file_builders.FileCounter">
 <em class="property">class </em><code class="descname">FileCounter</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/file_builders.html#FileCounter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.file_builders.FileCounter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="matgendb.builders.html#matgendb.builders.core.Builder" title="matgendb.builders.core.Builder"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></p>
 <p>Count lines and characters in a file.</p>
 <dl class="method">
 <dt id="matgendb.builders.examples.file_builders.FileCounter.finalize">
@@ -154,7 +143,7 @@ collection.</p>
 <dl class="class">
 <dt id="matgendb.builders.examples.maxvalue_builder.MaxValueBuilder">
 <em class="property">class </em><code class="descname">MaxValueBuilder</code><span class="sig-paren">(</span><em>ncores=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/maxvalue_builder.html#MaxValueBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.maxvalue_builder.MaxValueBuilder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="matgendb.builders.html#matgendb.builders.core.Builder" title="matgendb.builders.core.Builder"><code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.core.Builder</span></code></p>
 <p>Example of incremental builder that requires
 some custom logic for incremental case.</p>
 <p>Create new builder for threaded or multiprocess execution.</p>
@@ -183,8 +172,8 @@ some custom logic for incremental case.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>source</strong> (<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><em>QueryEngine</em></a>) &#8211; Input collection</li>
-<li><strong>target</strong> (<a class="reference internal" href="matgendb.html#matgendb.query_engine.QueryEngine" title="matgendb.query_engine.QueryEngine"><em>QueryEngine</em></a>) &#8211; Output collection</li>
+<li><strong>source</strong> (<em>QueryEngine</em>) &#8211; Input collection</li>
+<li><strong>target</strong> (<em>QueryEngine</em>) &#8211; Output collection</li>
 </ul>
 </td>
 </tr>
@@ -228,12 +217,6 @@ for &#8220;new&#8221; items only.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="matgendb.html">matgendb package</a><ul>
-  <li><a href="matgendb.builders.html">matgendb.builders package</a><ul>
-      <li>Previous: <a href="matgendb.builders.html" title="previous chapter">matgendb.builders package</a></li>
-      <li>Next: <a href="matgendb.vv.html" title="next chapter">matgendb.vv package</a></li>
-  </ul></li>
-  </ul></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">
