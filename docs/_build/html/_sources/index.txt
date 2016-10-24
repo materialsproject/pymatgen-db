@@ -7,12 +7,6 @@ the creation of Materials Project-style `MongoDB`_ databases for management
 of materials data. A query engine is also provided to enable the easy
 translation of MongoDB docs to useful pymatgen objects for analysis purposes.
 
-On this page
--------------
-
-.. contents::
-    :depth: 1
-
 Other pages
 ------------
 

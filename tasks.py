@@ -52,8 +52,6 @@ def make_doc(ctx):
         ctx.run("make html")
         ctx.run("cp _static/* _build/html/_static")
 
-        # This makes sure pymatgen.org works to redirect to the Gihub page
-        ctx.run("echo \"pymatgen.org\" > _build/html/CNAME")
         # Avoid ths use of jekyll so that _dir works as intended.
         ctx.run("touch _build/html/.nojekyll")
 
