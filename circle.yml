@@ -3,10 +3,8 @@ machine:
     version: 3.5.2
 dependencies:
   override:
-    - pip install numpy --upgrade
-    - pip install -r requirements.txt
-    - pip install coveralls coverage --upgrade
-    - python setup.py install
+    - pip install tox tox-pyenv
+    - pyenv local 2.7.12 3.5.2
 test:
   override:
     - mv matgendb mgdb
