@@ -7,6 +7,4 @@ dependencies:
     - pyenv local 2.7.12 3.5.2
 test:
   override:
-    - mv matgendb mgdb
-    - nosetests --config=nose.cfg --cover-html --cover-html-dir=$CIRCLE_ARTIFACTS
-    - coveralls
+    - tox
