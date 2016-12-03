@@ -87,5 +87,5 @@ def setver(ctx):
 def release(ctx):
     setver(ctx)
     #test(ctx)
-    makedoc(ctx)
+    make_doc(ctx)
     publish(ctx)
