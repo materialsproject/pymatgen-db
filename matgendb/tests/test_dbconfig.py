@@ -86,8 +86,9 @@ class SettingsTestCase(unittest.TestCase):
         """Create DBConfig from file or path.
         """
         # sending file obj, or its path, should have same effect
-        d1 = DBConfig(config_file=self.tmp)
-        d2 = DBConfig(config_file=self.tmp.name)
+        tmp = tempfile.NamedTemporaryFile("r+")
+        d1 = DBConfig(config_file=tmp)
+        d2 = DBConfig(config_file=tmp.name)
         self.assertEqual(d1.settings, d2.settings)
         self.assertEqual(d2.settings, self._aliased_cfg())
 
