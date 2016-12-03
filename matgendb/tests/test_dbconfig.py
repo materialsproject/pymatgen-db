@@ -87,6 +87,10 @@ class SettingsTestCase(unittest.TestCase):
         """
         # sending file obj, or its path, should have same effect
         tmp = tempfile.NamedTemporaryFile("r+")
+        json.dump(self.cfg, tmp)
+        tmp.flush()
+        # reset file to beginning
+        tmp.seek(0)
         d1 = DBConfig(config_file=tmp)
         d2 = DBConfig(config_file=tmp.name)
         self.assertEqual(d1.settings, d2.settings)
