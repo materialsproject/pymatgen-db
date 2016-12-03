@@ -1,3 +1,7 @@
+v0.6.5
+------
+1. Proper specification of requirements.
+
 v0.6.2
 ------
 1. Update dependency versions.
