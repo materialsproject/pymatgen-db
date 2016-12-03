@@ -103,7 +103,7 @@ class SettingsTestCase(unittest.TestCase):
         tf = tempfile.NamedTemporaryFile("w", delete=False)
         tf.write("JUNK")
         tf.close()
-        self.assertRaises(ConfigurationFileError, DBConfig, config_file=f.name)
+        self.assertRaises(ConfigurationFileError, DBConfig, config_file=tf.name)
 
 if __name__ == '__main__':
     unittest.main()
