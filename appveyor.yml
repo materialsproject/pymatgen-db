@@ -17,6 +17,9 @@ environment:
   PYPIPWD:
     secure: QPpXonUAeLJ8p3f936jh7g==
 
+services:
+  - mongodb
+
 install:
   # Add the paths
   - 'set PATH=%PYTHON%;%PYTHON%\Library\bin;%PYTHON%\Scripts;%PATH%'
@@ -28,7 +31,7 @@ install:
   - 'conda install --yes --quiet numpy scipy matplotlib setuptools wheel'
   - 'conda install --yes --quiet --channel matsci spglib'
   - "pip install -r requirements.txt"
-  - "pip install -r requirements-ci.txt"  
+  - "pip install -r requirements-ci.txt"
 
   # Run develop to install in dev mode and build C extension.
   - "python setup.py develop"
