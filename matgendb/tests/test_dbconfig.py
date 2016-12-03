@@ -69,11 +69,6 @@ class SettingsTestCase(unittest.TestCase):
             "password": u"knock-knock",
             "aliases": {},
         }
-        self.tmp = tempfile.NamedTemporaryFile("r+")
-        json.dump(self.cfg, self.tmp)
-        self.tmp.flush()
-        # reset file to beginning
-        self.tmp.seek(0)
 
     def _aliased_cfg(self):
         """Imitate authorization de-aliasing."""
@@ -92,6 +87,7 @@ class SettingsTestCase(unittest.TestCase):
         # reset file to beginning
         tmp.seek(0)
         d1 = DBConfig(config_file=tmp)
+        tmp.close()
         d2 = DBConfig(config_file=tmp.name)
         self.assertEqual(d1.settings, d2.settings)
         self.assertEqual(d2.settings, self._aliased_cfg())
