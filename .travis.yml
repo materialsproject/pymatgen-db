@@ -21,6 +21,7 @@ addons:
 install:
   - "easy_install -U setuptools"
   - "pip install -r requirements.txt"
+  - "pip install -r requirements-ci.txt"
 # This is needed, otherwise, nosetests can't find the installed pymatgen C
 # extensions.
 before_script:
