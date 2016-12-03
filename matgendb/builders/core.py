@@ -14,6 +14,10 @@ from abc import ABCMeta, abstractmethod
 import copy
 import logging
 import multiprocessing
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
 import traceback
 # local
 from matgendb.builders import schema, util
@@ -81,7 +85,7 @@ def parse_fn_docstring(fn):
 
 class Collections(object):
     """Interface to normalized names for collections.
-    
+
     After initialization with a MongoDB database and optional parameters,
     you can access collections in `known_collections` as attributes.
     """
@@ -141,7 +145,7 @@ class Collections(object):
     @property
     def database(self):
         """Return the current database object.
-        
+
         :return: Current database object
         """
         return self._db
