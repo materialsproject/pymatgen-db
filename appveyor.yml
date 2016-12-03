@@ -28,7 +28,7 @@ install:
   - 'conda install --yes --quiet numpy scipy matplotlib setuptools wheel'
   - 'conda install --yes --quiet --channel matsci spglib'
   - "pip install -r requirements.txt"
-  - "pip install -r requirement-ci.txt"  
+  - "pip install -r requirements-ci.txt"  
 
   # Run develop to install in dev mode and build C extension.
   - "python setup.py develop"
