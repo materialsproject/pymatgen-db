@@ -15,9 +15,13 @@ setup(
     packages=find_packages(),
     version="0.6.4",
     setup_requires=["numpy"],
-    install_requires=["pymatgen>=4.4.9", "monty>=0.9.6",
-                      "pymongo>=2.8", "mongomock", "smoqe",
-                      "enum34"],
+    install_requires=["pymatgen>=4.4.9", "monty>=0.9.6", "pymongo>=2.8", "smoqe"],
+    extras_require={
+        ':python_version == "2.7"': [
+            'enum34',
+        ],
+        'tests': 'mongomock'
+    },
     package_data={"matgendb": ["*.json"]},
     author="Shyue Ping Ong, Dan Gunter",
     author_email="shyuep@gmail.com",
