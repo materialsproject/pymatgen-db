@@ -81,14 +81,14 @@ class SettingsTestCase(unittest.TestCase):
         """Create DBConfig from file or path.
         """
         # sending file obj, or its path, should have same effect
-        tmp = tempfile.NamedTemporaryFile("r+")
-        json.dump(self.cfg, tmp)
-        tmp.flush()
-        # reset file to beginning
-        tmp.seek(0)
-        d1 = DBConfig(config_file=tmp)
-        tmp.close()
-        d2 = DBConfig(config_file=tmp.name)
+        tmp = "dbconfigtest.json"
+        with open(tmp, "w") as f:
+            json.dump(self.cfg, f)
+            tmp.flush()
+            # reset file to beginning
+            tmp.seek(0)
+            d1 = DBConfig(config_file=tmp)
+        d2 = DBConfig(config_file=tmp)
         self.assertEqual(d1.settings, d2.settings)
         self.assertEqual(d2.settings, self._aliased_cfg())
 
