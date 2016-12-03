@@ -84,10 +84,10 @@ class SettingsTestCase(unittest.TestCase):
         tmp = "dbconfigtest.json"
         with open(tmp, "w") as f:
             json.dump(self.cfg, f)
-            tmp.flush()
+            f.flush()
             # reset file to beginning
-            tmp.seek(0)
-            d1 = DBConfig(config_file=tmp)
+            f.seek(0)
+            d1 = DBConfig(config_file=f)
         d2 = DBConfig(config_file=tmp)
         self.assertEqual(d1.settings, d2.settings)
         self.assertEqual(d2.settings, self._aliased_cfg())
