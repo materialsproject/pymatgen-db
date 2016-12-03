@@ -82,11 +82,11 @@ class SettingsTestCase(unittest.TestCase):
         """
         # sending file obj, or its path, should have same effect
         tmp = "dbconfigtest.json"
-        with open(tmp, "r+") as f:
+        with open(tmp, "w") as f:
             json.dump(self.cfg, f)
             f.flush()
             # reset file to beginning
-            f.seek(0)
+        with open(tmp, "r") as f:
             d1 = DBConfig(config_file=f)
         d2 = DBConfig(config_file=tmp)
         self.assertEqual(d1.settings, d2.settings)
