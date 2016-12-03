@@ -100,9 +100,9 @@ class SettingsTestCase(unittest.TestCase):
     def test_init_junk_file(self):
         """Check error when creating DBConfig from bad input file.
         """
-        f = open(self.tmp.name, 'w')
-        f.write("JUNK")
-        f.close()
+        tf = tempfile.NamedTemporaryFile("w", delete=False)
+        tf.write("JUNK")
+        tf.close()
         self.assertRaises(ConfigurationFileError, DBConfig, config_file=f.name)
 
 if __name__ == '__main__':
