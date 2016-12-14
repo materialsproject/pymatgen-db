@@ -511,7 +511,7 @@ class QueryEngine(object):
         dosid = None
         for r in self.query(fields, args):
             dosid = r['calculations'][-1]['dos_fs_id']
-        if dosid != None:
+        if dosid is not None:
             self._fs = gridfs.GridFS(self.db, 'dos_fs')
             with self._fs.get(dosid) as dosfile:
                 s = dosfile.read()
