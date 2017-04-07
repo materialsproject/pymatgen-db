@@ -144,8 +144,16 @@ def get_settings(infile):
     settings = yaml.load(_as_file(infile))
     if not hasattr(settings, 'keys'):
         raise ValueError("Settings not found in {}".format(infile))
-    auth_aliases(settings)
-    return settings
+
+    # Processing of namespaced parameters in .pmgrc.yaml.
+    processed_settings = {}
+    for k, v in settings.items():
+        if k.startswith("PMG_DB_"):
+            processed_settings[k[7:].lower()] = v
+        else:
+            processed_settings[k] = v
+    auth_aliases(processed_settings)
+    return processed_settings
 
 def auth_aliases(d):
     """Interpret user/password aliases.
