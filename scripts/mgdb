@@ -23,6 +23,7 @@ from pymongo import MongoClient, ASCENDING
 
 from pymatgen.apps.borg.queen import BorgQueen
 
+from matgendb import SETTINGS
 from matgendb.query_engine import QueryEngine
 from matgendb.creator import VaspToDbTaskDrone
 from matgendb.dbconfig import DBConfig
@@ -258,6 +259,7 @@ def init_logging(args):
 
 
 if __name__ == "__main__":
+    db_file = SETTINGS.get("PMGDB_DB_FILE")
     parser = argparse.ArgumentParser(description="""
     mgdb is a complete command line db management script for pymatgen-db. It
     provides the facility to insert vasp runs, perform queries, and run a web
@@ -275,7 +277,7 @@ if __name__ == "__main__":
     parent_vb.add_argument('--verbose', '-v', dest='vb', action="count", default=0,
                            help="Print more verbose messages to standard error. Repeatable. (default=ERROR)")
     parent_cfg = argparse.ArgumentParser(add_help=False)
-    parent_cfg.add_argument("-c", "--config", dest="config_file", type=str,
+    parent_cfg.add_argument("-c", "--config", dest="config_file", type=str, default=db_file,
                             help="Config file to use. Generate one using mgdb "
                             "init --config filename.json if necessary. "
                             "Otherwise, the code searches for a db.json. If"
@@ -283,13 +285,16 @@ if __name__ == "__main__":
                             "localhost:27017/vasp database and tasks "
                             "collection is assumed.")
 
+    # change db_file to the default "db.json" if it does not exist
+    db_file = db_file or "db.json"
+
     # Init for all subparsers.
     subparsers = parser.add_subparsers()
 
     # The 'init' subcommand.
     pinit = subparsers.add_parser("init", help="Initialization tools.", parents=[parent_vb])
     pinit.add_argument("-c", "--config", dest="config_file", type=str,
-                       nargs='?', default="db.json",
+                       nargs='?', default=db_file,
                        help="Creates an db config file for the database. "
                             "Default filename is db.json.")
     pinit.set_defaults(func=init_db)
@@ -297,7 +302,7 @@ if __name__ == "__main__":
     popt = subparsers.add_parser("optimize", help="Optimization tools.")
 
     popt.add_argument("-c", "--config", dest="config_file", type=str,
-                       nargs='?', default="db.json",
+                       nargs='?', default=db_file,
                        help="Creates an db config file for the database. "
                             "Default filename is db.json.")
     popt.set_defaults(func=optimize_indexes)

@@ -7,9 +7,25 @@ is also provided to enable the easy translation of MongoDB docs to useful
 pymatgen objects for analysis purposes.
 """
 
+import os
+
 __author__ = "Shyue Ping Ong, Dan Gunter"
 __date__ = "Dec 3 2016"
 __version__ = "0.6.5"
 
 
 from .query_engine import QueryEngine
+
+SETTINGS_FILE = os.path.join(os.path.expanduser('~'), '.pmgrc.yaml')
+
+
+def _load_mgdb_settings():
+    try:
+        import yaml
+        with open(SETTINGS_FILE, 'rt') as f:
+            d = yaml.load(f)
+    except IOError:
+        return {}
+    return d
+
+SETTINGS = _load_mgdb_settings()
