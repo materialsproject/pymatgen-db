@@ -73,8 +73,8 @@ class VaspToDbTaskDrone(AbstractDrone):
 
     def __init__(self, host="127.0.0.1", port=27017, database="vasp",
                  user=None, password=None, collection="tasks",
-                 parse_dos=False, compress_dos=False, simulate_mode=False,
-                 additional_fields=None, update_duplicates=True,
+                 parse_dos=False, compress_dos=False,parse_projected_eigen=False,
+                 simulate_mode=False, additional_fields=None, update_duplicates=True,
                  mapi_key=None, use_full_uri=True, runs=None):
         """Constructor.
 
@@ -99,6 +99,11 @@ class VaspToDbTaskDrone(AbstractDrone):
                 Defaults to False. If True, all dos will be inserted into a gridfs
                 collection called dos_fs. If 'final', only the last calculation will
                 be parsed.
+            parse_projected_eigen:
+                Whether to parse the element and orbital projections. Options are True,
+                False, and 'final'; Defaults to False. If True, projections will be 
+                parsed for each calculation. If 'final', projections for only the last
+                calculation will be parsed.
             compress_dos:
                 Whether to compress the DOS data. Valid options are integers 1-9,
                 corresponding to zlib compression level. 1 is usually adequate.
@@ -143,6 +148,9 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.simulate = simulate_mode
         if isinstance(parse_dos, six.string_types) and parse_dos != 'final':
             raise ValueError('Invalid value for parse_dos')
+        if isinstance(parse_projected_eigen, six.string_types) and parse_projected_eigen != 'final':
+            raise ValueError('Invalid value for parse_projected_eigen')
+        self.parse_projected_eigen = parse_projected_eigen
         self.parse_dos = parse_dos
         self.compress_dos = compress_dos
         self.additional_fields = additional_fields or {}
@@ -474,7 +482,12 @@ class VaspToDbTaskDrone(AbstractDrone):
         Process a vasprun.xml file.
         """
         vasprun_file = os.path.join(dir_name, filename)
-        r = Vasprun(vasprun_file)
+        if self.parse_projected_eigen and (self.parse_projected_eigen != 'final' or \
+                             taskname == self.runs[-1]):
+            parse_projected_eigen = True
+        else:
+            parse_projected_eigen = False
+        r = Vasprun(vasprun_file,parse_projected_eigen=parse_projected_eigen)
         d = r.as_dict()
         d["dir_name"] = os.path.abspath(dir_name)
         d["completed_at"] = \
