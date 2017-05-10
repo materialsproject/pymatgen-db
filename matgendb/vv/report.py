@@ -111,7 +111,7 @@ class Table:
         self._colnames = colnames
         self._rows = []
         self._width = len(colnames)
-        self._max_col_widths = map(len, colnames)
+        self._max_col_widths = list(map(len, colnames))
 
     def add(self, values):
         if len(values) != self._width:
