@@ -418,9 +418,9 @@ class Validator(DoesLogging):
         cvgroup.subject = subject
 
         # If the constraint is an 'import' of code, treat it differently here
-        if self._is_python(parts):
-            num_found = self._run_python(cvgroup, coll, parts)
-            return None if num_found == 0 else cvgroup
+        # if self._is_python(parts):
+        #    num_found = self._run_python(cvgroup, coll, parts)
+        #    return None if num_found == 0 else cvgroup
 
         query = parts.cond.to_mongo(disjunction=False)
         query.update(parts.body.to_mongo())
