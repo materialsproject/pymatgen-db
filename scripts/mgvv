@@ -18,6 +18,7 @@ import sys
 import time
 import traceback
 import yaml
+import importlib
 # local module
 from matgendb.util import get_settings, get_collection
 from matgendb.vv.validate import ConstraintSpec, Validator
@@ -469,6 +470,32 @@ def command_validate(args, formatters):
     rpt.header.add('Elapsed time', '{:.2f}s'.format(elapsed.value))
     _log.debug('Run time: {:.2f}'.format(elapsed.value))
 
+    # Run custom python tests
+    # TODO: Eventually refactor into a real test runner.
+
+    if args.python_module:
+        # import the specified module
+        python_test_module = importlib.import_module(args.python_module)
+        # extract anything that begins with test_
+        test_methods = [getattr(python_test_module, m) for m in dir(python_test_module) if m.startswith("test_")]
+
+        sect_hdr = report.SectionHeader(title='Custom Validations')
+        rpt_sect = report.ReportSection(sect_hdr)
+
+        table = report.Table(colnames=('Function', 'Error'))
+
+        for t in test_methods:
+            error = t(db)
+            if error:
+                # Add a section to report for each test.
+                # TODO: Maybe do it as one eventually
+                table.add(('{}()'.format(t.__name__), error))
+
+        sub_sect_hdr = report.SectionHeader(title='Python Test Functions')
+        rpt_sect.add_section(report.ReportSection(sub_sect_hdr, table))
+
+        rpt.add_section(rpt_sect)
+
     # Report results.
     if not args.send_on_empty and rpt.is_empty():
         _log.warn("Report is empty, skipping output")
@@ -551,6 +578,8 @@ def main(cmdline=None):
                       help='Report progress every NUM invalid records found')
     subp.add_argument('--user', '-u', dest='user', metavar='NAME', default=None,
                       help='User name, for the report')
+    subp.add_argument('--python-module', dest='python_module', metavar='PYTHON_MODULE', default=None,
+                      help="Python module with test functions")
 
     # Diff command.
     subp = subparsers.add_parser("diff", help="Show difference in two collections", parents=[parent_parser])
