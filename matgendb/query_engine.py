@@ -294,6 +294,9 @@ class QueryEngine(object):
                        "hubbards", "pseudo_potential.labels",
                        "pseudo_potential.functional", "run_type",
                        "input.is_lasph", "input.xc_override", "input.potcar_spec"])
+        if inc_structure:
+            fields.append("output.crystal")
+
         for c in self.query(fields, criteria):
             func = c["pseudo_potential.functional"]
             labels = c["pseudo_potential.labels"]
@@ -307,7 +310,7 @@ class QueryEngine(object):
                           "xc_override": c.get("input.xc_override")}
             optional_data = {k: c[k] for k in optional_data}
             if inc_structure:
-                struct = self.get_structure_from_id(c["task_id"])
+                struct = Structure.from_dict(c["output.crystal"])
                 entry = ComputedStructureEntry(struct, c["energy"],
                                                0.0, parameters=parameters,
                                                data=optional_data,
