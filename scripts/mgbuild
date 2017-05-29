@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Run derived collection builder.
 
@@ -83,7 +85,7 @@ def command_merge(args):
     # Connect to "core" collections.
     try:
         settings = get_settings(args.config_file)
-    except ConfigurationError, err:
+    except ConfigurationError as err:
         _log.error("command_merge.configuration")
         raise
     core_db = QueryEngine(**settings)
@@ -117,7 +119,7 @@ def command_merge(args):
     t0 = time.time()
     try:
         core.merge_tasks(core_collections, sandbox_collections, id_prefix, target, wipe=args.wipe_target)
-    except pymongo.errors.DuplicateKeyError, err:
+    except pymongo.errors.DuplicateKeyError as err:
         _log.error("sandbox.merge.end error=merge.duplicate_key msg={}".format(err))
         tell_user("\nDuplicate key error from MongoDB.\nUse -W/--wipe to clear target collection before merge.\n")
         return -1
@@ -195,7 +197,7 @@ def command_build(args):
                 qe = create_qe(value, args.incr)
                 parsed_builder_args[key] = qe
                 query_engines.append(qe)
-            except ValueError, err:
+            except ValueError as err:
                 raise ConfigurationError("creating query engine", err)
         elif _type in simple_types:
             parsed_builder_args[key] = simple_types[_type](value)
@@ -272,7 +274,7 @@ def get_settings(config_file, allow_default=True):
             cfg = json.load(open(DEFAULT_CONFIG_FILE))
         else:
             raise ValueError("Default configuration '{}' not found".format(DEFAULT_CONFIG_FILE))
-    except Exception, err:
+    except Exception as err:
         raise ConfigurationError(config_file, err)
     normalize_userpass(cfg)
     normalize_aliases(cfg)
