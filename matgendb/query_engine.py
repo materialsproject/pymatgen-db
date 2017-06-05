@@ -436,6 +436,14 @@ class QueryEngine(object):
                 else:
                     props[p] = 1
                 prop_dict[p] = p.split(".")
+        # including a lower-level key after a higher level key e.g.:
+        # {'output': 1, 'output.crystal': 1} instead of
+        # {'output.crystal': 1, 'output': 1}
+        # causes mongo to skip the other higher level keys.
+        # this is a (sketchy) workaround for that. Note this problem
+        # doesn't appear often in python2 because the dictionary ordering
+        # is more stable.
+        props = OrderedDict(sorted(props.items(), reverse=True))
         return props, prop_dict
 
     def query_one(self, *args, **kwargs):
