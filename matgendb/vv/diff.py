@@ -11,6 +11,7 @@ import time
 # Package
 from matgendb import util
 from matgendb.query_engine import QueryEngine
+from matgendb.dbconfig import normalize_auth
 import six
 
 _log = logging.getLogger("mg.vv.diff")
@@ -96,7 +97,7 @@ class Differ(object):
             engines = []
             for cfg in c1, c2:
                 settings = util.get_settings(cfg)
-                if not dbconfig.normalize_auth(settings):
+                if not normalize_auth(settings):
                     _log.warn("Config file {} does not have a username/password".format(cfg))
                 settings["aliases_config"] = {"aliases": {}, "defaults": {}}
                 engine = QueryEngine(**settings)
