@@ -428,7 +428,7 @@ class Validator(DoesLogging):
         self._log.debug('Query spec: {}'.format(query))
         self._log.debug('Query fields: {}'.format(parts.report_fields))
         # Find records that violate 1 or more constraints
-        cursor = coll.find(query, fields=parts.report_fields, **self._find_kw)
+        cursor = coll.find(query, parts.report_fields, **self._find_kw)
         if parts.sampler is not None:
             cursor = parts.sampler.sample(cursor)
         nbytes, num_dberr, num_rec = 0, 0, 0
