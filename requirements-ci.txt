@@ -1,2 +1,1 @@
-mongomock==3.0.0
-nose
+mongomock==3.8.0
