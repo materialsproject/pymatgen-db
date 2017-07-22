@@ -10,8 +10,8 @@ pymatgen objects for analysis purposes.
 import os
 
 __author__ = "Shyue Ping Ong, Dan Gunter"
-__date__ = "Dec 3 2016"
-__version__ = "0.6.5"
+__date__ = "Jul 22 2017"
+__version__ = "0.7.0"
 
 
 from .query_engine import QueryEngine
