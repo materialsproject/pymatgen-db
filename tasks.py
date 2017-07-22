@@ -23,7 +23,7 @@ from matgendb import __version__ as ver
 
 @task
 def make_doc(ctx):
-    with cd("docs"):
+    with cd("docs_rst"):
         ctx.run("cp ../CHANGES.rst change_log.rst")
         ctx.run("sphinx-apidoc -d 6 -o . -f ../matgendb")
         ctx.run("rm matgendb*.tests.rst")
@@ -50,18 +50,19 @@ def make_doc(ctx):
                 with open(f, 'w') as fid:
                     fid.write("".join(newoutput))
         ctx.run("make html")
-        ctx.run("cp _static/* _build/html/_static")
+        ctx.run("cp _static/* ../docs/html/_static")
 
+    with cd("docs"):
+        ctx.run("cp -r html/* .")
+        ctx.run("rm -r html")
         # Avoid ths use of jekyll so that _dir works as intended.
-        ctx.run("touch _build/html/.nojekyll")
+        ctx.run("touch .nojekyll")
 
 
 @task
 def update_doc(ctx):
-    with cd("docs/_build/html/"):
-        ctx.run("git pull")
     make_doc(ctx)
-    with cd("docs/_build/html/"):
+    with cd("docs"):
         ctx.run("git add .")
         ctx.run("git commit -a -m \"Update dev docs\"")
         ctx.run("git push origin gh-pages")

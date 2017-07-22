@@ -1,0 +1,769 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Database “Builders” &#8212; pymatgen-db 0.6.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Database configuration" href="dbconfig.html" />
+    <link rel="prev" title="Materials Project Database Validation: mgvv" href="mgvv.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="dbconfig.html" title="Database configuration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.6.5 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="database-builders">
+<span id="builders"></span><h1><a class="toc-backref" href="#id1">Database &#8220;Builders&#8221;</a><a class="headerlink" href="#database-builders" title="Permalink to this headline">¶</a></h1>
+<p>The Materials Project relies on MongoDB databases. The common parts of the
+process of creating these databases from either files or other MongoDB databases
+are encapsulated in the <code class="docutils literal"><span class="pre">matgendb.builders</span></code> subpackage, and in the
+<code class="docutils literal"><span class="pre">mgbuild</span></code> command-line script. This package and script
+comprise a lightweight framework that is meant to
+automate, simplify, and ultimately streamline the process of creating databases.
+All the code and
+methods are general-purpose, and thus could be useful to <em>any</em> project that needs
+to perform extract-transform-load (ETL) operations with MongoDB.</p>
+<p>The code presented here can be found in the directory
+<cite>matgendb/builders/examples</cite> in the source code distribution.</p>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#database-builders" id="id1">Database &#8220;Builders&#8221;</a><ul>
+<li><a class="reference internal" href="#features" id="id2">Features</a><ul>
+<li><a class="reference internal" href="#parallel-building" id="id3">Parallel building</a></li>
+<li><a class="reference internal" href="#incremental-building" id="id4">Incremental building</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#writing-a-builder" id="id5">Writing a builder</a><ul>
+<li><a class="reference internal" href="#simple-filecounter-builder" id="id6">Simple &#8220;FileCounter&#8221; builder</a></li>
+<li><a class="reference internal" href="#database-copybuilder" id="id7">Database &#8220;CopyBuilder&#8221;</a></li>
+<li><a class="reference internal" href="#incremental-builder-maxvaluebuilder" id="id8">Incremental builder &#8220;MaxValueBuilder&#8221;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-a-builder" id="id9">Running a builder</a><ul>
+<li><a class="reference internal" href="#displaying-builder-usage" id="id10">Displaying builder usage</a></li>
+<li><a class="reference internal" href="#running-the-builder" id="id11">Running the builder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="features">
+<span id="bld-concepts"></span><h2><a class="toc-backref" href="#id2">Features</a><a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="parallel-building">
+<h3><a class="toc-backref" href="#id3">Parallel building</a><a class="headerlink" href="#parallel-building" title="Permalink to this headline">¶</a></h3>
+<p>Builders can be run in parallel without explicit coding of parallelism by
+the author. This allows CPU-intensive transformations of the data to run
+much faster on multicore machines, which includes most modern hardware.
+An illustration of the difference between sequential and parallel builds
+is shown below.</p>
+<img alt="_images/parallel_build.png" src="_images/parallel_build.png" />
+<p>The builder framework automatically parallelizes the processing of
+each item, by placing items in a shared queue and spawning processes to pull
+items off the queue in parallel. Note that the <code class="docutils literal"><span class="pre">get_items()</span></code> method
+is not automatically parallelized, so for better or worse
+querying the DB happens sequentially (unless you write explicit parallel
+code inside <code class="docutils literal"><span class="pre">get_items()</span></code>).</p>
+</div>
+<div class="section" id="incremental-building">
+<h3><a class="toc-backref" href="#id4">Incremental building</a><a class="headerlink" href="#incremental-building" title="Permalink to this headline">¶</a></h3>
+<p>Incremental building allows successive builds of source MongoDB collection(s)
+to only operate on the records added since the last build. This can save
+huge amounts of time. An illustration of the difference between an incremental and
+full (non-incremental) build is shown below.</p>
+<img alt="_images/incremental_build.png" src="_images/incremental_build.png" />
+</div>
+</div>
+<div class="section" id="writing-a-builder">
+<span id="bld-writing"></span><h2><a class="toc-backref" href="#id5">Writing a builder</a><a class="headerlink" href="#writing-a-builder" title="Permalink to this headline">¶</a></h2>
+<p>To write a builder, you must create a Python class that inherits from
+<cite>matgendb.builders.core.Builder</cite>
+(see the <a class="reference internal" href="matgendb.builders.html"><span class="doc">matgendb.builders</span></a> package)
+and implement a few methods on this class
+to perform the specific work for your builder. In this section we will
+give two example builders: a simple <a class="reference internal" href="#bld-ex-filecounter"><span class="std std-ref">FileCounter</span></a> builder
+that just counts the lines in a file,
+and a <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">CopyBuilder</span></a> that copies a MongoDB collection.</p>
+<div class="section" id="simple-filecounter-builder">
+<span id="bld-ex-filecounter"></span><h3><a class="toc-backref" href="#id6">Simple &#8220;FileCounter&#8221; builder</a><a class="headerlink" href="#simple-filecounter-builder" title="Permalink to this headline">¶</a></h3>
+<p>The first builder simply reads from a file, and counts the lines in that file.
+In this section we&#8217;ll show the whole program, then walk through it one section
+at a time:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
+<span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;input_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">:</span> <span class="s1">&#39;Input file path&#39;</span><span class="p">}}</span>
+
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">line</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:d}</span><span class="s2"> lines, </span><span class="si">{:d}</span><span class="s2"> characters&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chars</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Initialization</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
+<span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The class inherits from the <code class="docutils literal"><span class="pre">matgendb.core.Builder</span></code> class. In this case, it includes
+a constructor, but this is optional and often not needed. The constructor
+simply initializes the number of lines counter and then calls its parent.</p>
+<p><strong>get_parameters</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+   <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;input_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">:</span> <span class="s1">&#39;Input file path&#39;</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>This method returns a dictionary of metadata about the
+parameters for <code class="docutils literal"><span class="pre">get_items()</span></code>.
+This metadata is used when running a builder with the <cite>mgbuild</cite> program.
+More details on this are given in <a class="reference internal" href="#bld-running"><span class="std std-ref">Running a builder</span></a>.
+For now, it is enough to note that the
+parameters must match the keyword arguments to <code class="docutils literal"><span class="pre">get_items()</span></code>, both in
+name and (expected) type.</p>
+<p><strong>get_items</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">line</span>
+</pre></div>
+</div>
+<p>The two main methods that you <strong>must</strong> override are called <code class="docutils literal"><span class="pre">get_items()</span></code> and
+<code class="docutils literal"><span class="pre">process_item()</span></code>. The first will return an iterator, in this case
+the function simply returns one line of the file at a time.
+Notice that you can make the function into a generator by using <code class="docutils literal"><span class="pre">yield</span></code> to
+return items, but returning any other iterable would also work fine (e.g. the
+function could have been a one-liner &#8220;return open(input_file).readlines()&#8221;).</p>
+<p><strong>process_item</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Here the instance variable <code class="docutils literal"><span class="pre">num_lines</span></code> is simply incremented for every
+line passed to it by the <code class="docutils literal"><span class="pre">get_items()</span></code> iterator.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Updating instance variables
+will cause improper behavior if the user runs the builder in parallel.
+This occurs because the parallel mode automatically starts multiple
+copies of the same class, and their independent actions will clash.
+If you really need to update some shared state,
+use the Python <cite>multiprocessing</cite> module functions.
+See the <a class="reference external" href="https://docs.python.org/2/library/multiprocessing.html">multiprocessing docs</a>
+for details.</p>
+</div>
+<p><strong>finalize</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:d}</span><span class="s2"> lines, </span><span class="si">{:d}</span><span class="s2"> characters&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chars</span><span class="p">))</span>
+    <span class="k">return</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>Optionally, you can put code that will be run once (for all builders) in
+the <code class="docutils literal"><span class="pre">finalize()</span></code> method. Here we just print a result.
+The return value of finalize is used to determine whether the build was
+successful. So make sure you return <code class="docutils literal"><span class="pre">True</span></code>, if it succeeds, since the default
+of None will read as <code class="docutils literal"><span class="pre">False</span></code>.</p>
+<p>Note that this builder did not access MongoDB in any way.
+The next example will show MongoDB access and other features.</p>
+</div>
+<div class="section" id="database-copybuilder">
+<span id="bld-ex-copy"></span><h3><a class="toc-backref" href="#id7">Database &#8220;CopyBuilder&#8221;</a><a class="headerlink" href="#database-copybuilder" title="Permalink to this headline">¶</a></h3>
+<p>The next builder does a simple DB operation: copying one MongoDB collection
+from a source to a destination. As before, we begin with the full program
+and then step through it one snippet at at time:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="k">import</span> <span class="n">QueryEngine</span>
+
+<span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">CopyBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Copy from one MongoDB collection to another.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Copy records from source to target collection.</span>
+
+<span class="sd">        :param source: Input collection</span>
+<span class="sd">        :type source: QueryEngine</span>
+<span class="sd">        :param target: Output collection</span>
+<span class="sd">        :type target: QueryEngine</span>
+<span class="sd">        :param crit: Filter criteria, e.g. &quot;{ &#39;flag&#39;: True }&quot;.</span>
+<span class="sd">        :type crit: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">collection</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">crit</span><span class="p">:</span>  <span class="c1"># reduce any False-y crit value to None</span>
+            <span class="n">crit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">criteria</span><span class="o">=</span><span class="n">crit</span><span class="p">)</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;copy: source=</span><span class="si">{}</span><span class="s2"> crit=</span><span class="si">{}</span><span class="s2"> count=</span><span class="si">{:d}</span><span class="s2">&quot;</span>
+                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span> <span class="n">crit</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cur</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Logging</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this program, we start by setting up logging.
+For convenience, the <code class="docutils literal"><span class="pre">util.get_builder_log()</span></code> method creates a new
+Python logging.Logger instance with a standard name and format.</p>
+<p><strong>Initialization</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When we initialize the class, we create an instance variable that we will
+later use to remember the target collection.</p>
+<p><strong>get_items</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Copy records from source to target collection.</span>
+
+<span class="sd">    :param source: Input collection</span>
+<span class="sd">    :type source: QueryEngine</span>
+<span class="sd">    :param target: Output collection</span>
+<span class="sd">    :type target: QueryEngine</span>
+<span class="sd">    :param crit: Filter criteria, e.g. &quot;{ &#39;flag&#39;: True }&quot;.</span>
+<span class="sd">    :type crit: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">collection</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">crit</span><span class="p">:</span>  <span class="c1"># reduce any False-y crit value to None</span>
+        <span class="n">crit</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">criteria</span><span class="o">=</span><span class="n">crit</span><span class="p">)</span>
+    <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;source=</span><span class="si">{}</span><span class="s2"> crit=</span><span class="si">{}</span><span class="s2"> count=</span><span class="si">{:d}</span><span class="s2">&quot;</span>
+              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span> <span class="n">crit</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">cur</span>
+</pre></div>
+</div>
+<p>For a copy operation, the <code class="docutils literal"><span class="pre">get_items()</span></code> method must query the source
+collection and get an iterator over the records.</p>
+<p>There are two things that are different from the FileCounter example.
+First, note that there is no <code class="docutils literal"><span class="pre">get_parameters()</span></code> method at all. Instead
+the <em>docstring</em> of this method is actually a machine-readable version of
+the metadata needed for running the builder. Not coincidentally, the format
+expected by this docstring is also understood by Sphinx&#8217;s autodoc feature.
+This way, you will be able to kill two birds with one stone: your builders
+will be documented for command-line invocation, and you can easily generate
+HTML, PDF, etc. documentation pages.</p>
+<p>Second, this method connects to the database and queries it. But, you may
+be asking, where is the <code class="docutils literal"><span class="pre">db.connect()</span></code> call? This is handled by some magic
+that is in the docstring. Notice that the type of both the source and
+target is <code class="docutils literal"><span class="pre">QueryEngine</span></code>. This is a special datatype that instructs the
+driver program (<cite>mgbuild</cite>) to expect a database configuration file with
+host name, user, password, database name, etc. and to automatically connect
+to this database and return a <code class="docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></code> instance.
+These instances are passed in as arguments to the method. So, all the
+method has to do is to use the QueryEngine object. In this case,
+this means creating a cursor that iterates over the source collection
+and remembering the target collection in an instance variable.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Unlike the previous example where instance variables might cause
+strange behavior, here the <code class="docutils literal"><span class="pre">_target_coll</span></code> instance variable is
+perfectly fine for parallel execution because the individual
+builder instances do not want to share the state of this variable
+between them &#8211; they each want and need their own copy.</p>
+</div>
+<p><strong>process_item</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, we simply insert every item into the target collection.</p>
+<p>As we will see later, the builder framework also contains some automatic
+functionality for <em>incremental</em> building, which means only looking at
+records that are new since the last time. Usually this involves some extra
+logic inside the builder itself, but in a very simple case like this
+the copying would automatically work with the incremental mode.</p>
+</div>
+<div class="section" id="incremental-builder-maxvaluebuilder">
+<span id="bld-writing-incr"></span><h3><a class="toc-backref" href="#id8">Incremental builder &#8220;MaxValueBuilder&#8221;</a><a class="headerlink" href="#incremental-builder-maxvaluebuilder" title="Permalink to this headline">¶</a></h3>
+<p>The incremental building concept was introduced in <a class="reference internal" href="#bld-concepts"><span class="std std-ref">Features</span></a>.
+The central idea of the incremental building implementation is that any builder
+can be run in &#8220;incremental mode&#8221;. When this happens, any QueryEngine objects
+are replaced transparently by equivalent objects that track their last
+position, of class <code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.incr.TrackedQueryEngine</span></code>, which is
+documented in module <code class="xref py py-mod docutils literal"><span class="pre">matgendb.builders.incr</span></code>. This tracking can be
+controlled, if necessary, with the instance variable <code class="docutils literal"><span class="pre">tracking</span></code> on the
+TrackedQueryEngine class.</p>
+<p>The <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">Database &#8220;CopyBuilder&#8221;</span></a> is an example of a trivial builder that can work with
+incremental building, without modification to the source code. With incremental
+mode activated, successive copies will only move over &#8220;new&#8221; data items. But
+most builders will not be this easy. To help understand what to do in
+a non-trivial case, we show here a contrived example where a collection A
+is used to build a derived collection B. In A, there are 2 values for each
+record, a number and a group name. In B, there are two values for each
+distinct group in A: the group name, and the highest value for that group.</p>
+<p>For the sake of this example we will use the following algorithm to
+rebuild B from A when A gets new elements A<sub>new</sub>.</p>
+<ol class="arabic simple">
+<li>For each record present in A<sub>new</sub>:</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li>Get its group, <cite>g</cite></li>
+<li>If <cite>g</cite> is not seen, figure out current maximum (if any) from all records in A</li>
+<li>Update maximum for <cite>g</cite>, in memory, with value for record</li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li>After all records in A<sub>new</sub> are processed, set new group maximums in B
+from values stored in memory.</li>
+</ol>
+<p>This algorithm is incremental in the sense that it ignores
+any groups that are not in the new elements A<sub>new</sub>, yet non-trivial
+because in order to calculate the new maximum value one needs to examine
+all the elements in A:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="k">import</span> <span class="n">QueryEngine</span>
+
+<span class="k">class</span> <span class="nc">MaxValueBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
+<span class="sd">    some custom logic for incremental case.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all records from source collection to add to target.</span>
+
+<span class="sd">        :param source: Input collection</span>
+<span class="sd">        :type source: QueryEngine</span>
+<span class="sd">        :param target: Output collection</span>
+<span class="sd">        :type target: QueryEngine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared_dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">collection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_src</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate new maximum value for each group,</span>
+<span class="sd">        for &quot;new&quot; items only.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">:</span>
+            <span class="n">cur_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cur_val</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># New group. Could fetch old max. from target collection,</span>
+            <span class="c1"># but for the sake of illustration recalculate it from</span>
+            <span class="c1"># the source collection.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_src</span><span class="o">.</span><span class="n">tracking</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># examine entire collection</span>
+            <span class="n">new_max</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_src</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">criteria</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">},</span>
+                                       <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]):</span>
+                <span class="n">new_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">new_max</span><span class="p">,</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_src</span><span class="o">.</span><span class="n">tracking</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># back to incremental mode</span>
+            <span class="c1"># calculate new max</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_max</span>
+
+    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update target collection with calculated maximum values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">},</span> <span class="n">doc</span><span class="p">,</span> <span class="n">upsert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Initialization</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MaxValueBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
+<span class="sd">       some custom logic for incremental case.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all records from source collection to add to target.</span>
+
+<span class="sd">        :param source: Input collection</span>
+<span class="sd">        :type source: QueryEngine</span>
+<span class="sd">        :param target: Output collection</span>
+<span class="sd">        :type target: QueryEngine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared_dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">collection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_src</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Just as for the CopyBuilder, we use the docstring-style of declaration for the
+parameters to this builder, which are simply the input and output collections.
+We remember both source and target in variables. In addition, we use a utility
+function <code class="docutils literal"><span class="pre">shared_dict()</span></code> in the Builder class to get a dictionary variable
+that can be shared between parallel processes. Finally, this method returns
+a query on all items in the collection.</p>
+<p><strong>Processing</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate new maximum value for each group,</span>
+<span class="sd">    for &quot;new&quot; items only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">:</span>
+        <span class="n">cur_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cur_val</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># New group. Could fetch old max. from target collection,</span>
+        <span class="c1"># but for the sake of illustration recalculate it from</span>
+        <span class="c1"># the source collection.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_src</span><span class="o">.</span><span class="n">tracking</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># examine entire collection</span>
+        <span class="n">new_max</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_src</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">criteria</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">},</span>
+                                   <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]):</span>
+            <span class="n">new_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">new_max</span><span class="p">,</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_src</span><span class="o">.</span><span class="n">tracking</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># back to incremental mode</span>
+        <span class="c1"># calculate new max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_max</span>
+</pre></div>
+</div>
+<p>For each item, we update the shared <code class="docutils literal"><span class="pre">_groups</span></code> variable created in
+<code class="docutils literal"><span class="pre">get_items()</span></code>. For new groups, we re-scan the whole source collection
+to find the previous maximum value.
+There are a couple better ways to do this,
+but this method is easy to understand and illustrates how a collection
+can be manipulated in its &#8220;raw&#8221; form in an incremental builder.</p>
+<p>The key lines here are
+<code class="docutils literal"><span class="pre">self._src.tracking</span> <span class="pre">=</span> <span class="pre">False</span></code> and, later, <code class="docutils literal"><span class="pre">self._src.tracking</span> <span class="pre">=</span> <span class="pre">True</span></code>.
+These turn off the &#8220;incremental mode&#8221; so that the query will start at the
+beginning of the collection instead of from the start of A<sub>new</sub>.</p>
+<p><strong>Finalization</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update target collection with calculated maximum values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">},</span> <span class="n">doc</span><span class="p">,</span> <span class="n">upsert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>In this case, the <code class="docutils literal"><span class="pre">finalize()</span></code> method is used to set the calculated
+group maximums into the target collection. This is the same as the <em>reduce</em>
+stage of a map/reduce task (the <code class="docutils literal"><span class="pre">process_item</span></code> performs the <em>map</em>).</p>
+<p>In conclusion, we see that for this case only 2 lines turning the
+tracking variable on and off needed to be added to accommodate
+incremental building.</p>
+</div>
+</div>
+<div class="section" id="running-a-builder">
+<span id="bld-running"></span><h2><a class="toc-backref" href="#id9">Running a builder</a><a class="headerlink" href="#running-a-builder" title="Permalink to this headline">¶</a></h2>
+<p>This section describes how,
+once you have written a builder class, you can use <cite>mgbuild</cite> to run
+it, possibly in parallel and possibly &#8220;incrementally&#8221;, on some inputs.</p>
+<p>We will break this process into two parts:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#bld-run-show"><span class="std std-ref">Displaying</span></a> the usage for a given builder class</li>
+<li><a class="reference internal" href="#bld-run-exe"><span class="std std-ref">Running</span></a> the builder</li>
+</ul>
+<p>Both of these use the <cite>mgbuild</cite> sub-command &#8220;run&#8221; (alternatively: &#8220;build&#8221;),
+like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span> <span class="o">&lt;</span><span class="n">arguments</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>In the examples below, we will assume that you have pymatgen-db installed and
+in your Python path. We will use the example modules that are installed
+in <code class="docutils literal"><span class="pre">matgendb.builders.examples</span></code>.</p>
+<div class="section" id="displaying-builder-usage">
+<span id="bld-run-show"></span><h3><a class="toc-backref" href="#id10">Displaying builder usage</a><a class="headerlink" href="#displaying-builder-usage" title="Permalink to this headline">¶</a></h3>
+<p>You can get the list of parameters and their types for a given builder
+by giving its full module path, and the <code class="docutils literal"><span class="pre">-u</span></code> or <code class="docutils literal"><span class="pre">--usage</span></code> option:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="o">-</span><span class="n">u</span> <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
+
+<span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
+  <span class="n">Copy</span> <span class="kn">from</span> <span class="nn">one</span> <span class="n">MongoDB</span> <span class="n">collection</span> <span class="n">to</span> <span class="n">another</span><span class="o">.</span>
+  <span class="n">Parameters</span><span class="p">:</span>
+    <span class="n">crit</span> <span class="p">(</span><span class="nb">dict</span><span class="p">):</span> <span class="n">Filter</span> <span class="n">criteria</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="s2">&quot;{ &#39;flag&#39;: True }&quot;</span><span class="o">.</span>
+    <span class="n">source</span> <span class="p">(</span><span class="n">QueryEngine</span><span class="p">):</span> <span class="n">Input</span> <span class="n">collection</span>
+    <span class="n">target</span> <span class="p">(</span><span class="n">QueryEngine</span><span class="p">):</span> <span class="n">Output</span> <span class="n">collection</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You will also get the usage information if you invoke the builder with the
+wrong number of arguments (e.g. zero), although in this case you will also
+see some error messages.</p>
+</div>
+</div>
+<div class="section" id="running-the-builder">
+<span id="bld-run-exe"></span><h3><a class="toc-backref" href="#id11">Running the builder</a><a class="headerlink" href="#running-the-builder" title="Permalink to this headline">¶</a></h3>
+<p>The usage of the <cite>mgbuild run</cite> command is as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">quiet</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">OPER</span><span class="p">[:</span><span class="n">FIELD</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NUM_CORES</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">-</span><span class="n">u</span><span class="p">]</span>
+                   <span class="n">builder</span> <span class="p">[</span><span class="n">parameter</span> <span class="p">[</span><span class="n">parameter</span> <span class="o">...</span><span class="p">]]</span>
+
+<span class="n">positional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="n">builder</span>               <span class="n">Builder</span> <span class="n">class</span><span class="p">,</span> <span class="n">relative</span> <span class="ow">or</span> <span class="n">absolute</span> <span class="kn">import</span> <span class="nn">path</span><span class="o">,</span> <span class="nn">e.g.</span>
+                        <span class="s1">&#39;my.awesome.BigBuilder&#39;</span> <span class="ow">or</span> <span class="s1">&#39;BigBuilder&#39;</span><span class="o">.</span>
+  <span class="n">parameter</span>             <span class="n">Builder</span> <span class="n">parameters</span><span class="p">,</span> <span class="ow">in</span> <span class="nb">format</span> <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;=&lt;</span><span class="n">value</span><span class="o">&gt;.</span> <span class="n">If</span> <span class="n">the</span>
+                        <span class="n">parameter</span> <span class="nb">type</span> <span class="ow">is</span> <span class="n">QueryEngine</span><span class="p">,</span> <span class="n">the</span> <span class="n">value</span> <span class="n">should</span> <span class="n">be</span> <span class="n">a</span>
+                        <span class="n">JSON</span> <span class="n">configuration</span> <span class="n">file</span><span class="o">.</span> <span class="n">Prefix</span> <span class="n">filename</span> <span class="k">with</span> <span class="n">a</span> <span class="s1">&#39;-&#39;</span> <span class="n">to</span>
+                        <span class="n">ignore</span> <span class="n">incremental</span> <span class="n">mode</span> <span class="k">for</span> <span class="n">this</span> <span class="n">QueryEngine</span><span class="o">.</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">--</span><span class="n">quiet</span><span class="p">,</span> <span class="o">-</span><span class="n">q</span>           <span class="n">Minimal</span> <span class="n">verbosity</span><span class="o">.</span>
+  <span class="o">--</span><span class="n">verbose</span><span class="p">,</span> <span class="o">-</span><span class="n">v</span>         <span class="n">Print</span> <span class="n">more</span> <span class="n">verbose</span> <span class="n">messages</span> <span class="n">to</span> <span class="n">standard</span> <span class="n">error</span><span class="o">.</span>
+                        <span class="n">Repeatable</span><span class="o">.</span> <span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">ERROR</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">i</span> <span class="n">OPER</span><span class="p">[:</span><span class="n">FIELD</span><span class="p">],</span> <span class="o">--</span><span class="n">incr</span> <span class="n">OPER</span><span class="p">[:</span><span class="n">FIELD</span><span class="p">]</span>
+                        <span class="n">Incremental</span> <span class="n">mode</span> <span class="k">for</span> <span class="n">operation</span> <span class="ow">and</span> <span class="n">optional</span> <span class="n">sort</span><span class="o">-</span><span class="n">field</span>
+                        <span class="n">name</span><span class="o">.</span> <span class="n">OPER</span> <span class="n">may</span> <span class="n">be</span> <span class="n">one</span> <span class="n">of</span><span class="p">:</span> <span class="n">copy</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">build</span><span class="o">.</span> <span class="n">Default</span>
+                        <span class="n">FIELD</span> <span class="ow">is</span> <span class="s1">&#39;_id&#39;</span>
+  <span class="o">-</span><span class="n">n</span> <span class="n">NUM_CORES</span><span class="p">,</span> <span class="o">--</span><span class="n">ncores</span> <span class="n">NUM_CORES</span>
+                        <span class="n">Number</span> <span class="n">of</span> <span class="n">cores</span> <span class="ow">or</span> <span class="n">processes</span> <span class="n">to</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">parallel</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">u</span><span class="p">,</span> <span class="o">--</span><span class="n">usage</span>           <span class="n">Print</span> <span class="n">usage</span> <span class="n">information</span> <span class="n">on</span> <span class="n">selected</span> <span class="n">builder</span> <span class="ow">and</span> <span class="n">exit</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>To run the builder, you need at a minimum to give the full path to the
+builder class, and then values for each parameter. There are also optional
+arguments for building in parallel and building incrementally. This section will
+walk through from simple to more complex examples.</p>
+<div class="section" id="basic-usage">
+<h4>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h4>
+<p>Run the copy builder:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+    <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p>In this example, we are running the CopyBuilder with configuration files
+for the source and target and empty criteria (i.e. copy everything). The
+copy will be run in a single thread.</p>
+<p>The configuration files in question are just JSON files that look like this
+(you could add &#8220;user&#8221; and &#8220;password&#8221; for authenticated DBs):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="mi">27017</span><span class="p">,</span>
+ <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;collection&quot;</span><span class="p">:</span> <span class="s2">&quot;test1&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="dbconfig.html"><span class="doc">Database configuration</span></a> for more details.</p>
+</div>
+<div class="section" id="running-in-parallel">
+<h4>Running in parallel<a class="headerlink" href="#running-in-parallel" title="Permalink to this headline">¶</a></h4>
+<p>Most machines have multiple cores, and hundreds of cores will be common
+in the near future. If your item processing requires any
+real work, you will probably benefit by running in parallel:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+    <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> <span class="o">-</span><span class="n">n</span> <span class="mi">8</span>
+</pre></div>
+</div>
+<p>The same command as previously, but with <strong>-n 8</strong> added to cause 8 parallel
+threads to be spawned to run the copy in parallel.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For parallel runs, only the <code class="docutils literal"><span class="pre">process_item()</span></code> method is run in parallel.
+The <code class="docutils literal"><span class="pre">get_items()</span></code> is always run sequentially.</p>
+</div>
+</div>
+<div class="section" id="incremental-builds">
+<h4>Incremental builds<a class="headerlink" href="#incremental-builds" title="Permalink to this headline">¶</a></h4>
+<p>The concept of incremental building was introduced in <a class="reference internal" href="#bld-writing-incr"><span class="std std-ref">Incremental builder &#8220;MaxValueBuilder&#8221;</span></a>.
+From the command-line, incremental building is controlled by the <code class="docutils literal"><span class="pre">-i/--incr</span></code> option.
+What this really does is to add some behind-the-scenes bookkeeping for every
+parameter of type <code class="docutils literal"><span class="pre">QueryEngine</span></code> (except ones where it is explicitly
+turned off, <a class="reference internal" href="#bld-incr-skip"><span class="std std-ref">see below</span></a>) that records and retrieves the spot where processing
+was last ended. Multiple spots are allowed per-collection by requiring an
+&#8220;operation&#8221;. Currently,
+only a small set of operations are allowed: &#8220;copy&#8221;, &#8220;build&#8221;, and &#8220;other&#8221;.</p>
+<p>For incremental building to work properly, there must be some field
+in the collection that increases monotonically. This field is used to
+determine which records come <em>after</em> the spot marked on the last run. By
+default this field is <cite>_id</cite>, but it is highly recommended to choose a
+collection-specific identifier because <cite>_id</cite> as chosen by the
+client is not always monotonic.</p>
+<p><strong>Basic incremental build</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+    <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
+    <span class="o">-</span><span class="n">i</span> <span class="n">copy</span>
+</pre></div>
+</div>
+<p>Copies from source to target. Subsequent runs will only copy records that
+are newer (according to the field, in this case defaulting to <code class="docutils literal"><span class="pre">_id</span></code>)
+than the last record from the previous run.</p>
+<p><strong>Incremental build with parallelism</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+    <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
+    <span class="o">-</span><span class="n">n</span> <span class="mi">8</span> <span class="o">-</span><span class="n">i</span> <span class="n">copy</span>
+</pre></div>
+</div>
+<p>Parallelism is not different with incremental builds. As before, we
+simply add <strong>-n 8</strong> to the command-line.</p>
+<p><strong>Incremental build with custom identifier</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+    <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
+    <span class="o">-</span><span class="n">i</span> <span class="n">copy</span><span class="p">:</span><span class="n">num</span>
+</pre></div>
+</div>
+<p>This example runs an incremental build with the &#8220;copy&#8221; operation,
+using the <code class="docutils literal"><span class="pre">num</span></code> field instead of the default <code class="docutils literal"><span class="pre">_id</span></code>.</p>
+<p id="bld-incr-skip"><strong>Incremental build skipped for some collections</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+    <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=-</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
+    <span class="o">-</span><span class="n">i</span> <span class="n">copy</span><span class="p">:</span><span class="n">num</span>
+</pre></div>
+</div>
+<p>This is pretty subtle: notice the &#8220;-&#8221; inserted after the &#8220;=&#8221; in
+<code class="docutils literal"><span class="pre">target=-conf/test2.json</span></code>. This has the effect of not adding tracking information
+for the target collection.
+In this case, tracking the last record added to the target
+isn&#8217;t useful for the copy, all that matters is knowing where we stopped
+in the source collection.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Database &#8220;Builders&#8221;</a><ul>
+<li><a class="reference internal" href="#features">Features</a><ul>
+<li><a class="reference internal" href="#parallel-building">Parallel building</a></li>
+<li><a class="reference internal" href="#incremental-building">Incremental building</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#writing-a-builder">Writing a builder</a><ul>
+<li><a class="reference internal" href="#simple-filecounter-builder">Simple &#8220;FileCounter&#8221; builder</a></li>
+<li><a class="reference internal" href="#database-copybuilder">Database &#8220;CopyBuilder&#8221;</a></li>
+<li><a class="reference internal" href="#incremental-builder-maxvaluebuilder">Incremental builder &#8220;MaxValueBuilder&#8221;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-a-builder">Running a builder</a><ul>
+<li><a class="reference internal" href="#displaying-builder-usage">Displaying builder usage</a></li>
+<li><a class="reference internal" href="#running-the-builder">Running the builder</a><ul>
+<li><a class="reference internal" href="#basic-usage">Basic usage</a></li>
+<li><a class="reference internal" href="#running-in-parallel">Running in parallel</a></li>
+<li><a class="reference internal" href="#incremental-builds">Incremental builds</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="mgvv.html" title="previous chapter">Materials Project Database Validation: mgvv</a></li>
+      <li>Next: <a href="dbconfig.html" title="next chapter">Database configuration</a></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/builders.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>
