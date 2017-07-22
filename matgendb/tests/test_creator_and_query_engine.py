@@ -6,13 +6,6 @@ Created on Jun 19, 2012
 
 from __future__ import division
 
-__author__ = "Shyue Ping Ong"
-__copyright__ = "Copyright 2012, The Materials Project"
-__version__ = "0.1"
-__maintainer__ = "Shyue Ping Ong"
-__email__ = "shyue@mit.edu"
-__date__ = "Jun 19, 2012"
-
 import unittest
 import os
 import warnings
@@ -29,10 +22,18 @@ from matgendb.query_engine import QueryEngine
 from matgendb.creator import VaspToDbTaskDrone
 from matgendb.tests import common
 
+__author__ = "Shyue Ping Ong"
+__copyright__ = "Copyright 2012, The Materials Project"
+__version__ = "0.1"
+__maintainer__ = "Shyue Ping Ong"
+__email__ = "shyue@mit.edu"
+__date__ = "Jun 19, 2012"
+
 test_dir = os.path.join(os.path.dirname(__file__), "..", "..",
                         'test_files')
 
 has_mongo = common.has_mongo()
+
 
 class VaspToDbTaskDroneTest(unittest.TestCase):
 
@@ -45,7 +46,6 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                 cls.conn = None
         else:
             cls.conn = None
-
 
     @unittest.skipUnless(has_mongo, "MongoDB connection required")
     def test_get_valid_paths(self):
@@ -104,6 +104,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                 self.assertEqual(len(d["calculations"]), 2)
                 self.assertEqual(d['input']['is_lasph'], False)
                 self.assertEqual(d['input']['xc_override'], None)
+                self.assertEqual(d["oxide_type"], "oxide")
             elif dir_name.endswith("Li2O"):
                 self.assertEqual(d['state'], "successful")
                 self.assertEqual(d['pretty_formula'], "Li2O")
@@ -134,6 +135,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                     self.assertEqual(len(r["calculations"]), 2)
                     self.assertEqual(r["input"]["is_lasph"], False)
                     self.assertEqual(r['input']['xc_override'], None)
+                    self.assertEqual(d["oxide_type"], "oxide")
                 elif r["dir_name"].endswith("Li2O"):
                     self.assertAlmostEqual(r['energy'],
                                            -14.31337758, 4)
@@ -141,7 +143,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                     self.assertEqual(r["input"]["is_lasph"], False)
                     self.assertEqual(r['input']['xc_override'], None)
 
-            #Test lasph
+            # Test lasph
             e = qe.get_entries({"dir_name":{"$regex":"lasph"}})
             self.assertEqual(len(e), 1)
             self.assertEqual(e[0].parameters["is_lasph"], True)
@@ -155,6 +157,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             d = qe.get_entries_in_system(["Li", "O"])
             self.assertEqual(len(d), 3)
             self.assertIsInstance(d[0], ComputedEntry)
+            self.assertEqual(d[0].data["oxide_type"], "oxide")
 
             s = qe.get_structure_from_id(d[0].entry_id)
             self.assertIsInstance(s, Structure)

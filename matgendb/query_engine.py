@@ -289,11 +289,13 @@ class QueryEngine(object):
         """
         all_entries = list()
         optional_data = [] if not optional_data else list(optional_data)
+        optional_data.append("oxide_type")
         fields = [k for k in optional_data]
         fields.extend(["task_id", "unit_cell_formula", "energy", "is_hubbard",
                        "hubbards", "pseudo_potential.labels",
                        "pseudo_potential.functional", "run_type",
-                       "input.is_lasph", "input.xc_override", "input.potcar_spec"])
+                       "input.is_lasph", "input.xc_override",
+                       "input.potcar_spec"])
         if inc_structure:
             fields.append("output.crystal")
 

@@ -7,13 +7,6 @@ Mongo database.
 
 from __future__ import division
 
-__author__ = "Shyue Ping Ong"
-__copyright__ = "Copyright 2012, The Materials Project"
-__version__ = "2.0.0"
-__maintainer__ = "Shyue Ping Ong"
-__email__ = "shyue@mit.edu"
-__date__ = "Mar 18, 2012"
-
 import os
 import re
 import glob
@@ -43,7 +36,15 @@ from pymatgen.analysis.bond_valence import BVAnalyzer
 from monty.io import zopen
 from pymatgen.matproj.rest import MPRester
 from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.analysis.structure_analyzer import oxide_type
 from monty.json import MontyEncoder
+
+__author__ = "Shyue Ping Ong"
+__copyright__ = "Copyright 2012, The Materials Project"
+__version__ = "2.0.0"
+__maintainer__ = "Shyue Ping Ong"
+__email__ = "shyue@mit.edu"
+__date__ = "Mar 18, 2012"
 
 
 logger = logging.getLogger(__name__)
@@ -164,7 +165,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             if self.user:
                 db.authenticate(self.user, self.password)
             if db.counter.find({"_id": "taskid"}).count() == 0:
-                db.counter.insert({"_id": "taskid", "c": 1})
+                db.counter.insert_one({"_id": "taskid", "c": 1})
 
     def assimilate(self, path):
         """
@@ -273,10 +274,11 @@ class VaspToDbTaskDrone(AbstractDrone):
                 d["last_updated"] = datetime.datetime.today()
                 if result is None:
                     if ("task_id" not in d) or (not d["task_id"]):
-                        d["task_id"] = db.counter.find_and_modify(
-                            query={"_id": "taskid"},
+                        result = db.counter.find_one_and_update(
+                            filter={"_id": "taskid"},
                             update={"$inc": {"c": 1}}
-                            )["c"]
+                            )
+                        d["task_id"] = result["c"]
                     logger.info("Inserting {} with taskid = {}"
                                 .format(d["dir_name"], d["task_id"]))
                 elif self.update_duplicates:
@@ -284,8 +286,8 @@ class VaspToDbTaskDrone(AbstractDrone):
                     logger.info("Updating {} with taskid = {}"
                                 .format(d["dir_name"], d["task_id"]))
 
-                coll.update({"dir_name": d["dir_name"]}, {"$set": d},
-                            upsert=True)
+                coll.update_one({"dir_name": d["dir_name"]}, {"$set": d},
+                                upsert=True)
                 return d["task_id"]
             else:
                 logger.info("Skipping duplicate {}".format(d["dir_name"]))
@@ -500,12 +502,13 @@ class VaspToDbTaskDrone(AbstractDrone):
             try:
                 d["dos"] = r.complete_dos.as_dict()
             except Exception:
-                logger.warn("No valid dos data exist in {}.\n Skipping dos"
-                            .format(dir_name))
+                logger.warning("No valid dos data exist in {}.\n Skipping dos"
+                               .format(dir_name))
         if taskname == "relax1" or taskname == "relax2":
             d["task"] = {"type": "aflow", "name": taskname}
         else:
             d["task"] = {"type": taskname, "name": taskname}
+        d["oxide_type"] = oxide_type(r.final_structure)
         return d
 
     def generate_doc(self, dir_name, vasprun_files):
@@ -515,9 +518,9 @@ class VaspToDbTaskDrone(AbstractDrone):
         """
         try:
             fullpath = os.path.abspath(dir_name)
-            #Defensively copy the additional fields first.  This is a MUST.
-            #Otherwise, parallel updates will see the same object and inserts
-            #will be overridden!!
+            # Defensively copy the additional fields first.  This is a MUST.
+            # Otherwise, parallel updates will see the same object and inserts
+            # will be overridden!!
             d = {k: v for k, v in self.additional_fields.items()}
             d["dir_name"] = fullpath
             d["schema_version"] = VaspToDbTaskDrone.__version__
@@ -527,7 +530,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             d1 = d["calculations"][0]
             d2 = d["calculations"][-1]
 
-            #Now map some useful info to the root level.
+            # Now map some useful info to the root level.
             for root_key in ["completed_at", "nsites", "unit_cell_formula",
                              "reduced_cell_formula", "pretty_formula",
                              "elements", "nelements", "cif", "density",
@@ -535,7 +538,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 d[root_key] = d2[root_key]
             d["chemsys"] = "-".join(sorted(d2["elements"]))
 
-            #store any overrides to the exchange correlation functional
+            # store any overrides to the exchange correlation functional
             xc = d2["input"]["incar"].get("GGA")
             if xc:
                 xc = xc.upper()
@@ -573,6 +576,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                                "source": "spglib",
                                "crystal_system": sg.get_crystal_system(),
                                "hall": sg.get_hall()}
+            d["oxide_type"] = d2["oxide_type"]
             d["last_updated"] = datetime.datetime.today()
             return d
         except Exception as ex:
