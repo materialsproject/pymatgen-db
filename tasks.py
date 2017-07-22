@@ -65,7 +65,7 @@ def update_doc(ctx):
     with cd("docs"):
         ctx.run("git add .")
         ctx.run("git commit -a -m \"Update dev docs\"")
-        ctx.run("git push origin gh-pages")
+        ctx.run("git push")
 
 
 @task
