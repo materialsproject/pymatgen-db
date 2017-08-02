@@ -261,8 +261,9 @@ class HTMLFormatter:
                 text.append('</table>')
         text.append('</body>')
         text.append('</html>')
-        return self._sep.join(text)
-
+        text_str = self._sep.join(text)
+        text_str = text_str.replace("**", "<br>")
+        return text_str
 
 class JSONFormatter:
     """Format a report as JSON.

@@ -485,10 +485,10 @@ def command_validate(args, formatters):
         table = report.Table(colnames=('Function', 'Error'))
 
         for t in test_methods:
+            # Run the actual test. Test should return None if successful or error string if failure
             error = t(db)
             if error:
-                # Add a section to report for each test.
-                # TODO: Maybe do it as one eventually
+                # Add a row to report for each test.
                 table.add(('{}()'.format(t.__name__), error))
 
         sub_sect_hdr = report.SectionHeader(title='Python Test Functions')
