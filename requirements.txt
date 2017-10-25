@@ -1,5 +1,5 @@
 pymatgen==2017.10.16
-monty==1.0.1
+monty==1.0.2
 pymongo==3.5.1
 smoqe==0.1.3
 pybtex==0.21
