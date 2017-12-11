@@ -1,6 +1,6 @@
-pymatgen==2017.11.30
+pymatgen==2017.12.8
 monty==1.0.2
-pymongo==3.5.1
+pymongo==3.6.0
 smoqe==0.1.3
 pybtex==0.21
 enum34==1.1.6; python_version < '3.5'
