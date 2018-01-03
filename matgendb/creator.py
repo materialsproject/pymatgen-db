@@ -34,7 +34,7 @@ from pymatgen.io.cif import CifWriter
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from pymatgen.analysis.bond_valence import BVAnalyzer
 from monty.io import zopen
-from pymatgen.matproj.rest import MPRester
+from pymatgen.ext.matproj import MPRester
 from pymatgen.entries.computed_entries import ComputedEntry
 from pymatgen.analysis.structure_analyzer import oxide_type
 from monty.json import MontyEncoder
