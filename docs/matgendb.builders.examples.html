@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>matgendb.builders.examples package &#8212; pymatgen-db 0.7.0 documentation</title>
-    
+    <title>matgendb.builders.examples package &#8212; pymatgen-db 2017.1.4 documentation</title>
     <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.0',
+        VERSION:     '2017.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -40,7 +37,7 @@
 </script>
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -50,7 +47,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.7.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2017.1.4 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -66,7 +63,7 @@
 </div>
 <div class="section" id="module-matgendb.builders.examples.copy_builder">
 <span id="matgendb-builders-examples-copy-builder-module"></span><h2>matgendb.builders.examples.copy_builder module<a class="headerlink" href="#module-matgendb.builders.examples.copy_builder" title="Permalink to this headline">¶</a></h2>
-<p>Simple &#8220;copy&#8221; builder.</p>
+<p>Simple “copy” builder.</p>
 <p>Copies from one collection to another.
 With the optional incremental feature, running twice will only copy the new records, i.e.
 running twice in succession will cause the second run to do nothing.</p>
@@ -86,9 +83,9 @@ running twice in succession will cause the second run to do nothing.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>source</strong> (<em>QueryEngine</em>) &#8211; Input collection</li>
-<li><strong>target</strong> (<em>QueryEngine</em>) &#8211; Output collection</li>
-<li><strong>crit</strong> (<em>dict</em>) &#8211; Filter criteria, e.g. &#8220;{ &#8216;flag&#8217;: True }&#8221;.</li>
+<li><strong>source</strong> (<em>QueryEngine</em>) – Input collection</li>
+<li><strong>target</strong> (<em>QueryEngine</em>) – Output collection</li>
+<li><strong>crit</strong> (<em>dict</em>) – Filter criteria, e.g. “{ ‘flag’: True }”.</li>
 </ul>
 </td>
 </tr>
@@ -138,7 +135,7 @@ running twice in succession will cause the second run to do nothing.</p>
 <div class="section" id="module-matgendb.builders.examples.maxvalue_builder">
 <span id="matgendb-builders-examples-maxvalue-builder-module"></span><h2>matgendb.builders.examples.maxvalue_builder module<a class="headerlink" href="#module-matgendb.builders.examples.maxvalue_builder" title="Permalink to this headline">¶</a></h2>
 <p>Build a derived collection with the maximum
-value from each &#8216;group&#8217; defined in the source
+value from each ‘group’ defined in the source
 collection.</p>
 <dl class="class">
 <dt id="matgendb.builders.examples.maxvalue_builder.MaxValueBuilder">
@@ -151,9 +148,9 @@ some custom logic for incremental case.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ncores</strong> (<em>int</em>) &#8211; Desired number of threads or processes to run</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ncores</strong> (<em>int</em>) – Desired number of threads or processes to run</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">ValueError for bad &#8216;config&#8217; arg</td>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">ValueError for bad ‘config’ arg</td>
 </tr>
 </tbody>
 </table>
@@ -172,8 +169,8 @@ some custom logic for incremental case.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>source</strong> (<em>QueryEngine</em>) &#8211; Input collection</li>
-<li><strong>target</strong> (<em>QueryEngine</em>) &#8211; Output collection</li>
+<li><strong>source</strong> (<em>QueryEngine</em>) – Input collection</li>
+<li><strong>target</strong> (<em>QueryEngine</em>) – Output collection</li>
 </ul>
 </td>
 </tr>
@@ -185,7 +182,7 @@ some custom logic for incremental case.</p>
 <dt id="matgendb.builders.examples.maxvalue_builder.MaxValueBuilder.process_item">
 <code class="descname">process_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/matgendb/builders/examples/maxvalue_builder.html#MaxValueBuilder.process_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#matgendb.builders.examples.maxvalue_builder.MaxValueBuilder.process_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate new maximum value for each group,
-for &#8220;new&#8221; items only.</p>
+for “new” items only.</p>
 </dd></dl>
 
 </dd></dl>

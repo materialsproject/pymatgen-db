@@ -1,3 +1,3 @@
-matgendb.builders package
-=========================
+matgendb\.builders package
+==========================
 

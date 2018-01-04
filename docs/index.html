@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Pymatgen-db &#8212; pymatgen-db 0.7.0 documentation</title>
-    
+    <title>Pymatgen-db &#8212; pymatgen-db 2017.1.4 documentation</title>
     <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.0',
+        VERSION:     '2017.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -41,7 +38,7 @@
 </script>
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -54,7 +51,7 @@
         <li class="right" >
           <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">pymatgen-db 0.7.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">pymatgen-db 2017.1.4 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -122,7 +119,7 @@ install pymatgen on any system is to use easy_install or pip, as follows:</p>
 </div>
 <div class="section" id="developmental-version">
 <h2>Developmental version<a class="headerlink" href="#developmental-version" title="Permalink to this headline">¶</a></h2>
-<p>The bleeding edge developmental version is at the pymatgen-db&#8217;s <a class="reference external" href="https://github.com/materialsproject/pymatgen-db">Github repo</a>.
+<p>The bleeding edge developmental version is at the pymatgen-db’s <a class="reference external" href="https://github.com/materialsproject/pymatgen-db">Github repo</a>.
 The developmental version is likely to be more buggy, but may contain new
 features. The Github version include test files as well for complete unit
 testing. After cloning the source, you can type:</p>
@@ -173,7 +170,7 @@ following commands:</p>
 </div>
 <p>This will create a test database and start the Mongo daemon. Once you are
 done with testing, you can simply press Ctrl-C to stop the server and delete
-the &#8220;test_db&#8221; folder.</p>
+the “test_db” folder.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Running a Mongo server this way is insecure as Mongo does not enable
@@ -187,17 +184,17 @@ the following command:</p>
 </div>
 <p>This will prompt you for a few parameters to create a database config file,
 which will make it much easier to use mgdb in future. Note that the config file
-name can be anything of your choice, but using &#8220;db.json&#8221; will allow you to use
+name can be anything of your choice, but using “db.json” will allow you to use
 mgdb without explicitly specifying the filename in future. If you are just
 testing using the test database, simply hit Enter to accept the defaults for
 all settings.</p>
-<p>For more advanced use of the &#8220;db.json&#8221; config file (e.g., specifying aliases,
+<p>For more advanced use of the “db.json” config file (e.g., specifying aliases,
 defaults, etc., please refer to the following <a class="reference external" href="_static/db.json">sample</a>.</p>
 </div>
 <div class="section" id="inserting-calculations">
 <h2>Inserting calculations<a class="headerlink" href="#inserting-calculations" title="Permalink to this headline">¶</a></h2>
 <p>To insert an entire directory of runs (where the topmost directory is
-&#8220;dir_name&#8221;) into the database, use the following command:</p>
+“dir_name”) into the database, use the following command:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Note that &quot;-c db.json&quot; may be omitted if the config filename is the</span>
 <span class="c1"># current directory under the default filename of db.json.</span>
 

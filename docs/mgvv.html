@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 0.7.0 documentation</title>
-    
+    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2017.1.4 documentation</title>
     <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.0',
+        VERSION:     '2017.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +39,7 @@
 </script>
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -58,7 +55,7 @@
         <li class="right" >
           <a href="index.html" title="Pymatgen-db"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.7.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2017.1.4 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -72,7 +69,7 @@
 <p>The command-line program, <cite>mgvv</cite>, is used to validate MongoDB databases. This command has two sub-commands:</p>
 <ol class="arabic simple">
 <li><a class="reference internal" href="#mgvv-validate"><span class="std std-ref">mgvv validate</span></a> - Filter records on a set of criteria (conjunction) and apply a set of constraints.</li>
-<li><a class="reference internal" href="#mgvv-diff"><span class="std std-ref">mgvv diff</span></a> - Look at the &#8220;diff&#8221; of any two collections, for identifiers that are missing from one or the other, or for mis-matching values for identifiers that are the same.</li>
+<li><a class="reference internal" href="#mgvv-diff"><span class="std std-ref">mgvv diff</span></a> - Look at the “diff” of any two collections, for identifiers that are missing from one or the other, or for mis-matching values for identifiers that are the same.</li>
 </ol>
 <div class="section" id="mgvv-validate-subcommand">
 <span id="mgvv-validate"></span><h2>mgvv validate subcommand<a class="headerlink" href="#mgvv-validate-subcommand" title="Permalink to this headline">¶</a></h2>
@@ -92,7 +89,7 @@ equivalent:</p>
 </pre></div>
 </div>
 <p>The validation constraints could also be configured from a file using the
-<cite>&#8211;file</cite> option, as described below.</p>
+<cite>–file</cite> option, as described below.</p>
 </div>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
@@ -123,12 +120,12 @@ aliases.</p>
 
 <p>Email a report.
 The sender, server, and recipients can be specified either in a configuration file, or
-on the command line in the format &#8220;{from}:{to}[:server]&#8221;.
-The &#8220;from&#8221; and &#8220;to&#8221; are required; default server is localhost.
-If a file path is given (i.e. the option does not have a &#8216;:&#8217; in it),
+on the command line in the format “{from}:{to}[:server]”.
+The “from” and “to” are required; default server is localhost.
+If a file path is given (i.e. the option does not have a ‘:’ in it),
 then the format is JSON/YAML and the specification should be given
-under the &#8220;_email&#8221; key, which should be a mapping with keys
-&#8220;from&#8221;, &#8220;to&#8221;, and &#8220;server&#8221;. For example the following commandline uses localhost:9101 to send mail:</p>
+under the “_email” key, which should be a mapping with keys
+“from”, “to”, and “server”. For example the following commandline uses localhost:9101 to send mail:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="o">--</span><span class="n">email</span> <span class="n">dkgunter</span><span class="nd">@lbl</span><span class="o">.</span><span class="n">gov</span><span class="p">:</span><span class="n">somebody</span><span class="nd">@host</span><span class="o">.</span><span class="n">org</span><span class="p">:</span><span class="n">localhost</span><span class="p">:</span><span class="mi">9101</span>
 </pre></div>
 </div>
@@ -140,7 +137,7 @@ command-line syntax allows for multiple recipients.</p>
 <dd></dd></dl>
 
 <p>Main configuration file. Has constraints, and optionally email configuration
-(see <cite>&#8211;email</cite> option).</p>
+(see <cite>–email</cite> option).</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-limit">
 <code class="descname">--limit</code><code class="descclassname"> &lt;num&gt;</code><code class="descclassname">, </code><code class="descname">-m</code><code class="descclassname"> &lt;num&gt;</code><a class="headerlink" href="#cmdoption-mgvv-limit" title="Permalink to this definition">¶</a></dt>
@@ -170,7 +167,7 @@ to read from the console.</dd>
 <code class="descname">-c</code><code class="descclassname"> &lt;file&gt;</code><code class="descclassname">, </code><code class="descname">--config</code><code class="descclassname"> &lt;file&gt;</code><a class="headerlink" href="#cmdoption-mgvv-c" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Configuration file for database connection. Generate one using <cite>mgdb init &#8211;config filename.json</cite>, if necessary. Otherwise, the code searches for a db.json.  If none is found, a no-authentication localhost:27017/vasp database is assumed.</p>
+<p>Configuration file for database connection. Generate one using <cite>mgdb init –config filename.json</cite>, if necessary. Otherwise, the code searches for a db.json.  If none is found, a no-authentication localhost:27017/vasp database is assumed.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-v">
 <code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-v" title="Permalink to this definition">¶</a></dt>
@@ -202,7 +199,7 @@ or within the main configuration file.</p>
 </div>
 <p>The section for email must always be named <cite>_email</cite>.
 The purpose of the <cite>_email</cite> key is to make it easy to embed this information into
-the configuration file used for the constraints (the <cite>&#8211;file</cite> option).
+the configuration file used for the constraints (the <cite>–file</cite> option).
 The following keywords are recognized:</p>
 <dl class="docutils">
 <dt>from</dt>
@@ -210,7 +207,7 @@ The following keywords are recognized:</p>
 <dt>to</dt>
 <dd>Recipients of the email. If a single one, a string; if multiple, a list of strings. Required.</dd>
 <dt>server</dt>
-<dd>Email server address. Use &#8216;localhost&#8217; if none is given. Optional.</dd>
+<dd>Email server address. Use ‘localhost’ if none is given. Optional.</dd>
 <dt>port</dt>
 <dd>Email server port. Use default SMTP port if none is given. Optional.</dd>
 </dl>
@@ -258,7 +255,7 @@ All of these conditions must be true for the record
 to pass the filter and be evaluated according to the constraints.</p>
 <p><strong>Aliases</strong> can be defined (these operate across all collections, for better or worse, at the moment).
 Constraints that use these aliases will automatically be converted to the aliased name before the query
-is submitted to the database. The aliases are simply a list in the format &#8220;name = value&#8221;
+is submitted to the database. The aliases are simply a list in the format “name = value”
 in a section called <cite>_aliases</cite>, as shown below.</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">_aliases</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">snl_id = mps_id</span>
@@ -276,7 +273,7 @@ this would save a lot of bandwidth by only
 retrieving that <cite>density</cite> values for each array item.
 By default, the arrays are sliced to only retrieve enough elements
 to test against the condition, but this may not be sufficiently efficient for cases where each sub-element is very large.
-Note that this only applies to constraints that use the &#8216;size&#8217; family of array operators.</p>
+Note that this only applies to constraints that use the ‘size’ family of array operators.</p>
 </div>
 </div>
 <div class="section" id="constraint-syntax">
@@ -322,7 +319,7 @@ or <cite>admin_user</cite> and <cite>admin_password</cite>) are required:</p>
 </div>
 <div class="section" id="id4">
 <h2>Options<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-<p>usage: mgvv diff [-h] [&#8211;verbose] [-D CONFIG] [-E ADDR] [-f FILE] [-F FORMAT] [-s HOST] [-i INFO] [-k KEY] [-m] [-n EXPR] [-p PROPERTIES] [-P] [-q EXPR] [-u URL] [-V] old new</p>
+<p>usage: mgvv diff [-h] [–verbose] [-D CONFIG] [-E ADDR] [-f FILE] [-F FORMAT] [-s HOST] [-i INFO] [-k KEY] [-m] [-n EXPR] [-p PROPERTIES] [-P] [-q EXPR] [-u URL] [-V] old new</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-help">
 <code class="descname">--help</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">-h</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-help" title="Permalink to this definition">¶</a></dt>
@@ -349,7 +346,7 @@ the target database and collection must be writable.</p>
 <dd></dd></dl>
 
 <p>Email report to one or more email addresses. ADDR is a list of the form:
-&#8216;<code class="docutils literal"><span class="pre">sender/receiver,[receiver2...][/subject]</span></code>&#8216;.</p>
+‘<code class="docutils literal"><span class="pre">sender/receiver,[receiver2...][/subject]</span></code>’.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-s">
 <code class="descname">-s</code><code class="descclassname"> HOST</code><code class="descclassname">, </code><code class="descname">--email-server</code><code class="descclassname"> HOST</code><a class="headerlink" href="#cmdoption-mgvv-diff-s" title="Permalink to this definition">¶</a></dt>
@@ -382,13 +379,13 @@ command-line key/value pair lists become config file mappings.</p>
 <code class="descname">-F</code><code class="descclassname"> FORMAT</code><code class="descclassname">, </code><code class="descname">--format</code><code class="descclassname"> FORMAT</code><a class="headerlink" href="#cmdoption-mgvv-diff-format" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Default report format: &#8216;text&#8217;, &#8216;html&#8217;, or &#8216;json&#8217;. If not given, the format will be determined by the output: text for console, html for email.</p>
+<p>Default report format: ‘text’, ‘html’, or ‘json’. If not given, the format will be determined by the output: text for console, html for email.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-i">
 <code class="descname">-i</code><code class="descclassname"> INFO</code><code class="descclassname">, </code><code class="descname">--info</code><code class="descclassname"> INFO</code><a class="headerlink" href="#cmdoption-mgvv-diff-i" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Extra fields for records, as comma-separated list, e.g &#8216;<code class="docutils literal"><span class="pre">extra,fields,to_include</span></code>&#8216;.</p>
+<p>Extra fields for records, as comma-separated list, e.g ‘<code class="docutils literal"><span class="pre">extra,fields,to_include</span></code>’.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-k">
 <code class="descname">-k</code><code class="descclassname"> KEY</code><code class="descclassname">, </code><code class="descname">--key</code><code class="descclassname"> KEY</code><a class="headerlink" href="#cmdoption-mgvv-diff-k" title="Permalink to this definition">¶</a></dt>
@@ -400,7 +397,7 @@ command-line key/value pair lists become config file mappings.</p>
 <code class="descname">-m</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--missing</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-m" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Only report keys that are in the &#8216;old&#8217; collection, but not in the &#8216;new&#8217; collection.</p>
+<p>Only report keys that are in the ‘old’ collection, but not in the ‘new’ collection.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-n">
 <code class="descname">-n</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--numeric</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-n" title="Permalink to this definition">¶</a></dt>
@@ -443,8 +440,8 @@ command-line key/value pair lists become config file mappings.</p>
 <tr class="row-odd"><td>-Y[=]</td>
 <td>Negative changes only</td>
 </tr>
-<tr class="row-even"><td>...%</td>
-<td>Percent change. Instead of &#8220;(new - old)&#8221;, use &#8220;100 * (new - old) / old&#8221;</td>
+<tr class="row-even"><td>…%</td>
+<td>Percent change. Instead of “(new - old)”, use “100 * (new - old) / old”</td>
 </tr>
 </tbody>
 </table>
@@ -472,7 +469,7 @@ command-line key/value pair lists become config file mappings.</p>
 <code class="descname">-p</code><code class="descclassname"> PROPS</code><code class="descclassname">, </code><code class="descname">--properties</code><code class="descclassname"> PROPS</code><a class="headerlink" href="#cmdoption-mgvv-diff-p" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Fields with properties that must match, as comma-separated list , e.g &#8216;<code class="docutils literal"><span class="pre">these_must,match</span></code>&#8216;.</p>
+<p>Fields with properties that must match, as comma-separated list , e.g ‘<code class="docutils literal"><span class="pre">these_must,match</span></code>’.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-print">
 <code class="descname">-P</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--print</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-print" title="Permalink to this definition">¶</a></dt>
@@ -507,7 +504,7 @@ the Materials Project webpages:</p>
 </div>
 <div class="section" id="examples">
 <span id="mgvv-diff-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>Let&#8217;s say you want to compare the &#8216;materials&#8217; collection in a development and production database.
+<p>Let’s say you want to compare the ‘materials’ collection in a development and production database.
 You could have two JSON configuration files, <cite>prod.json</cite> and <cite>dev.json</cite> that specified the servers,
 user and password, and database and collection names:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># prod database</span>
@@ -537,7 +534,7 @@ user and password, and database and collection names:</p>
 the property <cite>icsd_id</cite>, adding to the output the value of the field
 <cite>pretty_formula</cite>. Because output is to the console, the format will default to
 text.</p>
-<p>To produce and view an HTML output report instead, just use the <cite>&#8211;format</cite> option:</p>
+<p>To produce and view an HTML output report instead, just use the <cite>–format</cite> option:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">--</span><span class="nb">format</span> <span class="n">html</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span>  <span class="o">-</span><span class="n">p</span> <span class="n">icsd_id</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">i</span> <span class="n">pretty_formula</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span> <span class="o">&gt;</span> <span class="n">page</span><span class="o">.</span><span class="n">html</span>
 <span class="nb">open</span> <span class="n">page</span><span class="o">.</span><span class="n">html</span> <span class="c1"># on OSX, view in a browser</span>
 </pre></div>
@@ -547,7 +544,7 @@ text.</p>
     <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span>  <span class="o">-</span><span class="n">p</span> <span class="n">icsd_id</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">i</span> <span class="n">pretty_formula</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
-<p>Note that the third part of the <cite>-e/&#8211;email</cite> command, the subject, is optional &#8211; but if you leave it out the email will arrive with no subject line.</p>
+<p>Note that the third part of the <cite>-e/–email</cite> command, the subject, is optional – but if you leave it out the email will arrive with no subject line.</p>
 <p>As you may have noticed, the command-lines begin to get rather complicated. To replace that last example with a configuration file, use instead this command:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">--</span><span class="n">file</span> <span class="n">diff</span><span class="o">.</span><span class="n">yaml</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
@@ -595,7 +592,7 @@ text.</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Pymatgen-db</a></li>
-      <li>Next: <a href="builders.html" title="next chapter">Database &#8220;Builders&#8221;</a></li>
+      <li>Next: <a href="builders.html" title="next chapter">Database “Builders”</a></li>
   </ul></li>
 </ul>
   <div role="note" aria-label="source link">

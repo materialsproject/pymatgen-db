@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Database “Builders” &#8212; pymatgen-db 0.7.0 documentation</title>
-    
+    <title>Database “Builders” &#8212; pymatgen-db 2017.1.4 documentation</title>
     <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.0',
+        VERSION:     '2017.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +39,7 @@
 </script>
 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -58,7 +55,7 @@
         <li class="right" >
           <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 0.7.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2017.1.4 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -68,7 +65,7 @@
           <div class="body" role="main">
             
   <div class="section" id="database-builders">
-<span id="builders"></span><h1><a class="toc-backref" href="#id1">Database &#8220;Builders&#8221;</a><a class="headerlink" href="#database-builders" title="Permalink to this headline">¶</a></h1>
+<span id="builders"></span><h1><a class="toc-backref" href="#id1">Database “Builders”</a><a class="headerlink" href="#database-builders" title="Permalink to this headline">¶</a></h1>
 <p>The Materials Project relies on MongoDB databases. The common parts of the
 process of creating these databases from either files or other MongoDB databases
 are encapsulated in the <code class="docutils literal"><span class="pre">matgendb.builders</span></code> subpackage, and in the
@@ -83,16 +80,16 @@ to perform extract-transform-load (ETL) operations with MongoDB.</p>
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#database-builders" id="id1">Database &#8220;Builders&#8221;</a><ul>
+<li><a class="reference internal" href="#database-builders" id="id1">Database “Builders”</a><ul>
 <li><a class="reference internal" href="#features" id="id2">Features</a><ul>
 <li><a class="reference internal" href="#parallel-building" id="id3">Parallel building</a></li>
 <li><a class="reference internal" href="#incremental-building" id="id4">Incremental building</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#writing-a-builder" id="id5">Writing a builder</a><ul>
-<li><a class="reference internal" href="#simple-filecounter-builder" id="id6">Simple &#8220;FileCounter&#8221; builder</a></li>
-<li><a class="reference internal" href="#database-copybuilder" id="id7">Database &#8220;CopyBuilder&#8221;</a></li>
-<li><a class="reference internal" href="#incremental-builder-maxvaluebuilder" id="id8">Incremental builder &#8220;MaxValueBuilder&#8221;</a></li>
+<li><a class="reference internal" href="#simple-filecounter-builder" id="id6">Simple “FileCounter” builder</a></li>
+<li><a class="reference internal" href="#database-copybuilder" id="id7">Database “CopyBuilder”</a></li>
+<li><a class="reference internal" href="#incremental-builder-maxvaluebuilder" id="id8">Incremental builder “MaxValueBuilder”</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#running-a-builder" id="id9">Running a builder</a><ul>
@@ -141,9 +138,9 @@ give two example builders: a simple <a class="reference internal" href="#bld-ex-
 that just counts the lines in a file,
 and a <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">CopyBuilder</span></a> that copies a MongoDB collection.</p>
 <div class="section" id="simple-filecounter-builder">
-<span id="bld-ex-filecounter"></span><h3><a class="toc-backref" href="#id6">Simple &#8220;FileCounter&#8221; builder</a><a class="headerlink" href="#simple-filecounter-builder" title="Permalink to this headline">¶</a></h3>
+<span id="bld-ex-filecounter"></span><h3><a class="toc-backref" href="#id6">Simple “FileCounter” builder</a><a class="headerlink" href="#simple-filecounter-builder" title="Permalink to this headline">¶</a></h3>
 <p>The first builder simply reads from a file, and counts the lines in that file.
-In this section we&#8217;ll show the whole program, then walk through it one section
+In this section we’ll show the whole program, then walk through it one section
 at a time:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
@@ -207,7 +204,7 @@ name and (expected) type.</p>
 the function simply returns one line of the file at a time.
 Notice that you can make the function into a generator by using <code class="docutils literal"><span class="pre">yield</span></code> to
 return items, but returning any other iterable would also work fine (e.g. the
-function could have been a one-liner &#8220;return open(input_file).readlines()&#8221;).</p>
+function could have been a one-liner “return open(input_file).readlines()”).</p>
 <p><strong>process_item</strong>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -242,7 +239,7 @@ of None will read as <code class="docutils literal"><span class="pre">False</spa
 The next example will show MongoDB access and other features.</p>
 </div>
 <div class="section" id="database-copybuilder">
-<span id="bld-ex-copy"></span><h3><a class="toc-backref" href="#id7">Database &#8220;CopyBuilder&#8221;</a><a class="headerlink" href="#database-copybuilder" title="Permalink to this headline">¶</a></h3>
+<span id="bld-ex-copy"></span><h3><a class="toc-backref" href="#id7">Database “CopyBuilder”</a><a class="headerlink" href="#database-copybuilder" title="Permalink to this headline">¶</a></h3>
 <p>The next builder does a simple DB operation: copying one MongoDB collection
 from a source to a destination. As before, we begin with the full program
 and then step through it one snippet at at time:</p>
@@ -321,7 +318,7 @@ collection and get an iterator over the records.</p>
 First, note that there is no <code class="docutils literal"><span class="pre">get_parameters()</span></code> method at all. Instead
 the <em>docstring</em> of this method is actually a machine-readable version of
 the metadata needed for running the builder. Not coincidentally, the format
-expected by this docstring is also understood by Sphinx&#8217;s autodoc feature.
+expected by this docstring is also understood by Sphinx’s autodoc feature.
 This way, you will be able to kill two birds with one stone: your builders
 will be documented for command-line invocation, and you can easily generate
 HTML, PDF, etc. documentation pages.</p>
@@ -342,7 +339,7 @@ and remembering the target collection in an instance variable.</p>
 strange behavior, here the <code class="docutils literal"><span class="pre">_target_coll</span></code> instance variable is
 perfectly fine for parallel execution because the individual
 builder instances do not want to share the state of this variable
-between them &#8211; they each want and need their own copy.</p>
+between them – they each want and need their own copy.</p>
 </div>
 <p><strong>process_item</strong>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
@@ -357,18 +354,18 @@ logic inside the builder itself, but in a very simple case like this
 the copying would automatically work with the incremental mode.</p>
 </div>
 <div class="section" id="incremental-builder-maxvaluebuilder">
-<span id="bld-writing-incr"></span><h3><a class="toc-backref" href="#id8">Incremental builder &#8220;MaxValueBuilder&#8221;</a><a class="headerlink" href="#incremental-builder-maxvaluebuilder" title="Permalink to this headline">¶</a></h3>
+<span id="bld-writing-incr"></span><h3><a class="toc-backref" href="#id8">Incremental builder “MaxValueBuilder”</a><a class="headerlink" href="#incremental-builder-maxvaluebuilder" title="Permalink to this headline">¶</a></h3>
 <p>The incremental building concept was introduced in <a class="reference internal" href="#bld-concepts"><span class="std std-ref">Features</span></a>.
 The central idea of the incremental building implementation is that any builder
-can be run in &#8220;incremental mode&#8221;. When this happens, any QueryEngine objects
+can be run in “incremental mode”. When this happens, any QueryEngine objects
 are replaced transparently by equivalent objects that track their last
 position, of class <code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.incr.TrackedQueryEngine</span></code>, which is
 documented in module <code class="xref py py-mod docutils literal"><span class="pre">matgendb.builders.incr</span></code>. This tracking can be
 controlled, if necessary, with the instance variable <code class="docutils literal"><span class="pre">tracking</span></code> on the
 TrackedQueryEngine class.</p>
-<p>The <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">Database &#8220;CopyBuilder&#8221;</span></a> is an example of a trivial builder that can work with
+<p>The <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">Database “CopyBuilder”</span></a> is an example of a trivial builder that can work with
 incremental building, without modification to the source code. With incremental
-mode activated, successive copies will only move over &#8220;new&#8221; data items. But
+mode activated, successive copies will only move over “new” data items. But
 most builders will not be this easy. To help understand what to do in
 a non-trivial case, we show here a contrived example where a collection A
 is used to build a derived collection B. In A, there are 2 values for each
@@ -498,10 +495,10 @@ a query on all items in the collection.</p>
 to find the previous maximum value.
 There are a couple better ways to do this,
 but this method is easy to understand and illustrates how a collection
-can be manipulated in its &#8220;raw&#8221; form in an incremental builder.</p>
+can be manipulated in its “raw” form in an incremental builder.</p>
 <p>The key lines here are
 <code class="docutils literal"><span class="pre">self._src.tracking</span> <span class="pre">=</span> <span class="pre">False</span></code> and, later, <code class="docutils literal"><span class="pre">self._src.tracking</span> <span class="pre">=</span> <span class="pre">True</span></code>.
-These turn off the &#8220;incremental mode&#8221; so that the query will start at the
+These turn off the “incremental mode” so that the query will start at the
 beginning of the collection instead of from the start of A<sub>new</sub>.</p>
 <p><strong>Finalization</strong>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errs</span><span class="p">):</span>
@@ -525,13 +522,13 @@ incremental building.</p>
 <span id="bld-running"></span><h2><a class="toc-backref" href="#id9">Running a builder</a><a class="headerlink" href="#running-a-builder" title="Permalink to this headline">¶</a></h2>
 <p>This section describes how,
 once you have written a builder class, you can use <cite>mgbuild</cite> to run
-it, possibly in parallel and possibly &#8220;incrementally&#8221;, on some inputs.</p>
+it, possibly in parallel and possibly “incrementally”, on some inputs.</p>
 <p>We will break this process into two parts:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#bld-run-show"><span class="std std-ref">Displaying</span></a> the usage for a given builder class</li>
 <li><a class="reference internal" href="#bld-run-exe"><span class="std std-ref">Running</span></a> the builder</li>
 </ul>
-<p>Both of these use the <cite>mgbuild</cite> sub-command &#8220;run&#8221; (alternatively: &#8220;build&#8221;),
+<p>Both of these use the <cite>mgbuild</cite> sub-command “run” (alternatively: “build”),
 like this:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span> <span class="o">&lt;</span><span class="n">arguments</span><span class="o">&gt;</span>
 </pre></div>
@@ -604,7 +601,7 @@ walk through from simple to more complex examples.</p>
 for the source and target and empty criteria (i.e. copy everything). The
 copy will be run in a single thread.</p>
 <p>The configuration files in question are just JSON files that look like this
-(you could add &#8220;user&#8221; and &#8220;password&#8221; for authenticated DBs):</p>
+(you could add “user” and “password” for authenticated DBs):</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="mi">27017</span><span class="p">,</span>
  <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;collection&quot;</span><span class="p">:</span> <span class="s2">&quot;test1&quot;</span><span class="p">}</span>
 </pre></div>
@@ -630,14 +627,14 @@ The <code class="docutils literal"><span class="pre">get_items()</span></code> i
 </div>
 <div class="section" id="incremental-builds">
 <h4>Incremental builds<a class="headerlink" href="#incremental-builds" title="Permalink to this headline">¶</a></h4>
-<p>The concept of incremental building was introduced in <a class="reference internal" href="#bld-writing-incr"><span class="std std-ref">Incremental builder &#8220;MaxValueBuilder&#8221;</span></a>.
+<p>The concept of incremental building was introduced in <a class="reference internal" href="#bld-writing-incr"><span class="std std-ref">Incremental builder “MaxValueBuilder”</span></a>.
 From the command-line, incremental building is controlled by the <code class="docutils literal"><span class="pre">-i/--incr</span></code> option.
 What this really does is to add some behind-the-scenes bookkeeping for every
 parameter of type <code class="docutils literal"><span class="pre">QueryEngine</span></code> (except ones where it is explicitly
 turned off, <a class="reference internal" href="#bld-incr-skip"><span class="std std-ref">see below</span></a>) that records and retrieves the spot where processing
 was last ended. Multiple spots are allowed per-collection by requiring an
-&#8220;operation&#8221;. Currently,
-only a small set of operations are allowed: &#8220;copy&#8221;, &#8220;build&#8221;, and &#8220;other&#8221;.</p>
+“operation”. Currently,
+only a small set of operations are allowed: “copy”, “build”, and “other”.</p>
 <p>For incremental building to work properly, there must be some field
 in the collection that increases monotonically. This field is used to
 determine which records come <em>after</em> the spot marked on the last run. By
@@ -667,7 +664,7 @@ simply add <strong>-n 8</strong> to the command-line.</p>
     <span class="o">-</span><span class="n">i</span> <span class="n">copy</span><span class="p">:</span><span class="n">num</span>
 </pre></div>
 </div>
-<p>This example runs an incremental build with the &#8220;copy&#8221; operation,
+<p>This example runs an incremental build with the “copy” operation,
 using the <code class="docutils literal"><span class="pre">num</span></code> field instead of the default <code class="docutils literal"><span class="pre">_id</span></code>.</p>
 <p id="bld-incr-skip"><strong>Incremental build skipped for some collections</strong>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
@@ -675,11 +672,11 @@ using the <code class="docutils literal"><span class="pre">num</span></code> fie
     <span class="o">-</span><span class="n">i</span> <span class="n">copy</span><span class="p">:</span><span class="n">num</span>
 </pre></div>
 </div>
-<p>This is pretty subtle: notice the &#8220;-&#8221; inserted after the &#8220;=&#8221; in
+<p>This is pretty subtle: notice the “-” inserted after the “=” in
 <code class="docutils literal"><span class="pre">target=-conf/test2.json</span></code>. This has the effect of not adding tracking information
 for the target collection.
 In this case, tracking the last record added to the target
-isn&#8217;t useful for the copy, all that matters is knowing where we stopped
+isn’t useful for the copy, all that matters is knowing where we stopped
 in the source collection.</p>
 </div>
 </div>
@@ -694,16 +691,16 @@ in the source collection.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Database &#8220;Builders&#8221;</a><ul>
+<li><a class="reference internal" href="#">Database “Builders”</a><ul>
 <li><a class="reference internal" href="#features">Features</a><ul>
 <li><a class="reference internal" href="#parallel-building">Parallel building</a></li>
 <li><a class="reference internal" href="#incremental-building">Incremental building</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#writing-a-builder">Writing a builder</a><ul>
-<li><a class="reference internal" href="#simple-filecounter-builder">Simple &#8220;FileCounter&#8221; builder</a></li>
-<li><a class="reference internal" href="#database-copybuilder">Database &#8220;CopyBuilder&#8221;</a></li>
-<li><a class="reference internal" href="#incremental-builder-maxvaluebuilder">Incremental builder &#8220;MaxValueBuilder&#8221;</a></li>
+<li><a class="reference internal" href="#simple-filecounter-builder">Simple “FileCounter” builder</a></li>
+<li><a class="reference internal" href="#database-copybuilder">Database “CopyBuilder”</a></li>
+<li><a class="reference internal" href="#incremental-builder-maxvaluebuilder">Incremental builder “MaxValueBuilder”</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#running-a-builder">Running a builder</a><ul>

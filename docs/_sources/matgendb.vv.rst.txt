@@ -1,3 +1,3 @@
-matgendb.vv package
-===================
+matgendb\.vv package
+====================
 

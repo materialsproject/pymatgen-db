@@ -1,3 +1,3 @@
-matgendb.alchemy package
-========================
+matgendb\.alchemy package
+=========================
 

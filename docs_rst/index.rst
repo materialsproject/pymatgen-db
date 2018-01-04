@@ -21,6 +21,11 @@ Other pages
 Change Log
 ==========
 
+v2018.1.4
+---------
+* Date based versioning in line with pymatgen.
+* Fix deprecated code.
+
 v0.7.0
 ------
 * Fix deprecation.
