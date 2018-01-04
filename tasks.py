@@ -14,11 +14,17 @@ __email__ = "shyue@mit.edu"
 __date__ = "Apr 29, 2012"
 
 import glob
+import datetime
+import re
+import json
+import requests
 import os
 
 from invoke import task
 from monty.os import cd
-from matgendb import __version__ as ver
+
+
+NEW_VER = datetime.datetime.today().strftime("%Y.%-m.%-d")
 
 
 @task
@@ -58,6 +64,26 @@ def make_doc(ctx):
         # Avoid ths use of jekyll so that _dir works as intended.
         ctx.run("touch .nojekyll")
 
+@task
+def set_ver(ctx):
+    lines = []
+    with open("matgendb/__init__.py", "rt") as f:
+        for l in f:
+            if "__version__" in l:
+                lines.append('__version__ = "%s"' % NEW_VER)
+            else:
+                lines.append(l.rstrip())
+    with open("matgendb/__init__.py", "wt") as f:
+        f.write("\n".join(lines))
+
+    lines = []
+    with open("setup.py", "rt") as f:
+        for l in f:
+            lines.append(re.sub(r'version=([^,]+),', 'version="%s",' % NEW_VER,
+                                l.rstrip()))
+    with open("setup.py", "wt") as f:
+        f.write("\n".join(lines))
+
 
 @task
 def update_doc(ctx):
@@ -70,7 +96,26 @@ def update_doc(ctx):
 
 @task
 def publish(ctx):
-    ctx.run("python setup.py release")
+    ctx.run("rm dist/*.*", warn=True)
+    ctx.run("python setup.py register sdist bdist_wheel")
+    ctx.run("twine upload dist/*")
+
+
+@task
+def release_github(ctx):
+    payload = {
+        "tag_name": "v" + NEW_VER,
+        "target_commitish": "master",
+        "name": "v" + NEW_VER,
+        "body": "v" + NEW_VER,
+        "draft": False,
+        "prerelease": False
+    }
+    response = requests.post(
+        "https://api.github.com/repos/materialsproject/pymatgen-db/releases",
+        data=json.dumps(payload),
+        headers={"Authorization": "token " + os.environ["GITHUB_RELEASES_TOKEN"]})
+    print(response.text)
 
 
 @task
@@ -79,14 +124,9 @@ def test(ctx):
 
 
 @task
-def setver(ctx):
-    ctx.run("sed s/version=.*,/version=\\\"{}\\\",/ setup.py > newsetup".format(ver))
-    ctx.run("mv newsetup setup.py")
-
-
-@task
 def release(ctx):
-    setver(ctx)
+    set_ver(ctx)
     #test(ctx)
     make_doc(ctx)
     publish(ctx)
+    release_github(ctx)
