@@ -6,13 +6,6 @@ Deployment file to facilitate releases of matgendb.
 
 from __future__ import division
 
-__author__ = "Shyue Ping Ong"
-__copyright__ = "Copyright 2012, The Materials Project"
-__version__ = "0.1"
-__maintainer__ = "Shyue Ping Ong"
-__email__ = "shyue@mit.edu"
-__date__ = "Apr 29, 2012"
-
 import glob
 import datetime
 import re
@@ -22,6 +15,13 @@ import os
 
 from invoke import task
 from monty.os import cd
+
+__author__ = "Shyue Ping Ong"
+__copyright__ = "Copyright 2012, The Materials Project"
+__version__ = "0.1"
+__maintainer__ = "Shyue Ping Ong"
+__email__ = "shyue@mit.edu"
+__date__ = "Apr 29, 2012"
 
 
 NEW_VER = datetime.datetime.today().strftime("%Y.%-m.%-d")
@@ -127,6 +127,6 @@ def test(ctx):
 def release(ctx):
     set_ver(ctx)
     #test(ctx)
-    make_doc(ctx)
+    update_doc(ctx)
     publish(ctx)
     release_github(ctx)
