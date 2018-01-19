@@ -1,4 +1,4 @@
-pymatgen==2017.12.30
+pymatgen==2018.1.19
 monty==1.0.2
 pymongo==3.6.0
 smoqe==0.1.3
