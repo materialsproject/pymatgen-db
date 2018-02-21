@@ -272,12 +272,16 @@ if __name__ == "__main__":
 
     # Parents for all subparsers.
     parent_vb = argparse.ArgumentParser(add_help=False)
-    parent_vb.add_argument('--quiet', '-q', dest='quiet', action="store_true", default=False,
+    parent_vb.add_argument('--quiet', '-q', dest='quiet', action="store_true",
+                           default=False,
                            help="Minimal verbosity.")
-    parent_vb.add_argument('--verbose', '-v', dest='vb', action="count", default=0,
-                           help="Print more verbose messages to standard error. Repeatable. (default=ERROR)")
+    parent_vb.add_argument('--verbose', '-v', dest='vb', action="count",
+                           default=0,
+                           help="Print more verbose messages to standard error. "
+                                "Repeatable. (default=ERROR)")
     parent_cfg = argparse.ArgumentParser(add_help=False)
-    parent_cfg.add_argument("-c", "--config", dest="config_file", type=str, default=db_file,
+    parent_cfg.add_argument("-c", "--config", dest="config_file", type=str,
+                            default=db_file,
                             help="Config file to use. Generate one using mgdb "
                             "init --config filename.json if necessary. "
                             "Otherwise, the code searches for a db.json. If"
@@ -292,7 +296,8 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers()
 
     # The 'init' subcommand.
-    pinit = subparsers.add_parser("init", help="Initialization tools.", parents=[parent_vb])
+    pinit = subparsers.add_parser("init", help="Initialization tools.",
+                                  parents=[parent_vb])
     pinit.add_argument("-c", "--config", dest="config_file", type=str,
                        nargs='?', default=db_file,
                        help="Creates an db config file for the database. "
@@ -302,9 +307,9 @@ if __name__ == "__main__":
     popt = subparsers.add_parser("optimize", help="Optimization tools.")
 
     popt.add_argument("-c", "--config", dest="config_file", type=str,
-                       nargs='?', default=db_file,
-                       help="Creates an db config file for the database. "
-                            "Default filename is db.json.")
+                      nargs='?', default=db_file,
+                      help="Creates an db config file for the database. "
+                           "Default filename is db.json.")
     popt.set_defaults(func=optimize_indexes)
 
     # The 'insert' subcommand.
@@ -317,7 +322,8 @@ if __name__ == "__main__":
     pinsert.add_argument("-t", "--tag", dest="tag", type=str, nargs="+",
                          default=[],
                          help="Tag your runs for easier search."
-                              " Accepts multiple tags")
+                              " Accepts multiple space-separated tags. E.g.,"
+                              " '--tag metal energy'")
     pinsert.add_argument("-f", "--force", dest="force_update_dupes",
                          action="store_true",
                          help="Force update duplicates. This forces the "
