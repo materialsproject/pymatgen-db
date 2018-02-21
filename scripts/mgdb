@@ -314,7 +314,7 @@ if __name__ == "__main__":
                          default=".", help="Root directory for runs.")
     pinsert.add_argument("-l", "--logfile", dest="logfile", type=str,
                          help="File to log db insertion. Defaults to stdout.")
-    pinsert.add_argument("-t", "--tag", dest="tag", type=str, nargs=1,
+    pinsert.add_argument("-t", "--tag", dest="tag", type=str, nargs="+",
                          default=[],
                          help="Tag your runs for easier search."
                               " Accepts multiple tags")
