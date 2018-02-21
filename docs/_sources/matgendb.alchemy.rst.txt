@@ -1,11 +1,11 @@
-matgendb\.alchemy package
-=========================
+matgendb.alchemy package
+========================
 
 Submodules
 ----------
 
-matgendb\.alchemy\.transmuters module
--------------------------------------
+matgendb.alchemy.transmuters module
+-----------------------------------
 
 .. automodule:: matgendb.alchemy.transmuters
     :members:

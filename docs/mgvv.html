@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2018.1.31 documentation</title>
+    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2018.2.21 documentation</title>
     <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2018.1.31',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -38,8 +30,7 @@
   _gaq.push(['_trackPageview']);
 </script>
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -55,7 +46,7 @@
         <li class="right" >
           <a href="index.html" title="Pymatgen-db"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2018.1.31 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2018.2.21 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -84,7 +75,7 @@ It is usually wise to quote the constraints so that the operators are not
 interpreted by the Unix shell. The constraints can be listed as separate quoted arguments
 or a single quoted argument using commas. For example, the following two command-lines are
 equivalent:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="s1">&#39;nelements &gt; 1&#39;</span> <span class="s1">&#39;e_above_hull &gt;= 0&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="s1">&#39;nelements &gt; 1&#39;</span> <span class="s1">&#39;e_above_hull &gt;= 0&#39;</span>
 <span class="n">mgvv</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="s1">&#39;nelements &gt; 1, e_above_hull &gt;= 0&#39;</span>
 </pre></div>
 </div>
@@ -126,7 +117,7 @@ If a file path is given (i.e. the option does not have a ‘:’ in it),
 then the format is JSON/YAML and the specification should be given
 under the “_email” key, which should be a mapping with keys
 “from”, “to”, and “server”. For example the following commandline uses localhost:9101 to send mail:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="o">--</span><span class="n">email</span> <span class="n">dkgunter</span><span class="nd">@lbl</span><span class="o">.</span><span class="n">gov</span><span class="p">:</span><span class="n">somebody</span><span class="nd">@host</span><span class="o">.</span><span class="n">org</span><span class="p">:</span><span class="n">localhost</span><span class="p">:</span><span class="mi">9101</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="o">--</span><span class="n">email</span> <span class="n">dkgunter</span><span class="nd">@lbl</span><span class="o">.</span><span class="n">gov</span><span class="p">:</span><span class="n">somebody</span><span class="nd">@host</span><span class="o">.</span><span class="n">org</span><span class="p">:</span><span class="n">localhost</span><span class="p">:</span><span class="mi">9101</span>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="#email-config">email-config</a> for an example of the configuration file syntax, which unlike the
@@ -190,7 +181,7 @@ administrative user, if both are present.</p>
 <p>Reports can be sent by email. This can be configured on the command-line,
 or within the main configuration file.</p>
 <p>Here is an example configuration:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">_email</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">_email</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
   <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
@@ -220,7 +211,7 @@ on which to apply the constraints. The specification of the constraints in
 each collection takes two possible forms, simple and complex. In both cases
 the syntax of the constraints is the same, see <a class="reference internal" href="#constraint-syntax"><span class="std std-ref">Constraint syntax</span></a>.</p>
 <p><strong>Simple</strong>: A list of constraints, which are simply combined. Any document in the collection that violates any of the constraints will generate a validation error.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">collection_name</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">collection_name</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 &lt;= value</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field2 &gt; value</span>
     <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
@@ -232,7 +223,7 @@ The <cite>filter</cite> key selects records for applying the constraints.
 The <cite>constraints</cite> key provides the list of constraints associated with that condition.
 As in the simple format, any document in the collection
 that violates any of the constraints will generate a validation error.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">mycollection</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">mycollection</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span>
         <span class="l l-Scalar l-Scalar-Plain">filter</span><span class="p p-Indicator">:</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 = &#39;negatory&#39;</span>
@@ -257,14 +248,14 @@ to pass the filter and be evaluated according to the constraints.</p>
 Constraints that use these aliases will automatically be converted to the aliased name before the query
 is submitted to the database. The aliases are simply a list in the format “name = value”
 in a section called <cite>_aliases</cite>, as shown below.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">_aliases</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">_aliases</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">snl_id = mps_id</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">energy = analysis.e_above_hull</span>
 </pre></div>
 </div>
 <p><strong>Partial arrays</strong> can be fetched, which is very useful for not spending a ton of bandwidth, by adding <cite>/&lt;path&gt;</cite>
 after the name of the field. For example:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">collection_name</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">collection_name</span><span class="p p-Indicator">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">calculations/density size 2</span>
 </pre></div>
 </div>
@@ -283,7 +274,7 @@ Note that this only applies to constraints that use the ‘size’ family of arr
 <div class="section" id="mgvv-diff-subcommand">
 <span id="mgvv-diff"></span><h2>mgvv diff subcommand<a class="headerlink" href="#mgvv-diff-subcommand" title="Permalink to this headline">¶</a></h2>
 <p>The <cite>diff</cite> sub-command takes options and two DB configurations:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="p">[</span><span class="n">options</span><span class="o">..</span><span class="p">]</span> <span class="n">old</span><span class="o">.</span><span class="n">json</span> <span class="n">new</span><span class="o">.</span><span class="n">json</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="p">[</span><span class="n">options</span><span class="o">..</span><span class="p">]</span> <span class="n">old</span><span class="o">.</span><span class="n">json</span> <span class="n">new</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>The command provides a convenient command-line interface to take the difference
@@ -298,7 +289,7 @@ See the <a class="reference internal" href="#mgvv-diff-examples"><span class="st
 These are called the <cite>old</cite> and <cite>new</cite> collections, respectively. Both
 are configured using a pymatgen-db JSON config file.</p>
 <p>For an unauthenticated database, we only need 3 keys:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;host&quot;</span> <span class="p">:</span> <span class="s2">&quot;myhost&quot;</span><span class="p">,</span>
     <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;mydatabase&quot;</span><span class="p">,</span>
     <span class="s2">&quot;collection&quot;</span><span class="p">:</span> <span class="s2">&quot;mycollection&quot;</span>
@@ -307,7 +298,7 @@ are configured using a pymatgen-db JSON config file.</p>
 </div>
 <p>For an authenticated database, <cite>user</cite> and <cite>password</cite> (or <cite>readonly_user</cite> and <cite>readonly_password</cite>,
 or <cite>admin_user</cite> and <cite>admin_password</cite>) are required:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;host&quot;</span> <span class="p">:</span> <span class="s2">&quot;myhost&quot;</span><span class="p">,</span>
     <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;mydatabase&quot;</span><span class="p">,</span>
     <span class="s2">&quot;collection&quot;</span><span class="p">:</span> <span class="s2">&quot;mycollection&quot;</span><span class="p">,</span>
@@ -346,7 +337,7 @@ the target database and collection must be writable.</p>
 <dd></dd></dl>
 
 <p>Email report to one or more email addresses. ADDR is a list of the form:
-‘<code class="docutils literal"><span class="pre">sender/receiver,[receiver2...][/subject]</span></code>’.</p>
+‘<code class="docutils literal notranslate"><span class="pre">sender/receiver,[receiver2...][/subject]</span></code>’.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-s">
 <code class="descname">-s</code><code class="descclassname"> HOST</code><code class="descclassname">, </code><code class="descname">--email-server</code><code class="descclassname"> HOST</code><a class="headerlink" href="#cmdoption-mgvv-diff-s" title="Permalink to this definition">¶</a></dt>
@@ -363,7 +354,7 @@ a subset), with the long option names as keys. Any time the command-line
 option takes a comma-separated list, the config file uses a real list;
 command-line key/value pair lists become config file mappings.</p>
 <p>For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Command</span><span class="o">-</span><span class="n">line</span>                    <span class="n">Config</span> <span class="n">file</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Command</span><span class="o">-</span><span class="n">line</span>                    <span class="n">Config</span> <span class="n">file</span>
 <span class="o">============</span>                    <span class="o">==============</span>
 <span class="o">--</span><span class="n">numeric</span><span class="o">=</span><span class="s1">&#39;x=+-1.5,y=+-0.5&#39;</span>     <span class="n">numeric</span><span class="p">:</span>
                                    <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;+-1.5&#39;</span>
@@ -385,7 +376,7 @@ command-line key/value pair lists become config file mappings.</p>
 <code class="descname">-i</code><code class="descclassname"> INFO</code><code class="descclassname">, </code><code class="descname">--info</code><code class="descclassname"> INFO</code><a class="headerlink" href="#cmdoption-mgvv-diff-i" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Extra fields for records, as comma-separated list, e.g ‘<code class="docutils literal"><span class="pre">extra,fields,to_include</span></code>’.</p>
+<p>Extra fields for records, as comma-separated list, e.g ‘<code class="docutils literal notranslate"><span class="pre">extra,fields,to_include</span></code>’.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-k">
 <code class="descname">-k</code><code class="descclassname"> KEY</code><code class="descclassname">, </code><code class="descname">--key</code><code class="descclassname"> KEY</code><a class="headerlink" href="#cmdoption-mgvv-diff-k" title="Permalink to this definition">¶</a></dt>
@@ -404,7 +395,7 @@ command-line key/value pair lists become config file mappings.</p>
 <dd></dd></dl>
 
 <p>Fields with numeric values that must match, with a tolerance, as a comma-separated list, e.g.,
-<code class="docutils literal"><span class="pre">&lt;name1&gt;=&lt;expr1&gt;,</span> <span class="pre">&lt;name2&gt;=&lt;expr2&gt;,</span> <span class="pre">..</span></code>. &lt;name&gt; is a field name, &lt;expr&gt; syntax is:</p>
+<code class="docutils literal notranslate"><span class="pre">&lt;name1&gt;=&lt;expr1&gt;,</span> <span class="pre">&lt;name2&gt;=&lt;expr2&gt;,</span> <span class="pre">..</span></code>. &lt;name&gt; is a field name, &lt;expr&gt; syntax is:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="12%" />
@@ -447,18 +438,18 @@ command-line key/value pair lists become config file mappings.</p>
 </table>
 <p>Some examples follow.</p>
 <ul>
-<li><p class="first">Report records where the value <code class="docutils literal"><span class="pre">analysis.e_above_hull</span></code> changes by more than 20% in either direction:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span> <span class="o">--</span><span class="n">numeric</span> <span class="s2">&quot;analysis.e_above_hull=+-20%&quot;</span> <span class="n">prod</span><span class="o">.</span><span class="n">json</span> <span class="n">dev</span><span class="o">.</span><span class="n">json</span>
+<li><p class="first">Report records where the value <code class="docutils literal notranslate"><span class="pre">analysis.e_above_hull</span></code> changes by more than 20% in either direction:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span> <span class="o">--</span><span class="n">numeric</span> <span class="s2">&quot;analysis.e_above_hull=+-20%&quot;</span> <span class="n">prod</span><span class="o">.</span><span class="n">json</span> <span class="n">dev</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Report records where the value <code class="docutils literal"><span class="pre">energy</span></code> changes sign:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">name</span> <span class="o">--</span><span class="n">numeric</span> <span class="s2">&quot;energy=+-&quot;</span> <span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span>
+<li><p class="first">Report records where the value <code class="docutils literal notranslate"><span class="pre">energy</span></code> changes sign:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">name</span> <span class="o">--</span><span class="n">numeric</span> <span class="s2">&quot;energy=+-&quot;</span> <span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Report records where either the value <code class="docutils literal"><span class="pre">frequency</span></code> or <code class="docutils literal"><span class="pre">duration</span></code> change is some quantity or more:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">somekey</span> <span class="o">--</span><span class="n">numeric</span> <span class="s2">&quot;frequency=+1.0-0.5=, duration=+10-15=&quot;</span> <span class="n">foo</span><span class="o">.</span><span class="n">json</span> <span class="n">bar</span><span class="o">.</span><span class="n">json</span>
+<li><p class="first">Report records where either the value <code class="docutils literal notranslate"><span class="pre">frequency</span></code> or <code class="docutils literal notranslate"><span class="pre">duration</span></code> change is some quantity or more:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">somekey</span> <span class="o">--</span><span class="n">numeric</span> <span class="s2">&quot;frequency=+1.0-0.5=, duration=+10-15=&quot;</span> <span class="n">foo</span><span class="o">.</span><span class="n">json</span> <span class="n">bar</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 </li>
@@ -469,7 +460,7 @@ command-line key/value pair lists become config file mappings.</p>
 <code class="descname">-p</code><code class="descclassname"> PROPS</code><code class="descclassname">, </code><code class="descname">--properties</code><code class="descclassname"> PROPS</code><a class="headerlink" href="#cmdoption-mgvv-diff-p" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p>Fields with properties that must match, as comma-separated list , e.g ‘<code class="docutils literal"><span class="pre">these_must,match</span></code>’.</p>
+<p>Fields with properties that must match, as comma-separated list , e.g ‘<code class="docutils literal notranslate"><span class="pre">these_must,match</span></code>’.</p>
 <dl class="option">
 <dt id="cmdoption-mgvv-diff-print">
 <code class="descname">-P</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--print</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-print" title="Permalink to this definition">¶</a></dt>
@@ -483,7 +474,7 @@ command-line key/value pair lists become config file mappings.</p>
 
 <p>Query to filter records before key and value tests.
 Uses simplified constraint syntax, from the <a class="reference external" href="http://pythonhosted.org/smoqe/">smoqe package</a>. For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">query</span><span class="o">=</span><span class="s1">&#39;name = &quot;oscar&quot; and grouchiness &gt; 3&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">query</span><span class="o">=</span><span class="s1">&#39;name = &quot;oscar&quot; and grouchiness &gt; 3&#39;</span>
 </pre></div>
 </div>
 <dl class="option">
@@ -494,7 +485,7 @@ Uses simplified constraint syntax, from the <a class="reference external" href="
 <p>In HTML reports, make the key into a hyperlink by prefixing with URL.
 This can be used to take advantage of clean RESTful URL schemes such as those found in
 the Materials Project webpages:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>   <span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span> <span class="o">-</span><span class="n">u</span> <span class="s1">&#39;https://materialsproject.org/tasks/&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span> <span class="o">-</span><span class="n">u</span> <span class="s1">&#39;https://materialsproject.org/tasks/&#39;</span>
 
 <span class="o">..</span> <span class="n">option</span><span class="p">::</span> <span class="o">-</span><span class="n">V</span><span class="p">,</span> <span class="o">--</span><span class="n">values</span>
 
@@ -507,7 +498,7 @@ the Materials Project webpages:</p>
 <p>Let’s say you want to compare the ‘materials’ collection in a development and production database.
 You could have two JSON configuration files, <cite>prod.json</cite> and <cite>dev.json</cite> that specified the servers,
 user and password, and database and collection names:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># prod database</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># prod database</span>
 <span class="p">{</span>
 <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;server1.my.domain&quot;</span><span class="p">,</span>
 <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;core_prod&quot;</span><span class="p">,</span>
@@ -527,7 +518,7 @@ user and password, and database and collection names:</p>
 </pre></div>
 </div>
 <p>You could issue this command-line:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span>  <span class="o">-</span><span class="n">p</span> <span class="n">icsd_id</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">i</span> <span class="n">pretty_formula</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span>  <span class="o">-</span><span class="n">p</span> <span class="n">icsd_id</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">i</span> <span class="n">pretty_formula</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>This compares with the key <cite>task_id</cite> and matches items with the same key on
@@ -535,22 +526,22 @@ the property <cite>icsd_id</cite>, adding to the output the value of the field
 <cite>pretty_formula</cite>. Because output is to the console, the format will default to
 text.</p>
 <p>To produce and view an HTML output report instead, just use the <cite>–format</cite> option:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">--</span><span class="nb">format</span> <span class="n">html</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span>  <span class="o">-</span><span class="n">p</span> <span class="n">icsd_id</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">i</span> <span class="n">pretty_formula</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span> <span class="o">&gt;</span> <span class="n">page</span><span class="o">.</span><span class="n">html</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">--</span><span class="nb">format</span> <span class="n">html</span> <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span>  <span class="o">-</span><span class="n">p</span> <span class="n">icsd_id</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">i</span> <span class="n">pretty_formula</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span> <span class="o">&gt;</span> <span class="n">page</span><span class="o">.</span><span class="n">html</span>
 <span class="nb">open</span> <span class="n">page</span><span class="o">.</span><span class="n">html</span> <span class="c1"># on OSX, view in a browser</span>
 </pre></div>
 </div>
 <p>To add an email report set the recipient and, optionally, the relay server (default will be localhost):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;me@my.mail.domain/you@your.mail.domain/DB diff&quot;</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;me@my.mail.domain/you@your.mail.domain/DB diff&quot;</span> \
     <span class="o">-</span><span class="n">k</span> <span class="n">task_id</span>  <span class="o">-</span><span class="n">p</span> <span class="n">icsd_id</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">i</span> <span class="n">pretty_formula</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>Note that the third part of the <cite>-e/–email</cite> command, the subject, is optional – but if you leave it out the email will arrive with no subject line.</p>
 <p>As you may have noticed, the command-lines begin to get rather complicated. To replace that last example with a configuration file, use instead this command:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">--</span><span class="n">file</span> <span class="n">diff</span><span class="o">.</span><span class="n">yaml</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="o">--</span><span class="n">file</span> <span class="n">diff</span><span class="o">.</span><span class="n">yaml</span> <span class="n">mdev</span><span class="o">.</span><span class="n">json</span> <span class="n">mprod</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
 </div>
 <p>and then put the options into <cite>diff.yaml</cite> like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">email</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">email</span><span class="p">:</span>
     <span class="o">-</span> <span class="s2">&quot;me@my.mail.domain/you@your.mail.domain/DB diff&quot;</span>
 <span class="n">key</span><span class="p">:</span> <span class="n">task_id</span>
 <span class="n">properties</span><span class="p">:</span>
@@ -604,12 +595,14 @@ text.</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

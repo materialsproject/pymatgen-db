@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Database “Builders” &#8212; pymatgen-db 2018.1.31 documentation</title>
+    <title>Database “Builders” &#8212; pymatgen-db 2018.2.21 documentation</title>
     <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '2018.1.31',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -38,8 +30,7 @@
   _gaq.push(['_trackPageview']);
 </script>
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -55,7 +46,7 @@
         <li class="right" >
           <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2018.1.31 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2018.2.21 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -68,8 +59,8 @@
 <span id="builders"></span><h1><a class="toc-backref" href="#id1">Database “Builders”</a><a class="headerlink" href="#database-builders" title="Permalink to this headline">¶</a></h1>
 <p>The Materials Project relies on MongoDB databases. The common parts of the
 process of creating these databases from either files or other MongoDB databases
-are encapsulated in the <code class="docutils literal"><span class="pre">matgendb.builders</span></code> subpackage, and in the
-<code class="docutils literal"><span class="pre">mgbuild</span></code> command-line script. This package and script
+are encapsulated in the <code class="docutils literal notranslate"><span class="pre">matgendb.builders</span></code> subpackage, and in the
+<code class="docutils literal notranslate"><span class="pre">mgbuild</span></code> command-line script. This package and script
 comprise a lightweight framework that is meant to
 automate, simplify, and ultimately streamline the process of creating databases.
 All the code and
@@ -113,10 +104,10 @@ is shown below.</p>
 <img alt="_images/parallel_build.png" src="_images/parallel_build.png" />
 <p>The builder framework automatically parallelizes the processing of
 each item, by placing items in a shared queue and spawning processes to pull
-items off the queue in parallel. Note that the <code class="docutils literal"><span class="pre">get_items()</span></code> method
+items off the queue in parallel. Note that the <code class="docutils literal notranslate"><span class="pre">get_items()</span></code> method
 is not automatically parallelized, so for better or worse
 querying the DB happens sequentially (unless you write explicit parallel
-code inside <code class="docutils literal"><span class="pre">get_items()</span></code>).</p>
+code inside <code class="docutils literal notranslate"><span class="pre">get_items()</span></code>).</p>
 </div>
 <div class="section" id="incremental-building">
 <h3><a class="toc-backref" href="#id4">Incremental building</a><a class="headerlink" href="#incremental-building" title="Permalink to this headline">¶</a></h3>
@@ -142,7 +133,7 @@ and a <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref
 <p>The first builder simply reads from a file, and counts the lines in that file.
 In this section we’ll show the whole program, then walk through it one section
 at a time:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -168,7 +159,7 @@ at a time:</p>
 </pre></div>
 </div>
 <p><strong>Initialization</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -177,41 +168,41 @@ at a time:</p>
         <span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The class inherits from the <code class="docutils literal"><span class="pre">matgendb.core.Builder</span></code> class. In this case, it includes
+<p>The class inherits from the <code class="docutils literal notranslate"><span class="pre">matgendb.core.Builder</span></code> class. In this case, it includes
 a constructor, but this is optional and often not needed. The constructor
 simply initializes the number of lines counter and then calls its parent.</p>
 <p><strong>get_parameters</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;input_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">:</span> <span class="s1">&#39;Input file path&#39;</span><span class="p">}}</span>
 </pre></div>
 </div>
 <p>This method returns a dictionary of metadata about the
-parameters for <code class="docutils literal"><span class="pre">get_items()</span></code>.
+parameters for <code class="docutils literal notranslate"><span class="pre">get_items()</span></code>.
 This metadata is used when running a builder with the <cite>mgbuild</cite> program.
 More details on this are given in <a class="reference internal" href="#bld-running"><span class="std std-ref">Running a builder</span></a>.
 For now, it is enough to note that the
-parameters must match the keyword arguments to <code class="docutils literal"><span class="pre">get_items()</span></code>, both in
+parameters must match the keyword arguments to <code class="docutils literal notranslate"><span class="pre">get_items()</span></code>, both in
 name and (expected) type.</p>
 <p><strong>get_items</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">line</span>
 </pre></div>
 </div>
-<p>The two main methods that you <strong>must</strong> override are called <code class="docutils literal"><span class="pre">get_items()</span></code> and
-<code class="docutils literal"><span class="pre">process_item()</span></code>. The first will return an iterator, in this case
+<p>The two main methods that you <strong>must</strong> override are called <code class="docutils literal notranslate"><span class="pre">get_items()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">process_item()</span></code>. The first will return an iterator, in this case
 the function simply returns one line of the file at a time.
-Notice that you can make the function into a generator by using <code class="docutils literal"><span class="pre">yield</span></code> to
+Notice that you can make the function into a generator by using <code class="docutils literal notranslate"><span class="pre">yield</span></code> to
 return items, but returning any other iterable would also work fine (e.g. the
 function could have been a one-liner “return open(input_file).readlines()”).</p>
 <p><strong>process_item</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">+=</span> <span class="mi">1</span>
 </pre></div>
 </div>
-<p>Here the instance variable <code class="docutils literal"><span class="pre">num_lines</span></code> is simply incremented for every
-line passed to it by the <code class="docutils literal"><span class="pre">get_items()</span></code> iterator.</p>
+<p>Here the instance variable <code class="docutils literal notranslate"><span class="pre">num_lines</span></code> is simply incremented for every
+line passed to it by the <code class="docutils literal notranslate"><span class="pre">get_items()</span></code> iterator.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">Updating instance variables
@@ -224,17 +215,17 @@ See the <a class="reference external" href="https://docs.python.org/2/library/mu
 for details.</p>
 </div>
 <p><strong>finalize</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:d}</span><span class="s2"> lines, </span><span class="si">{:d}</span><span class="s2"> characters&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chars</span><span class="p">))</span>
     <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
 </div>
 <p>Optionally, you can put code that will be run once (for all builders) in
-the <code class="docutils literal"><span class="pre">finalize()</span></code> method. Here we just print a result.
+the <code class="docutils literal notranslate"><span class="pre">finalize()</span></code> method. Here we just print a result.
 The return value of finalize is used to determine whether the build was
-successful. So make sure you return <code class="docutils literal"><span class="pre">True</span></code>, if it succeeds, since the default
-of None will read as <code class="docutils literal"><span class="pre">False</span></code>.</p>
+successful. So make sure you return <code class="docutils literal notranslate"><span class="pre">True</span></code>, if it succeeds, since the default
+of None will read as <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 <p>Note that this builder did not access MongoDB in any way.
 The next example will show MongoDB access and other features.</p>
 </div>
@@ -243,7 +234,7 @@ The next example will show MongoDB access and other features.</p>
 <p>The next builder does a simple DB operation: copying one MongoDB collection
 from a source to a destination. As before, we begin with the full program
 and then step through it one snippet at at time:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">util</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">util</span>
 <span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="k">import</span> <span class="n">QueryEngine</span>
 
 <span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
@@ -278,14 +269,14 @@ and then step through it one snippet at at time:</p>
 </pre></div>
 </div>
 <p><strong>Logging</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In this program, we start by setting up logging.
-For convenience, the <code class="docutils literal"><span class="pre">util.get_builder_log()</span></code> method creates a new
+For convenience, the <code class="docutils literal notranslate"><span class="pre">util.get_builder_log()</span></code> method creates a new
 Python logging.Logger instance with a standard name and format.</p>
 <p><strong>Initialization</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
@@ -293,7 +284,7 @@ Python logging.Logger instance with a standard name and format.</p>
 <p>When we initialize the class, we create an instance variable that we will
 later use to remember the target collection.</p>
 <p><strong>get_items</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Copy records from source to target collection.</span>
 
 <span class="sd">    :param source: Input collection</span>
@@ -312,10 +303,10 @@ later use to remember the target collection.</p>
     <span class="k">return</span> <span class="n">cur</span>
 </pre></div>
 </div>
-<p>For a copy operation, the <code class="docutils literal"><span class="pre">get_items()</span></code> method must query the source
+<p>For a copy operation, the <code class="docutils literal notranslate"><span class="pre">get_items()</span></code> method must query the source
 collection and get an iterator over the records.</p>
 <p>There are two things that are different from the FileCounter example.
-First, note that there is no <code class="docutils literal"><span class="pre">get_parameters()</span></code> method at all. Instead
+First, note that there is no <code class="docutils literal notranslate"><span class="pre">get_parameters()</span></code> method at all. Instead
 the <em>docstring</em> of this method is actually a machine-readable version of
 the metadata needed for running the builder. Not coincidentally, the format
 expected by this docstring is also understood by Sphinx’s autodoc feature.
@@ -323,12 +314,12 @@ This way, you will be able to kill two birds with one stone: your builders
 will be documented for command-line invocation, and you can easily generate
 HTML, PDF, etc. documentation pages.</p>
 <p>Second, this method connects to the database and queries it. But, you may
-be asking, where is the <code class="docutils literal"><span class="pre">db.connect()</span></code> call? This is handled by some magic
+be asking, where is the <code class="docutils literal notranslate"><span class="pre">db.connect()</span></code> call? This is handled by some magic
 that is in the docstring. Notice that the type of both the source and
-target is <code class="docutils literal"><span class="pre">QueryEngine</span></code>. This is a special datatype that instructs the
+target is <code class="docutils literal notranslate"><span class="pre">QueryEngine</span></code>. This is a special datatype that instructs the
 driver program (<cite>mgbuild</cite>) to expect a database configuration file with
 host name, user, password, database name, etc. and to automatically connect
-to this database and return a <code class="docutils literal"><span class="pre">matgendb.query_engine.QueryEngine</span></code> instance.
+to this database and return a <code class="docutils literal notranslate"><span class="pre">matgendb.query_engine.QueryEngine</span></code> instance.
 These instances are passed in as arguments to the method. So, all the
 method has to do is to use the QueryEngine object. In this case,
 this means creating a cursor that iterates over the source collection
@@ -336,13 +327,13 @@ and remembering the target collection in an instance variable.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Unlike the previous example where instance variables might cause
-strange behavior, here the <code class="docutils literal"><span class="pre">_target_coll</span></code> instance variable is
+strange behavior, here the <code class="docutils literal notranslate"><span class="pre">_target_coll</span></code> instance variable is
 perfectly fine for parallel execution because the individual
 builder instances do not want to share the state of this variable
 between them – they each want and need their own copy.</p>
 </div>
 <p><strong>process_item</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -359,9 +350,9 @@ the copying would automatically work with the incremental mode.</p>
 The central idea of the incremental building implementation is that any builder
 can be run in “incremental mode”. When this happens, any QueryEngine objects
 are replaced transparently by equivalent objects that track their last
-position, of class <code class="xref py py-class docutils literal"><span class="pre">matgendb.builders.incr.TrackedQueryEngine</span></code>, which is
-documented in module <code class="xref py py-mod docutils literal"><span class="pre">matgendb.builders.incr</span></code>. This tracking can be
-controlled, if necessary, with the instance variable <code class="docutils literal"><span class="pre">tracking</span></code> on the
+position, of class <code class="xref py py-class docutils literal notranslate"><span class="pre">matgendb.builders.incr.TrackedQueryEngine</span></code>, which is
+documented in module <code class="xref py py-mod docutils literal notranslate"><span class="pre">matgendb.builders.incr</span></code>. This tracking can be
+controlled, if necessary, with the instance variable <code class="docutils literal notranslate"><span class="pre">tracking</span></code> on the
 TrackedQueryEngine class.</p>
 <p>The <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">Database “CopyBuilder”</span></a> is an example of a trivial builder that can work with
 incremental building, without modification to the source code. With incremental
@@ -391,7 +382,7 @@ from values stored in memory.</li>
 any groups that are not in the new elements A<sub>new</sub>, yet non-trivial
 because in order to calculate the new maximum value one needs to examine
 all the elements in A:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">core</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">core</span>
 <span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">util</span>
 <span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="k">import</span> <span class="n">QueryEngine</span>
 
@@ -443,7 +434,7 @@ all the elements in A:</p>
 </pre></div>
 </div>
 <p><strong>Initialization</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MaxValueBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MaxValueBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
 <span class="sd">       some custom logic for incremental case.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -464,11 +455,11 @@ all the elements in A:</p>
 <p>Just as for the CopyBuilder, we use the docstring-style of declaration for the
 parameters to this builder, which are simply the input and output collections.
 We remember both source and target in variables. In addition, we use a utility
-function <code class="docutils literal"><span class="pre">shared_dict()</span></code> in the Builder class to get a dictionary variable
+function <code class="docutils literal notranslate"><span class="pre">shared_dict()</span></code> in the Builder class to get a dictionary variable
 that can be shared between parallel processes. Finally, this method returns
 a query on all items in the collection.</p>
 <p><strong>Processing</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate new maximum value for each group,</span>
 <span class="sd">    for &quot;new&quot; items only.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -490,18 +481,18 @@ a query on all items in the collection.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_max</span>
 </pre></div>
 </div>
-<p>For each item, we update the shared <code class="docutils literal"><span class="pre">_groups</span></code> variable created in
-<code class="docutils literal"><span class="pre">get_items()</span></code>. For new groups, we re-scan the whole source collection
+<p>For each item, we update the shared <code class="docutils literal notranslate"><span class="pre">_groups</span></code> variable created in
+<code class="docutils literal notranslate"><span class="pre">get_items()</span></code>. For new groups, we re-scan the whole source collection
 to find the previous maximum value.
 There are a couple better ways to do this,
 but this method is easy to understand and illustrates how a collection
 can be manipulated in its “raw” form in an incremental builder.</p>
 <p>The key lines here are
-<code class="docutils literal"><span class="pre">self._src.tracking</span> <span class="pre">=</span> <span class="pre">False</span></code> and, later, <code class="docutils literal"><span class="pre">self._src.tracking</span> <span class="pre">=</span> <span class="pre">True</span></code>.
+<code class="docutils literal notranslate"><span class="pre">self._src.tracking</span> <span class="pre">=</span> <span class="pre">False</span></code> and, later, <code class="docutils literal notranslate"><span class="pre">self._src.tracking</span> <span class="pre">=</span> <span class="pre">True</span></code>.
 These turn off the “incremental mode” so that the query will start at the
 beginning of the collection instead of from the start of A<sub>new</sub>.</p>
 <p><strong>Finalization</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errs</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Update target collection with calculated maximum values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -510,9 +501,9 @@ beginning of the collection instead of from the start of A<sub>new</sub>.</p>
     <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
 </div>
-<p>In this case, the <code class="docutils literal"><span class="pre">finalize()</span></code> method is used to set the calculated
+<p>In this case, the <code class="docutils literal notranslate"><span class="pre">finalize()</span></code> method is used to set the calculated
 group maximums into the target collection. This is the same as the <em>reduce</em>
-stage of a map/reduce task (the <code class="docutils literal"><span class="pre">process_item</span></code> performs the <em>map</em>).</p>
+stage of a map/reduce task (the <code class="docutils literal notranslate"><span class="pre">process_item</span></code> performs the <em>map</em>).</p>
 <p>In conclusion, we see that for this case only 2 lines turning the
 tracking variable on and off needed to be added to accommodate
 incremental building.</p>
@@ -530,17 +521,17 @@ it, possibly in parallel and possibly “incrementally”, on some inputs.</p>
 </ul>
 <p>Both of these use the <cite>mgbuild</cite> sub-command “run” (alternatively: “build”),
 like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span> <span class="o">&lt;</span><span class="n">arguments</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span> <span class="o">&lt;</span><span class="n">arguments</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>In the examples below, we will assume that you have pymatgen-db installed and
 in your Python path. We will use the example modules that are installed
-in <code class="docutils literal"><span class="pre">matgendb.builders.examples</span></code>.</p>
+in <code class="docutils literal notranslate"><span class="pre">matgendb.builders.examples</span></code>.</p>
 <div class="section" id="displaying-builder-usage">
 <span id="bld-run-show"></span><h3><a class="toc-backref" href="#id10">Displaying builder usage</a><a class="headerlink" href="#displaying-builder-usage" title="Permalink to this headline">¶</a></h3>
 <p>You can get the list of parameters and their types for a given builder
-by giving its full module path, and the <code class="docutils literal"><span class="pre">-u</span></code> or <code class="docutils literal"><span class="pre">--usage</span></code> option:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="o">-</span><span class="n">u</span> <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
+by giving its full module path, and the <code class="docutils literal notranslate"><span class="pre">-u</span></code> or <code class="docutils literal notranslate"><span class="pre">--usage</span></code> option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="o">-</span><span class="n">u</span> <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
 
 <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
   <span class="n">Copy</span> <span class="kn">from</span> <span class="nn">one</span> <span class="n">MongoDB</span> <span class="n">collection</span> <span class="n">to</span> <span class="n">another</span><span class="o">.</span>
@@ -560,7 +551,7 @@ see some error messages.</p>
 <div class="section" id="running-the-builder">
 <span id="bld-run-exe"></span><h3><a class="toc-backref" href="#id11">Running the builder</a><a class="headerlink" href="#running-the-builder" title="Permalink to this headline">¶</a></h3>
 <p>The usage of the <cite>mgbuild run</cite> command is as follows:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">quiet</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">OPER</span><span class="p">[:</span><span class="n">FIELD</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NUM_CORES</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">quiet</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">OPER</span><span class="p">[:</span><span class="n">FIELD</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NUM_CORES</span><span class="p">]</span>
                    <span class="p">[</span><span class="o">-</span><span class="n">u</span><span class="p">]</span>
                    <span class="n">builder</span> <span class="p">[</span><span class="n">parameter</span> <span class="p">[</span><span class="n">parameter</span> <span class="o">...</span><span class="p">]]</span>
 
@@ -593,7 +584,7 @@ walk through from simple to more complex examples.</p>
 <div class="section" id="basic-usage">
 <h4>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h4>
 <p>Run the copy builder:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
 </pre></div>
 </div>
@@ -602,7 +593,7 @@ for the source and target and empty criteria (i.e. copy everything). The
 copy will be run in a single thread.</p>
 <p>The configuration files in question are just JSON files that look like this
 (you could add “user” and “password” for authenticated DBs):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="mi">27017</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="mi">27017</span><span class="p">,</span>
  <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;collection&quot;</span><span class="p">:</span> <span class="s2">&quot;test1&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -613,7 +604,7 @@ copy will be run in a single thread.</p>
 <p>Most machines have multiple cores, and hundreds of cores will be common
 in the near future. If your item processing requires any
 real work, you will probably benefit by running in parallel:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> <span class="o">-</span><span class="n">n</span> <span class="mi">8</span>
 </pre></div>
 </div>
@@ -621,16 +612,16 @@ real work, you will probably benefit by running in parallel:</p>
 threads to be spawned to run the copy in parallel.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">For parallel runs, only the <code class="docutils literal"><span class="pre">process_item()</span></code> method is run in parallel.
-The <code class="docutils literal"><span class="pre">get_items()</span></code> is always run sequentially.</p>
+<p class="last">For parallel runs, only the <code class="docutils literal notranslate"><span class="pre">process_item()</span></code> method is run in parallel.
+The <code class="docutils literal notranslate"><span class="pre">get_items()</span></code> is always run sequentially.</p>
 </div>
 </div>
 <div class="section" id="incremental-builds">
 <h4>Incremental builds<a class="headerlink" href="#incremental-builds" title="Permalink to this headline">¶</a></h4>
 <p>The concept of incremental building was introduced in <a class="reference internal" href="#bld-writing-incr"><span class="std std-ref">Incremental builder “MaxValueBuilder”</span></a>.
-From the command-line, incremental building is controlled by the <code class="docutils literal"><span class="pre">-i/--incr</span></code> option.
+From the command-line, incremental building is controlled by the <code class="docutils literal notranslate"><span class="pre">-i/--incr</span></code> option.
 What this really does is to add some behind-the-scenes bookkeeping for every
-parameter of type <code class="docutils literal"><span class="pre">QueryEngine</span></code> (except ones where it is explicitly
+parameter of type <code class="docutils literal notranslate"><span class="pre">QueryEngine</span></code> (except ones where it is explicitly
 turned off, <a class="reference internal" href="#bld-incr-skip"><span class="std std-ref">see below</span></a>) that records and retrieves the spot where processing
 was last ended. Multiple spots are allowed per-collection by requiring an
 “operation”. Currently,
@@ -642,16 +633,16 @@ default this field is <cite>_id</cite>, but it is highly recommended to choose a
 collection-specific identifier because <cite>_id</cite> as chosen by the
 client is not always monotonic.</p>
 <p><strong>Basic incremental build</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
     <span class="o">-</span><span class="n">i</span> <span class="n">copy</span>
 </pre></div>
 </div>
 <p>Copies from source to target. Subsequent runs will only copy records that
-are newer (according to the field, in this case defaulting to <code class="docutils literal"><span class="pre">_id</span></code>)
+are newer (according to the field, in this case defaulting to <code class="docutils literal notranslate"><span class="pre">_id</span></code>)
 than the last record from the previous run.</p>
 <p><strong>Incremental build with parallelism</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
     <span class="o">-</span><span class="n">n</span> <span class="mi">8</span> <span class="o">-</span><span class="n">i</span> <span class="n">copy</span>
 </pre></div>
@@ -659,21 +650,21 @@ than the last record from the previous run.</p>
 <p>Parallelism is not different with incremental builds. As before, we
 simply add <strong>-n 8</strong> to the command-line.</p>
 <p><strong>Incremental build with custom identifier</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
     <span class="o">-</span><span class="n">i</span> <span class="n">copy</span><span class="p">:</span><span class="n">num</span>
 </pre></div>
 </div>
 <p>This example runs an incremental build with the “copy” operation,
-using the <code class="docutils literal"><span class="pre">num</span></code> field instead of the default <code class="docutils literal"><span class="pre">_id</span></code>.</p>
+using the <code class="docutils literal notranslate"><span class="pre">num</span></code> field instead of the default <code class="docutils literal notranslate"><span class="pre">_id</span></code>.</p>
 <p id="bld-incr-skip"><strong>Incremental build skipped for some collections</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=-</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
     <span class="o">-</span><span class="n">i</span> <span class="n">copy</span><span class="p">:</span><span class="n">num</span>
 </pre></div>
 </div>
 <p>This is pretty subtle: notice the “-” inserted after the “=” in
-<code class="docutils literal"><span class="pre">target=-conf/test2.json</span></code>. This has the effect of not adding tracking information
+<code class="docutils literal notranslate"><span class="pre">target=-conf/test2.json</span></code>. This has the effect of not adding tracking information
 for the target collection.
 In this case, tracking the last record added to the target
 isn’t useful for the copy, all that matters is knowing where we stopped
@@ -732,12 +723,14 @@ in the source collection.</p>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

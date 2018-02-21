@@ -1,3 +1,17 @@
+v0.7.0
+------
+* Fix deprecation.
+* Ensure oxide types are handled properly in creating docs and querying for
+  them.
+
+v0.6.2
+------
+* Minor bug fixes.
+
+v0.6.1
+------
+* Removed Materials Genomics UI. Pls use Flamyngo as an alternative.
+
 v0.6.5
 ------
 1. Proper specification of requirements.
