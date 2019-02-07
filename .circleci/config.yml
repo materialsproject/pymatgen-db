@@ -4,6 +4,7 @@ jobs:
     working_directory: ~/pymatgen-db
     docker:
       - image: materialsvirtuallab/circle-ci-pmg-py3:0.0.2
+      - image: circleci/mongo:latest
     steps:
       - checkout
       - run:
@@ -22,7 +23,6 @@ jobs:
             export PATH=$HOME/miniconda3/bin:$PATH
             pip install --quiet -e .
             nosetests --config=nose.cfg --cover-html --cover-html-dir=coverage_reports
-            # Command line tests
           no_output_timeout: 3600
       - store_artifacts:
           path: coverage_reports/
