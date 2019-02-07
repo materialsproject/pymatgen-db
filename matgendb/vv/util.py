@@ -20,8 +20,6 @@ import logging
 import time
 from sys import getsizeof
 from yaml import load
-import six
-from six.moves import map
 
 TRACE = logging.DEBUG -1
 
@@ -86,12 +84,12 @@ def total_size(o, handlers={}, verbose=False, count=False):
     return sizeof(o)
 
 
-class ElapsedTime(object):
+class ElapsedTime:
     def __init__(self):
         self.value = -1
 
 
-class Timing(object):
+class Timing:
     """Perform and report timings using the 'with' keyword.
 
     For example:
@@ -110,7 +108,7 @@ class Timing(object):
     def __exit__(self, type, value, tb):
         elapsed = time.time() - self.begin
         if self._log is not None:
-            nvp = ', '.join(['{}={}'.format(k, v) for k, v in six.iteritems(self.kw)])
+            nvp = ', '.join(['{}={}'.format(k, v) for k, v in self.kw.items()])
             self._log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
         if self.elapsed:
             self.elapsed.value = elapsed
@@ -124,7 +122,7 @@ def letter_num(x, letter='A'):
     return s
 
 
-class JsonWalker(object):
+class JsonWalker:
     """Walk a dict, transforming.
     Used for JSON formatting.
     """
@@ -144,7 +142,7 @@ class JsonWalker(object):
         """
         if isinstance(o, dict):
             d = o if self._dx is None else self._dx(o)
-            return {k: self.walk(v) for k, v in six.iteritems(d)}
+            return {k: self.walk(v) for k, v in d.items()}
         elif isinstance(o, list):
             return [self.walk(v) for v in o]
         else:

@@ -16,7 +16,6 @@ __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 __date__ = '4/25/14'
 
 import os
-import six
 import yaml
 
 # Constants for keys
@@ -33,7 +32,7 @@ class ConfigurationFileError(Exception):
         msg = "reading '{}': {}".format(filename, err)
         Exception.__init__(self, msg)
 
-class DBConfig(object):
+class DBConfig:
     """Database configuration.
     """
 
@@ -207,7 +206,8 @@ def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
 
     return found
 
+
 def _as_file(f, mode='r'):
-    if isinstance(f, six.string_types):
+    if isinstance(f, str):
         return open(f, mode)
     return f

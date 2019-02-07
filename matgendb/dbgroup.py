@@ -9,11 +9,11 @@ import glob
 import os
 import re
 from . import dbconfig, query_engine, util
-from six.moves import filter
 
 # aliases
 _opj = os.path.join
 _opx = os.path.splitext
+
 
 class CreateQueryEngineError(Exception):
     def __init__(self, cls, settings, err):
@@ -22,7 +22,7 @@ class CreateQueryEngineError(Exception):
         Exception.__init__(self, msg)
 
 
-class ConfigGroup(object):
+class ConfigGroup:
     """Convenient storage and access to a group
     of database configurations.
 
@@ -231,7 +231,7 @@ class RegexDict(dict):
         if not pattern.endswith("$"):
             pattern += "$"
         expr = re.compile(pattern)
-        return filter(expr.match, self.keys())
+        return list(filter(expr.match, self.keys()))
 
     def re_get(self, pattern):
         """Return values whose key matches `pattern`

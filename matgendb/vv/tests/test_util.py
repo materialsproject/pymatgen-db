@@ -8,7 +8,7 @@ import unittest
 from matgendb.vv.util import JsonWalker, YamlConfig
 
 
-class Jsonable(object):
+class Jsonable:
     def __init__(self, s):
         self.value = s
 

@@ -32,7 +32,7 @@ from pymatgen.entries.computed_entries import ComputedEntry,\
 _log = logging.getLogger('mg.' + __name__)
 
 
-class QueryEngine(object):
+class QueryEngine:
     """This class defines a QueryEngine interface to a Mongo Collection based on
     a set of aliases. This query engine also provides convenient translation
     between various pymatgen objects and database objects.

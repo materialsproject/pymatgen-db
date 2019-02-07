@@ -10,8 +10,6 @@ import json
 import os
 import re
 import time
-from six.moves import filter
-from six.moves import map
 
 # Default schema version
 DEFAULT_VERSION = '1.0.0'
@@ -108,7 +106,7 @@ def load_schema(file_or_fp):
 ## Validator classes
 
 
-class HasMeta(object):
+class HasMeta:
     """Mix-in class to handle metadata.
     Adds the 'meta' class attribute.
     """

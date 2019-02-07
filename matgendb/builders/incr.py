@@ -41,7 +41,6 @@ import pymongo
 from enum import Enum
 from matgendb.query_engine import QueryEngine
 from matgendb.builders import util as bld_util
-import six
 
 # Logging
 
@@ -66,7 +65,7 @@ class NoTrackingCollection(Exception):
 ## High level API
 ## --------------
 
-class TrackingInterface(six.with_metaclass(ABCMeta, object)):
+class TrackingInterface(metaclass=ABCMeta):
     @abstractmethod
     def set_mark(self):
         """Set the mark to the current end of the collection. This is saved in the database
@@ -142,7 +141,7 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
         assert self.collection
         self.collection.set_mark()
 
-class TrackedCollection(object):
+class TrackedCollection:
     """Wrapper on a pymongo collection to make `find' operations start
     after the "tracking" mark.
     """
@@ -219,7 +218,7 @@ class Operation(Enum):
     other = 99
 
 
-class Mark(object):
+class Mark:
     """The position in a collection for the last record that was
     processed by a given operation.
     """
@@ -310,7 +309,7 @@ class Mark(object):
         return q
 
 
-class CollectionTracker(object):
+class CollectionTracker:
     """Track which records are 'new' in a MongoDB collection
     with respect to a given operation.
     """

@@ -10,7 +10,6 @@ import time
 import unittest
 # Package
 from matgendb.tests.common import ComponentTest, get_component_logger
-from six.moves import map
 
 _log = get_component_logger("comp_incr")
 

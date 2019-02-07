@@ -13,7 +13,6 @@ import tempfile
 import unittest
 from matgendb.dbgroup import ConfigGroup
 from matgendb import dbconfig
-import six
 
 _opj = os.path.join
 
@@ -29,7 +28,7 @@ mockcoll = [
 ]
 [mockdb.testdb[c].insert(doc) for c in mockcoll]
 
-class MockQueryEngine(object):
+class MockQueryEngine:
     def __init__(self, **kwargs):
         self.kw = kwargs
 
@@ -46,13 +45,13 @@ class MockQueryEngine(object):
 
     @property
     def db(self):
-        class DB(object):
+        class DB:
             _c = mockcoll
             def collection_names(self, x=None):
                 return self._c
         return DB()
 
-class Cfg(object):
+class Cfg:
     def __init__(self, v):
         self.settings = {'collection': v}
         self.collection = v
@@ -150,7 +149,7 @@ class ConfigGroupTestCase(unittest.TestCase):
         self.assertEqual(expect, keys)
 
 def dict_subset(a, b):
-    for k in six.iterkeys(a):
+    for k in a.keys():
         if k not in b or b[k] != a[k]:
             return False
     return True

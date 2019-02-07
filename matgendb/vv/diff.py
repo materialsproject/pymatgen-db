@@ -12,12 +12,11 @@ import time
 from matgendb import util
 from matgendb.query_engine import QueryEngine
 from matgendb.dbconfig import normalize_auth
-import six
 
 _log = logging.getLogger("mg.vv.diff")
 
 
-class IID(object):
+class IID:
     _value = 0
 
     @classmethod
@@ -26,7 +25,7 @@ class IID(object):
         return cls._value
 
 
-class Differ(object):
+class Differ:
     """Calculate difference between two collections, based solely on a
     selected key.
 
@@ -140,7 +139,7 @@ class Differ(object):
                 # Extract numeric properties.
                 if has_numprops:
                     pvals = {}
-                    for pkey in six.iterkeys(self._prop_deltas):
+                    for pkey in self._prop_deltas.keys():
                         try:
                             pvals[pkey] = float(rec[pkey])
                         except KeyError:
@@ -243,7 +242,7 @@ class Differ(object):
         return changed
 
 
-class Delta(object):
+class Delta:
     """Delta between two properties.
 
     Syntax:
@@ -334,7 +333,7 @@ class Delta(object):
             return {'delta': {'id': self._json_id}}
         dtype = 'abs' if self._eq else 'pct'
         incl = self._eq
-        self._json_id = six.advance_iterator(IID)
+        self._json_id = next(IID)
         return {
             'delta': {
                 'plus': self._dx,

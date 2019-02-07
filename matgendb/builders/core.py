@@ -22,7 +22,6 @@ import traceback
 # local
 from matgendb.builders import schema, util
 from matgendb import util as dbutil
-import six
 
 ## Logging
 
@@ -83,7 +82,7 @@ def parse_fn_docstring(fn):
 ## Classes
 
 
-class Collections(object):
+class Collections:
     """Interface to normalized names for collections.
 
     After initialization with a MongoDB database and optional parameters,
@@ -187,7 +186,7 @@ def merge_tasks(core_collections, sandbox_collections, id_prefix, new_tasks, bat
         target.insert(batch)
 
 
-class HasExamples(object):
+class HasExamples:
     """Mix-in class for checking the output of a builder.
 
     This is a way to get some static checking of the schema of inserted documents,
@@ -225,7 +224,7 @@ class HasExamples(object):
                 fail_fn("Failed to validate sample document: {}".format(result))
 
 
-class Builder(six.with_metaclass(ABCMeta, object)):
+class Builder(metaclass=ABCMeta):
     """Abstract base class for all builders
 
     To implement a new builder, inherit from this class and
@@ -454,7 +453,7 @@ class Builder(six.with_metaclass(ABCMeta, object)):
         return self.__class__.__name__
 
 
-class BuilderStatus(object):
+class BuilderStatus:
     """Status of a Builder object run.
     """
     # States
@@ -506,7 +505,7 @@ class BuilderStatus(object):
         return ",".join([self._NAMES[state] for state in self._states])
 
 
-class ProcRunner(object):
+class ProcRunner:
     """This is a work-around to the limitation of multiprocessing that the
     function executed in the new module cannot be a method of a class.
     We simply set the instance (self) into the class before forking each

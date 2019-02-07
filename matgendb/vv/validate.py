@@ -11,14 +11,11 @@ __date__ = "1/31/13"
 
 import pymongo
 import random
-import re
 import sys
 import collections
 
 from .util import DoesLogging, total_size
-#from .mquery import *
 from smoqe.query import *
-import six
 
 
 class DBError(Exception):
@@ -30,7 +27,7 @@ class ValidatorSyntaxError(Exception):
         msg = 'Invalid syntax: {} -> "{}"'.format(desc, target)
         Exception.__init__(self, msg)
 
-class PythonMethod(object):
+class PythonMethod:
     """Encapsulate an external Python method that will be run on our target
     MongoDB collection to perform arbitrary types of validation.
     """
@@ -93,7 +90,7 @@ def mongo_get(rec, key, default=None):
     return rec
 
 
-class Projection(object):
+class Projection:
     """Fields on which to project the query results.
     """
 
@@ -129,12 +126,12 @@ class Projection(object):
         :rtype: dict
         """
         d = copy.copy(self._fields)
-        for k, v in six.iteritems(self._slices):
+        for k, v in self._slices.items():
             d[k] = {'$slice': v}
         return d
 
 
-class ConstraintViolation(object):
+class ConstraintViolation:
     """A single constraint violation, with no metadata.
     """
     def __init__(self, constraint, value, expected):
@@ -176,7 +173,7 @@ class NullConstraintViolation(ConstraintViolation):
         ConstraintViolation.__init__(self, Constraint('NA', '=', 'NA'), 'NA', 'NA')
 
 
-class ConstraintViolationGroup(object):
+class ConstraintViolationGroup:
     """A group of constraint violations with metadata.
     """
     def __init__(self):
@@ -207,7 +204,7 @@ class ConstraintViolationGroup(object):
         return len(self._viol)
 
 
-class ProgressMeter(object):
+class ProgressMeter:
     """Simple progress tracker
     """
     def __init__(self, num, fmt):
@@ -265,7 +262,7 @@ class ConstraintSpec(DoesLogging):
         """
         sect = []
         # simple 1-level flatten operation
-        for values in six.itervalues(self._sections):
+        for values in self._sections.values():
             for v in values:
                 sect.append(v)
         return iter(sect)
@@ -294,7 +291,7 @@ class ConstraintSpec(DoesLogging):
         self._sections[None] = [ConstraintSpecSection(None, item, None)]
 
 
-class ConstraintSpecSection(object):
+class ConstraintSpecSection:
     def __init__(self, fltr, constraints, sample):
         self._filter, self._constraints, self._sampler = fltr, constraints, sample
         # make condition(s) into a tuple
@@ -434,7 +431,7 @@ class Validator(DoesLogging):
         nbytes, num_dberr, num_rec = 0, 0, 0
         while 1:
             try:
-                record = six.advance_iterator(cursor)
+                record = next(cursor)
                 nbytes += total_size(record)
                 num_rec += 1
             except StopIteration:
@@ -490,7 +487,7 @@ class Validator(DoesLogging):
                 clause.constraint.value = value         # swap out value, temporarily
             # take length for size
             if op.is_size():
-                if isinstance(fval, six.string_types) or not hasattr(fval, '__len__'):
+                if isinstance(fval, str) or not hasattr(fval, '__len__'):
                     reasons.append(ConstraintViolation(clause.constraint, type(fval), 'sequence'))
                     if op.is_variable():
                         clause.constraint.value = var_name      # put original value back
@@ -534,7 +531,7 @@ class Validator(DoesLogging):
                 if sval.constraints is not None:
                     groups = self._process_constraint_expressions(sval.constraints)
                     projection = Projection()
-                    for cg in six.itervalues(groups):
+                    for cg in groups.values():
                         for c in cg:
                             projection.add(c.field, c.op, c.value)
                             query.add_clause(MongoClause(c))
@@ -548,7 +545,7 @@ class Validator(DoesLogging):
             cond_query = MongoQuery()
             if sval.filters is not None:
                 cond_groups = self._process_constraint_expressions(sval.filters, rev=False)
-                for cg in six.itervalues(cond_groups):
+                for cg in cond_groups.values():
                     for c in cg:
                         cond_query.add_clause(MongoClause(c, rev=False))
 
@@ -575,13 +572,13 @@ class Validator(DoesLogging):
             groups[field].add_constraint(op, val)
 
         # add existence constraints
-        for cgroup in six.itervalues(groups):
+        for cgroup in groups.values():
             cgroup.add_existence(rev)
 
         # optionally check for conflicts
         if conflict_check:
             # check for conflicts in each group
-            for field_name, group in six.iteritems(groups):
+            for field_name, group in groups.items():
                 conflicts = group.get_conflicts()
                 if conflicts:
                     raise ValueError('Conflicts for field {}: {}'.format(field_name, conflicts))
@@ -715,12 +712,12 @@ class Sampler(DoesLogging):
         n = 0
         while n < n_target:
             try:
-                item = six.advance_iterator(cursor)
+                item = next(cursor)
             except StopIteration:
                 # need to keep looping through data until
                 # we get all our items!
                 cursor.rewind()
-                item = six.advance_iterator(cursor)
+                item = next(cursor)
             if self._keep():
                 yield item
                 n += 1

@@ -6,7 +6,7 @@ __author__ = 'dang'
 import unittest
 from matgendb.util import collection_keys
 
-class FakeCollection(object):
+class FakeCollection:
     """Collection that emulates find_one().
     """
     def __init__(self, data):

@@ -21,8 +21,6 @@ from matgendb.dbconfig import DBConfig
 # Backwards compatibility from refactor to `dbconfig` module
 # Copy of functions that were moved
 from matgendb.dbconfig import normalize_auth
-import six
-from six.moves import map
 # Copy of global constants that were moved
 DEFAULT_PORT = DBConfig.DEFAULT_PORT
 DEFAULT_CONFIG_FILE = DBConfig.DEFAULT_FILE
@@ -100,16 +98,17 @@ def quotable(v):
         return str(v)
     return "'{}'".format(v)
 
+
 def csv_dict(d):
     """Format dict to a string with comma-separated values.
     """
     if len(d) == 0:
         return "{}"
     return "{" + ', '.join(["'{}': {}".format(k, quotable(v))
-                            for k, v in six.iteritems(d)]) + "}"
+                            for k, v in d.items()]) + "}"
 
 def kvp_dict(d):
     """Format dict to key=value pairs.
     """
     return ', '.join(
-        ["{}={}".format(k, quotable(v)) for k, v in six.iteritems(d)])
+        ["{}={}".format(k, quotable(v)) for k, v in d.items()])
