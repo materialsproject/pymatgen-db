@@ -14,11 +14,10 @@ jobs:
       - run:
           command: |
             export PATH=$HOME/miniconda3/bin:$PATH
-            conda create --quiet --yes --name test_env python=3.7
             source activate test_env
             conda install --quiet --yes numpy scipy matplotlib sympy cython
             conda install --quiet --yes cmake
-            # conda update --quiet --all
+            conda upgrade --quiet --all
             mkdir coverage_reports
             pip install --upgrade pip
             pip install --upgrade numpy
