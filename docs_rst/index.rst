@@ -21,6 +21,11 @@ Other pages
 Change Log
 ==========
 
+v2018.3.28
+----------
+1. Improved handling of nested db dicts. (Donny Winston)
+
+
 v2018.2.21
 ----------
 1. Fix --tag option in mgdb to support multiple tags.
