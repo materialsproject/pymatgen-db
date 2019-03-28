@@ -634,18 +634,22 @@ class QueryResults(Iterable):
             # Map aliased keys back to original key
             for k, v in self._prop_dict.items():
                 try:
-                    data = r[v[0]]
-                    for j in range(1, len(v)):
-                        if isinstance(data, list):
-                            data = [d[v[j]] for d in data]
-                        else:
-                            data = data[v[j]]
-                    result[k] = data
+                    result[k] = self._mapped_result_path(v[1:], data=r[v[0]])
                 except (IndexError, KeyError, ValueError):
                     result[k] = None
-
-
         return result
+
+    @staticmethod
+    def _mapped_result_path(path, data=None):
+        if not path:
+            return data
+        if isinstance(data, list):
+            return [QueryResults._mapped_result_path(path, d) for d in data]
+        else:
+            try:
+                return QueryResults._mapped_result_path(path[1:], data[path[0]])
+            except (IndexError, KeyError, ValueError):
+                return None
 
     def _result_generator(self):
         for r in self._results:
