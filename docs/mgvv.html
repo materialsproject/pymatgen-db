@@ -4,15 +4,16 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2018.2.21 documentation</title>
+    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2019.3.28 documentation</title>
     <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,7 +47,7 @@
         <li class="right" >
           <a href="index.html" title="Pymatgen-db"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2018.2.21 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2019.3.28 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -181,9 +182,9 @@ administrative user, if both are present.</p>
 <p>Reports can be sent by email. This can be configured on the command-line,
 or within the main configuration file.</p>
 <p>Here is an example configuration:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">_email</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
-  <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_email</span><span class="p">:</span>
+  <span class="nt">from</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
+  <span class="nt">to</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">othersucker@host.otherorg</span>
 </pre></div>
@@ -211,7 +212,7 @@ on which to apply the constraints. The specification of the constraints in
 each collection takes two possible forms, simple and complex. In both cases
 the syntax of the constraints is the same, see <a class="reference internal" href="#constraint-syntax"><span class="std std-ref">Constraint syntax</span></a>.</p>
 <p><strong>Simple</strong>: A list of constraints, which are simply combined. Any document in the collection that violates any of the constraints will generate a validation error.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">collection_name</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 &lt;= value</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field2 &gt; value</span>
     <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
@@ -223,19 +224,19 @@ The <cite>filter</cite> key selects records for applying the constraints.
 The <cite>constraints</cite> key provides the list of constraints associated with that condition.
 As in the simple format, any document in the collection
 that violates any of the constraints will generate a validation error.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">mycollection</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">mycollection</span><span class="p">:</span>
     <span class="p p-Indicator">-</span>
-        <span class="l l-Scalar l-Scalar-Plain">filter</span><span class="p p-Indicator">:</span>
+        <span class="nt">filter</span><span class="p">:</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 = &#39;negatory&#39;</span>
-        <span class="l l-Scalar l-Scalar-Plain">constraints</span><span class="p p-Indicator">:</span>
+        <span class="nt">constraints</span><span class="p">:</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field2 &lt;= value</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field3 &gt; value</span>
             <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
     <span class="p p-Indicator">-</span>
-        <span class="l l-Scalar l-Scalar-Plain">filter</span><span class="p p-Indicator">:</span>
+        <span class="nt">filter</span><span class="p">:</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 = &#39;excellent&#39;</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field4 &gt; 0</span>
-        <span class="l l-Scalar l-Scalar-Plain">then</span><span class="p p-Indicator">:</span>
+        <span class="nt">then</span><span class="p">:</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field5 &lt; value</span>
             <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
 </pre></div>
@@ -248,14 +249,14 @@ to pass the filter and be evaluated according to the constraints.</p>
 Constraints that use these aliases will automatically be converted to the aliased name before the query
 is submitted to the database. The aliases are simply a list in the format “name = value”
 in a section called <cite>_aliases</cite>, as shown below.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">_aliases</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_aliases</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">snl_id = mps_id</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">energy = analysis.e_above_hull</span>
 </pre></div>
 </div>
 <p><strong>Partial arrays</strong> can be fetched, which is very useful for not spending a ton of bandwidth, by adding <cite>/&lt;path&gt;</cite>
 after the name of the field. For example:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">collection_name</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">calculations/density size 2</span>
 </pre></div>
 </div>
@@ -559,7 +560,7 @@ text.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Materials Project Database Validation: mgvv</a><ul>
 <li><a class="reference internal" href="#mgvv-validate-subcommand">mgvv validate subcommand</a></li>
