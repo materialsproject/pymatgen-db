@@ -17,9 +17,6 @@ setup(
     setup_requires=["numpy"],
     install_requires=["pymatgen>=4.4.9", "monty>=0.9.6", "pymongo>=2.8", "smoqe"],
     extras_require={
-        ':python_version == "2.7"': [
-            'enum34',
-        ],
         'tests': 'mongomock'
     },
     package_data={"matgendb": ["*.json"]},
@@ -35,8 +32,6 @@ setup(
     keywords=["vasp", "gaussian", "materials", "project", "electronic",
               "structure", "mongo"],
     classifiers=[
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
