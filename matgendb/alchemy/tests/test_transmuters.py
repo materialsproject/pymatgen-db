@@ -15,8 +15,6 @@ __date__ = "Mar 5, 2012"
 import unittest
 import os
 
-from nose.exc import SkipTest
-
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
@@ -53,7 +51,7 @@ class QeTransmuterTest(unittest.TestCase):
 
     def test_transmute(self):
         if QeTransmuterTest.qe is None:
-            raise SkipTest("No MongoDB present")
+            self.skipTest("No MongoDB present")
         crit = {}
         trans = [SubstitutionTransformation({"Zn": "Mg"}),
                  OxidationStateDecorationTransformation(
