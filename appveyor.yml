@@ -29,9 +29,7 @@ install:
 
   # Install the build dependencies of the project via conda and pip
   - 'conda install --yes --quiet numpy scipy matplotlib setuptools wheel'
-  - 'conda install --yes --quiet --channel matsci spglib'
-  - "pip install -r requirements.txt"
-  - "pip install -r requirements-ci.txt"
+  - "pip install --quiet --ignore-installed -r requirements.txt -r requirements-ci.txt"
 
   # Run develop to install in dev mode and build C extension.
   - "python setup.py develop"
@@ -39,7 +37,7 @@ install:
 build: false
 
 test_script:
-  - IF NOT "%APPVEYOR_REPO_BRANCH%" == "stable" (nosetests)
+  - "pytest matgendb"
 
 notifications:
   - provider: Email
