@@ -63,9 +63,9 @@ class MyTestCase(unittest.TestCase):
     def check(self, sch, doc, expect_ok):
             result = sch.validate(doc)
             if result is None:
-                self.failUnless(expect_ok, self.false_positive(doc))
+                self.assertTrue(expect_ok, self.false_positive(doc))
             else:
-                self.failIf(expect_ok, self.false_negative(doc, result))
+                self.assertFalse(expect_ok, self.false_negative(doc, result))
 
     def false_positive(self, input_):
         return "input ({}) should have failed to validate".format(input_)

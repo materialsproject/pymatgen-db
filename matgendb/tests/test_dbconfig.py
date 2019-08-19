@@ -19,13 +19,13 @@ class NormAuthTestCase(unittest.TestCase):
     def _check(self, s):
         """Check that user/password matches expected.
         """
-        self.failUnless(s["user"] == self.U)
-        self.failUnless(s["password"] == self.P)
+        self.assertTrue(s["user"] == self.U)
+        self.assertTrue(s["password"] == self.P)
 
     def _check_absent(self, s):
         """Check that user/password is not present.
         """
-        self.failIf("user" in s or "password" in s)
+        self.assertFalse("user" in s or "password" in s)
 
     def test_admin(self):
         s = {"admin_user": self.U, "admin_password": self.P}

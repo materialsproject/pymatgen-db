@@ -179,7 +179,7 @@ class MyTestCase(unittest.TestCase):
     def test_delta(self):
         """Delta class parsing.
         """
-        self.failUnlessRaises(ValueError, Delta, "foo")
+        self.assertRaises(ValueError, Delta, "foo")
 
     def test_delta_sign(self):
         """Delta class sign.
