@@ -185,85 +185,85 @@ class MyTestCase(unittest.TestCase):
         """Delta class sign.
         """
         d = Delta("+-")
-        self.assertEquals(d.cmp(0, 1), False)
-        self.assertEquals(d.cmp(-1, 0), False)
-        self.assertEquals(d.cmp(-1, 1), True)
+        self.assertEqual(d.cmp(0, 1), False)
+        self.assertEqual(d.cmp(-1, 0), False)
+        self.assertEqual(d.cmp(-1, 1), True)
 
     def test_delta_val(self):
         """Delta class value, same absolute.
         """
         d = Delta("+-3")
-        self.assertEquals(d.cmp(0, 1), False)
-        self.assertEquals(d.cmp(1, 4), False)
-        self.assertEquals(d.cmp(1, 5), True)
+        self.assertEqual(d.cmp(0, 1), False)
+        self.assertEqual(d.cmp(1, 4), False)
+        self.assertEqual(d.cmp(1, 5), True)
 
     def test_delta_val(self):
         """Delta class value, different absolute.
         """
         d = Delta("+2.5-1.5")
-        self.assertEquals(d.cmp(0, 1), False)
-        self.assertEquals(d.cmp(1, 3), False)
-        self.assertEquals(d.cmp(3, 1), True)
+        self.assertEqual(d.cmp(0, 1), False)
+        self.assertEqual(d.cmp(1, 3), False)
+        self.assertEqual(d.cmp(3, 1), True)
 
     def test_delta_val(self):
         """Delta class value, same absolute equality.
         """
         d = Delta("+-3.0=")
-        self.assertEquals(d.cmp(0, 1), False)
-        self.assertEquals(d.cmp(1, 4), True)
-        self.assertEquals(d.cmp(4, 1), True)
+        self.assertEqual(d.cmp(0, 1), False)
+        self.assertEqual(d.cmp(1, 4), True)
+        self.assertEqual(d.cmp(4, 1), True)
 
     def test_delta_val(self):
         """Delta class value, same percentage.
         """
         d = Delta("+-25%")
-        self.assertEquals(d.cmp(0, 1), False)
-        self.assertEquals(d.cmp(8, 4), True)
-        self.assertEquals(d.cmp(8, 6), False)
+        self.assertEqual(d.cmp(0, 1), False)
+        self.assertEqual(d.cmp(8, 4), True)
+        self.assertEqual(d.cmp(8, 6), False)
 
     def test_delta_val(self):
         """Delta class value, same percentage equality.
         """
         d = Delta("+-25=%")
-        self.assertEquals(d.cmp(0, 1), False)
-        self.assertEquals(d.cmp(8, 4), True)
-        self.assertEquals(d.cmp(8, 6), True)
+        self.assertEqual(d.cmp(0, 1), False)
+        self.assertEqual(d.cmp(8, 4), True)
+        self.assertEqual(d.cmp(8, 6), True)
 
     def test_delta_val(self):
         """Delta class value, different percentage equality.
         """
         d = Delta("+50-25=%")
-        self.assertEquals(d.cmp(0, 1), False)
-        self.assertEquals(d.cmp(8, 4), True)
-        self.assertEquals(d.cmp(8, 6), True)
-        self.assertEquals(d.cmp(6, 8), False)
-        self.assertEquals(d.cmp(6, 9), True)
+        self.assertEqual(d.cmp(0, 1), False)
+        self.assertEqual(d.cmp(8, 4), True)
+        self.assertEqual(d.cmp(8, 6), True)
+        self.assertEqual(d.cmp(6, 8), False)
+        self.assertEqual(d.cmp(6, 9), True)
 
     def test_delta_plus(self):
         """Delta class value 'plus only'.
         """
         d = Delta("+50")
-        self.assertEquals(d.cmp(0, 50), False)
-        self.assertEquals(d.cmp(0, 51), True)
-        self.assertEquals(d.cmp(10, 5), False)
+        self.assertEqual(d.cmp(0, 50), False)
+        self.assertEqual(d.cmp(0, 51), True)
+        self.assertEqual(d.cmp(10, 5), False)
         d = Delta("+50=")
-        self.assertEquals(d.cmp(0, 50), True)
+        self.assertEqual(d.cmp(0, 50), True)
         d = Delta("+50%")
-        self.assertEquals(d.cmp(10, 25), True)
-        self.assertEquals(d.cmp(25, 10), False)
+        self.assertEqual(d.cmp(10, 25), True)
+        self.assertEqual(d.cmp(25, 10), False)
 
     def test_delta_minus(self):
         """Delta class value 'minus only'.
         """
         d = Delta("-50")
-        self.assertEquals(d.cmp(0, 50), False)
-        self.assertEquals(d.cmp(51, 0), True)
-        self.assertEquals(d.cmp(5, 10), False)
+        self.assertEqual(d.cmp(0, 50), False)
+        self.assertEqual(d.cmp(51, 0), True)
+        self.assertEqual(d.cmp(5, 10), False)
         d = Delta("-50=")
-        self.assertEquals(d.cmp(50, 0), True)
+        self.assertEqual(d.cmp(50, 0), True)
         d = Delta("-50%")
-        self.assertEquals(d.cmp(25, 10), True)
-        self.assertEquals(d.cmp(10, 25), False)
+        self.assertEqual(d.cmp(25, 10), True)
+        self.assertEqual(d.cmp(10, 25), False)
 
 if __name__ == '__main__':
     unittest.main()
