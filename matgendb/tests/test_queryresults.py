@@ -21,7 +21,7 @@ class QueryResultsTest(unittest.TestCase):
             self.coll = self.db[self.coll_name]
             with open(os.path.join(common.TEST_FILES_DIR, 'db_test', 'GaLa.task.json')) as f:
                 doc = bson.json_util.loads(f.read())
-                self.coll.insert(doc)
+                self.coll.insert_one(doc)
 
     def tearDown(self):
         if has_mongo:

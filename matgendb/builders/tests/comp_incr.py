@@ -33,7 +33,7 @@ class BuilderComponentTest(ComponentTest):
         if _log.isEnabledFor(logging.DEBUG):
             bld_args.append("-vv")
         # Insert a new record #x
-        addrec = lambda x: self.src.insert({
+        addrec = lambda x: self.src.insert_one({
             "number": x,
             "data": [
                 1, 2, 3
@@ -46,7 +46,7 @@ class BuilderComponentTest(ComponentTest):
         self.mgbuild(bld_args)
         # Count records in copied-to collection
         n = self.dst.count()
-        self.assert_(n == 1000,
+        self.assertTrue(n == 1000,
                      "Bad count after 1st copy: "
                      "expected=1000 got={:d}".format(n))
         # do a few more copies
@@ -94,7 +94,7 @@ class BuilderComponentTest(ComponentTest):
         get_group = lambda x, n: groups[:n][x % n]
         # Insert a new record #x
         ngrp = len(groups) - 1
-        addrec = lambda x: self.src.insert({
+        addrec = lambda x: self.src.insert_one({
             "recid": x, "value": x,
             "group": get_group(x, ngrp)
         })
@@ -119,7 +119,7 @@ class BuilderComponentTest(ComponentTest):
         # Add some more records, and a new group
         rmin, rmax = 20, 25
         ngrp = len(groups)
-        addrec = lambda x: self.src.insert({
+        addrec = lambda x: self.src.insert_one({
             "recid": x, "value": x,
             "group": get_group(x, ngrp)
         })

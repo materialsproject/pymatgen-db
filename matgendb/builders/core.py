@@ -171,19 +171,19 @@ def merge_tasks(core_collections, sandbox_collections, id_prefix, new_tasks, bat
     for doc in core_collections.tasks.find():
         batch.append(doc)
         if len(batch) == batch_size:
-            target.insert(batch)
+            target.insert_many(batch)
             batch = []
     if batch:
-        target.insert(batch)
+        target.insert_many(batch)
     batch = []
     for doc in sandbox_collections.tasks.find():
         doc['task_id'] = id_prefix + '-' + str(doc['task_id'])
         batch.append(doc)
         if len(batch) == batch_size:
-            target.insert(batch)
+            target.insert_many(batch)
             batch = []
     if batch:
-        target.insert(batch)
+        target.insert_many(batch)
 
 
 class HasExamples:

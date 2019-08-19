@@ -45,5 +45,5 @@ class CopyBuilder(core.Builder):
 
     def process_item(self, item):
         assert self._target_coll
-        self._target_coll.insert(item)
+        self._target_coll.insert_one(item)
 

@@ -61,7 +61,7 @@ class DBGroupComponentTest(ComponentTest):
             db = self._conn[dbname]
             for collname in collections:
                 coll = db[collname]
-                coll.insert({"hello": collname})
+                coll.insert_one({"hello": collname})
 
     def test_readall(self):
         """Read all configurations in a directory.

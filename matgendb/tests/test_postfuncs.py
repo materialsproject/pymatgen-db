@@ -46,7 +46,7 @@ class SandboxTest(unittest.TestCase):
                 doc.update({'state': 'successful'})
                 if i < 2:
                     pprint.pprint(doc)
-                self.coll.insert(doc)
+                self.coll.insert_one(doc)
 
     def tearDown(self):
         if has_mongo:

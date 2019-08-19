@@ -178,7 +178,7 @@ class TestCollectionFilter(unittest.TestCase):
         op = vv.ConstraintOperator('>=')
         cn = vv.Constraint(fld, op, 10)
         obj = vv.MongoClause(cn)
-        self.assert_(obj.query_loc == vv.MongoClause.LOC_MAIN)
+        self.assertTrue(obj.query_loc == vv.MongoClause.LOC_MAIN)
 
     def test_MongoClause_where(self):
         "Test MongoClause class for where"

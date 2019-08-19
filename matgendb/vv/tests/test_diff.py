@@ -60,7 +60,7 @@ class MyTestCase(unittest.TestCase):
             engine.collection.remove({})
             for i in range(self.NUM_RECORDS):
                 rec = create_record(i)
-                engine.collection.insert(rec)
+                engine.collection.insert_one(rec)
                 # save some vars for easy double-checking
                 self.colors[i][ei] = rec['color']
                 self.energies[i][ei] = rec['energy']
@@ -79,8 +79,8 @@ class MyTestCase(unittest.TestCase):
         """Keys only and keys are different.
         """
         # Add one different record to each collection.
-        self.engines[0].collection.insert(create_record(self.NUM_RECORDS + 1))
-        self.engines[1].collection.insert(create_record(self.NUM_RECORDS + 2))
+        self.engines[0].collection.insert_one(create_record(self.NUM_RECORDS + 1))
+        self.engines[1].collection.insert_one(create_record(self.NUM_RECORDS + 2))
         # Perform diff.
         df = Differ(key='name')
         d = df.diff(*self.engines)

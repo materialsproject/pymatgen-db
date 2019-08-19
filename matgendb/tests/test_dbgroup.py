@@ -18,7 +18,7 @@ _opj = os.path.join
 
 mockdb = mongomock.MongoClient()
 doc = {"hello": "world"}
-mockdb.testdb.data.insert(doc)
+mockdb.testdb.data.insert_one(doc)
 # add some nested collections
 mockcoll = [
     'data.a1',
@@ -26,7 +26,7 @@ mockcoll = [
     'data.a1.b2',
     'data.a2'
 ]
-[mockdb.testdb[c].insert(doc) for c in mockcoll]
+[mockdb.testdb[c].insert_one(doc) for c in mockcoll]
 
 class MockQueryEngine:
     def __init__(self, **kwargs):

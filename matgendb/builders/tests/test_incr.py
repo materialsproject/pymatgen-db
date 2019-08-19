@@ -34,7 +34,7 @@ def add_records(n, offs=0):
     for i in range(n):
         obj = {"n": i + offs,
                "s": "foo-{:d}".format(i)}
-        coll.insert(obj)
+        coll.insert_one(obj)
     return obj
 
 
