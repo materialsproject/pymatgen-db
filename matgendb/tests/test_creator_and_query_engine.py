@@ -129,7 +129,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             #Test mappings by query engine.
             for r in qe.query(criteria={"pretty_formula": "Li2O"},
                               properties=["dir_name", "energy",
-                                          "calculations", "input"]):
+                                          "calculations", "input", "oxide_type"]):
                 if r["dir_name"].endswith("Li2O_aflow"):
                     self.assertAlmostEqual(r['energy'], -14.31446494, 4)
                     self.assertEqual(len(r["calculations"]), 2)
