@@ -5,7 +5,6 @@ This module defines a Drone to assimilate vasp data and insert it into a
 Mongo database.
 """
 
-from __future__ import division
 
 import os
 import re
