@@ -135,7 +135,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                     self.assertEqual(len(r["calculations"]), 2)
                     self.assertEqual(r["input"]["is_lasph"], False)
                     self.assertEqual(r['input']['xc_override'], None)
-                    self.assertEqual(d["oxide_type"], "oxide")
+                    self.assertEqual(r["oxide_type"], "oxide")
                 elif r["dir_name"].endswith("Li2O"):
                     self.assertAlmostEqual(r['energy'],
                                            -14.31337758, 4)
