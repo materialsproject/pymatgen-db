@@ -1,1 +1,1 @@
-mongomock==3.0.0
+mongomock==3.17.0
