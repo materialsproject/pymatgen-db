@@ -1,4 +1,4 @@
-pymatgen==2019.9.12
+pymatgen==2019.9.16
 monty==2.0.6
 pymongo==3.9.0
 smoqe==0.1.3
