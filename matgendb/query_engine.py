@@ -22,7 +22,7 @@ from collections import OrderedDict, Iterable
 
 import pymongo
 from pymongo import MongoClient
-from pymatgen import Structure, Composition
+from pymatgen.core import Structure, Composition
 from pymatgen.electronic_structure.core import Orbital, Spin
 from pymatgen.electronic_structure.dos import CompleteDos, Dos
 from pymatgen.entries.computed_entries import ComputedEntry,\

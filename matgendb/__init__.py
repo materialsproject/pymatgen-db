@@ -23,7 +23,7 @@ def _load_mgdb_settings():
     try:
         import yaml
         with open(SETTINGS_FILE, 'rt') as f:
-            d = yaml.load(f)
+            d = yaml.safe_load(f)
     except IOError:
         return {}
     return d
