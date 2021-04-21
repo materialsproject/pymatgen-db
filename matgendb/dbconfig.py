@@ -140,7 +140,7 @@ def get_settings(infile):
     :return: Settings parsed from file
     :rtype: dict
     """
-    settings = yaml.load(_as_file(infile))
+    settings = yaml.safe_load(_as_file(infile))
     if not hasattr(settings, 'keys'):
         raise ValueError("Settings not found in {}".format(infile))
 
