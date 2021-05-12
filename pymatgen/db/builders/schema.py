@@ -298,7 +298,7 @@ class Scalar(HasMeta):
     # its argument matches.
 
     TYPES = {
-        "string": lambda x: isinstance(x, basestring),
+        "string": lambda x: isinstance(x, str),
         "bool": lambda x: x is True or x is False,
         "datetime": _is_datetime,
         "date": _is_datetime,

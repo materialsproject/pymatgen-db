@@ -208,14 +208,14 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(d.cmp(8, 4), True)
         self.assertEqual(d.cmp(8, 6), False)
 
-    def test_delta_val(self):
+    def test_delta_val5(self):
         """Delta class value, same percentage equality."""
         d = Delta("+-25=%")
         self.assertEqual(d.cmp(0, 1), False)
         self.assertEqual(d.cmp(8, 4), True)
         self.assertEqual(d.cmp(8, 6), True)
 
-    def test_delta_val5(self):
+    def test_delta_val6(self):
         """Delta class value, different percentage equality."""
         d = Delta("+50-25=%")
         self.assertEqual(d.cmp(0, 1), False)
