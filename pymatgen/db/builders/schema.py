@@ -125,7 +125,7 @@ class HasMeta:
         """
         if not meta:
             self.meta = {}
-        elif isinstance(meta, basestring):
+        elif isinstance(meta, str):
             # build a dict from key-value pairs
             parts = meta.split(self.FIELD_SEP)
             self.meta = {k: v for k, v in map(lambda fld: fld.split(":", 1), parts)}

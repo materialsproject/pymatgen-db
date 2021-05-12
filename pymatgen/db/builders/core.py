@@ -15,10 +15,7 @@ import copy
 import logging
 import multiprocessing
 
-try:
-    import Queue
-except ImportError:
-    import queue as Queue
+import queue as Queue
 import traceback
 
 # local

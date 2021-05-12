@@ -13,7 +13,7 @@ import pymongo
 import random
 import sys
 import collections
-
+import re
 from .util import DoesLogging, total_size
 from smoqe.query import *
 
@@ -367,10 +367,6 @@ class Validator(DoesLogging):
         self._max_dberr = max_dberrors
         self._base_report_fields = {"_id": 1, "task_id": 1}
         self._add_exists = add_exists
-
-    def set_aliases(self, a):
-        """Set aliases."""
-        self._aliases = a
 
     def set_progress(self, num):
         """Report progress every `num` bad records.

@@ -32,10 +32,6 @@ class MockQueryEngine:
         return other.kw == self.kw
 
     @property
-    def db(self):
-        return mockdb.testdb
-
-    @property
     def collection(self):
         return mockdb.testdb[self.kw["collection"]]
 

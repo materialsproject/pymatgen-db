@@ -625,7 +625,7 @@ class DiffHtmlFormatter(DiffFormatter):
             <div width="100%" style="{sty}">{content}</div>
             </html>
             """.format(
-                css=css, content=content, sty=self.styles["content"]["_"]
+                content=content, sty=self.styles["content"]["_"]
             )
         else:
             text = """<html>

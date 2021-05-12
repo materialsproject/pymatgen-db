@@ -187,21 +187,21 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(d.cmp(1, 4), False)
         self.assertEqual(d.cmp(1, 5), True)
 
-    def test_delta_val(self):
+    def test_delta_val2(self):
         """Delta class value, different absolute."""
         d = Delta("+2.5-1.5")
         self.assertEqual(d.cmp(0, 1), False)
         self.assertEqual(d.cmp(1, 3), False)
         self.assertEqual(d.cmp(3, 1), True)
 
-    def test_delta_val(self):
+    def test_delta_val3(self):
         """Delta class value, same absolute equality."""
         d = Delta("+-3.0=")
         self.assertEqual(d.cmp(0, 1), False)
         self.assertEqual(d.cmp(1, 4), True)
         self.assertEqual(d.cmp(4, 1), True)
 
-    def test_delta_val(self):
+    def test_delta_val4(self):
         """Delta class value, same percentage."""
         d = Delta("+-25%")
         self.assertEqual(d.cmp(0, 1), False)
@@ -215,7 +215,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(d.cmp(8, 4), True)
         self.assertEqual(d.cmp(8, 6), True)
 
-    def test_delta_val(self):
+    def test_delta_val5(self):
         """Delta class value, different percentage equality."""
         d = Delta("+50-25=%")
         self.assertEqual(d.cmp(0, 1), False)
