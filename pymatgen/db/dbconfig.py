@@ -12,8 +12,8 @@ passed in as a file or object. For example::
     settings = cfg1.settings
 
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '4/25/14'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "4/25/14"
 
 import os
 import yaml
@@ -27,17 +27,18 @@ USER_KEY = "user"
 PASS_KEY = "password"
 ALIASES_KEY = "aliases"
 
+
 class ConfigurationFileError(Exception):
     def __init__(self, filename, err):
         msg = "reading '{}': {}".format(filename, err)
         Exception.__init__(self, msg)
 
+
 class DBConfig:
-    """Database configuration.
-    """
+    """Database configuration."""
 
     DEFAULT_PORT = 27017
-    DEFAULT_FILE = 'db.json'
+    DEFAULT_FILE = "db.json"
     ALL_SETTINGS = [
         HOST_KEY,
         PORT_KEY,
@@ -90,8 +91,7 @@ class DBConfig:
         return str(self._cfg)
 
     def copy(self):
-        """Return a copy of self (internal settings are copied).
-        """
+        """Return a copy of self (internal settings are copied)."""
         return DBConfig(config_dict=self._cfg.copy())
 
     @property
@@ -141,7 +141,7 @@ def get_settings(infile):
     :rtype: dict
     """
     settings = yaml.safe_load(_as_file(infile))
-    if not hasattr(settings, 'keys'):
+    if not hasattr(settings, "keys"):
         raise ValueError("Settings not found in {}".format(infile))
 
     # Processing of namespaced parameters in .pmgrc.yaml.
@@ -154,14 +154,14 @@ def get_settings(infile):
     auth_aliases(processed_settings)
     return processed_settings
 
+
 def auth_aliases(d):
-    """Interpret user/password aliases.
-    """
-    for alias, real in ((USER_KEY, "readonly_user"),
-                        (PASS_KEY, "readonly_password")):
+    """Interpret user/password aliases."""
+    for alias, real in ((USER_KEY, "readonly_user"), (PASS_KEY, "readonly_password")):
         if alias in d:
             d[real] = d[alias]
             del d[alias]
+
 
 def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
     """Transform the readonly/admin user and password to simple user/password,
@@ -207,7 +207,7 @@ def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
     return found
 
 
-def _as_file(f, mode='r'):
+def _as_file(f, mode="r"):
     if isinstance(f, str):
         return open(f, mode)
     return f

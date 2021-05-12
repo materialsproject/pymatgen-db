@@ -1,8 +1,8 @@
 """
 Unit tests for `dbconfig` module.
 """
-__author__ = 'Dan Gunter'
-__date__ = '2014-04-25'
+__author__ = "Dan Gunter"
+__date__ = "2014-04-25"
 
 import json
 import tempfile
@@ -10,21 +10,20 @@ import unittest
 from pymatgen.db.dbconfig import DBConfig, normalize_auth
 from pymatgen.db.dbconfig import ConfigurationFileError
 
+
 class NormAuthTestCase(unittest.TestCase):
-    """Test cases for normalize_auth().
-    """
+    """Test cases for normalize_auth()."""
+
     def setUp(self):
         self.U, self.P = "joe", "secret"
 
     def _check(self, s):
-        """Check that user/password matches expected.
-        """
+        """Check that user/password matches expected."""
         self.assertTrue(s["user"] == self.U)
         self.assertTrue(s["password"] == self.P)
 
     def _check_absent(self, s):
-        """Check that user/password is not present.
-        """
+        """Check that user/password is not present."""
         self.assertFalse("user" in s or "password" in s)
 
     def test_admin(self):
@@ -49,12 +48,20 @@ class NormAuthTestCase(unittest.TestCase):
         self._check(s)
 
     def test_order(self):
-        s = {"readonly_user": self.U + "_1", "readonly_password": self.P,
-             "admin_user": self.U + "_2", "admin_password": self.P}
+        s = {
+            "readonly_user": self.U + "_1",
+            "readonly_password": self.P,
+            "admin_user": self.U + "_2",
+            "admin_password": self.P,
+        }
         normalize_auth(s, readonly_first=False)
         self.assertEqual(s["user"], self.U + "_2")
-        s = {"readonly_user": self.U + "_1", "readonly_password": self.P,
-             "admin_user": self.U + "_2", "admin_password": self.P}
+        s = {
+            "readonly_user": self.U + "_1",
+            "readonly_password": self.P,
+            "admin_user": self.U + "_2",
+            "admin_password": self.P,
+        }
         normalize_auth(s, readonly_first=True)
         self.assertEqual(s["user"], self.U + "_1")
 
@@ -73,13 +80,12 @@ class SettingsTestCase(unittest.TestCase):
     def _aliased_cfg(self):
         """Imitate authorization de-aliasing."""
         cfg = self.cfg.copy()
-        cfg['readonly_password'] = cfg['password']
-        cfg['readonly_user'] = cfg['user']
+        cfg["readonly_password"] = cfg["password"]
+        cfg["readonly_user"] = cfg["user"]
         return cfg
 
     def test_init_file(self):
-        """Create DBConfig from file or path.
-        """
+        """Create DBConfig from file or path."""
         # sending file obj, or its path, should have same effect
         tmp = "dbconfigtest.json"
         with open(tmp, "w") as f:
@@ -93,18 +99,17 @@ class SettingsTestCase(unittest.TestCase):
         self.assertEqual(d2.settings, self._aliased_cfg())
 
     def test_init_dict(self):
-        """Create DBConfig from dict object.
-        """
+        """Create DBConfig from dict object."""
         d1 = DBConfig(config_dict=self.cfg)
         self.assertEqual(d1.settings, self._aliased_cfg())
 
     def test_init_junk_file(self):
-        """Check error when creating DBConfig from bad input file.
-        """
+        """Check error when creating DBConfig from bad input file."""
         tf = tempfile.NamedTemporaryFile("w", delete=False)
         tf.write("JUNK")
         tf.close()
         self.assertRaises(ConfigurationFileError, DBConfig, config_file=tf.name)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

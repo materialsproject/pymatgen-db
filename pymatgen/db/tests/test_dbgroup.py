@@ -12,7 +12,7 @@ import os
 import tempfile
 import unittest
 from pymatgen.db.dbgroup import ConfigGroup
-from pymatgen.db.import dbconfig
+from pymatgen.db import dbconfig
 
 _opj = os.path.join
 
@@ -20,13 +20,9 @@ mockdb = mongomock.MongoClient()
 doc = {"hello": "world"}
 mockdb.testdb.data.insert_one(doc)
 # add some nested collections
-mockcoll = [
-    'data.a1',
-    'data.a1.b1',
-    'data.a1.b2',
-    'data.a2'
-]
+mockcoll = ["data.a1", "data.a1.b1", "data.a1.b2", "data.a2"]
 [mockdb.testdb[c].insert_one(doc) for c in mockcoll]
+
 
 class MockQueryEngine:
     def __init__(self, **kwargs):
@@ -41,22 +37,27 @@ class MockQueryEngine:
 
     @property
     def collection(self):
-        return mockdb.testdb[self.kw['collection']]
+        return mockdb.testdb[self.kw["collection"]]
 
     @property
     def db(self):
         class DB:
             _c = mockcoll
+
             def collection_names(self, x=None):
                 return self._c
+
         return DB()
+
 
 class Cfg:
     def __init__(self, v):
-        self.settings = {'collection': v}
+        self.settings = {"collection": v}
         self.collection = v
+
     def copy(self):
         return Cfg(self.collection)
+
 
 class ConfigGroupTestCase(unittest.TestCase):
     def setUp(self):
@@ -64,8 +65,7 @@ class ConfigGroupTestCase(unittest.TestCase):
         self.configs = [Cfg("qe{:d}".format(i)) for i in range(5)]
 
     def test_add(self):
-        """ConfigGroup add and lookup
-        """
+        """ConfigGroup add and lookup"""
         keys = ["foo", "bar", "foo.a", "foo.b"]
         expect = {}
         for i, k in enumerate(keys):
@@ -75,12 +75,12 @@ class ConfigGroupTestCase(unittest.TestCase):
         self.assertEqual(self.g["bar"], expect["bar"])
         self.assertEqual(self.g["bar*"], {"bar": expect["bar"]})
         self.assertEqual(self.g["foo.a"], expect["foo.a"])
-        self.assertEqual(self.g["foo.*"],
-                         {"foo.a": expect["foo.a"], "foo.b": expect["foo.b"]})
+        self.assertEqual(
+            self.g["foo.*"], {"foo.a": expect["foo.a"], "foo.b": expect["foo.b"]}
+        )
 
     def test_add_path(self):
-        """Add set of query engines from a path.
-        """
+        """Add set of query engines from a path."""
         # directory of pretend configs
         d = tempfile.mkdtemp()
         try:
@@ -88,10 +88,7 @@ class ConfigGroupTestCase(unittest.TestCase):
             c = {}
             for root in ("foo", "bar"):
                 for sub in ("a", "b.1", "b.2"):
-                    config = {
-                        dbconfig.DB_KEY: root,
-                        dbconfig.COLL_KEY: sub
-                    }
+                    config = {dbconfig.DB_KEY: root, dbconfig.COLL_KEY: sub}
                     filename = "mg_core_{}_{}.json".format(root, sub)
                     with open(_opj(d, filename), "w") as fp:
                         json.dump(config, fp)
@@ -122,8 +119,7 @@ class ConfigGroupTestCase(unittest.TestCase):
             os.rmdir(d)
 
     def test_uncache(self):
-        """Remove cached query engine(s) from ConfigGroup.
-        """
+        """Remove cached query engine(s) from ConfigGroup."""
         keys = ("foo.a", "foo", "bar")
         for i in range(len(keys)):
             self.g.add(keys[i], self.configs[i])
@@ -140,13 +136,13 @@ class ConfigGroupTestCase(unittest.TestCase):
         self.assertEqual(self.g[keys[2]], left_behind)
 
     def test_expand(self):
-        """Add multiple collections at once with 'expand'.
-        """
+        """Add multiple collections at once with 'expand'."""
         self.g.add("foo", Cfg("data"), expand=True)
         # check that data.* got added as foo.*
         keys = set(self.g.keys())
         expect = set(["foo"] + [f.replace("data", "foo") for f in mockcoll])
         self.assertEqual(expect, keys)
+
 
 def dict_subset(a, b):
     for k in a.keys():
@@ -154,5 +150,6 @@ def dict_subset(a, b):
             return False
     return True
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

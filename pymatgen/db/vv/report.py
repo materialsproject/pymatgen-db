@@ -1,14 +1,15 @@
 """
 Description.
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '2/21/13'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "2/21/13"
 
 
 from email.mime.text import MIMEText
 import json
 from operator import itemgetter
 import smtplib
+
 #
 from .util import DoesLogging, JsonWalker
 from ..util import MongoJSONEncoder
@@ -51,8 +52,8 @@ class Report:
 
 
 class ReportSection(Report):
-    """Section within a report, with data.
-    """
+    """Section within a report, with data."""
+
     def __init__(self, header, body=None):
         """Create new report section, initialized with header and body.
 
@@ -70,9 +71,9 @@ class ReportSection(Report):
 
 
 class Header:
-    """Base header class.
-    """
-    def __init__(self, title=''):
+    """Base header class."""
+
+    def __init__(self, title=""):
         self._kv = []
         self.title = title
 
@@ -90,20 +91,20 @@ class Header:
 
 
 class ReportHeader(Header):
-    """Header for entire report.
-    """
+    """Header for entire report."""
+
     pass
 
 
 class SectionHeader(Header):
-    """Header for one section of a report.
-    """
+    """Header for one section of a report."""
+
     pass
 
 
 class Table:
-    """Table of values.
-    """
+    """Table of values."""
+
     def __init__(self, colnames):
         self._colnames = colnames
         self._rows = []
@@ -112,7 +113,9 @@ class Table:
 
     def add(self, values):
         if len(values) != self._width:
-            raise ValueError('expected {:d} values, got {:d}'.format(self._width, len(values)))
+            raise ValueError(
+                "expected {:d} values, got {:d}".format(self._width, len(values))
+            )
         self._rows.append(values)
         for i, v in enumerate(values):
             n = len(str(v))
@@ -129,10 +132,10 @@ class Table:
             try:
                 colnum = self._colnames.index(name)
             except ValueError:
-                raise ValueError('column {} not in {}'.format(name, self._colnames))
+                raise ValueError("column {} not in {}".format(name, self._colnames))
         else:
             if index < 0 or index >= self._width:
-                raise ValueError('index out of range 0..{:d}'.format(self._width - 1))
+                raise ValueError("index out of range 0..{:d}".format(self._width - 1))
             colnum = index
         self._rows.sort(key=itemgetter(colnum))
 
@@ -141,8 +144,9 @@ class Table:
 
     @property
     def values(self):
-        return [{self._colnames[i]: r[i] for i in range(self._width)}
-                for r in self._rows]
+        return [
+            {self._colnames[i]: r[i] for i in range(self._width)} for r in self._rows
+        ]
 
     @property
     def column_names(self):
@@ -163,17 +167,20 @@ class Table:
 
 ## Exceptions
 
+
 class ReportBackupError(Exception):
     pass
+
 
 ## Formatting
 
 
 def css_minify(s):
-    #return s.replace('\n', ' ').replace('  ', ' ')
+    # return s.replace('\n', ' ').replace('  ', ' ')
     s = s.replace("{ ", "{")
     s = s.replace(" }", "}")
     return s
+
 
 # CSS for HTML report output
 DEFAULT_CSS = [
@@ -190,14 +197,14 @@ DEFAULT_CSS = [
     "th { text-align: left;  color: black; margin: 0; font-weight: 300;}",
     "h1, h2, h3 { clear: both; margin: 0; padding: 0; }",
     "h1 { font-size: 18; color: rgb(44, 62, 80); }",
-    "h2 { font-size: 14; color: black; }"
+    "h2 { font-size: 14; color: black; }",
 ]
 
 
 class HTMLFormatter:
-    """Format a report as HTML.
-    """
-    def __init__(self, line_sep='\n', id_column=0, css=None):
+    """Format a report as HTML."""
+
+    def __init__(self, line_sep="\n", id_column=0, css=None):
         self._sep = line_sep
         self._idcol = id_column
         if css is None:
@@ -206,65 +213,66 @@ class HTMLFormatter:
 
     def format(self, report):
         text = []
-        text.append('<!DOCTYPE html>')
-        text.append('<html>')
-        text.append('<title>{}</title>'.format(report.header.title))
-        text.append('<head>')
+        text.append("<!DOCTYPE html>")
+        text.append("<html>")
+        text.append("<title>{}</title>".format(report.header.title))
+        text.append("<head>")
         if self._css:
-            text.append('<style>')
+            text.append("<style>")
             text.append("\r\n".join(self._css))
-            text.append('</style>')
-        text.append('</head>')
-        text.append('<body>')
-        text.append('<h1>{}</h1>'.format(report.header.title))
+            text.append("</style>")
+        text.append("</head>")
+        text.append("<body>")
+        text.append("<h1>{}</h1>".format(report.header.title))
         text.append('<dl class="rptmeta">')
         for key, value in report.header:
-            text.append('<dt>{}</dt>'.format(key))
-            text.append('<dd>{}</dd>'.format(value))
-        text.append('</dl>')
+            text.append("<dt>{}</dt>".format(key))
+            text.append("<dd>{}</dd>".format(value))
+        text.append("</dl>")
         for section in report:
-            text.append('<h2>{}</h2>'.format(section.header.title))
+            text.append("<h2>{}</h2>".format(section.header.title))
             text.append('<dl class="sectmeta">')
             for key, value in section.header:
-                text.append('<dt>{}</dt>'.format(key))
-                text.append('<dd>{}</dd>'.format(value))
-            text.append('</dl>')
+                text.append("<dt>{}</dt>".format(key))
+                text.append("<dd>{}</dd>".format(value))
+            text.append("</dl>")
             for cond_section in section:
-                text.append('<h3>{}</h3>'.format(cond_section.header.title))
+                text.append("<h3>{}</h3>".format(cond_section.header.title))
                 text.append('<dl class="subsectmeta">')
                 for key, value in cond_section.header:
-                    text.append('<dt>{}</dt>'.format(key))
-                    text.append('<dd>{}</dd>'.format(value))
-                text.append('</dl>')
-                text.append('<table>')
-                text.append('<tr>')
+                    text.append("<dt>{}</dt>".format(key))
+                    text.append("<dd>{}</dd>".format(value))
+                text.append("</dl>")
+                text.append("<table>")
+                text.append("<tr>")
                 for name in cond_section.body.column_names:
-                    text.append('<th>{}</th>'.format(name))
-                text.append('</tr>')
+                    text.append("<th>{}</th>".format(name))
+                text.append("</tr>")
                 prev_key, i = None, 0
                 for row in cond_section.body:
                     row = list(row)
                     key = row[self._idcol]
                     if prev_key and key == prev_key:
-                        row[self._idcol] = ''
+                        row[self._idcol] = ""
                     else:
                         prev_key = key
                         i += 1
-                    rclass = ('even', 'odd')[i % 2]
+                    rclass = ("even", "odd")[i % 2]
                     text.append('<tr class="{}">'.format(rclass))
                     for value in row:
-                        text.append('<td>{}</td>'.format(value))
-                    text.append('</tr>')
-                text.append('</table>')
-        text.append('</body>')
-        text.append('</html>')
+                        text.append("<td>{}</td>".format(value))
+                    text.append("</tr>")
+                text.append("</table>")
+        text.append("</body>")
+        text.append("</html>")
         text_str = self._sep.join(text)
         text_str = text_str.replace("**", "<br>")
         return text_str
 
+
 class JSONFormatter:
-    """Format a report as JSON.
-    """
+    """Format a report as JSON."""
+
     def __init__(self, id_column=0, indent=2):
         self._indent = indent
         self._idcol = id_column
@@ -274,17 +282,16 @@ class JSONFormatter:
             title=report.header.title,
             info=report.header,
             sections=[
-                dict(title=s.header.title,
-                     info=s.header,
-                     conditions=[dict(
-                         title=cs.header.title,
-                         info=cs.header,
-                         violations=cs.body)
-                         for cs in s
-                     ]
+                dict(
+                    title=s.header.title,
+                    info=s.header,
+                    conditions=[
+                        dict(title=cs.header.title, info=cs.header, violations=cs.body)
+                        for cs in s
+                    ],
                 )
                 for s in report
-            ]
+            ],
         )
         return json.dumps(obj, indent=self._indent, cls=MongoJSONEncoder)
 
@@ -299,17 +306,18 @@ class ReportJSONEncoder(MongoJSONEncoder):
 
 
 class MarkdownFormatter:
-    """Format a report as markdown
-    """
+    """Format a report as markdown"""
+
     def __init__(self, id_column=0):
         self._idcol = id_column
 
     def _mapdump(self, d):
-        return ', '.join((('{}={}'.format(k, v) for k, v in d.items())))
+        return ", ".join((("{}={}".format(k, v) for k, v in d.items())))
 
     def _fixed_width(self, values, widths):
-        s = ''.join(["{{:{:d}s}}".format(w + 1).format(str(v))
-                    for w, v in zip(widths, values)])
+        s = "".join(
+            ["{{:{:d}s}}".format(w + 1).format(str(v)) for w, v in zip(widths, values)]
+        )
         return s
 
     def format(self, report):
@@ -323,34 +331,41 @@ class MarkdownFormatter:
                 self._append_heading(lines, 3, cond.header.title)
                 self._append_info_section(lines, cond.header)
                 self._append_violations(lines, cond.body)
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _append_info_section(self, lines, info):
         if not info:
             return
         infodict = info.as_dict()
         if infodict:
-            text = 'Info: {}'.format(self._mapdump(infodict))
+            text = "Info: {}".format(self._mapdump(infodict))
             lines.append(text)
 
     def _append_heading(self, lines, level, title):
-        hashes = '#' * level
-        text = '\n{} {} {}\n'.format(hashes, title, hashes)
+        hashes = "#" * level
+        text = "\n{} {} {}\n".format(hashes, title, hashes)
         lines.append(text)
 
     def _append_violations(self, lines, data):
-        lines.append('\nViolations:\n')
-        indent = '    '
+        lines.append("\nViolations:\n")
+        indent = "    "
         lines.append(indent + self._fixed_width(data.column_names, data.column_widths))
         for row in data:
             lines.append(indent + self._fixed_width(row, data.column_widths))
 
 
 class Emailer(DoesLogging):
-    """Send a report to an email recipient.
-    """
-    def __init__(self, sender='me@localhost', recipients=('you@remote.host',),
-                 subject='Report', server='localhost', port=None, **kwargs):
+    """Send a report to an email recipient."""
+
+    def __init__(
+        self,
+        sender="me@localhost",
+        recipients=("you@remote.host",),
+        subject="Report",
+        server="localhost",
+        port=None,
+        **kwargs
+    ):
         """Send reports as email.
 
         :param: sender Sender of the email
@@ -359,9 +374,8 @@ class Emailer(DoesLogging):
         :param: server SMTP server host
         :param: port SMTP server port (None for default)
         """
-        DoesLogging.__init__(self, 'mg.emailer')
-        self._sender, self._recipients, self._subject = (sender, recipients,
-                                                         subject)
+        DoesLogging.__init__(self, "mg.emailer")
+        self._sender, self._recipients, self._subject = (sender, recipients, subject)
         self._server, self._port = server, port
         self._message = ""
 
@@ -383,16 +397,16 @@ class Emailer(DoesLogging):
         :return: Number of recipients it was sent to
         :rtype: int
         """
-        main_fmt, sub_fmt = fmt.split('/')
+        main_fmt, sub_fmt = fmt.split("/")
         if sub_fmt.lower() == "text":
             msg = MIMEText(text, "plain")
         elif sub_fmt.lower() == "html":
             msg = MIMEText(text, "html")
         else:
             raise ValueError("Unknown message format: {}".format(fmt))
-        msg['Subject'] = self._subject
-        msg['From'] = self._sender
-        msg['To'] = ', '.join(self._recipients)
+        msg["Subject"] = self._subject
+        msg["From"] = self._sender
+        msg["To"] = ", ".join(self._recipients)
         if self._port is None:
             conn_kwargs = dict(host=self._server)
         else:
@@ -400,12 +414,18 @@ class Emailer(DoesLogging):
         self._log.info("connect to email server {}".format(conn_kwargs))
         try:
             s = smtplib.SMTP(**conn_kwargs)
-            #s.set_debuglevel(2)
+            # s.set_debuglevel(2)
             refused = s.sendmail(self._sender, self._recipients, msg.as_string())
             if refused:
-                self._log.warn("Email to {:d} recipients was refused".format(len(refused)))
+                self._log.warn(
+                    "Email to {:d} recipients was refused".format(len(refused))
+                )
                 for person, (code, msg) in refused.items():
-                    self._log("Email to {p} was refused ({c}): {m}".format(p=person, c=code, m=msg))
+                    self._log(
+                        "Email to {p} was refused ({c}): {m}".format(
+                            p=person, c=code, m=msg
+                        )
+                    )
             s.quit()
             n_recip = len(self._recipients)
         except Exception as err:
@@ -418,9 +438,9 @@ class Emailer(DoesLogging):
 # Diff formatting
 # ---------------
 
+
 class DiffFormatter:
-    """Base class for formatting a 'diff' report.
-    """
+    """Base class for formatting a 'diff' report."""
 
     TITLE = "Materials Project Database Diff Report"
 
@@ -465,12 +485,13 @@ class DiffFormatter:
         return keyset, maxwid
 
     def ordered_cols(self, columns, section):
-        """Return ordered list of columns, from given columns and the name of the section
-        """
+        """Return ordered list of columns, from given columns and the name of the section"""
         columns = list(columns)  # might be a tuple
         fixed_cols = [self.key]
         if section.lower() == "different":
-            fixed_cols.extend([Differ.CHANGED_MATCH_KEY, Differ.CHANGED_OLD, Differ.CHANGED_NEW])
+            fixed_cols.extend(
+                [Differ.CHANGED_MATCH_KEY, Differ.CHANGED_OLD, Differ.CHANGED_NEW]
+            )
         map(columns.remove, fixed_cols)
         columns.sort()
         return fixed_cols + columns
@@ -482,7 +503,7 @@ class DiffFormatter:
         :param section: Name of section, should match const in Differ class
         :return: None; rows are sorted in-place
         """
-        #print("@@ SORT ROWS:\n{}".format(rows))
+        # print("@@ SORT ROWS:\n{}".format(rows))
         # Section-specific determination of sort key
         if section.lower() == Differ.CHANGED.lower():
             sort_key = Differ.CHANGED_DELTA
@@ -493,16 +514,15 @@ class DiffFormatter:
 
 
 class DiffJsonFormatter(DiffFormatter):
-
     class Encoder(json.JSONEncoder):
         def default(self, o):
-            if hasattr(o, 'as_json'):
+            if hasattr(o, "as_json"):
                 return o.as_json()
             return json.JSONEncoder.default(self, o)
 
-#    class Manipulator(pymongo.son_manipulator.SONManipulator):
-#        def transform_incoming(self, son, collection):
-#            return walk(son, visit_as_json, None)
+    #    class Manipulator(pymongo.son_manipulator.SONManipulator):
+    #        def transform_incoming(self, son, collection):
+    #            return walk(son, visit_as_json, None)
 
     def __init__(self, meta, pretty=False, **kwargs):
         """Constructor.
@@ -515,21 +535,20 @@ class DiffJsonFormatter(DiffFormatter):
         self._indent = 4 if pretty else None
 
     def will_copy(self):
-            return True
+        return True
 
     def _add_meta(self, result):
         # put metadata into its own section
-        result['meta'] = self.meta
+        result["meta"] = self.meta
         # .. but promote a timestamp, for searching
-        result['time'] = self.meta['end_time']
+        result["time"] = self.meta["end_time"]
 
     def format(self, result):
         self._add_meta(result)
         return json.dumps(result, cls=self.Encoder, indent=self._indent)
 
     def document(self, result):
-        """Build dict for MongoDB, expanding result keys as we go.
-        """
+        """Build dict for MongoDB, expanding result keys as we go."""
         self._add_meta(result)
         walker = JsonWalker(JsonWalker.value_json, JsonWalker.dict_expand)
         r = walker.walk(result)
@@ -537,8 +556,8 @@ class DiffJsonFormatter(DiffFormatter):
 
 
 class DiffHtmlFormatter(DiffFormatter):
-    """Format an HTML diff report.
-    """
+    """Format an HTML diff report."""
+
     DIFF_CSS = [
         ".header {padding: 5px; margin: 0 5px;}",
         ".header h1 {color: #165F4B; font-size: 20; text-align: left; margin-left: 20px;}",
@@ -563,13 +582,13 @@ class DiffHtmlFormatter(DiffFormatter):
     styles = {
         "header": {
             "h1": "color: #165F4B; font-size: 20; text-align: left; margin-left: 20px",
-            "p":  "color: #666666; margin-left: 20px; height: 12px",
-            "em": "color: #4169E1; font-style: normal"
+            "p": "color: #666666; margin-left: 20px; height: 12px",
+            "em": "color: #4169E1; font-style: normal",
         },
         "content": {
             "_": "padding: 15px; padding-top: 0px; margin: 0; background-color: #F3F3F3",
             "h2": "color: #2C3E50; font-size: 16px",
-            "section": "padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px"
+            "section": "padding: 5px; margin: 10px; background-color: #E2E2E2; border-radius: 5px",
         },
         "table": {
             "table": "margin-top: 1em; clear: both; border: 0",
@@ -577,8 +596,8 @@ class DiffHtmlFormatter(DiffFormatter):
             "tr_odd": "background-color: #F5F5F5",
             "tr1": "background-color: #778899; font-weight: 500",
             "th": "text-align: left;  color: white; margin: 0; padding: 0.2em 0.5em",
-            "td": "padding: 0.2em 0.5em"
-        }
+            "td": "padding: 0.2em 0.5em",
+        },
     }
 
     def __init__(self, meta, url=None, email_mode=False, **kwargs):
@@ -605,25 +624,35 @@ class DiffHtmlFormatter(DiffFormatter):
             <html>
             <div width="100%" style="{sty}">{content}</div>
             </html>
-            """.format(css=css, content=content, sty=self.styles["content"]["_"])
+            """.format(
+                css=css, content=content, sty=self.styles["content"]["_"]
+            )
         else:
             text = """<html>
             <head><style>{css}</style></head>
             <body>{content}</body>
             </html>
-            """.format(css=css, content=content)
+            """.format(
+                css=css, content=content
+            )
         return text
 
     def _header(self):
-        lines = ["<div class='header'><h1{{sh1}}>{t}</h1>".format(t=self.TITLE),
-                 "<p{sp}>Compared <em{sem}>{{db1}}</em> with <em{sem}>{{db2}}</em></p>",
-                 "<p{sp}>Filter: <span class='fixed'>{{filter}}</span></p>",
-                 "<p{sp}>Run time: <em{sem}>{{start_time}}</em> to <em{sem}>{{end_time}}</em> ",
-                 "(<em{sem}>{{elapsed:.1f}}</em> sec)</p>",
-                 "</div>"]
+        lines = [
+            "<div class='header'><h1{{sh1}}>{t}</h1>".format(t=self.TITLE),
+            "<p{sp}>Compared <em{sem}>{{db1}}</em> with <em{sem}>{{db2}}</em></p>",
+            "<p{sp}>Filter: <span class='fixed'>{{filter}}</span></p>",
+            "<p{sp}>Run time: <em{sem}>{{start_time}}</em> to <em{sem}>{{end_time}}</em> ",
+            "(<em{sem}>{{elapsed:.1f}}</em> sec)</p>",
+            "</div>",
+        ]
         if self._email:  # inline the styles
             _c = "header"
-            _f = lambda s: s.format(sp=self.style(_c, "p"), sem=self.style(_c, "em"), sh1=self.style(_c, "h1"))
+            _f = lambda s: s.format(
+                sp=self.style(_c, "p"),
+                sem=self.style(_c, "em"),
+                sh1=self.style(_c, "h1"),
+            )
         else:
             _f = lambda s: s.format(sp="", sem="", sh1="")
         lines = map(_f, lines)
@@ -639,7 +668,11 @@ class DiffHtmlFormatter(DiffFormatter):
     def _body(self, result):
         body = ["<div class='content'>"]
         for section in result.keys():
-            body.append("<div class='section'{{ssec}}><h2{{sh2}}>{t}</h2>".format(t=section.title()))
+            body.append(
+                "<div class='section'{{ssec}}><h2{{sh2}}>{t}</h2>".format(
+                    t=section.title()
+                )
+            )
             if len(result[section]) == 0:
                 body.append("<div class='empty'>Empty</div>")
             else:
@@ -648,11 +681,15 @@ class DiffHtmlFormatter(DiffFormatter):
         body.append("</div>")
         if self._email:
             _c = "content"
-            _f = lambda s: s.format(s_=self.style(_c, "_"), sh2=self.style(_c, "h2"), ssec=self.style(_c, "section"))
+            _f = lambda s: s.format(
+                s_=self.style(_c, "_"),
+                sh2=self.style(_c, "h2"),
+                ssec=self.style(_c, "section"),
+            )
         else:
             _f = lambda s: s.format(s_="", sh2="", ssec="")
         body = map(_f, body)
-        return '\n'.join(body)
+        return "\n".join(body)
 
     def _table(self, section, rows):
         if self._email:
@@ -665,26 +702,31 @@ class DiffHtmlFormatter(DiffFormatter):
             tables.append("<table{table}>".format(**inline))
             cols = self.ordered_cols(subset, section)
             # Format the table.
-            tables.extend(["<tr{tr1}>".format(**inline)] +
-                          ["<th{th}>{c}</th>".format(c=c, **inline) for c in cols] +
-                          ["</tr>"])
+            tables.extend(
+                ["<tr{tr1}>".format(**inline)]
+                + ["<th{th}>{c}</th>".format(c=c, **inline) for c in cols]
+                + ["</tr>"]
+            )
             self.sort_rows(rows, section)
             for i, r in enumerate(rows):
                 tr = "{{tr_{}}}".format(("even", "odd")[i % 2])
                 if tuple(sorted(r.keys())) != subset:
                     continue
                 if self._url is not None:
-                    r[cols[0]] = "<a href='{p}{v}'>{v}</a>".format(p=self._url, v=r[cols[0]])
-                tables.extend(["<tr{}>".format(tr).format(**inline)] +
-                              ["<td{td}>{d}</td>".format(d=r[c], **inline) for c in cols] +
-                              ["</tr>"])
+                    r[cols[0]] = "<a href='{p}{v}'>{v}</a>".format(
+                        p=self._url, v=r[cols[0]]
+                    )
+                tables.extend(
+                    ["<tr{}>".format(tr).format(**inline)]
+                    + ["<td{td}>{d}</td>".format(d=r[c], **inline) for c in cols]
+                    + ["</tr>"]
+                )
             tables.append("</table>")
         return tables
 
 
 class DiffTextFormatter(DiffFormatter):
-    """Format a plain-text diff report.
-    """
+    """Format a plain-text diff report."""
 
     def format(self, result):
         """Generate plain text report.
@@ -693,13 +735,15 @@ class DiffTextFormatter(DiffFormatter):
         :rtype: str
         """
         m = self.meta
-        lines = ['-' * len(self.TITLE),
-                 self.TITLE,
-                 '-' * len(self.TITLE),
-                 "Compared: {db1} <-> {db2}".format(**m),
-                 "Filter: {filter}".format(**m),
-                 "Run time: {start_time} -- {end_time} ({elapsed:.1f} sec)".format(**m),
-                 ""]
+        lines = [
+            "-" * len(self.TITLE),
+            self.TITLE,
+            "-" * len(self.TITLE),
+            "Compared: {db1} <-> {db2}".format(**m),
+            "Filter: {filter}".format(**m),
+            "Run time: {start_time} -- {end_time} ({elapsed:.1f} sec)".format(**m),
+            "",
+        ]
         for section in result.keys():
             lines.append("* " + section.title())
             indent = " " * 4
@@ -711,10 +755,10 @@ class DiffTextFormatter(DiffFormatter):
                     ocol = self.ordered_cols(columns, section)
                     mw = maxwid[columns]
                     mw_i = [columns.index(c) for c in ocol]  # reorder indexes
-                    fmt = '  '.join(["{{:{:d}s}}".format(mw[i]) for i in mw_i])
+                    fmt = "  ".join(["{{:{:d}s}}".format(mw[i]) for i in mw_i])
                     lines.append("")
                     lines.append(indent + fmt.format(*ocol))
-                    lines.append(indent + '-_' * (sum(mw)/2 + len(columns)))
+                    lines.append(indent + "-_" * (sum(mw) / 2 + len(columns)))
                     rows = result[section]
                     self.sort_rows(rows, section)
                     for r in rows:
@@ -722,8 +766,8 @@ class DiffTextFormatter(DiffFormatter):
                         if key == columns:
                             values = [str(r[k]) for k in ocol]
                             lines.append(indent + fmt.format(*values))
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _record(self, rec):
-        fields = ['{}: {}'.format(k, v) for k, v in rec.items()]
-        return '{' + ', '.join(fields) + '}'
+        fields = ["{}: {}".format(k, v) for k, v in rec.items()]
+        return "{" + ", ".join(fields) + "}"

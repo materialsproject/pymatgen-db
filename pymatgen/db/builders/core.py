@@ -4,8 +4,8 @@ Shared code for builders.
 For developers implementing a new builder,
 you should inherit from :class:`Builder`.
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '5/29/13'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "5/29/13"
 
 ## Imports
 
@@ -14,14 +14,16 @@ from abc import ABCMeta, abstractmethod
 import copy
 import logging
 import multiprocessing
+
 try:
     import Queue
 except ImportError:
     import queue as Queue
 import traceback
+
 # local
 from pymatgen.db.builders import schema, util
-from pymatgen.db.import util as dbutil
+from pymatgen.db import util as dbutil
 
 ## Logging
 
@@ -34,6 +36,7 @@ class BuildError(Exception):
     def __init__(self, who, why):
         errmsg = "Builder {} failed: {}".format(who, why)
         Exception.__init__(self, errmsg)
+
 
 ## Versioning (experimental)
 
@@ -63,21 +66,22 @@ def parse_fn_docstring(fn):
         if line.startswith(":param"):
             _, name, desc = line.split(":", 2)
             name = name[6:].strip()  # skip 'param '
-            params[name] = {'desc': desc.strip()}
+            params[name] = {"desc": desc.strip()}
             param_order.append(name)
         elif line.startswith(":type"):
             _, name, desc = line.split(":", 2)
             name = name[5:].strip()  # skip 'type '
             if not name in params:
                 raise ValueError("'type' without 'param' for {}".format(name))
-            params[name]['type'] = desc.strip()
+            params[name]["type"] = desc.strip()
         elif line.startswith(":return"):
             _1, _2, desc = line.split(":", 2)
-            return_['desc'] = desc
+            return_["desc"] = desc
         elif line.startswith(":rtype"):
             _1, _2, desc = line.split(":", 2)
-            return_['type'] = desc.strip()
-    return params #, return_
+            return_["type"] = desc.strip()
+    return params  # , return_
+
 
 ## Classes
 
@@ -88,12 +92,21 @@ class Collections:
     After initialization with a MongoDB database and optional parameters,
     you can access collections in `known_collections` as attributes.
     """
+
     #: Collection names that are accessible as attributes
     #: of an instance of this class
     known_collections = [
-        'tasks', 'materials', 'diffraction_patterns',
-        'electrodes', 'conversion_electrodes', 'bandstructures', 'icsd',
-        'phase_diagrams', 'brototypes', 'electronic_structure']
+        "tasks",
+        "materials",
+        "diffraction_patterns",
+        "electrodes",
+        "conversion_electrodes",
+        "bandstructures",
+        "icsd",
+        "phase_diagrams",
+        "brototypes",
+        "electronic_structure",
+    ]
 
     MIN_VER = 1
     MAX_VER = 1
@@ -113,13 +126,16 @@ class Collections:
         :raise: ValueError if `version` is not known
         """
         if not self.MIN_VER <= version <= self.MAX_VER:
-            raise ValueError("Bad version ({v:d}) not in range {v0} .. {v1} ".
-                             format(v=version, v0=self.MIN_VER, v1=self.MAX_VER))
+            raise ValueError(
+                "Bad version ({v:d}) not in range {v0} .. {v1} ".format(
+                    v=version, v0=self.MIN_VER, v1=self.MAX_VER
+                )
+            )
         self._names, self._coll = {}, {}
         if version == 1:
             for name in self.known_collections:
                 full_name = "{}.{}".format(prefix, name) if prefix else name
-                if name == 'tasks' and task_suffix is not None:
+                if name == "tasks" and task_suffix is not None:
                     full_name = "{}.{}".format(full_name, task_suffix)
                 self._names[name] = full_name
                 self._coll[full_name] = None
@@ -150,7 +166,14 @@ class Collections:
         return self._db
 
 
-def merge_tasks(core_collections, sandbox_collections, id_prefix, new_tasks, batch_size=100, wipe=False):
+def merge_tasks(
+    core_collections,
+    sandbox_collections,
+    id_prefix,
+    new_tasks,
+    batch_size=100,
+    wipe=False,
+):
     """Merge core and sandbox collections into a temporary collection in the sandbox.
 
     :param core_collections: Core collection info
@@ -164,7 +187,7 @@ def merge_tasks(core_collections, sandbox_collections, id_prefix, new_tasks, bat
     if wipe:
         _log.debug("merge_tasks.wipe.begin")
         target.remove()
-        merged.database['counter'].remove()
+        merged.database["counter"].remove()
         _log.debug("merge_tasks.wipe.end")
     # perform the merge
     batch = []
@@ -177,7 +200,7 @@ def merge_tasks(core_collections, sandbox_collections, id_prefix, new_tasks, bat
         target.insert_many(batch)
     batch = []
     for doc in sandbox_collections.tasks.find():
-        doc['task_id'] = id_prefix + '-' + str(doc['task_id'])
+        doc["task_id"] = id_prefix + "-" + str(doc["task_id"])
         batch.append(doc)
         if len(batch) == batch_size:
             target.insert_many(batch)
@@ -208,7 +231,6 @@ class HasExamples:
         """
         raise NotImplementedError()
 
-
     def validate_examples(self, fail_fn):
         """Check the examples against the schema.
 
@@ -219,7 +241,9 @@ class HasExamples:
             _log.debug("validating example in collection {}".format(collection))
             sch = schema.get_schema(collection)  # with more err. checking
             result = sch.validate(doc)
-            _log.debug("validation result: {}".format("OK" if result is None else result))
+            _log.debug(
+                "validation result: {}".format("OK" if result is None else result)
+            )
             if result is not None:
                 fail_fn("Failed to validate sample document: {}".format(result))
 
@@ -239,7 +263,7 @@ class Builder(metaclass=ABCMeta):
         :type ncores: int
         :raise: ValueError for bad 'config' arg
         """
-        sequential = (ncores == 1)
+        sequential = ncores == 1
         if sequential:
             self._seq = True
             self._queue = Queue.Queue()
@@ -329,16 +353,14 @@ class Builder(metaclass=ABCMeta):
     # -----------------------------
 
     def shared_dict(self):
-        """Get dict that can be shared between parallel processes.
-        """
+        """Get dict that can be shared between parallel processes."""
         if self._seq:
             return dict()
         else:
             return self._mgr.dict()
 
     def shared_list(self):
-        """Get list that can be shared between parallel processes.
-        """
+        """Get list that can be shared between parallel processes."""
         if self._seq:
             return list()
         else:
@@ -375,8 +397,10 @@ class Builder(metaclass=ABCMeta):
         elif isinstance(config, dict):
             conn = dbutil.get_database(settings=config)
         else:
-            raise ValueError("Configuration, '{}',  must be a path to "
-                             "a configuration file or dict".format(config))
+            raise ValueError(
+                "Configuration, '{}',  must be a path to "
+                "a configuration file or dict".format(config)
+            )
         return conn
 
     # -----------------------------
@@ -411,8 +435,7 @@ class Builder(metaclass=ABCMeta):
         return n
 
     def _run_parallel_multiprocess(self):
-        """Run processes from queue
-        """
+        """Run processes from queue"""
         _log.debug("run.parallel.multiprocess.start")
         processes = []
         ProcRunner.instance = self
@@ -454,8 +477,8 @@ class Builder(metaclass=ABCMeta):
 
 
 class BuilderStatus:
-    """Status of a Builder object run.
-    """
+    """Status of a Builder object run."""
+
     # States
     WAIT, RUNNING, SUCCESS, FAILURE = 0, 1, 2, -1
     # For printing.
@@ -491,8 +514,7 @@ class BuilderStatus:
         self._set(i, self.FAILURE)
 
     def has_failures(self):
-        """Whether there are any failures in the states.
-        """
+        """Whether there are any failures in the states."""
         return self.FAILURE in self._states
 
     def _set(self, index, value):
@@ -511,6 +533,7 @@ class ProcRunner:
     We simply set the instance (self) into the class before forking each
     process, and the class' method calls the instance method for us.
     """
+
     instance = None
 
     @classmethod
@@ -522,12 +545,16 @@ def alphadump(d, indent=2, depth=0):
     """Dump a dict to a str,
     with keys in alphabetical order.
     """
-    sep = '\n' + ' ' * depth * indent
-    return ''.join(
-        ("{}: {}{}".format(
-            k,
-            alphadump(d[k], depth=depth+1) if isinstance(d[k], dict)
-            else str(d[k]),
-            sep)
-         for k in sorted(d.keys()))
+    sep = "\n" + " " * depth * indent
+    return "".join(
+        (
+            "{}: {}{}".format(
+                k,
+                alphadump(d[k], depth=depth + 1)
+                if isinstance(d[k], dict)
+                else str(d[k]),
+                sep,
+            )
+            for k in sorted(d.keys())
+        )
     )

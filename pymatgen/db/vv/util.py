@@ -21,16 +21,17 @@ import time
 from sys import getsizeof
 from yaml import load
 
-TRACE = logging.DEBUG -1
+TRACE = logging.DEBUG - 1
 
 
 class DoesLogging:
     """Mix-in class that creates the attribute 'log', setting its qualified
     name to the name of the module and class.
     """
+
     def __init__(self, name=None):
         if name is None:
-            if self.__module__ != '__main__':
+            if self.__module__ != "__main__":
                 name = "%s.%s" % (self.__module__, self.__class__.__name__)
             else:
                 name = self.__class__.__name__
@@ -55,19 +56,21 @@ def total_size(o, handlers={}, verbose=False, count=False):
     """
     # How to make different types of objects iterable
     dict_handler = lambda d: chain.from_iterable(d.items())
-    all_handlers = {tuple: iter,
-                    list: iter,
-                    deque: iter,
-                    dict: dict_handler,
-                    set: iter,
-                    frozenset: iter}
-    all_handlers.update(handlers)     # user handlers take precedence
-    seen = set()                      # track which object id's have already been seen
-    default_size = getsizeof(0)       # estimate sizeof object without __sizeof__
+    all_handlers = {
+        tuple: iter,
+        list: iter,
+        deque: iter,
+        dict: dict_handler,
+        set: iter,
+        frozenset: iter,
+    }
+    all_handlers.update(handlers)  # user handlers take precedence
+    seen = set()  # track which object id's have already been seen
+    default_size = getsizeof(0)  # estimate sizeof object without __sizeof__
 
     def sizeof(o):
         "Calculate size of `o` and all its children"
-        if id(o) in seen:             # do not double count the same object
+        if id(o) in seen:  # do not double count the same object
             return 0
         seen.add(id(o))
         if count:
@@ -97,7 +100,10 @@ class Timing:
             do_foo1()
             do_foo2()
     """
-    def __init__(self, name="event", elapsed=None, log=None, level=logging.DEBUG, **kwargs):
+
+    def __init__(
+        self, name="event", elapsed=None, log=None, level=logging.DEBUG, **kwargs
+    ):
         self.name, self.kw, self.level = name, kwargs, level
         self.elapsed = elapsed
         self._log = log
@@ -108,14 +114,16 @@ class Timing:
     def __exit__(self, type, value, tb):
         elapsed = time.time() - self.begin
         if self._log is not None:
-            nvp = ', '.join(['{}={}'.format(k, v) for k, v in self.kw.items()])
-            self._log.log(self.level, '@{n}={s:f}s {kw}'.format(n=self.name, s=elapsed, kw=nvp))
+            nvp = ", ".join(["{}={}".format(k, v) for k, v in self.kw.items()])
+            self._log.log(
+                self.level, "@{n}={s:f}s {kw}".format(n=self.name, s=elapsed, kw=nvp)
+            )
         if self.elapsed:
             self.elapsed.value = elapsed
 
 
-def letter_num(x, letter='A'):
-    s, a0 = '', ord(letter) - 1
+def letter_num(x, letter="A"):
+    s, a0 = "", ord(letter) - 1
     while x > 0:
         s = chr(a0 + x % 26) + s
         x /= 26
@@ -126,6 +134,7 @@ class JsonWalker:
     """Walk a dict, transforming.
     Used for JSON formatting.
     """
+
     def __init__(self, value_transform=None, dict_transform=None):
         """Constructor.
 
@@ -138,8 +147,7 @@ class JsonWalker:
         self._dx = dict_transform
 
     def walk(self, o):
-        """Walk a dict & transform.
-        """
+        """Walk a dict & transform."""
         if isinstance(o, dict):
             d = o if self._dx is None else self._dx(o)
             return {k: self.walk(v) for k, v in d.items()}
@@ -153,7 +161,7 @@ class JsonWalker:
         """Apply as_json() method on object to get value,
         otherwise return object itself as the value.
         """
-        if hasattr(o, 'as_json'):
+        if hasattr(o, "as_json"):
             return o.as_json()
         return o
 
@@ -167,9 +175,9 @@ class JsonWalker:
         r = {}
         for k, v in o.items():
             if isinstance(k, str):
-                k = k.replace('$', '_')
+                k = k.replace("$", "_")
             if "." in k:
-                sub_r, keys = r, k.split('.')
+                sub_r, keys = r, k.split(".")
                 # create sub-dicts until last part of key
                 for k2 in keys[:-1]:
                     sub_r[k2] = {}
@@ -180,11 +188,12 @@ class JsonWalker:
                 r[k] = v
         return r
 
+
 # Argument handling
 # -----------------
 
 _alog = logging.getLogger("mg.args")
-#_alog.setLevel(logging.DEBUG)
+# _alog.setLevel(logging.DEBUG)
 _argparse_is_dumb = True  # because it doesn't report orig. error text
 
 
@@ -244,4 +253,4 @@ def args_list(s):
     """
     if s is None:
         return []
-    return [item.strip() for item in s.split(',')]
+    return [item.strip() for item in s.split(",")]

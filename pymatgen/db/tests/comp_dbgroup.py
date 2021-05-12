@@ -1,18 +1,21 @@
 """
 Component-level tests for dbgroup module.
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '5/2/14'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "5/2/14"
 
 # Stdlib
 import json
 import logging
 import pymongo
-import os; _opj = os.path.join
+import os
+
+_opj = os.path.join
 import sys
 import tempfile
 import time
 import unittest
+
 # Package
 from pymatgen.db.tests.common import ComponentTest
 from pymatgen.db.dbconfig import DB_KEY, COLL_KEY
@@ -23,15 +26,13 @@ _h = logging.StreamHandler(sys.stdout)
 _log.addHandler(_h)
 _log.setLevel(logging.INFO)
 
+
 class DBGroupComponentTest(ComponentTest):
     DB_COLL = {
         "marvel": ["spiderman", "spiderman.amazing", "spiderman.spectacular", "hulk"],
-        "dc": ["flash", "flash.garrick", "flash.barry", "flash.wally", "superman"]
+        "dc": ["flash", "flash.garrick", "flash.barry", "flash.wally", "superman"],
     }
-    DB_COLL_CFG = {
-        "marvel": ["spiderman", "hulk"],
-        "dc": ["flash", "superman"]
-    }
+    DB_COLL_CFG = {"marvel": ["spiderman", "hulk"], "dc": ["flash", "superman"]}
 
     def setUp(self):
         self._tmpdir = tempfile.mkdtemp()
@@ -64,8 +65,7 @@ class DBGroupComponentTest(ComponentTest):
                 coll.insert_one({"hello": collname})
 
     def test_readall(self):
-        """Read all configurations in a directory.
-        """
+        """Read all configurations in a directory."""
         g = ConfigGroup()
         t0 = time.time()
         g.add_path(self._tmpdir)
@@ -76,8 +76,7 @@ class DBGroupComponentTest(ComponentTest):
         self.assertEqual(expect, got)
 
     def test_expand(self):
-        """Expand configurations to get full list of collections.
-        """
+        """Expand configurations to get full list of collections."""
         g = ConfigGroup().add_path(self._tmpdir)
         _log.debug("Base: {}".format(g.keys()))
         t0 = time.time()
@@ -85,19 +84,18 @@ class DBGroupComponentTest(ComponentTest):
         t1 = time.time()
         _log.debug("Expanded in {:.3g}s: {}".format(t1 - t0, g.keys()))
         # expect expanded marvel, but just configured dc
-        marvel = map(lambda val: 'marvel.' + val, self.DB_COLL['marvel'])
-        dc = map(lambda val: 'dc.' + val, self.DB_COLL_CFG['dc'])
+        marvel = map(lambda val: "marvel." + val, self.DB_COLL["marvel"])
+        dc = map(lambda val: "dc." + val, self.DB_COLL_CFG["dc"])
         expect = set(marvel + dc)
         got = set(g.keys())
         self.assertEqual(expect, got)
 
     def test_sandbox(self):
-        """Combine expand and prefix to make a sandbox.
-        """
+        """Combine expand and prefix to make a sandbox."""
         g = ConfigGroup().add_path(self._tmpdir)
         for i, sandbox in enumerate(["marvel.spiderman", "dc.flash"]):
             g.expand("{}*".format(sandbox))
-            _log.debug("Expanded {} keys: {}".format(sandbox,g.keys()))
+            _log.debug("Expanded {} keys: {}".format(sandbox, g.keys()))
             g.set_prefix(sandbox)
             qe, expect_name = None, None
             if i == 0:
@@ -119,5 +117,5 @@ class DBGroupComponentTest(ComponentTest):
             self.assertEqual(row["hello"], expect_name)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

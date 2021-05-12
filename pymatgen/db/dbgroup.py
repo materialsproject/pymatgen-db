@@ -2,8 +2,8 @@
 Create and access groups of databases,
 each configured from different settings.
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '4/29/14'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "4/29/14"
 
 import glob
 import os
@@ -17,8 +17,9 @@ _opx = os.path.splitext
 
 class CreateQueryEngineError(Exception):
     def __init__(self, cls, settings, err):
-        msg = "creating query engine, class={cls} settings={s}: {m}"\
-            .format(cls=cls.__name__, s=util.csv_dict(settings), m=err)
+        msg = "creating query engine, class={cls} settings={s}: {m}".format(
+            cls=cls.__name__, s=util.csv_dict(settings), m=err
+        )
         Exception.__init__(self, msg)
 
 
@@ -33,10 +34,10 @@ class ConfigGroup:
     SEP = "."  # Separator between collection names
 
     def __init__(self, qe_class=query_engine.QueryEngine):
-        self._d = RegexDict()   # Main object store
+        self._d = RegexDict()  # Main object store
         self._class = qe_class  # Class to used for building QEs
-        self._pfx = None        # Prefix to namespace all lookups
-        self._cached = {}       # cached QE objs
+        self._pfx = None  # Prefix to namespace all lookups
+        self._cached = {}  # cached QE objs
 
     def add_path(self, path, pattern="*.json"):
         """Add configuration file(s)
@@ -56,16 +57,15 @@ class ConfigGroup:
         else:
             configs = [path]
         for config in configs:
-                cfg = dbconfig.DBConfig(config_file=config)
-                cs = cfg.settings
-                if dbconfig.DB_KEY not in cs:
-                    raise ValueError("No database in '{}'".format(config))
-                if dbconfig.COLL_KEY in cs:
-                    name = "{}.{}".format(cs[dbconfig.DB_KEY],
-                                          cs[dbconfig.COLL_KEY])
-                else:
-                    name = cs[dbconfig.DB_KEY]
-                self.add(name, cfg)
+            cfg = dbconfig.DBConfig(config_file=config)
+            cs = cfg.settings
+            if dbconfig.DB_KEY not in cs:
+                raise ValueError("No database in '{}'".format(config))
+            if dbconfig.COLL_KEY in cs:
+                name = "{}.{}".format(cs[dbconfig.DB_KEY], cs[dbconfig.COLL_KEY])
+            else:
+                name = cs[dbconfig.DB_KEY]
+            self.add(name, cfg)
         return self
 
     def add(self, name, cfg, expand=False):
@@ -111,7 +111,7 @@ class ConfigGroup:
         """Perform real work of `expand()` function."""
         cfg = self._d[name]
         if cfg.collection is None:
-            base_coll = ''
+            base_coll = ""
         else:
             base_coll = cfg.collection + self.SEP
         qe = self._get_qe(name, cfg)
@@ -122,7 +122,7 @@ class ConfigGroup:
                 continue
             ex_cfg = cfg.copy()
             ex_cfg.collection = coll_name
-            group_name = name + self.SEP + coll_name[len(base_coll):]
+            group_name = name + self.SEP + coll_name[len(base_coll) :]
             self.add(group_name, ex_cfg, expand=False)
 
     def uncache(self, name):
@@ -172,8 +172,11 @@ class ConfigGroup:
             for k, v in self._d.re_get(name).items():
                 qe[k] = self._get_qe(k, v)
             if not qe:
-                raise KeyError("No configuration found, name='{}' full-regex='{}'"
-                               .format(orig_name, name))
+                raise KeyError(
+                    "No configuration found, name='{}' full-regex='{}'".format(
+                        orig_name, name
+                    )
+                )
         else:
             qe = self._get_qe(name, self._d[name])
         return qe
@@ -195,17 +198,15 @@ class ConfigGroup:
 
     @staticmethod
     def _is_pattern(s):
-        return s and (s[-1] == '*')
+        return s and (s[-1] == "*")
 
     @staticmethod
     def _pattern_to_regex(pat):
         pat = pat.replace(ConfigGroup.SEP, "\\" + ConfigGroup.SEP)
         return pat[:-1] + ".*"
 
-
     def _get_qe(self, key, obj):
-        """Instantiate a query engine, or retrieve a cached one.
-        """
+        """Instantiate a query engine, or retrieve a cached one."""
         if key in self._cached:
             return self._cached[key]
         qe = create_query_engine(obj, self._class)
@@ -221,6 +222,7 @@ class RegexDict(dict):
        d = RegexDict(tweedledee=1, tweedledum=2)
 
     """
+
     def re_keys(self, pattern):
         """Find keys matching `pattern`.
 
@@ -240,6 +242,7 @@ class RegexDict(dict):
         :return: Found values, as a dict.
         """
         return {k: self[k] for k in self.re_keys(pattern)}
+
 
 def create_query_engine(config, clazz):
     """Create and return new query engine object from the

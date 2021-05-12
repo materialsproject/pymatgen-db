@@ -21,6 +21,7 @@ from pymatgen.db.dbconfig import DBConfig
 # Backwards compatibility from refactor to `dbconfig` module
 # Copy of functions that were moved
 from pymatgen.db.dbconfig import normalize_auth
+
 # Copy of global constants that were moved
 DEFAULT_PORT = DBConfig.DEFAULT_PORT
 DEFAULT_CONFIG_FILE = DBConfig.DEFAULT_FILE
@@ -32,6 +33,7 @@ _log = logging.getLogger("mg.util")
 
 ## Classes
 
+
 class MongoJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, bson.objectid.ObjectId):
@@ -42,6 +44,7 @@ class MongoJSONEncoder(json.JSONEncoder):
 
 
 ## Functions
+
 
 def get_settings(config_file):
     cfg = DBConfig(config_file)
@@ -57,8 +60,10 @@ def get_database(config_file=None, settings=None, admin=False, **kwargs):
         passwd = d["admin_password"] if admin else d["readonly_password"]
         db.authenticate(user, passwd)
     except (KeyError, TypeError, ValueError):
-        _log.warn("No {admin,readonly}_user/password found in config. file, "
-                  "accessing DB without authentication")
+        _log.warn(
+            "No {admin,readonly}_user/password found in config. file, "
+            "accessing DB without authentication"
+        )
     return db
 
 
@@ -69,14 +74,15 @@ def get_collection(config_file, admin=False, settings=None):
     return db[settings["collection"]]
 
 
-def collection_keys(coll, sep='.'):
+def collection_keys(coll, sep="."):
     """Get a list of all (including nested) keys in a collection.
     Examines the first document in the collection.
 
     :param sep: Separator for nested keys
     :return: List of str
     """
-    def _keys(x, pre=''):
+
+    def _keys(x, pre=""):
         for k in x:
             yield (pre + k)
             if isinstance(x[k], dict):
@@ -85,12 +91,12 @@ def collection_keys(coll, sep='.'):
 
     return list(_keys(coll.find_one()))
 
+
 def csv_list(l):
-    """Format list to a string with comma-separated values.
-    """
+    """Format list to a string with comma-separated values."""
     if len(l) == 0:
         return ""
-    return ', '.join(map(str, l))
+    return ", ".join(map(str, l))
 
 
 def quotable(v):
@@ -100,15 +106,14 @@ def quotable(v):
 
 
 def csv_dict(d):
-    """Format dict to a string with comma-separated values.
-    """
+    """Format dict to a string with comma-separated values."""
     if len(d) == 0:
         return "{}"
-    return "{" + ', '.join(["'{}': {}".format(k, quotable(v))
-                            for k, v in d.items()]) + "}"
+    return (
+        "{" + ", ".join(["'{}': {}".format(k, quotable(v)) for k, v in d.items()]) + "}"
+    )
+
 
 def kvp_dict(d):
-    """Format dict to key=value pairs.
-    """
-    return ', '.join(
-        ["{}={}".format(k, quotable(v)) for k, v in d.items()])
+    """Format dict to key=value pairs."""
+    return ", ".join(["{}={}".format(k, quotable(v)) for k, v in d.items()])

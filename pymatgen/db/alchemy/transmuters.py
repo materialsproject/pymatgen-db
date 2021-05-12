@@ -7,7 +7,6 @@ high-throughput generation of new structures and input files.
 """
 
 
-
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
 __version__ = "0.1"
@@ -26,8 +25,9 @@ class QeTransmuter(StandardTransmuter):
     from a database.
     """
 
-    def __init__(self, queryengine, criteria, transformations,
-                 extend_collection=0, ncores=None):
+    def __init__(
+        self, queryengine, criteria, transformations, extend_collection=0, ncores=None
+    ):
         """Constructor.
 
         Args:
@@ -48,20 +48,31 @@ class QeTransmuter(StandardTransmuter):
         """
         entries = queryengine.get_entries(criteria, inc_structure=True)
 
-        source = "{}:{}/{}/{}".format(queryengine.host, queryengine.port,
-                                      queryengine.database_name,
-                                      queryengine.collection_name)
+        source = "{}:{}/{}/{}".format(
+            queryengine.host,
+            queryengine.port,
+            queryengine.database_name,
+            queryengine.collection_name,
+        )
 
         def get_history(entry):
-            return [{"source": source,
-                     "criteria": criteria,
-                     "entry": entry.as_dict(),
-                     "datetime": datetime.datetime.utcnow()}]
+            return [
+                {
+                    "source": source,
+                    "criteria": criteria,
+                    "entry": entry.as_dict(),
+                    "datetime": datetime.datetime.utcnow(),
+                }
+            ]
 
-        transformed_structures = [TransformedStructure(
-            entry.structure, [], history=get_history(entry))
-            for entry in entries]
-        StandardTransmuter.__init__(self, transformed_structures,
-                                    transformations=transformations,
-                                    extend_collection=extend_collection,
-                                    ncores=ncores)
+        transformed_structures = [
+            TransformedStructure(entry.structure, [], history=get_history(entry))
+            for entry in entries
+        ]
+        StandardTransmuter.__init__(
+            self,
+            transformed_structures,
+            transformations=transformations,
+            extend_collection=extend_collection,
+            ncores=ncores,
+        )

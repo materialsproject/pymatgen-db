@@ -1,14 +1,15 @@
 """
 Tests for pymatgen.db.util
 """
-__author__ = 'dang'
+__author__ = "dang"
 
 import unittest
 from pymatgen.db.util import collection_keys
 
+
 class FakeCollection:
-    """Collection that emulates find_one().
-    """
+    """Collection that emulates find_one()."""
+
     def __init__(self, data):
         self.data = data
 
@@ -17,8 +18,8 @@ class FakeCollection:
 
 
 class KeysTestCase(unittest.TestCase):
-    """Test collection_keys.
-    """
+    """Test collection_keys."""
+
     def test_flat(self):
         keys = ["a", "b", "C"]
         coll = FakeCollection(dict.fromkeys(keys))
@@ -33,5 +34,6 @@ class KeysTestCase(unittest.TestCase):
         keys = ["a", "a.b", "a.b.c"]
         self.assertEqual(set(keys), set(result))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

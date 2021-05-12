@@ -16,16 +16,18 @@ __version__ = "2021.5.12"
 
 from .query_engine import QueryEngine
 
-SETTINGS_FILE = os.path.join(os.path.expanduser('~'), '.pmgrc.yaml')
+SETTINGS_FILE = os.path.join(os.path.expanduser("~"), ".pmgrc.yaml")
 
 
 def _load_mgdb_settings():
     try:
         import yaml
-        with open(SETTINGS_FILE, 'rt') as f:
+
+        with open(SETTINGS_FILE, "rt") as f:
             d = yaml.safe_load(f)
     except IOError:
         return {}
     return d
+
 
 SETTINGS = _load_mgdb_settings()

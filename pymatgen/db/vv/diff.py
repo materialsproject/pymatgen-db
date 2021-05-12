@@ -1,15 +1,16 @@
 """
 Diff collections, as sets
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '3/29/13'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "3/29/13"
 
 # System
 import logging
 import re
 import time
+
 # Package
-from pymatgen.db.import util
+from pymatgen.db import util
 from pymatgen.db.query_engine import QueryEngine
 from pymatgen.db.dbconfig import normalize_auth
 
@@ -34,7 +35,7 @@ class Differ:
     """
 
     #: Keys in result dictionary.
-    MISSING, NEW, CHANGED = 'missing', 'additional', 'different'
+    MISSING, NEW, CHANGED = "missing", "additional", "different"
 
     #: CHANGED result fields
     CHANGED_MATCH_KEY = "match type"
@@ -47,7 +48,7 @@ class Differ:
     #: for missing property
     NO_PROPERTY = "__MISSING__"
 
-    def __init__(self, key='_id', props=None, info=None, fltr=None, deltas=None):
+    def __init__(self, key="_id", props=None, info=None, fltr=None, deltas=None):
         """Constructor.
 
         :param key: Field to use for identifying records
@@ -64,8 +65,7 @@ class Differ:
         self._info = [] if info is None else info
         self._filter = fltr if fltr else {}
         self._prop_deltas = {} if deltas is None else deltas
-        self._all_props = list(set(self._props[:] +
-                                   list(self._prop_deltas.keys())))
+        self._all_props = list(set(self._props[:] + list(self._prop_deltas.keys())))
 
     def diff(self, c1, c2, only_missing=False, only_values=False, allow_dup=False):
         """Perform a difference between the 2 collections.
@@ -97,7 +97,9 @@ class Differ:
             for cfg in c1, c2:
                 settings = util.get_settings(cfg)
                 if not normalize_auth(settings):
-                    _log.warn("Config file {} does not have a username/password".format(cfg))
+                    _log.warn(
+                        "Config file {} does not have a username/password".format(cfg)
+                    )
                 settings["aliases_config"] = {"aliases": {}, "defaults": {}}
                 engine = QueryEngine(**settings)
                 engines.append(engine)
@@ -110,8 +112,8 @@ class Differ:
 
         # Build query fields.
         fields = dict.fromkeys(self._info + self._all_props + [self._key_field], True)
-        if not '_id' in fields:  # explicitly remove _id if not given
-            fields['_id'] = False
+        if not "_id" in fields:  # explicitly remove _id if not given
+            fields["_id"] = False
 
         # Initialize for query loop.
         info = {}  # per-key information
@@ -130,8 +132,11 @@ class Differ:
                 try:
                     key = rec[self._key_field]
                 except KeyError:
-                    _log.critical("Key '{}' not found in record: {}. Abort.".format(
-                        self._key_field, rec))
+                    _log.critical(
+                        "Key '{}' not found in record: {}. Abort.".format(
+                            self._key_field, rec
+                        )
+                    )
                     return {}
                 if not allow_dup and key in keys[i]:
                     raise ValueError("Duplicate key: {}".format(key))
@@ -143,12 +148,15 @@ class Differ:
                         try:
                             pvals[pkey] = float(rec[pkey])
                         except KeyError:
-                            #print("@@ missing {} on {}".format(pkey, rec))
+                            # print("@@ missing {} on {}".format(pkey, rec))
                             missing_props += 1
                             continue
                         except (TypeError, ValueError):
-                            raise ValueError("Not a number: collection={c} key={k} {p}='{v}'"
-                                             .format(k=key, c=("old", "new")[i], p=pkey, v=rec[pkey]))
+                            raise ValueError(
+                                "Not a number: collection={c} key={k} {p}='{v}'".format(
+                                    k=key, c=("old", "new")[i], p=pkey, v=rec[pkey]
+                                )
+                            )
                     numprops[i][key] = pvals
                 # Extract properties for exact match.
                 if has_eqprops:
@@ -156,7 +164,7 @@ class Differ:
                         propval = tuple([(p, str(rec[p])) for p in self._props])
                     except KeyError:
                         missing_props += 1
-                        #print("@@ missing {} on {}".format(pkey, rec))
+                        # print("@@ missing {} on {}".format(pkey, rec))
                         continue
                     eqprops[i][key] = propval
 
@@ -169,13 +177,17 @@ class Differ:
 
             # Stop if we don't have properties on any record at all
             if 0 < count == missing_props:
-                _log.critical("Missing one or more properties on all {:d} records"
-                              .format(count))
+                _log.critical(
+                    "Missing one or more properties on all {:d} records".format(count)
+                )
                 return {}
             # ..but only issue a warning for partially missing properties.
             elif missing_props > 0:
-                _log.warn("Missing one or more properties for {:d}/{:d} records"
-                          .format(missing_props, count))
+                _log.warn(
+                    "Missing one or more properties for {:d}/{:d} records".format(
+                        missing_props, count
+                    )
+                )
         t1 = time.time()
         _log.info("query.end sec={:f}".format(t1 - t0))
 
@@ -191,8 +203,14 @@ class Differ:
 
         # Compute mis-matched properties.
         if has_props:
-            changed = self._changed_props(keys, eqprops, numprops, info,
-                                          has_eqprops=has_eqprops, has_numprops=has_numprops)
+            changed = self._changed_props(
+                keys,
+                eqprops,
+                numprops,
+                info,
+                has_eqprops=has_eqprops,
+                has_numprops=has_numprops,
+            )
         else:
             changed = []
 
@@ -218,26 +236,42 @@ class Differ:
 
         return result
 
-    def _changed_props(self, keys=None, eqprops=None, numprops=None, info=None,
-                       has_numprops=False, has_eqprops=False):
+    def _changed_props(
+        self,
+        keys=None,
+        eqprops=None,
+        numprops=None,
+        info=None,
+        has_numprops=False,
+        has_eqprops=False,
+    ):
         changed = []
-        _up = lambda d, v: d.update(v) or d   # functional dict.update()
+        _up = lambda d, v: d.update(v) or d  # functional dict.update()
         for key in keys[0].intersection(keys[1]):
             # Numeric property comparisons.
             if has_numprops:
                 for pkey in self._prop_deltas:
                     oldval, newval = numprops[0][key][pkey], numprops[1][key][pkey]
                     if self._prop_deltas[pkey].cmp(oldval, newval):
-                        change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_DELTA, self._key_field: key, "property": pkey,
-                                  self.CHANGED_OLD: "{:f}".format(oldval), self.CHANGED_NEW: "{:f}".format(newval),
-                                  "rule": self._prop_deltas[pkey],
-                                  self.CHANGED_DELTA: "{:f}".format(newval - oldval)}
+                        change = {
+                            self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_DELTA,
+                            self._key_field: key,
+                            "property": pkey,
+                            self.CHANGED_OLD: "{:f}".format(oldval),
+                            self.CHANGED_NEW: "{:f}".format(newval),
+                            "rule": self._prop_deltas[pkey],
+                            self.CHANGED_DELTA: "{:f}".format(newval - oldval),
+                        }
                         changed.append(_up(change, info[key]) if info else change)
             # Exact property comparison.
             if has_eqprops:
                 if not eqprops[0][key] == eqprops[1][key]:
-                    change = {self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_EXACT, self._key_field: key,
-                              self.CHANGED_OLD: eqprops[0][key], self.CHANGED_NEW: eqprops[1][key]}
+                    change = {
+                        self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_EXACT,
+                        self._key_field: key,
+                        self.CHANGED_OLD: eqprops[0][key],
+                        self.CHANGED_NEW: eqprops[1][key],
+                    }
                     changed.append(_up(change, info[key]) if info else change)
         return changed
 
@@ -256,13 +290,16 @@ class Delta:
         -Y[=]   Just look in '-' direction
         ...%     Instead of (v2 - v1), use 100*(v2 - v1)/v1
     """
+
     _num = "\d+(\.\d+)?"
-    _expr = re.compile("(?:"
-                       "\+(?P<X>{n})?-(?P<Y>{n})?|"  # both + and -
-                       "\+(?P<X2>{n})?|"              # only +
-                       "-(?P<Y2>{n})?"                # only -
-                       ")"
-                       "(?P<eq>=)?(?P<pct>%)?".format(n=_num))
+    _expr = re.compile(
+        "(?:"
+        "\+(?P<X>{n})?-(?P<Y>{n})?|"  # both + and -
+        "\+(?P<X2>{n})?|"  # only +
+        "-(?P<Y2>{n})?"  # only -
+        ")"
+        "(?P<eq>=)?(?P<pct>%)?".format(n=_num)
+    )
 
     def __init__(self, s):
         """Constructor.
@@ -285,34 +322,34 @@ class Delta:
         # Initialize parsed values.
         self._sign = False
         self._dx, self._dy = 0, 0
-        self._pct = False           # %change
-        self._eq = False            # >=,<= instead of >, <
+        self._pct = False  # %change
+        self._eq = False  # >=,<= instead of >, <
 
         # Set parsed values.
         d = m.groupdict()
-        #print("@@ expr :: {}".format(d))
-        if all((d[k] is None for k in ('X', 'Y', 'X2', 'Y2'))):
+        # print("@@ expr :: {}".format(d))
+        if all((d[k] is None for k in ("X", "Y", "X2", "Y2"))):
             # Change in sign only
             self._sign = True
-            self._eq = d['eq'] is not None
-        elif d['X'] is not None and d['Y'] is None:
+            self._eq = d["eq"] is not None
+        elif d["X"] is not None and d["Y"] is None:
             raise ValueError("Missing value for negative delta '{}'".format(s))
         else:
-            if d['X2'] is not None:
+            if d["X2"] is not None:
                 # Positive only
-                self._dx = float(d['X2'])
+                self._dx = float(d["X2"])
                 self._dy = None
-            elif d['Y2'] is not None:
+            elif d["Y2"] is not None:
                 # Negative only
                 self._dx = None
-                self._dy = -float(d['Y2'])
+                self._dy = -float(d["Y2"])
             else:
                 # Both
-                self._dy = -float(d['Y'])
-                self._dx = float(d['X'] or d['Y'])
-            self._eq = d['eq'] is not None
-            self._pct = d['pct'] is not None
-            #print("@@ dx,dy eq,pct = {},{}  {},{}".format(self._dx, self._dy, self._eq, self._pct))
+                self._dy = -float(d["Y"])
+                self._dx = float(d["X"] or d["Y"])
+            self._eq = d["eq"] is not None
+            self._pct = d["pct"] is not None
+            # print("@@ dx,dy eq,pct = {},{}  {},{}".format(self._dx, self._dy, self._eq, self._pct))
 
         # Pre-calculate comparison function.
         if self._sign:
@@ -330,17 +367,17 @@ class Delta:
     def as_json(self):
         if self._json_id:
             # only serialize fully the first time
-            return {'delta': {'id': self._json_id}}
-        dtype = 'abs' if self._eq else 'pct'
+            return {"delta": {"id": self._json_id}}
+        dtype = "abs" if self._eq else "pct"
         incl = self._eq
         self._json_id = next(IID)
         return {
-            'delta': {
-                'plus': self._dx,
-                'minus': self._dy,
-                'type': dtype,
-                'endpoints': incl,
-                'id': self._json_id
+            "delta": {
+                "plus": self._dx,
+                "minus": self._dy,
+                "type": dtype,
+                "endpoints": incl,
+                "id": self._json_id,
             }
         }
 

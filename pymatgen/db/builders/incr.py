@@ -33,8 +33,8 @@ The main classes are Mark and CollectionTracker. Usage example::
     print(mark.update().as_dict())
 
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '4/11/14'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "4/11/14"
 
 from abc import abstractmethod, ABCMeta
 import pymongo
@@ -48,9 +48,10 @@ _log = bld_util.get_builder_log("incr")
 
 # Exceptions
 
+
 class DBError(Exception):
-    """Generic database error.
-    """
+    """Generic database error."""
+
     pass
 
 
@@ -58,12 +59,14 @@ class NoTrackingCollection(Exception):
     """Raised if no tracking collection is present,
     but some operation is requested on that collection.
     """
+
     pass
 
 
 ## --------------
 ## High level API
 ## --------------
+
 
 class TrackingInterface(metaclass=ABCMeta):
     @abstractmethod
@@ -73,14 +76,15 @@ class TrackingInterface(metaclass=ABCMeta):
         """
         pass
 
+
 class UnTrackedQueryEngine(QueryEngine, TrackingInterface):
     """A QE that has the interface for tracking, but does nothing for it.
     Allows for callers to do same operations regardless of whether tracking is
     activated or not.
     """
+
     def set_mark(self):
-        """Does nothing and returns None.
-        """
+        """Does nothing and returns None."""
         return
 
 
@@ -95,9 +99,9 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
     To go around this transparent change, use the ``t.findall``
     instead.
     """
+
     def __init__(self, track_operation=None, track_field=None, **kwargs):
-        """Constructor.
-        """
+        """Constructor."""
         self._tracking_off = False
         # Set these first because QueryEngine.__init__ calls overridden `collection_name setter()`.
         assert track_field
@@ -132,19 +136,21 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
         """
         self._collection_name = value
         self._mongo_coll = self.db[value]
-        self.collection = TrackedCollection(self._mongo_coll, operation=self._t_op,
-                                            field=self._t_field)
+        self.collection = TrackedCollection(
+            self._mongo_coll, operation=self._t_op, field=self._t_field
+        )
 
     def set_mark(self):
-        """See :meth:`TrackingInterface.set_mark`
-        """
+        """See :meth:`TrackingInterface.set_mark`"""
         assert self.collection
         self.collection.set_mark()
+
 
 class TrackedCollection:
     """Wrapper on a pymongo collection to make `find' operations start
     after the "tracking" mark.
     """
+
     def __init__(self, coll, operation=None, field=None):
         self._coll, self._coll_find = coll, coll.find
         self._tracking_off = False
@@ -162,12 +168,11 @@ class TrackedCollection:
         self._tracking_off = not is_tracked
 
     def findall(self, *args, **kwargs):
-        """Call non-tracked ``find()`` operation with same args.
-        """
+        """Call non-tracked ``find()`` operation with same args."""
         return self._coll.find(*args, **kwargs)
 
     def __getattr__(self, item):
-        if item == 'find':
+        if item == "find":
             # monkey-patch the find() method in the collection object
             return self.tracked_find
         else:
@@ -177,8 +182,7 @@ class TrackedCollection:
         return "Tracked collection ({})".format(self._coll)
 
     def tracked_find(self, *args, **kwargs):
-        """Replacement for regular ``find()``.
-        """
+        """Replacement for regular ``find()``."""
         _log.info("tracked_find.begin")
         # if tracking is off, just call find (ie do nothing)
         if self._tracking_off:
@@ -189,17 +193,22 @@ class TrackedCollection:
         if len(args) > 0:
             filt = args[0]
         else:
-            if 'filter' not in kwargs:
-                kwargs['filter'] = {}
-            filt = kwargs['filter']
+            if "filter" not in kwargs:
+                kwargs["filter"] = {}
+            filt = kwargs["filter"]
         # update filter with tracker query
         filt.update(self._mark.query)
         # delegate to "real" find()
-        _log.info("tracked_find.end, call: {}.find(args={} kwargs={})".format(self._coll.name, args, kwargs))
+        _log.info(
+            "tracked_find.end, call: {}.find(args={} kwargs={})".format(
+                self._coll.name, args, kwargs
+            )
+        )
         return self._coll_find(*args, **kwargs)
 
     def set_mark(self):
         self._tracker.save(self._mark.update())
+
 
 # TODO: TrackedFileset -- Same basic idea with one or more files in a directory.
 # TODO: This would enable the incremental interface to work just as well with loading
@@ -210,9 +219,10 @@ class TrackedCollection:
 ## Low level API
 ## --------------
 
+
 class Operation(Enum):
-    """Enumeration of collection operations.
-    """
+    """Enumeration of collection operations."""
+
     copy = 1
     build = 2
     other = 99
@@ -222,6 +232,7 @@ class Mark:
     """The position in a collection for the last record that was
     processed by a given operation.
     """
+
     # Fields for JSON representation
     FLD_OP, FLD_MARK, FLD_FLD = "operation", "mark", "field"
 
@@ -256,8 +267,11 @@ class Mark:
         if rec is None:
             self._pos = self._empty_pos()
         elif not self._fld in rec:
-            _log.error("Tracking field not found. field={} collection={}"
-                       .format(self._fld, self._c.name))
+            _log.error(
+                "Tracking field not found. field={} collection={}".format(
+                    self._fld, self._c.name
+                )
+            )
             _log.warn("Continuing without tracking")
             self._pos = self._empty_pos()
         else:
@@ -272,13 +286,14 @@ class Mark:
         return self._pos
 
     def as_dict(self):
-        """Representation as a dict for JSON serialization.
-        """
-        return {self.FLD_OP: self._op.name,
-                self.FLD_MARK: self._pos,
-                self.FLD_FLD: self._fld}
+        """Representation as a dict for JSON serialization."""
+        return {
+            self.FLD_OP: self._op.name,
+            self.FLD_MARK: self._pos,
+            self.FLD_FLD: self._fld,
+        }
 
-    to_dict = as_dict   # synonym
+    to_dict = as_dict  # synonym
 
     @classmethod
     def from_dict(cls, coll, d):
@@ -290,8 +305,12 @@ class Mark:
         :return: new instance
         :rtype: Mark
         """
-        return Mark(collection=coll, operation=Operation[d[cls.FLD_OP]],
-                    pos=d[cls.FLD_MARK], field=d[cls.FLD_FLD])
+        return Mark(
+            collection=coll,
+            operation=Operation[d[cls.FLD_OP]],
+            pos=d[cls.FLD_MARK],
+            field=d[cls.FLD_FLD],
+        )
 
     @property
     def query(self):
@@ -303,9 +322,9 @@ class Mark:
         q = {}
         for field, value in self._pos.items():
             if value is None:
-                q.update({field: {'$exists': True}})
+                q.update({field: {"$exists": True}})
             else:
-                q.update({field: {'$gt': value}})
+                q.update({field: {"$gt": value}})
         return q
 
 
@@ -313,9 +332,10 @@ class CollectionTracker:
     """Track which records are 'new' in a MongoDB collection
     with respect to a given operation.
     """
+
     #: Sub-collection name, added as ".<TRACKING_NAME>" to the
     #: name of the target collection to create the tracking collection.
-    TRACKING_NAME = 'tracker'
+    TRACKING_NAME = "tracker"
 
     def __init__(self, coll, create=True):
         """Constructor.
@@ -337,12 +357,11 @@ class CollectionTracker:
 
     @property
     def tracking_collection_name(self):
-        return self.collection.name + '.' + self.TRACKING_NAME
+        return self.collection.name + "." + self.TRACKING_NAME
 
     @property
     def tracking_collection(self):
-        """Return current tracking collection, or None if it does not exist.
-        """
+        """Return current tracking collection, or None if it does not exist."""
         return self._track
 
     def create(self):
@@ -390,8 +409,10 @@ class CollectionTracker:
     def _get(self, operation, field):
         """Get tracked position for a given operation and field."""
         self._check_exists()
-        query = {Mark.FLD_OP: operation.name,
-                 Mark.FLD_MARK + "." + field: {"$exists": True}}
+        query = {
+            Mark.FLD_OP: operation.name,
+            Mark.FLD_MARK + "." + field: {"$exists": True},
+        }
         return self._track.find_one(query)
 
     def _check_exists(self):

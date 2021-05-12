@@ -1,8 +1,8 @@
 """
 Utility module for schema validation, for builder testing
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '11/1/13'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "11/1/13"
 
 import datetime
 import glob
@@ -12,30 +12,29 @@ import re
 import time
 
 # Default schema version
-DEFAULT_VERSION = '1.0.0'
+DEFAULT_VERSION = "1.0.0"
 
 # Indicates any version
 ANY_VERSION = "*.*.*"
 
 # denotes optional field/scalar
-OPTIONAL_FLAG = '?'
+OPTIONAL_FLAG = "?"
 
 # marker of specialness
-SPECIAL = '__'
+SPECIAL = "__"
 SPECIAL_LEN = len(SPECIAL)
 
 # Regex for values
 # Note that the special prefix/suffix is optional
-VALUE_RE = re.compile("(?:{spec})?([a-zA-Z]+)(?:{spec})?\s*(.*)"
-                      .format(spec=SPECIAL))
+VALUE_RE = re.compile("(?:{spec})?([a-zA-Z]+)(?:{spec})?\s*(.*)".format(spec=SPECIAL))
 
 # Global obj with all collected schemas
 schemata = {}
 
 
 class SchemaError(Exception):
-    """Base class of all errors raised by schema creation or validation.
-    """
+    """Base class of all errors raised by schema creation or validation."""
+
     pass
 
 
@@ -69,7 +68,7 @@ def add_schemas(path, ext="json"):
         raise SchemaPathError()
     filepat = "*." + ext if ext else "*"
     for f in glob.glob(os.path.join(path, filepat)):
-        with open(f, 'r') as fp:
+        with open(f, "r") as fp:
             try:
                 schema = json.load(fp)
             except ValueError:
@@ -98,10 +97,11 @@ def load_schema(file_or_fp):
     :raise: IOError if file cannot be opened or read, ValueError if
             file is not valid JSON or JSON is not a valid schema.
     """
-    fp = open(file_or_fp, 'r') if isinstance(file_or_fp, str) else file_or_fp
+    fp = open(file_or_fp, "r") if isinstance(file_or_fp, str) else file_or_fp
     obj = json.load(fp)
     schema = Schema(obj)
     return schema
+
 
 ## Validator classes
 
@@ -110,6 +110,7 @@ class HasMeta:
     """Mix-in class to handle metadata.
     Adds the 'meta' class attribute.
     """
+
     FIELD_SEP = ","
     KV_SEP = ":"
 
@@ -127,7 +128,7 @@ class HasMeta:
         elif isinstance(meta, basestring):
             # build a dict from key-value pairs
             parts = meta.split(self.FIELD_SEP)
-            self.meta = {k: v for k, v in map(lambda fld: fld.split(':', 1), parts)}
+            self.meta = {k: v for k, v in map(lambda fld: fld.split(":", 1), parts)}
         else:
             # assume dict-like
             self.meta = meta
@@ -141,7 +142,7 @@ class Schema(HasMeta):
     # enum for navigating hierarchies
     IS_LIST, IS_DICT, IS_SCALAR = 0, 1, 2
 
-    def __init__(self, schema, optional=False, meta=''):
+    def __init__(self, schema, optional=False, meta=""):
         HasMeta.__init__(self, meta)
         self.is_optional = optional
         self._schema = self._parse(schema)
@@ -151,7 +152,9 @@ class Schema(HasMeta):
     def validate(self, doc, path="(root)"):
         t = self._whatis(doc)
         if t != self._type:
-            return self._vresult(path, "type mismatch: {} != {}", self._typestr(t), self)
+            return self._vresult(
+                path, "type mismatch: {} != {}", self._typestr(t), self
+            )
         if t == self.IS_LIST:
             if len(doc) == 0:
                 return None
@@ -159,10 +162,13 @@ class Schema(HasMeta):
         elif t == self.IS_DICT:
             # fail if document is missing any required keys
             dkeys = set(doc.keys())
-            skeys = set(filter(lambda k: not self._schema[k].is_optional,
-                               self._schema.keys()))
+            skeys = set(
+                filter(lambda k: not self._schema[k].is_optional, self._schema.keys())
+            )
             if skeys - dkeys:
-                return self._vresult(path, "missing keys: ({})".format(', '.join(skeys - dkeys)))
+                return self._vresult(
+                    path, "missing keys: ({})".format(", ".join(skeys - dkeys))
+                )
             # check each item in document
             for k, v in doc.items():
                 if k in self._schema:
@@ -171,11 +177,12 @@ class Schema(HasMeta):
                         return result
                 else:
                     pass  # do nothing for 'extra' keys
-                    #return self._vresult(path, "missing key: {}", k)
+                    # return self._vresult(path, "missing key: {}", k)
         else:
             if not self._schema.check(doc):
-                return self._vresult(path, "bad value '{}' for type {}",
-                                     doc, self._schema)
+                return self._vresult(
+                    path, "bad value '{}' for type {}", doc, self._schema
+                )
 
     def json_schema(self, **add_keys):
         """Convert our compact schema representation to the standard, but more verbose,
@@ -193,16 +200,16 @@ class Schema(HasMeta):
         return self._json_schema
 
     def _build_schema(self, s):
-        """Recursive schema builder, called by `json_schema`.
-        """
+        """Recursive schema builder, called by `json_schema`."""
         w = self._whatis(s)
         if w == self.IS_LIST:
             w0 = self._whatis(s[0])
-            js = {"type": "array",
-                  "items": {"type": self._jstype(w0, s[0])}}
+            js = {"type": "array", "items": {"type": self._jstype(w0, s[0])}}
         elif w == self.IS_DICT:
-            js = {"type": "object",
-                  "properties": {key: self._build_schema(val) for key, val in s.items()}}
+            js = {
+                "type": "object",
+                "properties": {key: self._build_schema(val) for key, val in s.items()},
+            }
             req = [key for key, val in s.items() if not val.is_optional]
             if req:
                 js["required"] = req
@@ -214,8 +221,7 @@ class Schema(HasMeta):
         return js
 
     def _jstype(self, stype, sval):
-        """Get JavaScript name for given data type, called by `_build_schema`.
-        """
+        """Get JavaScript name for given data type, called by `_build_schema`."""
         if stype == self.IS_LIST:
             return "array"
         if stype == self.IS_DICT:
@@ -227,9 +233,9 @@ class Schema(HasMeta):
         return self._jstype(self._whatis(v), v)
 
     def _vresult(self, path, fmt, *args):
-        meta_info = ''
-        if self.meta and 'desc' in self.meta:
-            meta_info = '="{}"'.format(self.meta['desc'])
+        meta_info = ""
+        if self.meta and "desc" in self.meta:
+            meta_info = '="{}"'.format(self.meta["desc"])
         return "{}{}: ".format(path, meta_info) + fmt.format(*args)
 
     def _parse(self, value):
@@ -248,7 +254,7 @@ class Schema(HasMeta):
                 if k[0] == OPTIONAL_FLAG:
                     k = k[1:]
                     opt_flag = True
-                elif k in ('@class', '@module'):  # optionalize the cruft
+                elif k in ("@class", "@module"):  # optionalize the cruft
                     opt_flag = True
                 # parse value and assign
                 r[k] = Schema(v, optional=opt_flag)
@@ -260,8 +266,9 @@ class Schema(HasMeta):
                 optional = True
             vinfo = VALUE_RE.match(value)
             if not vinfo:
-                raise ValueError("bad type format, must be __<type>__ got {}"
-                                 .format(value))
+                raise ValueError(
+                    "bad type format, must be __<type>__ got {}".format(value)
+                )
             dtype, meta = vinfo.groups()
             return Scalar(dtype, optional=optional, meta=meta)
 
@@ -283,8 +290,7 @@ class Schema(HasMeta):
 
 
 def _is_datetime(d):
-    return isinstance(d, datetime.datetime) or \
-        isinstance(d, time.struct_time)
+    return isinstance(d, datetime.datetime) or isinstance(d, time.struct_time)
 
 
 class Scalar(HasMeta):
@@ -292,18 +298,18 @@ class Scalar(HasMeta):
     # its argument matches.
 
     TYPES = {
-        'string': lambda x: isinstance(x, basestring),
-        'bool': lambda x: x is True or x is False,
-        'datetime': _is_datetime,
-        'date': _is_datetime,
-        'float': lambda x: isinstance(x, float),
-        'int': lambda x: isinstance(x, int),
-        'null': lambda x: x is None,
-        'array': lambda x: isinstance(x, list),
-        'object': lambda x: isinstance(x, dict)
+        "string": lambda x: isinstance(x, basestring),
+        "bool": lambda x: x is True or x is False,
+        "datetime": _is_datetime,
+        "date": _is_datetime,
+        "float": lambda x: isinstance(x, float),
+        "int": lambda x: isinstance(x, int),
+        "null": lambda x: x is None,
+        "array": lambda x: isinstance(x, list),
+        "object": lambda x: isinstance(x, dict),
     }
 
-    def __init__(self, typecode, optional=False, meta=''):
+    def __init__(self, typecode, optional=False, meta=""):
         self.is_optional = optional
         self._type = typecode
         HasMeta.__init__(self, meta)
@@ -313,18 +319,18 @@ class Scalar(HasMeta):
             raise SchemaTypeError(typecode)
 
     JSTYPES = {
-        "datetime": "string", "date": "string",
+        "datetime": "string",
+        "date": "string",
         "string": "string",
         "bool": "boolean",
         "int": "integer",
         "float": "number",
-        "null": "null"
+        "null": "null",
     }
 
     @property
     def jstype(self):
-        """Return JavaScript type.
-        """
+        """Return JavaScript type."""
         return self.JSTYPES[self._type]
 
     def __str__(self):
@@ -332,4 +338,3 @@ class Scalar(HasMeta):
 
     def __repr__(self):
         return "scalar::{}".format(self)
-

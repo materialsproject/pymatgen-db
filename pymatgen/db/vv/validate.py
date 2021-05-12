@@ -21,21 +21,25 @@ from smoqe.query import *
 class DBError(Exception):
     pass
 
+
 class ValidatorSyntaxError(Exception):
     "Syntax error in configuration of Validator"
+
     def __init__(self, target, desc):
         msg = 'Invalid syntax: {} -> "{}"'.format(desc, target)
         Exception.__init__(self, msg)
+
 
 class PythonMethod:
     """Encapsulate an external Python method that will be run on our target
     MongoDB collection to perform arbitrary types of validation.
     """
-    _PATTERN = re.compile(r'\s*(@\w+)(\s+\w+)*')
 
-    CANNOT_COMBINE_ERR = 'Call to a Python method cannot be combined '
-    'with any other constraints'
-    BAD_CONSTRAINT_ERR = 'Invalid constraint (must be: @<method> [<param> ..])'
+    _PATTERN = re.compile(r"\s*(@\w+)(\s+\w+)*")
+
+    CANNOT_COMBINE_ERR = "Call to a Python method cannot be combined "
+    "with any other constraints"
+    BAD_CONSTRAINT_ERR = "Invalid constraint (must be: @<method> [<param> ..])"
 
     @classmethod
     def constraint_is_method(cls, text):
@@ -54,11 +58,12 @@ class PythonMethod:
         """
         if not self._PATTERN.match(text):
             raise ValidatorSyntaxError(text, self.BAD_CONSTRAINT_ERR)
-        tokens = re.split('@?\s+', text)
+        tokens = re.split("@?\s+", text)
         if len(tokens) < 1:
             raise ValidatorSyntaxError(text, self.BAD_CONSTRAINT_ERR)
         self.method = tokens[0]
         self.params = tokens[1:]
+
 
 def mongo_get(rec, key, default=None):
     """
@@ -78,10 +83,10 @@ def mongo_get(rec, key, default=None):
     if not rec:
         return default
     if not isinstance(rec, collections.Mapping):
-        raise ValueError('input record must act like a dict')
-    if not '.' in key:
+        raise ValueError("input record must act like a dict")
+    if not "." in key:
         return rec.get(key, default)
-    for key_part in key.split('.'):
+    for key_part in key.split("."):
         if not isinstance(rec, collections.Mapping):
             return default
         if not key_part in rec:
@@ -91,8 +96,7 @@ def mongo_get(rec, key, default=None):
 
 
 class Projection:
-    """Fields on which to project the query results.
-    """
+    """Fields on which to project the query results."""
 
     def __init__(self):
         self._fields = {}
@@ -127,13 +131,13 @@ class Projection:
         """
         d = copy.copy(self._fields)
         for k, v in self._slices.items():
-            d[k] = {'$slice': v}
+            d[k] = {"$slice": v}
         return d
 
 
 class ConstraintViolation:
-    """A single constraint violation, with no metadata.
-    """
+    """A single constraint violation, with no metadata."""
+
     def __init__(self, constraint, value, expected):
         """Create new constraint violation
 
@@ -150,7 +154,7 @@ class ConstraintViolation:
 
     @property
     def op(self):
-        #return str(self._constraint.op)
+        # return str(self._constraint.op)
         return self._constraint.op.display_op
 
     @property
@@ -167,21 +171,20 @@ class ConstraintViolation:
 
 
 class NullConstraintViolation(ConstraintViolation):
-    """Empty constraint violation, for when there are no constraints.
-    """
+    """Empty constraint violation, for when there are no constraints."""
+
     def __init__(self):
-        ConstraintViolation.__init__(self, Constraint('NA', '=', 'NA'), 'NA', 'NA')
+        ConstraintViolation.__init__(self, Constraint("NA", "=", "NA"), "NA", "NA")
 
 
 class ConstraintViolationGroup:
-    """A group of constraint violations with metadata.
-    """
+    """A group of constraint violations with metadata."""
+
     def __init__(self):
-        """Create an empty object.
-        """
+        """Create an empty object."""
         self._viol = []
         # These are read/write
-        self.subject = ''
+        self.subject = ""
         self.condition = None
 
     def add_violations(self, violations, record=None):
@@ -205,11 +208,11 @@ class ConstraintViolationGroup:
 
 
 class ProgressMeter:
-    """Simple progress tracker
-    """
+    """Simple progress tracker"""
+
     def __init__(self, num, fmt):
         self._n = num
-        self._subject = '?'
+        self._subject = "?"
         self._fmt = fmt
         self._count = 0
         self._total = 0
@@ -226,18 +229,20 @@ class ProgressMeter:
         self._total += 1
         if self._n == 0 or self._count < self._n:
             return
-        sys.stderr.write(self._fmt.format(*args, subject=self._subject, count=self.count))
-        sys.stderr.write('\n')
+        sys.stderr.write(
+            self._fmt.format(*args, subject=self._subject, count=self.count)
+        )
+        sys.stderr.write("\n")
         sys.stderr.flush()
         self._count = 0
 
 
 class ConstraintSpec(DoesLogging):
-    """Specification of a set of constraints for a collection.
-    """
-    FILTER_SECT = 'filter'
-    CONSTRAINT_SECT = 'constraints'
-    SAMPLE_SECT = 'sample'
+    """Specification of a set of constraints for a collection."""
+
+    FILTER_SECT = "filter"
+    CONSTRAINT_SECT = "constraints"
+    SAMPLE_SECT = "sample"
 
     def __init__(self, spec):
         """Create specification from a configuration.
@@ -246,7 +251,7 @@ class ConstraintSpec(DoesLogging):
         :type spec: dict
         :raise: ValueError if specification is wrong
         """
-        DoesLogging.__init__(self, name='mg.ConstraintSpec')
+        DoesLogging.__init__(self, name="mg.ConstraintSpec")
         self._sections, _slist = {}, []
         for item in spec:
             self._log.debug("build constraint from: {}".format(item))
@@ -322,13 +327,13 @@ class ConstraintSpecSection:
 
 
 class Validator(DoesLogging):
-    """Validate a collection.
-    """
+    """Validate a collection."""
 
     class SectionParts:
         """Encapsulate the tuple of information for each section of filters, constraints,
-         etc. within a collection.
+        etc. within a collection.
         """
+
         def __init__(self, cond, body, sampler, report_fields):
             """Create new initialized set of parts.
 
@@ -341,25 +346,30 @@ class Validator(DoesLogging):
             :param report_fields: Fields to report on
             :type report_fields: list
             """
-            self.cond, self.body, self.sampler, self.report_fields = \
-                cond, body, sampler, report_fields
+            self.cond, self.body, self.sampler, self.report_fields = (
+                cond,
+                body,
+                sampler,
+                report_fields,
+            )
 
-    def __init__(self, max_violations=50, max_dberrors=10, aliases=None, add_exists=False):
-        DoesLogging.__init__(self, name='mg.validator')
+    def __init__(
+        self, max_violations=50, max_dberrors=10, aliases=None, add_exists=False
+    ):
+        DoesLogging.__init__(self, name="mg.validator")
         self.set_progress(0)
         self._aliases = aliases if aliases else {}
         self._max_viol = max_violations
         if self._max_viol > 0:
-            self._find_kw = {'limit': self._max_viol}
+            self._find_kw = {"limit": self._max_viol}
         else:
             self._find_kw = {}
         self._max_dberr = max_dberrors
-        self._base_report_fields = {'_id': 1, 'task_id': 1}
+        self._base_report_fields = {"_id": 1, "task_id": 1}
         self._add_exists = add_exists
 
     def set_aliases(self, a):
-        """Set aliases.
-        """
+        """Set aliases."""
         self._aliases = a
 
     def set_progress(self, num):
@@ -369,7 +379,9 @@ class Validator(DoesLogging):
         :type num: int
         :return: None
         """
-        report_str = 'Progress for {subject}: {count:d} invalid, {:d} db errors, {:d} bytes'
+        report_str = (
+            "Progress for {subject}: {count:d} invalid, {:d} db errors, {:d} bytes"
+        )
         self._progress = ProgressMeter(num, report_str)
 
     def num_violations(self):
@@ -377,7 +389,7 @@ class Validator(DoesLogging):
             return 0
         return self._progress._count
 
-    def validate(self, coll, constraint_spec, subject='collection'):
+    def validate(self, coll, constraint_spec, subject="collection"):
         """Validation of  a collection.
         This is a generator that yields ConstraintViolationGroups.
 
@@ -422,8 +434,8 @@ class Validator(DoesLogging):
         query = parts.cond.to_mongo(disjunction=False)
         query.update(parts.body.to_mongo())
         cvgroup.condition = parts.cond.to_mongo(disjunction=False)
-        self._log.debug('Query spec: {}'.format(query))
-        self._log.debug('Query fields: {}'.format(parts.report_fields))
+        self._log.debug("Query spec: {}".format(query))
+        self._log.debug("Query fields: {}".format(parts.report_fields))
         # Find records that violate 1 or more constraints
         cursor = coll.find(query, parts.report_fields, **self._find_kw)
         if parts.sampler is not None:
@@ -435,8 +447,11 @@ class Validator(DoesLogging):
                 nbytes += total_size(record)
                 num_rec += 1
             except StopIteration:
-                self._log.info("collection {}: {:d} records, {:d} bytes, {:d} db-errors"
-                               .format(subject, num_rec, nbytes, num_dberr))
+                self._log.info(
+                    "collection {}: {:d} records, {:d} bytes, {:d} db-errors".format(
+                        subject, num_rec, nbytes, num_dberr
+                    )
+                )
                 break
             except pymongo.errors.PyMongoError as err:
                 num_dberr += 1
@@ -475,29 +490,35 @@ class Validator(DoesLogging):
             fval = mongo_get(record, key)
             if fval is None:
                 expected = clause.constraint.value
-                reasons.append(ConstraintViolation(clause.constraint, 'missing', expected))
+                reasons.append(
+                    ConstraintViolation(clause.constraint, "missing", expected)
+                )
                 continue
             if op.is_variable():
                 # retrieve value for variable
                 var_name = clause.constraint.value
                 value = mongo_get(record, var_name, default=None)
                 if value is None:
-                    reasons.append(ConstraintViolation(clause.constraint, 'missing', var_name))
+                    reasons.append(
+                        ConstraintViolation(clause.constraint, "missing", var_name)
+                    )
                     continue
-                clause.constraint.value = value         # swap out value, temporarily
+                clause.constraint.value = value  # swap out value, temporarily
             # take length for size
             if op.is_size():
-                if isinstance(fval, str) or not hasattr(fval, '__len__'):
-                    reasons.append(ConstraintViolation(clause.constraint, type(fval), 'sequence'))
+                if isinstance(fval, str) or not hasattr(fval, "__len__"):
+                    reasons.append(
+                        ConstraintViolation(clause.constraint, type(fval), "sequence")
+                    )
                     if op.is_variable():
-                        clause.constraint.value = var_name      # put original value back
+                        clause.constraint.value = var_name  # put original value back
                     continue
                 fval = len(fval)
             ok, expected = clause.constraint.passes(fval)
             if not ok:
                 reasons.append(ConstraintViolation(clause.constraint, fval, expected))
             if op.is_variable():
-                clause.constraint.value = var_name      # put original value back
+                clause.constraint.value = var_name  # put original value back
         return reasons
 
     def _build(self, constraint_spec):
@@ -515,8 +536,8 @@ class Validator(DoesLogging):
 
         for sval in constraint_spec:
             rpt_fld = self._base_report_fields.copy()
-            #print("@@ CONDS = {}".format(sval.filters))
-            #print("@@ MAIN = {}".format(sval.constraints))
+            # print("@@ CONDS = {}".format(sval.filters))
+            # print("@@ MAIN = {}".format(sval.constraints))
 
             # Constraints
 
@@ -544,7 +565,9 @@ class Validator(DoesLogging):
 
             cond_query = MongoQuery()
             if sval.filters is not None:
-                cond_groups = self._process_constraint_expressions(sval.filters, rev=False)
+                cond_groups = self._process_constraint_expressions(
+                    sval.filters, rev=False
+                )
                 for cg in cond_groups.values():
                     for c in cg:
                         cond_query.add_clause(MongoClause(c, rev=False))
@@ -581,7 +604,9 @@ class Validator(DoesLogging):
             for field_name, group in groups.items():
                 conflicts = group.get_conflicts()
                 if conflicts:
-                    raise ValueError('Conflicts for field {}: {}'.format(field_name, conflicts))
+                    raise ValueError(
+                        "Conflicts for field {}: {}".format(field_name, conflicts)
+                    )
         return groups
 
     def _is_python(self, constraint_list):
@@ -592,12 +617,14 @@ class Validator(DoesLogging):
         :return: True if this refers to an import of code, False otherwise
         :raises: ValidatorSyntaxError
         """
-        if len(constraint_list) == 1 and \
-                PythonMethod.constraint_is_method(constraint_list[0]):
+        if len(constraint_list) == 1 and PythonMethod.constraint_is_method(
+            constraint_list[0]
+        ):
             return True
-        if len(constraint_list) > 1 and \
-                any(filter(PythonMethod.constraint_is_method, constraint_list)):
-            condensed_list = '/'.join(constraint_list)
+        if len(constraint_list) > 1 and any(
+            filter(PythonMethod.constraint_is_method, constraint_list)
+        ):
+            condensed_list = "/".join(constraint_list)
             err = PythonMethod.CANNOT_COMBINE_ERR
             raise ValidatorSyntaxError(condensed_list, err)
         return False
@@ -618,16 +645,16 @@ class Validator(DoesLogging):
         except Exception as err:
             raise ValueError("invalid value: {}".format(err))
 
+
 class Sampler(DoesLogging):
-    """Randomly sample a proportion of the full collection.
-    """
+    """Randomly sample a proportion of the full collection."""
 
     # Random uniform distribution
     DIST_RUNIF = 1
     # Default distribution
     DEFAULT_DIST = DIST_RUNIF
     # Names of distributions
-    DIST_CODES = {'uniform': DIST_RUNIF}
+    DIST_CODES = {"uniform": DIST_RUNIF}
 
     def __init__(self, min_items=0, max_items=1e9, p=1.0, distrib=DEFAULT_DIST, **kw):
         """Create new parameterized sampler.
@@ -639,14 +666,18 @@ class Sampler(DoesLogging):
         :type distrib: str or int
         :raise: ValueError, if `distrib` is an unknown code or string
         """
-        DoesLogging.__init__(self, 'mg.sampler')
+        DoesLogging.__init__(self, "mg.sampler")
         # Sanity checks
         if min_items < 0:
-            raise ValueError('min_items cannot be negative ({:d})'.format(min_items))
+            raise ValueError("min_items cannot be negative ({:d})".format(min_items))
         if (max_items != 0) and (max_items < min_items):
-            raise ValueError('max_items must be zero or >= min_items ({:d} < {:d})'.format(max_items, min_items))
+            raise ValueError(
+                "max_items must be zero or >= min_items ({:d} < {:d})".format(
+                    max_items, min_items
+                )
+            )
         if not (0.0 <= p <= 1.0):
-            raise ValueError('probability, p, must be between 0 and 1 ({:f})'.format(p))
+            raise ValueError("probability, p, must be between 0 and 1 ({:f})".format(p))
         self.min_items = min_items
         self.max_items = max_items
         self.p = p

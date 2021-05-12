@@ -25,10 +25,9 @@ from pymongo import MongoClient
 from pymatgen.core import Structure, Composition
 from pymatgen.electronic_structure.core import Orbital, Spin
 from pymatgen.electronic_structure.dos import CompleteDos, Dos
-from pymatgen.entries.computed_entries import ComputedEntry,\
-    ComputedStructureEntry
+from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
 
-_log = logging.getLogger('mg.' + __name__)
+_log = logging.getLogger("mg." + __name__)
 
 
 class QueryEngine:
@@ -51,27 +50,38 @@ class QueryEngine:
     """
 
     # avoid hard-coding these in other places
-    ALIASES_CONFIG_KEY = 'aliases_config'
-    COLLECTION_KEY = 'collection'
-    HOST_KEY = 'host'
-    PORT_KEY = 'port'
-    DB_KEY = 'database'
-    USER_KEY = 'user'
-    PASSWORD_KEY = 'password'
+    ALIASES_CONFIG_KEY = "aliases_config"
+    COLLECTION_KEY = "collection"
+    HOST_KEY = "host"
+    PORT_KEY = "port"
+    DB_KEY = "database"
+    USER_KEY = "user"
+    PASSWORD_KEY = "password"
 
     # Aliases and defaults
-    aliases = None            #: See `aliases` arg to constructor
-    default_criteria = None   #: See `default_criteria` arg to constructor
-    default_properties = None #: See `default_properties` arg to constructor
+    aliases = None  #: See `aliases` arg to constructor
+    default_criteria = None  #: See `default_criteria` arg to constructor
+    default_properties = None  #: See `default_properties` arg to constructor
     # Post-processing operations
-    query_post = None         #: See `query_post` arg to constructor
-    result_post = None        #: See `result_post` arg to constructor
+    query_post = None  #: See `query_post` arg to constructor
+    result_post = None  #: See `result_post` arg to constructor
 
-    def __init__(self, host="127.0.0.1", port=27017, database="vasp",
-                 user=None, password=None, collection="tasks",
-                 aliases_config=None, default_properties=None,
-                 query_post=None, result_post=None,
-                 connection=None, replicaset=None, **ignore):
+    def __init__(
+        self,
+        host="127.0.0.1",
+        port=27017,
+        database="vasp",
+        user=None,
+        password=None,
+        collection="tasks",
+        aliases_config=None,
+        default_properties=None,
+        query_post=None,
+        result_post=None,
+        connection=None,
+        replicaset=None,
+        **ignore
+    ):
         """Constructor.
 
         Args:
@@ -126,8 +136,9 @@ class QueryEngine:
         if connection is None:
             # can't pass replicaset=None to MongoClient (fails validation)
             if self.replicaset:
-                self.connection = MongoClient(self.host, self.port,
-                                              replicaset=self.replicaset)
+                self.connection = MongoClient(
+                    self.host, self.port, replicaset=self.replicaset
+                )
             else:
                 self.connection = MongoClient(self.host, self.port)
         else:
@@ -136,8 +147,9 @@ class QueryEngine:
         if user:
             self.db.authenticate(user, password)
         self.collection_name = collection
-        self.set_aliases_and_defaults(aliases_config=aliases_config,
-                                      default_properties=default_properties)
+        self.set_aliases_and_defaults(
+            aliases_config=aliases_config, default_properties=default_properties
+        )
         # Post-processing functions
         self.query_post = query_post or []
         self.result_post = result_post or []
@@ -170,9 +182,7 @@ class QueryEngine:
         # Use the @property setter collection_name setter above
         self.collection_name = collection
 
-
-    def set_aliases_and_defaults(self, aliases_config=None,
-                                 default_properties=None):
+    def set_aliases_and_defaults(self, aliases_config=None, default_properties=None):
         """
         Set the alias config and defaults to use. Typically used when
         switching to a collection with a different schema.
@@ -188,8 +198,7 @@ class QueryEngine:
                 query().
         """
         if aliases_config is None:
-            with open(os.path.join(os.path.dirname(__file__),
-                                   "aliases.json")) as f:
+            with open(os.path.join(os.path.dirname(__file__), "aliases.json")) as f:
                 d = json.load(f)
                 self.aliases = d.get("aliases", {})
                 self.default_criteria = d.get("defaults", {})
@@ -200,9 +209,9 @@ class QueryEngine:
         if default_properties is None:
             self._default_props, self._default_prop_dict = None, None
         else:
-            self._default_props, self._default_prop_dict = \
-                self._parse_properties(default_properties)
-
+            self._default_props, self._default_prop_dict = self._parse_properties(
+                default_properties
+            )
 
     def __enter__(self):
         """Allows for use with the 'with' context manager"""
@@ -216,8 +225,13 @@ class QueryEngine:
         """Disconnects the connection."""
         self.connection.disconnect()
 
-    def get_entries_in_system(self, elements, inc_structure=False,
-                              optional_data=None, additional_criteria=None):
+    def get_entries_in_system(
+        self,
+        elements,
+        inc_structure=False,
+        optional_data=None,
+        additional_criteria=None,
+    ):
         """
         Gets all entries in a chemical system, e.g. Li-Fe-O will return all
         Li-O, Fe-O, Li-Fe, Li-Fe-O compounds.
@@ -256,8 +270,7 @@ class QueryEngine:
         crit = {"chemsys": {"$in": chemsys_list}}
         if additional_criteria is not None:
             crit.update(additional_criteria)
-        return self.get_entries(crit, inc_structure,
-                                optional_data=optional_data)
+        return self.get_entries(crit, inc_structure, optional_data=optional_data)
 
     def get_entries(self, criteria, inc_structure=False, optional_data=None):
         """
@@ -290,11 +303,21 @@ class QueryEngine:
         optional_data = [] if not optional_data else list(optional_data)
         optional_data.append("oxide_type")
         fields = [k for k in optional_data]
-        fields.extend(["task_id", "unit_cell_formula", "energy", "is_hubbard",
-                       "hubbards", "pseudo_potential.labels",
-                       "pseudo_potential.functional", "run_type",
-                       "input.is_lasph", "input.xc_override",
-                       "input.potcar_spec"])
+        fields.extend(
+            [
+                "task_id",
+                "unit_cell_formula",
+                "energy",
+                "is_hubbard",
+                "hubbards",
+                "pseudo_potential.labels",
+                "pseudo_potential.functional",
+                "run_type",
+                "input.is_lasph",
+                "input.xc_override",
+                "input.potcar_spec",
+            ]
+        )
         if inc_structure:
             fields.append("output.crystal")
 
@@ -302,25 +325,35 @@ class QueryEngine:
             func = c["pseudo_potential.functional"]
             labels = c["pseudo_potential.labels"]
             symbols = ["{} {}".format(func, label) for label in labels]
-            parameters = {"run_type": c["run_type"],
-                          "is_hubbard": c["is_hubbard"],
-                          "hubbards": c["hubbards"],
-                          "potcar_symbols": symbols,
-                          "is_lasph": c.get("input.is_lasph") or False,
-                          "potcar_spec": c.get("input.potcar_spec"),
-                          "xc_override": c.get("input.xc_override")}
+            parameters = {
+                "run_type": c["run_type"],
+                "is_hubbard": c["is_hubbard"],
+                "hubbards": c["hubbards"],
+                "potcar_symbols": symbols,
+                "is_lasph": c.get("input.is_lasph") or False,
+                "potcar_spec": c.get("input.potcar_spec"),
+                "xc_override": c.get("input.xc_override"),
+            }
             optional_data = {k: c[k] for k in optional_data}
             if inc_structure:
                 struct = Structure.from_dict(c["output.crystal"])
-                entry = ComputedStructureEntry(struct, c["energy"],
-                                               0.0, parameters=parameters,
-                                               data=optional_data,
-                                               entry_id=c["task_id"])
+                entry = ComputedStructureEntry(
+                    struct,
+                    c["energy"],
+                    0.0,
+                    parameters=parameters,
+                    data=optional_data,
+                    entry_id=c["task_id"],
+                )
             else:
-                entry = ComputedEntry(Composition(c["unit_cell_formula"]),
-                                      c["energy"], 0.0, parameters=parameters,
-                                      data=optional_data,
-                                      entry_id=c["task_id"])
+                entry = ComputedEntry(
+                    Composition(c["unit_cell_formula"]),
+                    c["energy"],
+                    0.0,
+                    parameters=parameters,
+                    data=optional_data,
+                    entry_id=c["task_id"],
+                )
             all_entries.append(entry)
 
         return all_entries
@@ -353,7 +386,7 @@ class QueryEngine:
                 for el, amt in crit.items():
                     parsed_crit["{}.{}".format(self.aliases[key], el)] = amt
                 parsed_crit["nelements"] = len(crit)
-                parsed_crit['pretty_formula'] = comp.reduced_formula
+                parsed_crit["pretty_formula"] = comp.reduced_formula
             elif key in ["$or", "$and"]:
                 parsed_crit[key] = [self._parse_criteria(m) for m in crit]
             else:
@@ -361,12 +394,10 @@ class QueryEngine:
         return parsed_crit
 
     def ensure_index(self, key, unique=False):
-        """Wrapper for pymongo.Collection.ensure_index
-        """
+        """Wrapper for pymongo.Collection.ensure_index"""
         return self.collection.ensure_index(key, unique=unique)
 
-    def query(self, properties=None, criteria=None, distinct_key=None,
-              **kwargs):
+    def query(self, properties=None, criteria=None, distinct_key=None, **kwargs):
         """
         Convenience method for database access.  All properties and criteria
         can be specified using simplified names defined in Aliases.  You can
@@ -448,8 +479,7 @@ class QueryEngine:
         return props, prop_dict
 
     def query_one(self, *args, **kwargs):
-        """Return first document from :meth:`query`, with same parameters.
-        """
+        """Return first document from :meth:`query`, with same parameters."""
         for r in self.query(*args, **kwargs):
             return r
         return None
@@ -465,20 +495,21 @@ class QueryEngine:
                 Whether to obtain the final or initial structure. Defaults to
                 True.
         """
-        args = {'task_id': task_id}
-        field = 'output.crystal' if final_structure else 'input.crystal'
+        args = {"task_id": task_id}
+        field = "output.crystal" if final_structure else "input.crystal"
         results = tuple(self.query([field], args))
 
         if len(results) > 1:
-            raise QueryError("More than one result found for task_id {}!".format(task_id))
+            raise QueryError(
+                "More than one result found for task_id {}!".format(task_id)
+            )
         elif len(results) == 0:
             raise QueryError("No structure found for task_id {}!".format(task_id))
         c = results[0]
         return Structure.from_dict(c[field])
 
     def __repr__(self):
-        return "QueryEngine: {}:{}/{}".format(self.host, self.port,
-                                              self.database_name)
+        return "QueryEngine: {}:{}/{}".format(self.host, self.port, self.database_name)
 
     @staticmethod
     def from_config(config_file, use_admin=False):
@@ -500,12 +531,16 @@ class QueryEngine:
         with open(config_file) as f:
             d = json.load(f)
             user = d["admin_user"] if use_admin else d["readonly_user"]
-            password = d["admin_password"] if use_admin \
-                else d["readonly_password"]
+            password = d["admin_password"] if use_admin else d["readonly_password"]
             return QueryEngine(
-                host=d["host"], port=d["port"], database=d["database"],
-                user=user, password=password, collection=d["collection"],
-                aliases_config=d.get("aliases_config", None))
+                host=d["host"],
+                port=d["port"],
+                database=d["database"],
+                user=user,
+                password=password,
+                collection=d["collection"],
+                aliases_config=d.get("aliases_config", None),
+            )
 
     def __getitem__(self, item):
         """Support pymongo.Database syntax db['collection'] to access collections.
@@ -517,14 +552,14 @@ class QueryEngine:
         """
         Overrides the get_dos_from_id for the MIT gridfs format.
         """
-        args = {'task_id': task_id}
-        fields = ['calculations']
+        args = {"task_id": task_id}
+        fields = ["calculations"]
         structure = self.get_structure_from_id(task_id)
         dosid = None
         for r in self.query(fields, args):
-            dosid = r['calculations'][-1]['dos_fs_id']
+            dosid = r["calculations"][-1]["dos_fs_id"]
         if dosid is not None:
-            self._fs = gridfs.GridFS(self.db, 'dos_fs')
+            self._fs = gridfs.GridFS(self.db, "dos_fs")
             with self._fs.get(dosid) as dosfile:
                 s = dosfile.read()
                 try:
@@ -534,15 +569,15 @@ class QueryEngine:
                     d = json.loads(s.decode("utf-8"))
                 tdos = Dos.from_dict(d)
                 pdoss = {}
-                for i in range(len(d['pdos'])):
-                    ados = d['pdos'][i]
+                for i in range(len(d["pdos"])):
+                    ados = d["pdos"][i]
                     all_ados = {}
                     for j in range(len(ados)):
                         orb = Orbital(j)
                         odos = ados[str(orb)]
-                        all_ados[orb] = {Spin(int(k)): v
-                                         for k, v
-                                         in odos['densities'].items()}
+                        all_ados[orb] = {
+                            Spin(int(k)): v for k, v in odos["densities"].items()
+                        }
                     pdoss[structure[i]] = all_ados
                 return CompleteDos(structure, tdos, pdoss)
         return None
@@ -557,6 +592,7 @@ class QueryResults(Iterable):
     support nearly all cursor like attributes such as count(), explain(),
     hint(), etc. Please see pymongo cursor documentation for details.
     """
+
     def __init__(self, prop_dict, result_cursor, postprocess=None):
         """Constructor.
 
@@ -569,13 +605,13 @@ class QueryResults(Iterable):
         self._prop_dict = prop_dict
         self._pproc = postprocess or []  # make empty values iterable
 
-
     def _wrapper(self, func):
         """
         This function wraps all callable objects returned by self.__getattr__.
         If the result is a cursor, wrap it into a QueryResults object
         so that you can invoke postprocess functions in self._pproc
         """
+
         def wrapped(*args, **kwargs):
             ret_val = func(*args, **kwargs)
             if isinstance(ret_val, pymongo.cursor.Cursor):
@@ -607,10 +643,8 @@ class QueryResults(Iterable):
         """
         return QueryResults(self._prop_dict, cursor, self._pproc)
 
-
     def __len__(self):
-        """Return length as a `count()` on the MongoDB cursor.
-        """
+        """Return length as a `count()` on the MongoDB cursor."""
         return self._results.count()
 
     def __getitem__(self, i):
@@ -620,8 +654,7 @@ class QueryResults(Iterable):
         return self._result_generator()
 
     def _mapped_result(self, r):
-        """Transform/map a result.
-        """
+        """Transform/map a result."""
         # Apply result_post funcs for pulling out sandbox properties
         for func in self._pproc:
             func(r)
@@ -656,8 +689,8 @@ class QueryResults(Iterable):
 
 
 class QueryListResults(QueryResults):
-    """Set of QueryResults on a list instead of a MongoDB cursor.
-    """
+    """Set of QueryResults on a list instead of a MongoDB cursor."""
+
     def clone(self):
         return QueryResults(self._prop_dict, self._results[:])
 
@@ -665,7 +698,7 @@ class QueryListResults(QueryResults):
         """Return length of iterable, as a list if possible; otherwise,
         fall back to the superclass' implementation.
         """
-        if hasattr(self._results, '__len__'):
+        if hasattr(self._results, "__len__"):
             return len(self._results)
         else:
             return QueryResults.__len__(self)
@@ -675,4 +708,5 @@ class QueryError(Exception):
     """
     Exception class for errors occuring during queries.
     """
+
     pass

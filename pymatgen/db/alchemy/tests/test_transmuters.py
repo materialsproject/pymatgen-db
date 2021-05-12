@@ -18,17 +18,18 @@ import os
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
-from pymatgen.transformations.standard_transformations import \
-    SubstitutionTransformation, OxidationStateDecorationTransformation, \
-    PartialRemoveSpecieTransformation
+from pymatgen.transformations.standard_transformations import (
+    SubstitutionTransformation,
+    OxidationStateDecorationTransformation,
+    PartialRemoveSpecieTransformation,
+)
 
 from pymatgen.db.query_engine import QueryEngine
 from pymatgen.db.alchemy.transmuters import QeTransmuter
 from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.db.creator import VaspToDbTaskDrone
 
-test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..",
-                        "test_files")
+test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "test_files")
 
 
 class QeTransmuterTest(unittest.TestCase):
@@ -41,8 +42,9 @@ class QeTransmuterTest(unittest.TestCase):
         try:
             drone = VaspToDbTaskDrone(database="qetransmuter_unittest")
             queen = BorgQueen(drone)
-            queen.serial_assimilate(os.path.join(test_dir, 'db_test',
-                                                 'success_mp_aflow'))
+            queen.serial_assimilate(
+                os.path.join(test_dir, "db_test", "success_mp_aflow")
+            )
             cls.conn = MongoClient()
             cls.qe = QueryEngine(database="qetransmuter_unittest")
         except ConnectionFailure:
@@ -53,19 +55,20 @@ class QeTransmuterTest(unittest.TestCase):
         if QeTransmuterTest.qe is None:
             self.skipTest("No MongoDB present")
         crit = {}
-        trans = [SubstitutionTransformation({"Zn": "Mg"}),
-                 OxidationStateDecorationTransformation(
-                     {"B": 3, "O": -2, "Mg": 2, "Tb":3}),
-                 PartialRemoveSpecieTransformation(
-                     "Mg2+", 0.5,
-                     algo=PartialRemoveSpecieTransformation.ALGO_COMPLETE)]
-        self.qep = QeTransmuter(QeTransmuterTest.qe, crit, trans,
-                                extend_collection=10)
+        trans = [
+            SubstitutionTransformation({"Zn": "Mg"}),
+            OxidationStateDecorationTransformation({"B": 3, "O": -2, "Mg": 2, "Tb": 3}),
+            PartialRemoveSpecieTransformation(
+                "Mg2+", 0.5, algo=PartialRemoveSpecieTransformation.ALGO_COMPLETE
+            ),
+        ]
+        self.qep = QeTransmuter(QeTransmuterTest.qe, crit, trans, extend_collection=10)
         trans_structures = self.qep.transformed_structures
         self.assertEqual(len(trans_structures), 3)
         for s in trans_structures:
-            self.assertEqual(s.final_structure.composition.reduced_formula,
-                             "Tb2Mg(BO2)10")
+            self.assertEqual(
+                s.final_structure.composition.reduced_formula, "Tb2Mg(BO2)10"
+            )
 
     @classmethod
     def tearDownClass(cls):

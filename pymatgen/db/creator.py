@@ -26,8 +26,7 @@ from pymatgen.apps.borg.hive import AbstractDrone
 from pymatgen.analysis.local_env import VoronoiNN
 from pymatgen.core.structure import Structure
 from pymatgen.core.composition import Composition
-from pymatgen.io.vasp import Vasprun, Incar, Kpoints, Potcar, Poscar, \
-    Outcar, Oszicar
+from pymatgen.io.vasp import Vasprun, Incar, Kpoints, Potcar, Poscar, Outcar, Oszicar
 from pymatgen.io.cif import CifWriter
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from pymatgen.analysis.bond_valence import BVAnalyzer
@@ -70,11 +69,24 @@ class VaspToDbTaskDrone(AbstractDrone):
     # Version of this db creator document.
     __version__ = "2.0.0"
 
-    def __init__(self, host="127.0.0.1", port=27017, database="vasp",
-                 user=None, password=None, collection="tasks",
-                 parse_dos=False, compress_dos=False,parse_projected_eigen=False,
-                 simulate_mode=False, additional_fields=None, update_duplicates=True,
-                 mapi_key=None, use_full_uri=True, runs=None):
+    def __init__(
+        self,
+        host="127.0.0.1",
+        port=27017,
+        database="vasp",
+        user=None,
+        password=None,
+        collection="tasks",
+        parse_dos=False,
+        compress_dos=False,
+        parse_projected_eigen=False,
+        simulate_mode=False,
+        additional_fields=None,
+        update_duplicates=True,
+        mapi_key=None,
+        use_full_uri=True,
+        runs=None,
+    ):
         """Constructor.
 
         Args:
@@ -100,7 +112,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 be parsed.
             parse_projected_eigen:
                 Whether to parse the element and orbital projections. Options are True,
-                False, and 'final'; Defaults to False. If True, projections will be 
+                False, and 'final'; Defaults to False. If True, projections will be
                 parsed for each calculation. If 'final', projections for only the last
                 calculation will be parsed.
             compress_dos:
@@ -145,10 +157,10 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.collection = collection
         self.port = port
         self.simulate = simulate_mode
-        if isinstance(parse_dos, str) and parse_dos != 'final':
-            raise ValueError('Invalid value for parse_dos')
-        if isinstance(parse_projected_eigen, str) and parse_projected_eigen != 'final':
-            raise ValueError('Invalid value for parse_projected_eigen')
+        if isinstance(parse_dos, str) and parse_dos != "final":
+            raise ValueError("Invalid value for parse_dos")
+        if isinstance(parse_projected_eigen, str) and parse_projected_eigen != "final":
+            raise ValueError("Invalid value for parse_projected_eigen")
         self.parse_projected_eigen = parse_projected_eigen
         self.parse_dos = parse_dos
         self.compress_dos = compress_dos
@@ -182,18 +194,19 @@ class VaspToDbTaskDrone(AbstractDrone):
             return tid
         except Exception as ex:
             import traceback
+
             logger.error(traceback.format_exc())
             return False
 
     def calculate_stability(self, d):
         m = MPRester(self.mapi_key)
         functional = d["pseudo_potential"]["functional"]
-        syms = ["{} {}".format(functional, l)
-                for l in d["pseudo_potential"]["labels"]]
-        entry = ComputedEntry(Composition(d["unit_cell_formula"]),
-                              d["output"]["final_energy"],
-                              parameters={"hubbards": d["hubbards"],
-                                          "potcar_symbols": syms})
+        syms = ["{} {}".format(functional, l) for l in d["pseudo_potential"]["labels"]]
+        entry = ComputedEntry(
+            Composition(d["unit_cell_formula"]),
+            d["output"]["final_energy"],
+            parameters={"hubbards": d["hubbards"], "potcar_symbols": syms},
+        )
         data = m.get_stability([entry])[0]
         for k in ("e_above_hull", "decomposes_to"):
             d["analysis"][k] = data[k]
@@ -206,31 +219,31 @@ class VaspToDbTaskDrone(AbstractDrone):
         files = os.listdir(path)
         vasprun_files = OrderedDict()
         if "STOPCAR" in files:
-            #Stopped runs. Try to parse as much as possible.
+            # Stopped runs. Try to parse as much as possible.
             logger.info(path + " contains stopped run")
         for r in self.runs:
-            if r in files: #try subfolder schema
+            if r in files:  # try subfolder schema
                 for f in os.listdir(os.path.join(path, r)):
                     if fnmatch(f, "vasprun.xml*"):
                         vasprun_files[r] = os.path.join(r, f)
-            else: #try extension schema
+            else:  # try extension schema
                 for f in files:
                     if fnmatch(f, "vasprun.xml.{}*".format(r)):
                         vasprun_files[r] = f
         if len(vasprun_files) == 0:
-            for f in files: #get any vasprun from the folder
-                if fnmatch(f, "vasprun.xml*") and \
-                        f not in vasprun_files.values():
-                    vasprun_files['standard'] = f
+            for f in files:  # get any vasprun from the folder
+                if fnmatch(f, "vasprun.xml*") and f not in vasprun_files.values():
+                    vasprun_files["standard"] = f
 
         if len(vasprun_files) > 0:
             d = self.generate_doc(path, vasprun_files)
             if not d:
                 d = self.process_killed_run(path)
             self.post_process(path, d)
-        elif (not (path.endswith("relax1") or
-              path.endswith("relax2"))) and contains_vasp_input(path):
-            #If not Materials Project style, process as a killed run.
+        elif (
+            not (path.endswith("relax1") or path.endswith("relax2"))
+        ) and contains_vasp_input(path):
+            # If not Materials Project style, process as a killed run.
             logger.warning(path + " contains killed run")
             d = self.process_killed_run(path)
             self.post_process(path, d)
@@ -253,16 +266,16 @@ class VaspToDbTaskDrone(AbstractDrone):
             # Insert dos data into gridfs and then remove it from the dict.
             # DOS data tends to be above the 4Mb limit for mongo docs. A ref
             # to the dos file is in the dos_fs_id.
-            result = coll.find_one({"dir_name": d["dir_name"]},
-                                   ["dir_name", "task_id"])
+            result = coll.find_one({"dir_name": d["dir_name"]}, ["dir_name", "task_id"])
             if result is None or self.update_duplicates:
                 if self.parse_dos and "calculations" in d:
                     for calc in d["calculations"]:
                         if "dos" in calc:
                             dos = json.dumps(calc["dos"], cls=MontyEncoder)
                             if self.compress_dos:
-                                dos = zlib.compress(dos.encode('utf-8'),
-                                                    self.compress_dos)
+                                dos = zlib.compress(
+                                    dos.encode("utf-8"), self.compress_dos
+                                )
                                 calc["dos_compression"] = "zlib"
                             fs = gridfs.GridFS(db, "dos_fs")
                             dosid = fs.put(dos)
@@ -273,26 +286,33 @@ class VaspToDbTaskDrone(AbstractDrone):
                 if result is None:
                     if ("task_id" not in d) or (not d["task_id"]):
                         result = db.counter.find_one_and_update(
-                            filter={"_id": "taskid"},
-                            update={"$inc": {"c": 1}}
-                            )
+                            filter={"_id": "taskid"}, update={"$inc": {"c": 1}}
+                        )
                         d["task_id"] = result["c"]
-                    logger.info("Inserting {} with taskid = {}"
-                                .format(d["dir_name"], d["task_id"]))
+                    logger.info(
+                        "Inserting {} with taskid = {}".format(
+                            d["dir_name"], d["task_id"]
+                        )
+                    )
                 elif self.update_duplicates:
                     d["task_id"] = result["task_id"]
-                    logger.info("Updating {} with taskid = {}"
-                                .format(d["dir_name"], d["task_id"]))
+                    logger.info(
+                        "Updating {} with taskid = {}".format(
+                            d["dir_name"], d["task_id"]
+                        )
+                    )
 
-                coll.update_one({"dir_name": d["dir_name"]}, {"$set": d},
-                                upsert=True)
+                coll.update_one({"dir_name": d["dir_name"]}, {"$set": d}, upsert=True)
                 return d["task_id"]
             else:
                 logger.info("Skipping duplicate {}".format(d["dir_name"]))
         else:
             d["task_id"] = 0
-            logger.info("Simulated insert into database for {} with task_id {}"
-                        .format(d["dir_name"], d["task_id"]))
+            logger.info(
+                "Simulated insert into database for {} with task_id {}".format(
+                    d["dir_name"], d["task_id"]
+                )
+            )
             return d
 
     def post_process(self, dir_name, d):
@@ -322,13 +342,11 @@ class VaspToDbTaskDrone(AbstractDrone):
             with zopen(filenames[0], "rt") as f:
                 transformations = json.load(f)
                 try:
-                    m = re.match("(\d+)-ICSD",
-                                 transformations["history"][0]["source"])
+                    m = re.match("(\d+)-ICSD", transformations["history"][0]["source"])
                     if m:
                         d["icsd_id"] = int(m.group(1))
                 except Exception as ex:
-                    logger.warning("Cannot parse ICSD from transformations "
-                                   "file.")
+                    logger.warning("Cannot parse ICSD from transformations " "file.")
                     pass
         else:
             logger.warning("Transformations file does not exist.")
@@ -365,8 +383,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             for filename in glob.glob(os.path.join(fullpath, "OUTCAR*")):
                 outcar = Outcar(filename)
                 i = 1 if re.search("relax2", filename) else 0
-                taskname = "relax2" if re.search("relax2", filename) else \
-                    "relax1"
+                taskname = "relax2" if re.search("relax2", filename) else "relax1"
                 d["calculations"][i]["output"]["outcar"] = outcar.as_dict()
                 run_stats[taskname] = outcar.run_stats
         except:
@@ -374,17 +391,20 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         try:
             overall_run_stats = {}
-            for key in ["Total CPU time used (sec)", "User time (sec)",
-                        "System time (sec)", "Elapsed time (sec)"]:
-                overall_run_stats[key] = sum([v[key]
-                                              for v in run_stats.values()])
+            for key in [
+                "Total CPU time used (sec)",
+                "User time (sec)",
+                "System time (sec)",
+                "Elapsed time (sec)",
+            ]:
+                overall_run_stats[key] = sum([v[key] for v in run_stats.values()])
             run_stats["overall"] = overall_run_stats
         except:
             logger.error("Bad run stats for {}.".format(fullpath))
 
         d["run_stats"] = run_stats
 
-        #Convert to full uri path.
+        # Convert to full uri path.
         if self.use_full_uri:
             d["dir_name"] = get_uri(dir_name)
 
@@ -424,57 +444,69 @@ class VaspToDbTaskDrone(AbstractDrone):
                         d["run_type"] = "GGA"
                 except Exception as ex:
                     print(str(ex))
-                    logger.error("Unable to parse INCAR for killed run {}."
-                                 .format(dir_name))
+                    logger.error(
+                        "Unable to parse INCAR for killed run {}.".format(dir_name)
+                    )
             elif fnmatch(f, "KPOINTS*"):
                 try:
                     kpoints = Kpoints.from_file(filename)
                     d["kpoints"] = kpoints.as_dict()
                 except:
-                    logger.error("Unable to parse KPOINTS for killed run {}."
-                                 .format(dir_name))
+                    logger.error(
+                        "Unable to parse KPOINTS for killed run {}.".format(dir_name)
+                    )
             elif fnmatch(f, "POSCAR*"):
                 try:
                     s = Poscar.from_file(filename).structure
                     comp = s.composition
                     el_amt = s.composition.get_el_amt_dict()
-                    d.update({"unit_cell_formula": comp.as_dict(),
-                              "reduced_cell_formula": comp.to_reduced_dict,
-                              "elements": list(el_amt.keys()),
-                              "nelements": len(el_amt),
-                              "pretty_formula": comp.reduced_formula,
-                              "anonymous_formula": comp.anonymized_formula,
-                              "nsites": comp.num_atoms,
-                              "chemsys": "-".join(sorted(el_amt.keys()))})
+                    d.update(
+                        {
+                            "unit_cell_formula": comp.as_dict(),
+                            "reduced_cell_formula": comp.to_reduced_dict,
+                            "elements": list(el_amt.keys()),
+                            "nelements": len(el_amt),
+                            "pretty_formula": comp.reduced_formula,
+                            "anonymous_formula": comp.anonymized_formula,
+                            "nsites": comp.num_atoms,
+                            "chemsys": "-".join(sorted(el_amt.keys())),
+                        }
+                    )
                     d["poscar"] = s.as_dict()
                 except:
-                    logger.error("Unable to parse POSCAR for killed run {}."
-                                 .format(dir_name))
+                    logger.error(
+                        "Unable to parse POSCAR for killed run {}.".format(dir_name)
+                    )
             elif fnmatch(f, "POTCAR*"):
                 try:
                     potcar = Potcar.from_file(filename)
                     d["pseudo_potential"] = {
                         "functional": potcar.functional.lower(),
                         "pot_type": "paw",
-                        "labels": potcar.symbols}
+                        "labels": potcar.symbols,
+                    }
                 except:
-                    logger.error("Unable to parse POTCAR for killed run in {}."
-                                 .format(dir_name))
+                    logger.error(
+                        "Unable to parse POTCAR for killed run in {}.".format(dir_name)
+                    )
             elif fnmatch(f, "OSZICAR"):
                 try:
-                    d["oszicar"]["root"] = \
-                        Oszicar(os.path.join(dir_name, f)).as_dict()
+                    d["oszicar"]["root"] = Oszicar(os.path.join(dir_name, f)).as_dict()
                 except:
-                    logger.error("Unable to parse OSZICAR for killed run in {}."
-                                 .format(dir_name))
+                    logger.error(
+                        "Unable to parse OSZICAR for killed run in {}.".format(dir_name)
+                    )
             elif re.match("relax\d", f):
                 if os.path.exists(os.path.join(dir_name, f, "OSZICAR")):
                     try:
                         d["oszicar"][f] = Oszicar(
-                            os.path.join(dir_name, f, "OSZICAR")).as_dict()
+                            os.path.join(dir_name, f, "OSZICAR")
+                        ).as_dict()
                     except:
-                        logger.error("Unable to parse OSZICAR for killed "
-                                     "run in {}.".format(dir_name))
+                        logger.error(
+                            "Unable to parse OSZICAR for killed "
+                            "run in {}.".format(dir_name)
+                        )
         return d
 
     def process_vasprun(self, dir_name, taskname, filename):
@@ -482,26 +514,27 @@ class VaspToDbTaskDrone(AbstractDrone):
         Process a vasprun.xml file.
         """
         vasprun_file = os.path.join(dir_name, filename)
-        if self.parse_projected_eigen and (self.parse_projected_eigen != 'final' or \
-                             taskname == self.runs[-1]):
+        if self.parse_projected_eigen and (
+            self.parse_projected_eigen != "final" or taskname == self.runs[-1]
+        ):
             parse_projected_eigen = True
         else:
             parse_projected_eigen = False
-        r = Vasprun(vasprun_file,parse_projected_eigen=parse_projected_eigen)
+        r = Vasprun(vasprun_file, parse_projected_eigen=parse_projected_eigen)
         d = r.as_dict()
         d["dir_name"] = os.path.abspath(dir_name)
-        d["completed_at"] = \
-            str(datetime.datetime.fromtimestamp(os.path.getmtime(
-                vasprun_file)))
+        d["completed_at"] = str(
+            datetime.datetime.fromtimestamp(os.path.getmtime(vasprun_file))
+        )
         d["cif"] = str(CifWriter(r.final_structure))
         d["density"] = r.final_structure.density
-        if self.parse_dos and (self.parse_dos != 'final' \
-                               or taskname == self.runs[-1]):
+        if self.parse_dos and (self.parse_dos != "final" or taskname == self.runs[-1]):
             try:
                 d["dos"] = r.complete_dos.as_dict()
             except Exception:
-                logger.warning("No valid dos data exist in {}.\n Skipping dos"
-                               .format(dir_name))
+                logger.warning(
+                    "No valid dos data exist in {}.\n Skipping dos".format(dir_name)
+                )
         if taskname == "relax1" or taskname == "relax2":
             d["task"] = {"type": "aflow", "name": taskname}
         else:
@@ -524,15 +557,26 @@ class VaspToDbTaskDrone(AbstractDrone):
             d["schema_version"] = VaspToDbTaskDrone.__version__
             d["calculations"] = [
                 self.process_vasprun(dir_name, taskname, filename)
-                for taskname, filename in vasprun_files.items()]
+                for taskname, filename in vasprun_files.items()
+            ]
             d1 = d["calculations"][0]
             d2 = d["calculations"][-1]
 
             # Now map some useful info to the root level.
-            for root_key in ["completed_at", "nsites", "unit_cell_formula",
-                             "reduced_cell_formula", "pretty_formula",
-                             "elements", "nelements", "cif", "density",
-                             "is_hubbard", "hubbards", "run_type"]:
+            for root_key in [
+                "completed_at",
+                "nsites",
+                "unit_cell_formula",
+                "reduced_cell_formula",
+                "pretty_formula",
+                "elements",
+                "nelements",
+                "cif",
+                "density",
+                "is_hubbard",
+                "hubbards",
+                "run_type",
+            ]:
                 d[root_key] = d2[root_key]
             d["chemsys"] = "-".join(sorted(d2["elements"]))
 
@@ -540,48 +584,60 @@ class VaspToDbTaskDrone(AbstractDrone):
             xc = d2["input"]["incar"].get("GGA")
             if xc:
                 xc = xc.upper()
-            d["input"] = {"crystal": d1["input"]["crystal"],
-                          "is_lasph": d2["input"]["incar"].get("LASPH", False),
-                          "potcar_spec": d1["input"].get("potcar_spec"),
-                          "xc_override": xc}
+            d["input"] = {
+                "crystal": d1["input"]["crystal"],
+                "is_lasph": d2["input"]["incar"].get("LASPH", False),
+                "potcar_spec": d1["input"].get("potcar_spec"),
+                "xc_override": xc,
+            }
             vals = sorted(d2["reduced_cell_formula"].values())
-            d["anonymous_formula"] = {string.ascii_uppercase[i]: float(vals[i])
-                                      for i in range(len(vals))}
+            d["anonymous_formula"] = {
+                string.ascii_uppercase[i]: float(vals[i]) for i in range(len(vals))
+            }
             d["output"] = {
                 "crystal": d2["output"]["crystal"],
                 "final_energy": d2["output"]["final_energy"],
-                "final_energy_per_atom": d2["output"]["final_energy_per_atom"]}
+                "final_energy_per_atom": d2["output"]["final_energy_per_atom"],
+            }
             d["name"] = "aflow"
             p = d2["input"]["potcar_type"][0].split("_")
             pot_type = p[0]
             functional = "lda" if len(pot_type) == 1 else "_".join(p[1:])
-            d["pseudo_potential"] = {"functional": functional.lower(),
-                                     "pot_type": pot_type.lower(),
-                                     "labels": d2["input"]["potcar"]}
-            if len(d["calculations"]) == len(self.runs) or \
-                    list(vasprun_files.keys())[0] != "relax1":
-                d["state"] = "successful" if d2["has_vasp_completed"] \
-                    else "unsuccessful"
+            d["pseudo_potential"] = {
+                "functional": functional.lower(),
+                "pot_type": pot_type.lower(),
+                "labels": d2["input"]["potcar"],
+            }
+            if (
+                len(d["calculations"]) == len(self.runs)
+                or list(vasprun_files.keys())[0] != "relax1"
+            ):
+                d["state"] = (
+                    "successful" if d2["has_vasp_completed"] else "unsuccessful"
+                )
             else:
                 d["state"] = "stopped"
             d["analysis"] = get_basic_analysis_and_error_checks(d)
 
-            sg = SpacegroupAnalyzer(Structure.from_dict(d["output"]["crystal"]),
-                                    0.1)
-            d["spacegroup"] = {"symbol": sg.get_space_group_symbol(),
-                               "number": sg.get_space_group_number(),
-                               "point_group": sg.get_point_group_symbol(),
-                               "source": "spglib",
-                               "crystal_system": sg.get_crystal_system(),
-                               "hall": sg.get_hall()}
+            sg = SpacegroupAnalyzer(Structure.from_dict(d["output"]["crystal"]), 0.1)
+            d["spacegroup"] = {
+                "symbol": sg.get_space_group_symbol(),
+                "number": sg.get_space_group_number(),
+                "point_group": sg.get_point_group_symbol(),
+                "source": "spglib",
+                "crystal_system": sg.get_crystal_system(),
+                "hall": sg.get_hall(),
+            }
             d["oxide_type"] = d2["oxide_type"]
             d["last_updated"] = datetime.datetime.today()
             return d
         except Exception as ex:
             import traceback
+
             print(traceback.format_exc())
-            logger.error("Error in " + os.path.abspath(dir_name) +
-                         ".\n" + traceback.format_exc())
+            logger.error(
+                "Error in " + os.path.abspath(dir_name) + ".\n" + traceback.format_exc()
+            )
 
             return None
 
@@ -599,8 +655,10 @@ class VaspToDbTaskDrone(AbstractDrone):
         (parent, subdirs, files) = path
         if set(self.runs).intersection(subdirs):
             return [parent]
-        if not any([parent.endswith(os.sep + r) for r in self.runs]) and \
-                len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0:
+        if (
+            not any([parent.endswith(os.sep + r) for r in self.runs])
+            and len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0
+        ):
             return [parent]
         return []
 
@@ -615,21 +673,29 @@ class VaspToDbTaskDrone(AbstractDrone):
         return cls(**d["init_args"])
 
     def as_dict(self):
-        init_args = {"host": self.host, "port": self.port,
-                     "database": self.database, "user": self.user,
-                     "password": self.password,
-                     "collection": self.collection,
-                     "parse_dos": self.parse_dos,
-                     "simulate_mode": self.simulate,
-                     "additional_fields": self.additional_fields,
-                     "update_duplicates": self.update_duplicates}
-        output = {"name": self.__class__.__name__,
-                  "init_args": init_args, "version": __version__}
+        init_args = {
+            "host": self.host,
+            "port": self.port,
+            "database": self.database,
+            "user": self.user,
+            "password": self.password,
+            "collection": self.collection,
+            "parse_dos": self.parse_dos,
+            "simulate_mode": self.simulate,
+            "additional_fields": self.additional_fields,
+            "update_duplicates": self.update_duplicates,
+        }
+        output = {
+            "name": self.__class__.__name__,
+            "init_args": init_args,
+            "version": __version__,
+        }
         return output
 
 
-def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5,
-                                        volume_change_threshold=0.2):
+def get_basic_analysis_and_error_checks(
+    d, max_force_threshold=0.5, volume_change_threshold=0.2
+):
 
     initial_vol = d["input"]["crystal"]["lattice"]["volume"]
     final_vol = d["output"]["crystal"]["lattice"]["volume"]
@@ -646,30 +712,34 @@ def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5,
     error_msgs = []
 
     if abs(percent_delta_vol) > volume_change_threshold:
-        warning_msgs.append("Volume change > {}%"
-                            .format(volume_change_threshold * 100))
+        warning_msgs.append("Volume change > {}%".format(volume_change_threshold * 100))
 
     bv_struct = Structure.from_dict(d["output"]["crystal"])
     try:
         bva = BVAnalyzer()
         bv_struct = bva.get_oxi_state_decorated_structure(bv_struct)
     except ValueError as e:
-        logger.error("Valence cannot be determined due to {e}."
-                     .format(e=e))
+        logger.error("Valence cannot be determined due to {e}.".format(e=e))
     except Exception as ex:
         logger.error("BVAnalyzer error {e}.".format(e=str(ex)))
 
     max_force = None
-    if d["state"] == "successful" and \
-            d["calculations"][0]["input"]["parameters"].get("NSW", 0) > 0:
+    if (
+        d["state"] == "successful"
+        and d["calculations"][0]["input"]["parameters"].get("NSW", 0) > 0
+    ):
         # handle the max force and max force error
-        max_force = max([np.linalg.norm(a)
-                        for a in d["calculations"][-1]["output"]
-                        ["ionic_steps"][-1]["forces"]])
+        max_force = max(
+            [
+                np.linalg.norm(a)
+                for a in d["calculations"][-1]["output"]["ionic_steps"][-1]["forces"]
+            ]
+        )
 
         if max_force > max_force_threshold:
-            error_msgs.append("Final max force exceeds {} eV"
-                              .format(max_force_threshold))
+            error_msgs.append(
+                "Final max force exceeds {} eV".format(max_force_threshold)
+            )
             d["state"] = "error"
 
         s = Structure.from_dict(d["output"]["crystal"])
@@ -677,15 +747,19 @@ def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5,
             error_msgs.append("Bad structure (atoms are too close!)")
             d["state"] = "error"
 
-    return {"delta_volume": delta_vol,
-            "max_force": max_force,
-            "percent_delta_volume": percent_delta_vol,
-            "warnings": warning_msgs,
-            "errors": error_msgs,
-            "coordination_numbers": coord_num,
-            "bandgap": gap, "cbm": cbm, "vbm": vbm,
-            "is_gap_direct": is_direct,
-            "bv_structure": bv_struct.as_dict()}
+    return {
+        "delta_volume": delta_vol,
+        "max_force": max_force,
+        "percent_delta_volume": percent_delta_vol,
+        "warnings": warning_msgs,
+        "errors": error_msgs,
+        "coordination_numbers": coord_num,
+        "bandgap": gap,
+        "cbm": cbm,
+        "vbm": vbm,
+        "is_gap_direct": is_direct,
+        "bv_structure": bv_struct.as_dict(),
+    }
 
 
 def contains_vasp_input(dir_name):
@@ -701,8 +775,9 @@ def contains_vasp_input(dir_name):
         KPOINTS and POTCAR).
     """
     for f in ["INCAR", "POSCAR", "POTCAR", "KPOINTS"]:
-        if not os.path.exists(os.path.join(dir_name, f)) and \
-                not os.path.exists(os.path.join(dir_name, f + ".orig")):
+        if not os.path.exists(os.path.join(dir_name, f)) and not os.path.exists(
+            os.path.join(dir_name, f + ".orig")
+        ):
             return False
     return True
 

@@ -1,14 +1,16 @@
 """
 Common utility functions for the database functions
 """
-__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
-__date__ = '11/4/13'
+__author__ = "Dan Gunter <dkgunter@lbl.gov>"
+__date__ = "11/4/13"
 
 ## Imports
 import logging
 import matgendb
+
 # Stdlib
 import os
+
 # Local
 from pymatgen.db.util import csv_dict, csv_list
 
@@ -29,8 +31,8 @@ def get_test_dir(name=None):
     :rtype: str
     """
 
-    subdir = name + '_test'
-    return os.path.join(_top_dir, '..', 'test_files', subdir)
+    subdir = name + "_test"
+    return os.path.join(_top_dir, "..", "test_files", subdir)
 
 
 def get_schema_dir(db_version=1):
@@ -42,7 +44,7 @@ def get_schema_dir(db_version=1):
     :rtype: str
     """
     v = str(db_version)
-    return os.path.join(_top_dir, '..', 'schemata', 'versions', v)
+    return os.path.join(_top_dir, "..", "schemata", "versions", v)
 
 
 def get_schema_file(db_version=1, db="mg_core", collection="materials"):
@@ -63,6 +65,7 @@ def get_schema_file(db_version=1, db="mg_core", collection="materials"):
     f = open(os.path.join(d, schemafile), "r")
     return f
 
+
 def get_builder_log(name):
     """Get a logging object, in the right place in the
     hierarchy, for a given builder.
@@ -73,5 +76,3 @@ def get_builder_log(name):
     :rtype: logging.Logger
     """
     return logging.getLogger("mg.builders." + name)
-
-
