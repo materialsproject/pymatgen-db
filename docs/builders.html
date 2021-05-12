@@ -1,19 +1,17 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Database “Builders” &#8212; pymatgen-db 2019.3.28 documentation</title>
-    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database “Builders” &#8212; pymatgen-db 2021.5.12 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,7 +45,8 @@
         <li class="right" >
           <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2019.3.28 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2021.5.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Database “Builders”</a></li> 
       </ul>
     </div>  
 
@@ -70,23 +69,27 @@ to perform extract-transform-load (ETL) operations with MongoDB.</p>
 <p>The code presented here can be found in the directory
 <cite>matgendb/builders/examples</cite> in the source code distribution.</p>
 <div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
+<p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#database-builders" id="id1">Database “Builders”</a><ul>
-<li><a class="reference internal" href="#features" id="id2">Features</a><ul>
-<li><a class="reference internal" href="#parallel-building" id="id3">Parallel building</a></li>
-<li><a class="reference internal" href="#incremental-building" id="id4">Incremental building</a></li>
+<li><p><a class="reference internal" href="#database-builders" id="id1">Database “Builders”</a></p>
+<ul>
+<li><p><a class="reference internal" href="#features" id="id2">Features</a></p>
+<ul>
+<li><p><a class="reference internal" href="#parallel-building" id="id3">Parallel building</a></p></li>
+<li><p><a class="reference internal" href="#incremental-building" id="id4">Incremental building</a></p></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#writing-a-builder" id="id5">Writing a builder</a><ul>
-<li><a class="reference internal" href="#simple-filecounter-builder" id="id6">Simple “FileCounter” builder</a></li>
-<li><a class="reference internal" href="#database-copybuilder" id="id7">Database “CopyBuilder”</a></li>
-<li><a class="reference internal" href="#incremental-builder-maxvaluebuilder" id="id8">Incremental builder “MaxValueBuilder”</a></li>
+<li><p><a class="reference internal" href="#writing-a-builder" id="id5">Writing a builder</a></p>
+<ul>
+<li><p><a class="reference internal" href="#simple-filecounter-builder" id="id6">Simple “FileCounter” builder</a></p></li>
+<li><p><a class="reference internal" href="#database-copybuilder" id="id7">Database “CopyBuilder”</a></p></li>
+<li><p><a class="reference internal" href="#incremental-builder-maxvaluebuilder" id="id8">Incremental builder “MaxValueBuilder”</a></p></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#running-a-builder" id="id9">Running a builder</a><ul>
-<li><a class="reference internal" href="#displaying-builder-usage" id="id10">Displaying builder usage</a></li>
-<li><a class="reference internal" href="#running-the-builder" id="id11">Running the builder</a></li>
+<li><p><a class="reference internal" href="#running-a-builder" id="id9">Running a builder</a></p>
+<ul>
+<li><p><a class="reference internal" href="#displaying-builder-usage" id="id10">Displaying builder usage</a></p></li>
+<li><p><a class="reference internal" href="#running-the-builder" id="id11">Running the builder</a></p></li>
 </ul>
 </li>
 </ul>
@@ -134,11 +137,11 @@ and a <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref
 <p>The first builder simply reads from a file, and counts the lines in that file.
 In this section we’ll show the whole program, then walk through it one section
 at a time:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="kn">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -160,11 +163,11 @@ at a time:</p>
 </pre></div>
 </div>
 <p><strong>Initialization</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="k">import</span> <span class="n">Builder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="kn">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
@@ -205,8 +208,8 @@ function could have been a one-liner “return open(input_file).readlines()”).
 <p>Here the instance variable <code class="docutils literal notranslate"><span class="pre">num_lines</span></code> is simply incremented for every
 line passed to it by the <code class="docutils literal notranslate"><span class="pre">get_items()</span></code> iterator.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Updating instance variables
+<p class="admonition-title">Warning</p>
+<p>Updating instance variables
 will cause improper behavior if the user runs the builder in parallel.
 This occurs because the parallel mode automatically starts multiple
 copies of the same class, and their independent actions will clash.
@@ -235,15 +238,15 @@ The next example will show MongoDB access and other features.</p>
 <p>The next builder does a simple DB operation: copying one MongoDB collection
 from a source to a destination. As before, we begin with the full program
 and then step through it one snippet at at time:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">util</span>
-<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="k">import</span> <span class="n">QueryEngine</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
 
 <span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">CopyBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Copy from one MongoDB collection to another.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -277,7 +280,7 @@ and then step through it one snippet at at time:</p>
 For convenience, the <code class="docutils literal notranslate"><span class="pre">util.get_builder_log()</span></code> method creates a new
 Python logging.Logger instance with a standard name and format.</p>
 <p><strong>Initialization</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
@@ -326,8 +329,8 @@ method has to do is to use the QueryEngine object. In this case,
 this means creating a cursor that iterates over the source collection
 and remembering the target collection in an instance variable.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Unlike the previous example where instance variables might cause
+<p class="admonition-title">Note</p>
+<p>Unlike the previous example where instance variables might cause
 strange behavior, here the <code class="docutils literal notranslate"><span class="pre">_target_coll</span></code> instance variable is
 perfectly fine for parallel execution because the individual
 builder instances do not want to share the state of this variable
@@ -366,26 +369,26 @@ distinct group in A: the group name, and the highest value for that group.</p>
 <p>For the sake of this example we will use the following algorithm to
 rebuild B from A when A gets new elements A<sub>new</sub>.</p>
 <ol class="arabic simple">
-<li>For each record present in A<sub>new</sub>:</li>
+<li><p>For each record present in A<sub>new</sub>:</p></li>
 </ol>
 <blockquote>
 <div><ul class="simple">
-<li>Get its group, <cite>g</cite></li>
-<li>If <cite>g</cite> is not seen, figure out current maximum (if any) from all records in A</li>
-<li>Update maximum for <cite>g</cite>, in memory, with value for record</li>
+<li><p>Get its group, <cite>g</cite></p></li>
+<li><p>If <cite>g</cite> is not seen, figure out current maximum (if any) from all records in A</p></li>
+<li><p>Update maximum for <cite>g</cite>, in memory, with value for record</p></li>
 </ul>
 </div></blockquote>
 <ol class="arabic simple" start="2">
-<li>After all records in A<sub>new</sub> are processed, set new group maximums in B
-from values stored in memory.</li>
+<li><p>After all records in A<sub>new</sub> are processed, set new group maximums in B
+from values stored in memory.</p></li>
 </ol>
 <p>This algorithm is incremental in the sense that it ignores
 any groups that are not in the new elements A<sub>new</sub>, yet non-trivial
 because in order to calculate the new maximum value one needs to examine
 all the elements in A:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">core</span>
-<span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="k">import</span> <span class="n">util</span>
-<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="k">import</span> <span class="n">QueryEngine</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
 
 <span class="k">class</span> <span class="nc">MaxValueBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
@@ -517,8 +520,8 @@ once you have written a builder class, you can use <cite>mgbuild</cite> to run
 it, possibly in parallel and possibly “incrementally”, on some inputs.</p>
 <p>We will break this process into two parts:</p>
 <ul class="simple">
-<li><a class="reference internal" href="#bld-run-show"><span class="std std-ref">Displaying</span></a> the usage for a given builder class</li>
-<li><a class="reference internal" href="#bld-run-exe"><span class="std std-ref">Running</span></a> the builder</li>
+<li><p><a class="reference internal" href="#bld-run-show"><span class="std std-ref">Displaying</span></a> the usage for a given builder class</p></li>
+<li><p><a class="reference internal" href="#bld-run-exe"><span class="std std-ref">Running</span></a> the builder</p></li>
 </ul>
 <p>Both of these use the <cite>mgbuild</cite> sub-command “run” (alternatively: “build”),
 like this:</p>
@@ -543,8 +546,8 @@ by giving its full module path, and the <code class="docutils literal notranslat
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">You will also get the usage information if you invoke the builder with the
+<p class="admonition-title">Note</p>
+<p>You will also get the usage information if you invoke the builder with the
 wrong number of arguments (e.g. zero), although in this case you will also
 see some error messages.</p>
 </div>
@@ -612,8 +615,8 @@ real work, you will probably benefit by running in parallel:</p>
 <p>The same command as previously, but with <strong>-n 8</strong> added to cause 8 parallel
 threads to be spawned to run the copy in parallel.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">For parallel runs, only the <code class="docutils literal notranslate"><span class="pre">process_item()</span></code> method is run in parallel.
+<p class="admonition-title">Note</p>
+<p>For parallel runs, only the <code class="docutils literal notranslate"><span class="pre">process_item()</span></code> method is run in parallel.
 The <code class="docutils literal notranslate"><span class="pre">get_items()</span></code> is always run sequentially.</p>
 </div>
 </div>
@@ -676,6 +679,7 @@ in the source collection.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -723,17 +727,15 @@ in the source collection.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

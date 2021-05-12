@@ -1,19 +1,17 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Pymatgen-db &#8212; pymatgen-db 2019.3.28 documentation</title>
-    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pymatgen-db &#8212; pymatgen-db 2021.5.12 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -43,7 +41,8 @@
         <li class="right" >
           <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">pymatgen-db 2019.3.28 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">pymatgen-db 2021.5.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Pymatgen-db</a></li> 
       </ul>
     </div>  
 
@@ -76,20 +75,20 @@ translation of MongoDB docs to useful pymatgen objects for analysis purposes.</p
 <div class="section" id="v2018-3-28">
 <h2>v2018.3.28<a class="headerlink" href="#v2018-3-28" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li>Improved handling of nested db dicts. (Donny Winston)</li>
+<li><p>Improved handling of nested db dicts. (Donny Winston)</p></li>
 </ol>
 </div>
 <div class="section" id="v2018-2-21">
 <h2>v2018.2.21<a class="headerlink" href="#v2018-2-21" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li>Fix –tag option in mgdb to support multiple tags.</li>
+<li><p>Fix –tag option in mgdb to support multiple tags.</p></li>
 </ol>
 </div>
 <div class="section" id="v2018-1-4">
 <h2>v2018.1.4<a class="headerlink" href="#v2018-1-4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Date based versioning in line with pymatgen.</li>
-<li>Fix deprecated code.</li>
+<li><p>Date based versioning in line with pymatgen.</p></li>
+<li><p>Fix deprecated code.</p></li>
 </ul>
 </div>
 </div>
@@ -129,13 +128,13 @@ testing. After cloning the source, you can type:</p>
 install pymatgen-db using easy_install or pip. Otherwise, these packages should
 be available on <a class="reference external" href="http://pypi.python.org">PyPI</a>.</p>
 <ol class="arabic simple">
-<li>Python 2.7+ required. New default modules such as json are used, as well as
-new unittest features in Python 2.7.</li>
-<li>pymatgen 2.5+, including all dependencies associated with it. Please refer
+<li><p>Python 2.7+ required. New default modules such as json are used, as well as
+new unittest features in Python 2.7.</p></li>
+<li><p>pymatgen 2.5+, including all dependencies associated with it. Please refer
 to the <a class="reference external" href="http://pymatgen.org">pymatgen docs</a> for detailed
-installation instructions.</li>
-<li>pymongo 2.4+: For interfacing with MongoDb.</li>
-<li>MongoDB 2.2+: Get it at the <a class="reference external" href="http://www.mongodb.org/">MongoDB</a> website.</li>
+installation instructions.</p></li>
+<li><p>pymongo 2.4+: For interfacing with MongoDb.</p></li>
+<li><p>MongoDB 2.2+: Get it at the <a class="reference external" href="http://www.mongodb.org/">MongoDB</a> website.</p></li>
 </ol>
 </div>
 <div class="section" id="usage">
@@ -163,8 +162,8 @@ following commands:</p>
 done with testing, you can simply press Ctrl-C to stop the server and delete
 the “test_db” folder.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Running a Mongo server this way is insecure as Mongo does not enable
+<p class="admonition-title">Note</p>
+<p>Running a Mongo server this way is insecure as Mongo does not enable
 authentication by default. Please refer to the <a class="reference external" href="http://docs.mongodb.org/manual/">MongoDB manual</a> when
 setting up your production database.</p>
 </div>
@@ -212,7 +211,7 @@ postprocessing and analysis).</p>
 <p>For more advanced queries, you can use the
 <code class="xref py py-class docutils literal notranslate"><span class="pre">matgendb.query_engine.QueryEngine</span></code> class for which a default
 alias is provided at the root package. Some examples are as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matgendb</span> <span class="k">import</span> <span class="n">QueryEngine</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matgendb</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qe</span> <span class="o">=</span> <span class="n">QueryEngine</span><span class="p">()</span>
 
 <span class="go">#Print the task id and formula of all entries in the database.</span>
@@ -257,11 +256,12 @@ methods. They are available at the link below.</p>
 <p>If you use pymatgen and pymatgen-db in your research, please consider citing
 the following work:</p>
 <blockquote>
-<div>Shyue Ping Ong, William Davidson Richards, Anubhav Jain, Geoffroy Hautier,
+<div><p>Shyue Ping Ong, William Davidson Richards, Anubhav Jain, Geoffroy Hautier,
 Michael Kocher, Shreyas Cholia, Dan Gunter, Vincent Chevrier, Kristin A.
 Persson, Gerbrand Ceder. <em>Python Materials Genomics (pymatgen) : A Robust,
 Open-Source Python Library for Materials Analysis.</em> Computational
-Materials Science, 2013, 68, 314-319. <a class="reference external" href="http://dx.doi.org/10.1016/j.commatsci.2012.10.028">doi:10.1016/j.commatsci.2012.10.028</a></div></blockquote>
+Materials Science, 2013, 68, 314-319. <a class="reference external" href="http://dx.doi.org/10.1016/j.commatsci.2012.10.028">doi:10.1016/j.commatsci.2012.10.028</a></p>
+</div></blockquote>
 </div>
 <div class="section" id="license">
 <h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
@@ -293,13 +293,14 @@ follows:</p>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -349,17 +350,15 @@ follows:</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

@@ -13,7 +13,7 @@ with open("README.rst") as f:
 setup(
     name="pymatgen-db",
     packages=find_packages(),
-    version="2019.3.28",
+    version="2021.5.12",
     setup_requires=["numpy"],
     install_requires=["pymatgen>=4.4.9", "monty>=0.9.6", "pymongo>=2.8", "smoqe"],
     extras_require={
