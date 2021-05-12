@@ -6,7 +6,6 @@ __date__ = "11/4/13"
 
 ## Imports
 import logging
-import matgendb
 
 # Stdlib
 import os
