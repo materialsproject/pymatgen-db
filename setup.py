@@ -5,17 +5,17 @@
 import os
 from io import open
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 with open("README.rst") as f:
     long_desc = f.read()
 
 setup(
     name="pymatgen-db",
-    packages=find_packages(),
+    packages=find_namespace_packages(include=["pymatgen.*"]),
     version="2021.5.12",
     setup_requires=["numpy"],
-    install_requires=["pymatgen>=4.4.9", "monty>=0.9.6", "pymongo>=2.8", "smoqe"],
+    install_requires=["pymatgen>=2022.0.3", "monty>=0.9.6", "pymongo>=2.8", "smoqe"],
     extras_require={
         'tests': 'mongomock'
     },
@@ -33,9 +33,8 @@ setup(
               "structure", "mongo"],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",

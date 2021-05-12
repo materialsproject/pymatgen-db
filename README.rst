@@ -10,33 +10,9 @@ Getting pymatgen-db
 Stable version
 --------------
 
-The version at the Python Package Index (PyPI) is always the latest stable
-release that will be hopefully, be relatively bug-free. The easiest way to
-install pymatgen-db on any system is to use easy_install or pip, as follows::
-
-    easy_install pymatgen-db
-
-or::
+The easiest way to install pymatgen-db on any system is to use pip, as follows::
 
     pip install pymatgen-db
-
-Developmental version
----------------------
-
-The bleeding edge developmental version is at the pymatgen-db's `Github repo
-<https://github.com/materialsproject/pymatgen-db>`_. The developmental
-version is likely to be more buggy, but may contain new features. The
-Github version include test files as well for complete unit testing. After
-cloning the source, you can type::
-
-    python setup.py install
-
-or to install the package in developmental mode::
-
-    python setup.py develop
-
-The version number is in the file `VERSION` in the same directory as this
-README.
 
 Requirements
 ============
@@ -45,8 +21,8 @@ All required python dependencies should be automatically taken care of if you
 install pymatgen-db using easy_install or pip. Otherwise, these packages should
 be available on `PyPI <http://pypi.python.org>`_.
 
-1. Python 2.7+ or 3.5+ required.
-2. Pymatgen 4+, including all dependencies associated with it. Please refer
+1. Python 3.7+ required.
+2. Pymatgen 2022+, including all dependencies associated with it. Please refer
    to the `pymatgen docs <http://pythonhosted.org//pymatgen>`_ for detailed
    installation instructions.
 3. Pymongo 3.3+: For interfacing with MongoDb.
