@@ -4,6 +4,12 @@ Project-style `MongoDB`_ databases for management of materials data. A query
 engine is also provided to enable the easy translation of MongoDB docs to
 useful pymatgen objects for analysis purposes.
 
+Major change
+------------
+
+From v2021.5.13, pymatgen-db is now a proper namespace add-on to pymatgen. In
+other words, you no longer import from matgendb but rather pymatgen.db.
+
 Getting pymatgen-db
 ===================
 

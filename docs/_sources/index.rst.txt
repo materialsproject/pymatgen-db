@@ -21,19 +21,7 @@ Other pages
 Change Log
 ==========
 
-v2018.3.28
-----------
-1. Improved handling of nested db dicts. (Donny Winston)
-
-
-v2018.2.21
-----------
-1. Fix --tag option in mgdb to support multiple tags.
-
-v2018.1.4
----------
-* Date based versioning in line with pymatgen.
-* Fix deprecated code.
+:doc:`Change log </change_log>`
 
 Getting pymatgen-db
 ===================
