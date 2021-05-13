@@ -25,7 +25,7 @@ from pymatgen.db.builders.incr import CollectionTracker
 _log = logging.getLogger("pymatgen.db.tests")
 
 TEST_FILES_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    os.path.dirname(os.path.abspath(__file__)),
     "..", "..", "..", "test_files",
 )
 

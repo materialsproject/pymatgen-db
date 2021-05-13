@@ -10,6 +10,7 @@ from pymatgen.db.tests import common
 
 has_mongo = common.has_mongo()
 
+test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "test_files")
 
 class QueryResultsTest(unittest.TestCase):
     def setUp(self):
@@ -20,7 +21,7 @@ class QueryResultsTest(unittest.TestCase):
             self.coll_name = "tasks_{}".format(uuid.uuid4())
             self.coll = self.db[self.coll_name]
             with open(
-                os.path.join(common.TEST_FILES_DIR, "db_test", "GaLa.task.json")
+                os.path.join(test_dir, "db_test", "GaLa.task.json")
             ) as f:
                 doc = bson.json_util.loads(f.read())
                 self.coll.insert_one(doc)
