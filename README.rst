@@ -104,7 +104,7 @@ The mgdb script allows you to make simple queries from the command line::
 For more advanced queries, you can use the QueryEngine class for which an
 alias is provided at the root package. Some examples are as follows::
 
-    >>> from matgendb import QueryEngine
+    >>> from pymatgen.db import QueryEngine
     # Depending on your db.json, you may need to supply keyword args below
     # for `port`, `database`, `collection`, etc.
     >>> qe = QueryEngine()
