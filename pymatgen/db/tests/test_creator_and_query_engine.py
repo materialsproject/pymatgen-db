@@ -28,7 +28,7 @@ __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Jun 19, 2012"
 
-test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "test_files")
+test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "test_files")
 
 has_mongo = common.has_mongo()
 

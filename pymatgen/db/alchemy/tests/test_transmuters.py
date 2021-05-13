@@ -29,7 +29,7 @@ from pymatgen.db.alchemy.transmuters import QeTransmuter
 from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.db.creator import VaspToDbTaskDrone
 
-test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "test_files")
+test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "test_files")
 
 
 class QeTransmuterTest(unittest.TestCase):
