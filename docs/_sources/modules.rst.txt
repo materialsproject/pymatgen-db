@@ -1,7 +1,7 @@
-matgendb
+pymatgen
 ========
 
 .. toctree::
    :maxdepth: 6
 
-   matgendb
+   pymatgen

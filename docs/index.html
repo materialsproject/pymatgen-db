@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pymatgen-db &#8212; pymatgen-db 2021.5.12 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -65,7 +65,7 @@ translation of MongoDB docs to useful pymatgen objects for analysis purposes.</p
 <li class="toctree-l1"><a class="reference internal" href="mgvv.html">Validation and verification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="builders.html">Building databases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dbconfig.html">Configuration file format</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matgendb.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pymatgen.db.html">API Reference</a></li>
 </ul>
 </div>
 </div>
@@ -209,9 +209,9 @@ postprocessing and analysis).</p>
 </div>
 <p>The format of the configuration file <cite>db.json</cite> is given <a class="reference internal" href="dbconfig.html"><span class="doc">on this page</span></a>.</p>
 <p>For more advanced queries, you can use the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">matgendb.query_engine.QueryEngine</span></code> class for which a default
+<a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine" title="pymatgen.db.query_engine.QueryEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.query_engine.QueryEngine</span></code></a> class for which a default
 alias is provided at the root package. Some examples are as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matgendb</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pymatgen.db</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">qe</span> <span class="o">=</span> <span class="n">QueryEngine</span><span class="p">()</span>
 
 <span class="go">#Print the task id and formula of all entries in the database.</span>
@@ -238,9 +238,9 @@ ComputedEntries.</p>
 it is perfectly extensible to any kind of data, e.g., other kinds of VASP runs
 (bandstructure, NEB, etc.) or just any form of data in general. Developers
 looking to adapt pymatgen-db for other purposes should look at the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">matgendb.creator.VaspToDbTaskDrone</span></code> class as an example and write
+<a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone" title="pymatgen.db.creator.VaspToDbTaskDrone"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.creator.VaspToDbTaskDrone</span></code></a> class as an example and write
 similar drones for their needs. The
-<code class="xref py py-class docutils literal notranslate"><span class="pre">matgendb.query_engine.QueryEngine</span></code> can generally be applied to any
+<a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine" title="pymatgen.db.query_engine.QueryEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.query_engine.QueryEngine</span></code></a> can generally be applied to any
 Mongo collection, with suitable specification of aliases if desired.</p>
 </div>
 </div>
@@ -249,7 +249,7 @@ Mongo collection, with suitable specification of aliases if desired.</p>
 <p>The API docs are generated using Sphinx auto-doc and outlines the purpose of all
 modules and classes, and the expected argument and returned objects for most
 methods. They are available at the link below.</p>
-<p><a class="reference internal" href="matgendb.html"><span class="doc">pymatgen-db API docs</span></a></p>
+<p><a class="reference internal" href="pymatgen.db.html"><span class="doc">pymatgen-db API docs</span></a></p>
 </div>
 <div class="section" id="how-to-cite-pymatgen-db">
 <h1>How to cite pymatgen-db<a class="headerlink" href="#how-to-cite-pymatgen-db" title="Permalink to this headline">¶</a></h1>
@@ -365,7 +365,7 @@ follows:</p>
     </div>
 
     <div class="footer">
-      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+      &copy; Copyright 2016, Shyue Ping Ong, Dan Gunter.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

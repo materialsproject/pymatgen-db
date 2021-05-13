@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Database “Builders” &#8212; pymatgen-db 2021.5.12 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -59,7 +59,7 @@
 <span id="builders"></span><h1><a class="toc-backref" href="#id1">Database “Builders”</a><a class="headerlink" href="#database-builders" title="Permalink to this headline">¶</a></h1>
 <p>The Materials Project relies on MongoDB databases. The common parts of the
 process of creating these databases from either files or other MongoDB databases
-are encapsulated in the <code class="docutils literal notranslate"><span class="pre">matgendb.builders</span></code> subpackage, and in the
+are encapsulated in the <code class="docutils literal notranslate"><span class="pre">pymatgen.db.builders</span></code> subpackage, and in the
 <code class="docutils literal notranslate"><span class="pre">mgbuild</span></code> command-line script. This package and script
 comprise a lightweight framework that is meant to
 automate, simplify, and ultimately streamline the process of creating databases.
@@ -67,7 +67,7 @@ All the code and
 methods are general-purpose, and thus could be useful to <em>any</em> project that needs
 to perform extract-transform-load (ETL) operations with MongoDB.</p>
 <p>The code presented here can be found in the directory
-<cite>matgendb/builders/examples</cite> in the source code distribution.</p>
+<cite>pymatgen.db/builders/examples</cite> in the source code distribution.</p>
 <div class="contents topic" id="contents">
 <p class="topic-title">Contents</p>
 <ul class="simple">
@@ -125,8 +125,8 @@ full (non-incremental) build is shown below.</p>
 <div class="section" id="writing-a-builder">
 <span id="bld-writing"></span><h2><a class="toc-backref" href="#id5">Writing a builder</a><a class="headerlink" href="#writing-a-builder" title="Permalink to this headline">¶</a></h2>
 <p>To write a builder, you must create a Python class that inherits from
-<cite>matgendb.builders.core.Builder</cite>
-(see the <a class="reference internal" href="matgendb.builders.html"><span class="doc">matgendb.builders</span></a> package)
+<cite>pymatgen.db.builders.core.Builder</cite>
+(see the <a class="reference internal" href="pymatgen.db.builders.html"><span class="doc">pymatgen.db.builders</span></a> package)
 and implement a few methods on this class
 to perform the specific work for your builder. In this section we will
 give two example builders: a simple <a class="reference internal" href="#bld-ex-filecounter"><span class="std std-ref">FileCounter</span></a> builder
@@ -137,7 +137,7 @@ and a <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref
 <p>The first builder simply reads from a file, and counts the lines in that file.
 In this section we’ll show the whole program, then walk through it one section
 at a time:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="kn">import</span> <span class="n">Builder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.db.builders.core</span> <span class="kn">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -163,7 +163,7 @@ at a time:</p>
 </pre></div>
 </div>
 <p><strong>Initialization</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders.core</span> <span class="kn">import</span> <span class="n">Builder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.db.builders.core</span> <span class="kn">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -172,7 +172,7 @@ at a time:</p>
         <span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The class inherits from the <code class="docutils literal notranslate"><span class="pre">matgendb.core.Builder</span></code> class. In this case, it includes
+<p>The class inherits from the <code class="docutils literal notranslate"><span class="pre">pymatgen.db.core.Builder</span></code> class. In this case, it includes
 a constructor, but this is optional and often not needed. The constructor
 simply initializes the number of lines counter and then calls its parent.</p>
 <p><strong>get_parameters</strong>:</p>
@@ -238,8 +238,8 @@ The next example will show MongoDB access and other features.</p>
 <p>The next builder does a simple DB operation: copying one MongoDB collection
 from a source to a destination. As before, we begin with the full program
 and then step through it one snippet at at time:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">util</span>
-<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.db.builders</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">pymatgen.db.query_engine</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
 
 <span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
 
@@ -323,7 +323,7 @@ that is in the docstring. Notice that the type of both the source and
 target is <code class="docutils literal notranslate"><span class="pre">QueryEngine</span></code>. This is a special datatype that instructs the
 driver program (<cite>mgbuild</cite>) to expect a database configuration file with
 host name, user, password, database name, etc. and to automatically connect
-to this database and return a <code class="docutils literal notranslate"><span class="pre">matgendb.query_engine.QueryEngine</span></code> instance.
+to this database and return a <code class="docutils literal notranslate"><span class="pre">pymatgen.db.query_engine.QueryEngine</span></code> instance.
 These instances are passed in as arguments to the method. So, all the
 method has to do is to use the QueryEngine object. In this case,
 this means creating a cursor that iterates over the source collection
@@ -354,8 +354,8 @@ the copying would automatically work with the incremental mode.</p>
 The central idea of the incremental building implementation is that any builder
 can be run in “incremental mode”. When this happens, any QueryEngine objects
 are replaced transparently by equivalent objects that track their last
-position, of class <code class="xref py py-class docutils literal notranslate"><span class="pre">matgendb.builders.incr.TrackedQueryEngine</span></code>, which is
-documented in module <code class="xref py py-mod docutils literal notranslate"><span class="pre">matgendb.builders.incr</span></code>. This tracking can be
+position, of class <a class="reference internal" href="pymatgen.db.builders.html#pymatgen.db.builders.incr.TrackedQueryEngine" title="pymatgen.db.builders.incr.TrackedQueryEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.incr.TrackedQueryEngine</span></code></a>, which is
+documented in module <a class="reference internal" href="pymatgen.db.builders.html#module-pymatgen.db.builders.incr" title="pymatgen.db.builders.incr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pymatgen.db.builders.incr</span></code></a>. This tracking can be
 controlled, if necessary, with the instance variable <code class="docutils literal notranslate"><span class="pre">tracking</span></code> on the
 TrackedQueryEngine class.</p>
 <p>The <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">Database “CopyBuilder”</span></a> is an example of a trivial builder that can work with
@@ -386,9 +386,9 @@ from values stored in memory.</p></li>
 any groups that are not in the new elements A<sub>new</sub>, yet non-trivial
 because in order to calculate the new maximum value one needs to examine
 all the elements in A:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="kn">import</span> <span class="n">core</span>
-<span class="kn">from</span> <span class="nn">matgendb.builders</span> <span class="kn">import</span> <span class="n">util</span>
-<span class="kn">from</span> <span class="nn">matgendb.query_engine</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.db.builders</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">pymatgen.db.builders</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">pymatgen.db.query_engine</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
 
 <span class="k">class</span> <span class="nc">MaxValueBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
@@ -530,14 +530,14 @@ like this:</p>
 </div>
 <p>In the examples below, we will assume that you have pymatgen-db installed and
 in your Python path. We will use the example modules that are installed
-in <code class="docutils literal notranslate"><span class="pre">matgendb.builders.examples</span></code>.</p>
+in <code class="docutils literal notranslate"><span class="pre">pymatgen.db.builders.examples</span></code>.</p>
 <div class="section" id="displaying-builder-usage">
 <span id="bld-run-show"></span><h3><a class="toc-backref" href="#id10">Displaying builder usage</a><a class="headerlink" href="#displaying-builder-usage" title="Permalink to this headline">¶</a></h3>
 <p>You can get the list of parameters and their types for a given builder
 by giving its full module path, and the <code class="docutils literal notranslate"><span class="pre">-u</span></code> or <code class="docutils literal notranslate"><span class="pre">--usage</span></code> option:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="o">-</span><span class="n">u</span> <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="o">-</span><span class="n">u</span> <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
 
-<span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
+<span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
   <span class="n">Copy</span> <span class="kn">from</span> <span class="nn">one</span> <span class="n">MongoDB</span> <span class="n">collection</span> <span class="n">to</span> <span class="n">another</span><span class="o">.</span>
   <span class="n">Parameters</span><span class="p">:</span>
     <span class="n">crit</span> <span class="p">(</span><span class="nb">dict</span><span class="p">):</span> <span class="n">Filter</span> <span class="n">criteria</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="s2">&quot;{ &#39;flag&#39;: True }&quot;</span><span class="o">.</span>
@@ -588,7 +588,7 @@ walk through from simple to more complex examples.</p>
 <div class="section" id="basic-usage">
 <h4>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h4>
 <p>Run the copy builder:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
 </pre></div>
 </div>
@@ -608,7 +608,7 @@ copy will be run in a single thread.</p>
 <p>Most machines have multiple cores, and hundreds of cores will be common
 in the near future. If your item processing requires any
 real work, you will probably benefit by running in parallel:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> <span class="o">-</span><span class="n">n</span> <span class="mi">8</span>
 </pre></div>
 </div>
@@ -637,7 +637,7 @@ default this field is <cite>_id</cite>, but it is highly recommended to choose a
 collection-specific identifier because <cite>_id</cite> as chosen by the
 client is not always monotonic.</p>
 <p><strong>Basic incremental build</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
     <span class="o">-</span><span class="n">i</span> <span class="n">copy</span>
 </pre></div>
@@ -646,7 +646,7 @@ client is not always monotonic.</p>
 are newer (according to the field, in this case defaulting to <code class="docutils literal notranslate"><span class="pre">_id</span></code>)
 than the last record from the previous run.</p>
 <p><strong>Incremental build with parallelism</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
     <span class="o">-</span><span class="n">n</span> <span class="mi">8</span> <span class="o">-</span><span class="n">i</span> <span class="n">copy</span>
 </pre></div>
@@ -654,7 +654,7 @@ than the last record from the previous run.</p>
 <p>Parallelism is not different with incremental builds. As before, we
 simply add <strong>-n 8</strong> to the command-line.</p>
 <p><strong>Incremental build with custom identifier</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
     <span class="o">-</span><span class="n">i</span> <span class="n">copy</span><span class="p">:</span><span class="n">num</span>
 </pre></div>
@@ -662,7 +662,7 @@ simply add <strong>-n 8</strong> to the command-line.</p>
 <p>This example runs an incremental build with the “copy” operation,
 using the <code class="docutils literal notranslate"><span class="pre">num</span></code> field instead of the default <code class="docutils literal notranslate"><span class="pre">_id</span></code>.</p>
 <p id="bld-incr-skip"><strong>Incremental build skipped for some collections</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">matgendb</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=-</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> \
     <span class="o">-</span><span class="n">i</span> <span class="n">copy</span><span class="p">:</span><span class="n">num</span>
 </pre></div>
@@ -742,7 +742,7 @@ in the source collection.</p>
     </div>
 
     <div class="footer">
-      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+      &copy; Copyright 2016, Shyue Ping Ong, Dan Gunter.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

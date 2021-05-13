@@ -6,9 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2021.5.12 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -85,28 +85,28 @@ equivalent:</p>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-help">
-<span id="cmdoption-mgvv-h"></span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-help" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-help">
+<span id="cmdoption-mgvv-h"></span><code class="sig-name descname"><span class="pre">--help</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">-h</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-help" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>show help message and exit</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-alias">
-<span id="cmdoption-mgvv-a"></span><span class="sig-name descname"><span class="pre">--alias</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-a</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-alias" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-alias">
+<span id="cmdoption-mgvv-a"></span><code class="sig-name descname"><span class="pre">--alias</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">-a</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-alias" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Value is an alias for a field used in a constraint or condition,
 in form alias=name_in_db. This option is repeatable to allow multiple
 aliases.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-collection">
-<span id="cmdoption-mgvv-C"></span><span id="cmdoption-mgvv-c"></span><span class="sig-name descname"><span class="pre">--collection</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-C</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;name&gt;</span></span><a class="headerlink" href="#cmdoption-mgvv-collection" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-collection">
+<span id="cmdoption-mgvv-C"></span><span id="cmdoption-mgvv-c"></span><code class="sig-name descname"><span class="pre">--collection</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">-C</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;name&gt;</span></code><a class="headerlink" href="#cmdoption-mgvv-collection" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Name of collection on which to operate.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-email">
-<span id="cmdoption-mgvv-e"></span><span class="sig-name descname"><span class="pre">--email</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-e</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;file</span> <span class="pre">or</span> <span class="pre">spec&gt;</span></span><a class="headerlink" href="#cmdoption-mgvv-email" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-email">
+<span id="cmdoption-mgvv-e"></span><code class="sig-name descname"><span class="pre">--email</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">-e</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;file</span> <span class="pre">or</span> <span class="pre">spec&gt;</span></code><a class="headerlink" href="#cmdoption-mgvv-email" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Email a report.
@@ -123,22 +123,22 @@ under the “_email” key, which should be a mapping with keys
 <p>See <a class="reference internal" href="#email-config">email-config</a> for an example of the configuration file syntax, which unlike the
 command-line syntax allows for multiple recipients.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-f">
-<span id="cmdoption-mgvv-file"></span><span class="sig-name descname"><span class="pre">-f</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--file</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></span><a class="headerlink" href="#cmdoption-mgvv-f" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-f">
+<span id="cmdoption-mgvv-file"></span><code class="sig-name descname"><span class="pre">-f</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--file</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></code><a class="headerlink" href="#cmdoption-mgvv-f" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Main configuration file. Has constraints, and optionally email configuration
 (see <cite>–email</cite> option).</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-limit">
-<span id="cmdoption-mgvv-m"></span><span class="sig-name descname"><span class="pre">--limit</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;num&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-m</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;num&gt;</span></span><a class="headerlink" href="#cmdoption-mgvv-limit" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-limit">
+<span id="cmdoption-mgvv-m"></span><code class="sig-name descname"><span class="pre">--limit</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;num&gt;</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">-m</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;num&gt;</span></code><a class="headerlink" href="#cmdoption-mgvv-limit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>In output, limit number of displayed validation errors, per collection, to <cite>num</cite>.
 The default is 50. To show as many errors as you can find, use 0.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-format">
-<span id="cmdoption-mgvv-F"></span><span class="sig-name descname"><span class="pre">--format</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;type&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-F</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;type&gt;</span></span><a class="headerlink" href="#cmdoption-mgvv-format" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-format">
+<span id="cmdoption-mgvv-F"></span><code class="sig-name descname"><span class="pre">--format</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;type&gt;</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">-F</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;type&gt;</span></code><a class="headerlink" href="#cmdoption-mgvv-format" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Use the specified report type to format and send the validation output.
@@ -154,14 +154,14 @@ to read from the console.</p>
 </dd>
 </dl>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-0">
-<span id="cmdoption-mgvv-config"></span><span class="sig-name descname"><span class="pre">-c</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--config</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></span><a class="headerlink" href="#cmdoption-mgvv-0" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-0">
+<span id="cmdoption-mgvv-config"></span><code class="sig-name descname"><span class="pre">-c</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--config</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></code><a class="headerlink" href="#cmdoption-mgvv-0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Configuration file for database connection. Generate one using <cite>mgdb init –config filename.json</cite>, if necessary. Otherwise, the code searches for a db.json.  If none is found, a no-authentication localhost:27017/vasp database is assumed.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-v">
-<span id="cmdoption-mgvv-verbose"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--verbose</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-v" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-v">
+<span id="cmdoption-mgvv-verbose"></span><code class="sig-name descname"><span class="pre">-v</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--verbose</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-v" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Increase log message verbosity. Repeatable. Messages are logged to standard error.</p>
@@ -312,41 +312,41 @@ or <cite>admin_user</cite> and <cite>admin_password</cite>) are required:</p>
 <h2>Options<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>usage: mgvv diff [-h] [–verbose] [-D CONFIG] [-E ADDR] [-f FILE] [-F FORMAT] [-s HOST] [-i INFO] [-k KEY] [-m] [-n EXPR] [-p PROPERTIES] [-P] [-q EXPR] [-u URL] [-V] old new</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-help">
-<span id="cmdoption-mgvv-diff-h"></span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-diff-help" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-help">
+<span id="cmdoption-mgvv-diff-h"></span><code class="sig-name descname"><span class="pre">--help</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">-h</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-help" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>show help message and exit</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-v">
-<span id="cmdoption-mgvv-diff-verbose"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--verbose</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-diff-v" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-v">
+<span id="cmdoption-mgvv-diff-verbose"></span><code class="sig-name descname"><span class="pre">-v</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--verbose</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-v" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Increase log message verbosity. Repeatable. Messages are logged to standard error.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-D">
-<span id="cmdoption-mgvv-diff-d"></span><span id="cmdoption-mgvv-diff-db"></span><span class="sig-name descname"><span class="pre">-D</span></span><span class="sig-prename descclassname"> <span class="pre">CONFIG</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--db</span></span><span class="sig-prename descclassname"> <span class="pre">CONFIG</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-D" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-D">
+<span id="cmdoption-mgvv-diff-d"></span><span id="cmdoption-mgvv-diff-db"></span><code class="sig-name descname"><span class="pre">-D</span></code><code class="sig-prename descclassname"> <span class="pre">CONFIG</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--db</span></code><code class="sig-prename descclassname"> <span class="pre">CONFIG</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-D" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Insert a JSON record of the report in the MongoDB collection pointed to by
 CONFIG, which is a standard pymatgen-db JSON configuration file. Note that
 the target database and collection must be writable.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-E">
-<span id="cmdoption-mgvv-diff-e"></span><span id="cmdoption-mgvv-diff-email"></span><span class="sig-name descname"><span class="pre">-E</span></span><span class="sig-prename descclassname"> <span class="pre">ADDR</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--email</span></span><span class="sig-prename descclassname"> <span class="pre">ADDR</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-E" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-E">
+<span id="cmdoption-mgvv-diff-e"></span><span id="cmdoption-mgvv-diff-email"></span><code class="sig-name descname"><span class="pre">-E</span></code><code class="sig-prename descclassname"> <span class="pre">ADDR</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--email</span></code><code class="sig-prename descclassname"> <span class="pre">ADDR</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-E" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Email report to one or more email addresses. ADDR is a list of the form:
 ‘<code class="docutils literal notranslate"><span class="pre">sender/receiver,[receiver2...][/subject]</span></code>’.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-s">
-<span id="cmdoption-mgvv-diff-email-server"></span><span class="sig-name descname"><span class="pre">-s</span></span><span class="sig-prename descclassname"> <span class="pre">HOST</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--email-server</span></span><span class="sig-prename descclassname"> <span class="pre">HOST</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-s" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-s">
+<span id="cmdoption-mgvv-diff-email-server"></span><code class="sig-name descname"><span class="pre">-s</span></code><code class="sig-prename descclassname"> <span class="pre">HOST</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--email-server</span></code><code class="sig-prename descclassname"> <span class="pre">HOST</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-s" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Server HOST for an email report, in form hostname[:port]. Default is localhost</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-f">
-<span id="cmdoption-mgvv-diff-file"></span><span class="sig-name descname"><span class="pre">-f</span></span><span class="sig-prename descclassname"> <span class="pre">FILE</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--file</span></span><span class="sig-prename descclassname"> <span class="pre">FILE</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-f" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-f">
+<span id="cmdoption-mgvv-diff-file"></span><code class="sig-name descname"><span class="pre">-f</span></code><code class="sig-prename descclassname"> <span class="pre">FILE</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--file</span></code><code class="sig-prename descclassname"> <span class="pre">FILE</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-f" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Read options from FILE instead of command line. File format is YAML (or JSON,
@@ -366,32 +366,32 @@ command-line key/value pair lists become config file mappings.</p>
 </pre></div>
 </div>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-F">
-<span id="cmdoption-mgvv-diff-format"></span><span class="sig-name descname"><span class="pre">-F</span></span><span class="sig-prename descclassname"> <span class="pre">FORMAT</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--format</span></span><span class="sig-prename descclassname"> <span class="pre">FORMAT</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-F" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-F">
+<span id="cmdoption-mgvv-diff-format"></span><code class="sig-name descname"><span class="pre">-F</span></code><code class="sig-prename descclassname"> <span class="pre">FORMAT</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--format</span></code><code class="sig-prename descclassname"> <span class="pre">FORMAT</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-F" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Default report format: ‘text’, ‘html’, or ‘json’. If not given, the format will be determined by the output: text for console, html for email.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-i">
-<span id="cmdoption-mgvv-diff-info"></span><span class="sig-name descname"><span class="pre">-i</span></span><span class="sig-prename descclassname"> <span class="pre">INFO</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--info</span></span><span class="sig-prename descclassname"> <span class="pre">INFO</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-i" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-i">
+<span id="cmdoption-mgvv-diff-info"></span><code class="sig-name descname"><span class="pre">-i</span></code><code class="sig-prename descclassname"> <span class="pre">INFO</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--info</span></code><code class="sig-prename descclassname"> <span class="pre">INFO</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-i" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Extra fields for records, as comma-separated list, e.g ‘<code class="docutils literal notranslate"><span class="pre">extra,fields,to_include</span></code>’.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-k">
-<span id="cmdoption-mgvv-diff-key"></span><span class="sig-name descname"><span class="pre">-k</span></span><span class="sig-prename descclassname"> <span class="pre">KEY</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--key</span></span><span class="sig-prename descclassname"> <span class="pre">KEY</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-k" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-k">
+<span id="cmdoption-mgvv-diff-key"></span><code class="sig-name descname"><span class="pre">-k</span></code><code class="sig-prename descclassname"> <span class="pre">KEY</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--key</span></code><code class="sig-prename descclassname"> <span class="pre">KEY</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-k" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Key for matching records.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-m">
-<span id="cmdoption-mgvv-diff-missing"></span><span class="sig-name descname"><span class="pre">-m</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--missing</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-diff-m" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-m">
+<span id="cmdoption-mgvv-diff-missing"></span><code class="sig-name descname"><span class="pre">-m</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--missing</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-m" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Only report keys that are in the ‘old’ collection, but not in the ‘new’ collection.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-n">
-<span id="cmdoption-mgvv-diff-numeric"></span><span class="sig-name descname"><span class="pre">-n</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--numeric</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-diff-n" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-n">
+<span id="cmdoption-mgvv-diff-numeric"></span><code class="sig-name descname"><span class="pre">-n</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--numeric</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-n" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Fields with numeric values that must match, with a tolerance, as a comma-separated list, e.g.,
@@ -456,20 +456,20 @@ command-line key/value pair lists become config file mappings.</p>
 </ul>
 <p>This option may be combined with any of the other options.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-p">
-<span id="cmdoption-mgvv-diff-properties"></span><span class="sig-name descname"><span class="pre">-p</span></span><span class="sig-prename descclassname"> <span class="pre">PROPS</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--properties</span></span><span class="sig-prename descclassname"> <span class="pre">PROPS</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-p" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-p">
+<span id="cmdoption-mgvv-diff-properties"></span><code class="sig-name descname"><span class="pre">-p</span></code><code class="sig-prename descclassname"> <span class="pre">PROPS</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--properties</span></code><code class="sig-prename descclassname"> <span class="pre">PROPS</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-p" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Fields with properties that must match, as comma-separated list , e.g ‘<code class="docutils literal notranslate"><span class="pre">these_must,match</span></code>’.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-P">
-<span id="cmdoption-mgvv-diff-print"></span><span class="sig-name descname"><span class="pre">-P</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--print</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-diff-P" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-P">
+<span id="cmdoption-mgvv-diff-print"></span><code class="sig-name descname"><span class="pre">-P</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--print</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-mgvv-diff-P" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Print report to the console.</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-q">
-<span id="cmdoption-mgvv-diff-query"></span><span class="sig-name descname"><span class="pre">-q</span></span><span class="sig-prename descclassname"> <span class="pre">EXPR</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--query</span></span><span class="sig-prename descclassname"> <span class="pre">EXPR</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-q" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-q">
+<span id="cmdoption-mgvv-diff-query"></span><code class="sig-name descname"><span class="pre">-q</span></code><code class="sig-prename descclassname"> <span class="pre">EXPR</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--query</span></code><code class="sig-prename descclassname"> <span class="pre">EXPR</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-q" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>Query to filter records before key and value tests.
@@ -478,8 +478,8 @@ Uses simplified constraint syntax, from the <a class="reference external" href="
 </pre></div>
 </div>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-mgvv-diff-u">
-<span id="cmdoption-mgvv-diff-url"></span><span class="sig-name descname"><span class="pre">-u</span></span><span class="sig-prename descclassname"> <span class="pre">URL</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--url</span></span><span class="sig-prename descclassname"> <span class="pre">URL</span></span><a class="headerlink" href="#cmdoption-mgvv-diff-u" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-mgvv-diff-u">
+<span id="cmdoption-mgvv-diff-url"></span><code class="sig-name descname"><span class="pre">-u</span></code><code class="sig-prename descclassname"> <span class="pre">URL</span></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--url</span></code><code class="sig-prename descclassname"> <span class="pre">URL</span></code><a class="headerlink" href="#cmdoption-mgvv-diff-u" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>In HTML reports, make the key into a hyperlink by prefixing with URL.
@@ -610,7 +610,7 @@ text.</p>
     </div>
 
     <div class="footer">
-      &copy; Copyright 2011, Shyue Ping Ong, Dan Gunter.
+      &copy; Copyright 2016, Shyue Ping Ong, Dan Gunter.
     </div>
 <div class="footer">This page uses <a href="http://analytics.google.com/">
 Google Analytics</a> to collect statistics. You can disable it by blocking

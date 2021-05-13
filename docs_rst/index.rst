@@ -16,7 +16,7 @@ Other pages
     Validation and verification <mgvv>
     Building databases <builders>
     Configuration file format <dbconfig>
-    API Reference <matgendb>
+    API Reference <pymatgen.db>
 
 Change Log
 ==========
@@ -162,10 +162,10 @@ The mgdb script allows you to make simple queries from the command line::
 The format of the configuration file `db.json` is given :doc:`on this page <dbconfig>`.
 
 For more advanced queries, you can use the
-:class:`matgendb.query_engine.QueryEngine` class for which a default
+:class:`pymatgen.db.query_engine.QueryEngine` class for which a default
 alias is provided at the root package. Some examples are as follows::
 
-    >>> from matgendb import QueryEngine
+    >>> from pymatgen.db import QueryEngine
     >>> qe = QueryEngine()
 
     #Print the task id and formula of all entries in the database.
@@ -192,9 +192,9 @@ Currently, pymatgen-db is written with standard VASP runs in mind. However,
 it is perfectly extensible to any kind of data, e.g., other kinds of VASP runs
 (bandstructure, NEB, etc.) or just any form of data in general. Developers
 looking to adapt pymatgen-db for other purposes should look at the
-:class:`matgendb.creator.VaspToDbTaskDrone` class as an example and write
+:class:`pymatgen.db.creator.VaspToDbTaskDrone` class as an example and write
 similar drones for their needs. The
-:class:`matgendb.query_engine.QueryEngine` can generally be applied to any
+:class:`pymatgen.db.query_engine.QueryEngine` can generally be applied to any
 Mongo collection, with suitable specification of aliases if desired.
 
 API/Reference Docs
@@ -204,7 +204,7 @@ The API docs are generated using Sphinx auto-doc and outlines the purpose of all
 modules and classes, and the expected argument and returned objects for most
 methods. They are available at the link below.
 
-:doc:`pymatgen-db API docs <matgendb>`
+:doc:`pymatgen-db API docs <pymatgen.db>`
 
 How to cite pymatgen-db
 =======================

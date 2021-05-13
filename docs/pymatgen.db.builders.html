@@ -1,0 +1,1228 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pymatgen.db.builders package &#8212; pymatgen-db 2021.5.12 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pymatgen.db.builders.examples package" href="pymatgen.db.builders.examples.html" />
+    <link rel="prev" title="pymatgen.db.alchemy package" href="pymatgen.db.alchemy.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pymatgen.db.builders.examples.html" title="pymatgen.db.builders.examples package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pymatgen.db.alchemy.html" title="pymatgen.db.alchemy package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2021.5.12 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="pymatgen.db.html" accesskey="U">pymatgen.db package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pymatgen.db.builders package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pymatgen-db-builders-package">
+<h1>pymatgen.db.builders package<a class="headerlink" href="#pymatgen-db-builders-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pymatgen.db.builders.examples.html">pymatgen.db.builders.examples package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pymatgen.db.builders.examples.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pymatgen.db.builders.examples.html#module-pymatgen.db.builders.examples.copy_builder">pymatgen.db.builders.examples.copy_builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pymatgen.db.builders.examples.html#module-pymatgen.db.builders.examples.file_builders">pymatgen.db.builders.examples.file_builders module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pymatgen.db.builders.examples.html#module-pymatgen.db.builders.examples.maxvalue_builder">pymatgen.db.builders.examples.maxvalue_builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pymatgen.db.builders.examples.html#module-pymatgen.db.builders.examples">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pymatgen.db.builders.core">
+<span id="pymatgen-db-builders-core-module"></span><h2>pymatgen.db.builders.core module<a class="headerlink" href="#module-pymatgen.db.builders.core" title="Permalink to this headline">¶</a></h2>
+<p>Shared code for builders.</p>
+<p>For developers implementing a new builder,
+you should inherit from <a class="reference internal" href="#pymatgen.db.builders.core.Builder" title="pymatgen.db.builders.core.Builder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Builder</span></code></a>.</p>
+<dl class="py exception">
+<dt id="pymatgen.db.builders.core.BuildError">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">BuildError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">who</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">why</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#BuildError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.BuildError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.core.Builder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Builder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract base class for all builders</p>
+<p>To implement a new builder, inherit from this class and
+define the <a class="reference internal" href="#pymatgen.db.builders.core.Builder.get_items" title="pymatgen.db.builders.core.Builder.get_items"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_items()</span></code></a> and <a class="reference internal" href="#pymatgen.db.builders.core.Builder.process_item" title="pymatgen.db.builders.core.Builder.process_item"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_item()</span></code></a> methods.
+See the online documentation for details.</p>
+<p>Create new builder for threaded or multiprocess execution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ncores</strong> (<em>int</em>) – Desired number of threads or processes to run</p>
+</dd>
+<dt class="field-even">Raise</dt>
+<dd class="field-even"><p>ValueError for bad ‘config’ arg</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Builder.connect">
+<code class="sig-name descname"><span class="pre">connect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to database with given configuration, which may be a dict or
+a path to a pymatgen-db configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Builder.finalize">
+<code class="sig-name descname"><span class="pre">finalize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">had_errors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder.finalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform any cleanup actions after all items have been processed.
+Subclasses may choose not to implement this, in which case it is a no-op.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>had_errors</strong> (<em>bool</em>) – True if the run itself had errors.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if nothing went wrong, else False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Builder.get_items">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_items</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder.get_items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder.get_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform one-time setup at the top of a run, returning
+an iterator on items to use as input.</p>
+<p>If get_parameters() doesn’t return None, this method is used to
+discover the names and types of this function’s parameters.
+Otherwise, the docstring of this function is used.
+This docstring must use the ‘:’ version of the restructured
+text style. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyBuilder</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :param source: The input porous materials collection</span>
+<span class="sd">    :type source: QueryEngine</span>
+<span class="sd">    :param target: The output materials collection</span>
+<span class="sd">    :type target: QueryEngine</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+</pre></div>
+</div>
+<p>More details on the parameters is in <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_items_parameters()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>iterator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Builder.get_parameters">
+<code class="sig-name descname"><span class="pre">get_parameters</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder.get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return key/value pairs that will be passed to get_items().</p>
+<p>This is an alternative to the use of special docstrings as described
+in <a class="reference internal" href="#pymatgen.db.builders.core.Builder.get_items" title="pymatgen.db.builders.core.Builder.get_items"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_items()</span></code></a>.</p>
+<p>If the type of the argument is ‘QueryEngine’, then the driver program
+will add options for, and create, a pymatgen.db.query_engine.QueryEngine
+instance. The value given for this argument will be interpreted as
+the MongoDB collection name.</p>
+<p>Some other basic Python types – list, dict, int, float – are
+automatically parsed. If an empty value is supplied for these, then
+None will be passed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>{‘param_name’: {‘type’: ‘param_type’, ‘desc’:’description’},
+‘param2_name’: {‘type’: ‘param2_type’, ‘desc’:’descr2’}, ..}</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Builder.process_item">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">process_item</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder.process_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder.process_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement the analysis for each item of work here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>item</strong> (<em>object</em>) – One item of work from the queue (i.e., one item from the iterator that
+was returned by the <cite>setup</cite> method).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Status code, 0 for OK</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Builder.run">
+<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the builder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_kw</strong> (<em>dict</em>) – keywords from user</p></li>
+<li><p><strong>build_kw</strong> (<em>dict</em>) – internal settings</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of items processed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Builder.shared_dict">
+<code class="sig-name descname"><span class="pre">shared_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder.shared_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder.shared_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get dict that can be shared between parallel processes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Builder.shared_list">
+<code class="sig-name descname"><span class="pre">shared_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Builder.shared_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Builder.shared_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list that can be shared between parallel processes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.core.BuilderStatus">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">BuilderStatus</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#BuilderStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Status of a Builder object run.</p>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.core.BuilderStatus.FAILURE">
+<code class="sig-name descname"><span class="pre">FAILURE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">-1</span></em><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus.FAILURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.core.BuilderStatus.RUNNING">
+<code class="sig-name descname"><span class="pre">RUNNING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus.RUNNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.core.BuilderStatus.SUCCESS">
+<code class="sig-name descname"><span class="pre">SUCCESS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus.SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.core.BuilderStatus.WAIT">
+<code class="sig-name descname"><span class="pre">WAIT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus.WAIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.BuilderStatus.fail">
+<code class="sig-name descname"><span class="pre">fail</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#BuilderStatus.fail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set state of a single process or thread to ‘failure’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>i</strong> – Index of process or thread.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.BuilderStatus.has_failures">
+<code class="sig-name descname"><span class="pre">has_failures</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#BuilderStatus.has_failures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus.has_failures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether there are any failures in the states.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.BuilderStatus.running">
+<code class="sig-name descname"><span class="pre">running</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#BuilderStatus.running"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus.running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set state of a single process or thread to ‘running’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>i</strong> – Index of process or thread.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.BuilderStatus.success">
+<code class="sig-name descname"><span class="pre">success</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#BuilderStatus.success"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.BuilderStatus.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set state of a single process or thread to ‘success’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>i</strong> – Index of process or thread.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.core.Collections">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Collections</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Collections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Collections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Interface to normalized names for collections.</p>
+<p>After initialization with a MongoDB database and optional parameters,
+you can access collections in <cite>known_collections</cite> as attributes.</p>
+<p>Set collections from database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>dict-like object</em>) – MongoDB database, but really anything that acts like a dict. If None, it will be ignored.</p></li>
+<li><p><strong>version</strong> (<em>int</em>) – Version of naming scheme for the collections</p></li>
+<li><p><strong>prefix</strong> (<em>str</em>) – Prefix string to put before collection names, e.g. “dahn”. Full
+collection name will be &lt;prefix&gt;.&lt;name&gt;; don’t include ‘.’ in the input.</p></li>
+<li><p><strong>task_suffix</strong> (<em>str</em>) – Add this suffix to the tasks collection. Used for merged collections for sandboxes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raise</dt>
+<dd class="field-even"><p>ValueError if <cite>version</cite> is not known</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.core.Collections.MAX_VER">
+<code class="sig-name descname"><span class="pre">MAX_VER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#pymatgen.db.builders.core.Collections.MAX_VER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.core.Collections.MIN_VER">
+<code class="sig-name descname"><span class="pre">MIN_VER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#pymatgen.db.builders.core.Collections.MIN_VER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Collections.database">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">database</span></code><a class="headerlink" href="#pymatgen.db.builders.core.Collections.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current database object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current database object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.Collections.get_collection_name">
+<code class="sig-name descname"><span class="pre">get_collection_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alias</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#Collections.get_collection_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.Collections.get_collection_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.core.Collections.known_collections">
+<code class="sig-name descname"><span class="pre">known_collections</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['tasks',</span> <span class="pre">'materials',</span> <span class="pre">'diffraction_patterns',</span> <span class="pre">'electrodes',</span> <span class="pre">'conversion_electrodes',</span> <span class="pre">'bandstructures',</span> <span class="pre">'icsd',</span> <span class="pre">'phase_diagrams',</span> <span class="pre">'brototypes',</span> <span class="pre">'electronic_structure']</span></em><a class="headerlink" href="#pymatgen.db.builders.core.Collections.known_collections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection names that are accessible as attributes
+of an instance of this class</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.core.HasExamples">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">HasExamples</span></code><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#HasExamples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.HasExamples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Mix-in class for checking the output of a builder.</p>
+<p>This is a way to get some static checking of the schema of inserted documents,
+without imposing the burden of schema-checking every single document.
+The check is static in the sense that it will only be run by the unit tests.</p>
+<blockquote>
+<div><p>See the</p>
+</div></blockquote>
+<p><cite>pymatpro.db.builders.test.test_porous_builder</cite> module for an example of
+how to use this to perform unit tests.</p>
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.HasExamples.examples">
+<code class="sig-name descname"><span class="pre">examples</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#HasExamples.examples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.HasExamples.examples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return example document(s) for collection(s).</p>
+<p>This must be implemented in subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of pairs (doc, collection_name)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list(dict,str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.HasExamples.validate_examples">
+<code class="sig-name descname"><span class="pre">validate_examples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fail_fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#HasExamples.validate_examples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.HasExamples.validate_examples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the examples against the schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fail_fn</strong> (<em>function</em><em>(</em><em>str</em><em>)</em>) – Pass failure messages to this function</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.core.ProcRunner">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">ProcRunner</span></code><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#ProcRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.ProcRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is a work-around to the limitation of multiprocessing that the
+function executed in the new module cannot be a method of a class.
+We simply set the instance (self) into the class before forking each
+process, and the class’ method calls the instance method for us.</p>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.core.ProcRunner.instance">
+<code class="sig-name descname"><span class="pre">instance</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.builders.core.ProcRunner.instance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.core.ProcRunner.run">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#ProcRunner.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.ProcRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.core.alphadump">
+<code class="sig-name descname"><span class="pre">alphadump</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#alphadump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.alphadump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump a dict to a str,
+with keys in alphabetical order.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.core.merge_tasks">
+<code class="sig-name descname"><span class="pre">merge_tasks</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core_collections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sandbox_collections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_tasks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#merge_tasks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.merge_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge core and sandbox collections into a temporary collection in the sandbox.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>core_collections</strong> (<a class="reference internal" href="#pymatgen.db.builders.core.Collections" title="pymatgen.db.builders.core.Collections"><em>Collections</em></a>) – Core collection info</p></li>
+<li><p><strong>sandbox_collections</strong> (<a class="reference internal" href="#pymatgen.db.builders.core.Collections" title="pymatgen.db.builders.core.Collections"><em>Collections</em></a>) – Sandbox collection info</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.core.parse_fn_docstring">
+<code class="sig-name descname"><span class="pre">parse_fn_docstring</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/core.html#parse_fn_docstring"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.core.parse_fn_docstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameter and return types from function’s docstring.</p>
+<p>Docstrings must use this format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">:</span><span class="n">param</span> <span class="n">foo</span><span class="p">:</span> <span class="n">What</span> <span class="ow">is</span> <span class="n">foo</span>
+<span class="p">:</span><span class="nb">type</span> <span class="n">foo</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">:</span><span class="k">return</span><span class="p">:</span> <span class="n">What</span> <span class="ow">is</span> <span class="n">returned</span>
+<span class="p">:</span><span class="n">rtype</span><span class="p">:</span> <span class="n">double</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A map of names, each with keys ‘type’ and ‘desc’.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymatgen.db.builders.incr">
+<span id="pymatgen-db-builders-incr-module"></span><h2>pymatgen.db.builders.incr module<a class="headerlink" href="#module-pymatgen.db.builders.incr" title="Permalink to this headline">¶</a></h2>
+<p>Incremental builders.</p>
+<p>## High-level API ##</p>
+<p>The main class is TrackedQueryEngine. Usage example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.db.builders.incr</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">qe</span> <span class="o">=</span> <span class="n">TrackedQueryEngine</span><span class="p">(</span><span class="n">track_operation</span><span class="o">=</span><span class="n">Operation</span><span class="o">.</span><span class="n">copy</span><span class="p">,</span>
+                        <span class="n">track_field</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="o">...</span><span class="n">other</span> <span class="n">kw</span><span class="o">...</span><span class="p">)</span>
+<span class="c1"># That&#39;s it! Use as you normally would.</span>
+<span class="c1"># The collection &#39;inside&#39; the qe will be tracked, so</span>
+<span class="c1"># when you are done using the QE instance, you can call either</span>
+<span class="n">qe</span><span class="o">.</span><span class="n">set_mark</span><span class="p">()</span>
+<span class="c1"># or</span>
+<span class="n">qe</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">set_mark</span><span class="p">()</span>
+<span class="c1"># Just be sure not to set the `qe.collection` attribute directly,</span>
+<span class="c1"># always use `qe.collection_name = &quot;new_name&quot; (which calls a setter)`.</span>
+</pre></div>
+</div>
+<p>## Low-level API ##</p>
+<p>The main classes are Mark and CollectionTracker. Usage example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.db.builders.incr</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">collection</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">MongoClient</span><span class="p">()</span><span class="o">.</span><span class="n">mydb</span><span class="o">.</span><span class="n">mycollection</span>
+<span class="c1"># Init tracker</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">CollectionTracker</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<span class="c1"># Save mark for copy operation</span>
+<span class="n">tracker</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">Mark</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">Operation</span><span class="o">.</span><span class="n">copy</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">))</span>
+<span class="c1"># Retrieve mark for copy operation</span>
+<span class="n">mark</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">Operation</span><span class="o">.</span><span class="n">copy</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+<span class="c1"># Update mark position, and print mark</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mark</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt id="pymatgen.db.builders.incr.CollectionTracker">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">CollectionTracker</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#CollectionTracker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.CollectionTracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Track which records are ‘new’ in a MongoDB collection
+with respect to a given operation.</p>
+<p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coll</strong> (<em>pymongo.collection.Collection</em>) – Collection to track</p></li>
+<li><p><strong>create</strong> (<em>bool</em>) – Create tracking collection, if not present. Otherwise the tracking
+collection can be manually created with <a class="reference internal" href="#pymatgen.db.builders.incr.CollectionTracker.create" title="pymatgen.db.builders.incr.CollectionTracker.create"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create()</span></code></a>, later.
+If the collection is not created, <a class="reference internal" href="#pymatgen.db.builders.incr.CollectionTracker.save" title="pymatgen.db.builders.incr.CollectionTracker.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a> and <a class="reference internal" href="#pymatgen.db.builders.incr.CollectionTracker.retrieve" title="pymatgen.db.builders.incr.CollectionTracker.retrieve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">retrieve()</span></code></a> will
+raise a <cite>NoTrackingCollection</cite> exception.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.incr.CollectionTracker.TRACKING_NAME">
+<code class="sig-name descname"><span class="pre">TRACKING_NAME</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'tracker'</span></em><a class="headerlink" href="#pymatgen.db.builders.incr.CollectionTracker.TRACKING_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sub-collection name, added as “.&lt;TRACKING_NAME&gt;” to the
+name of the target collection to create the tracking collection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.CollectionTracker.create">
+<code class="sig-name descname"><span class="pre">create</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#CollectionTracker.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.CollectionTracker.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create tracking collection.
+Does nothing if tracking collection already exists.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.CollectionTracker.retrieve">
+<code class="sig-name descname"><span class="pre">retrieve</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#CollectionTracker.retrieve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.CollectionTracker.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a position in this collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>operation</strong> (<a class="reference internal" href="#pymatgen.db.builders.incr.Operation" title="pymatgen.db.builders.incr.Operation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a>) – Name of an operation</p></li>
+<li><p><strong>field</strong> (<em>str</em>) – Name of field for sort order</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The position for this operation</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pymatgen.db.builders.incr.Mark" title="pymatgen.db.builders.incr.Mark">Mark</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p>NoTrackingCollection</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.CollectionTracker.save">
+<code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mark</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#CollectionTracker.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.CollectionTracker.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a position in this collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mark</strong> (<a class="reference internal" href="#pymatgen.db.builders.incr.Mark" title="pymatgen.db.builders.incr.Mark"><em>Mark</em></a>) – The position to save</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p>DBError, NoTrackingCollection</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.CollectionTracker.tracking_collection">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tracking_collection</span></code><a class="headerlink" href="#pymatgen.db.builders.incr.CollectionTracker.tracking_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return current tracking collection, or None if it does not exist.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.CollectionTracker.tracking_collection_name">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tracking_collection_name</span></code><a class="headerlink" href="#pymatgen.db.builders.incr.CollectionTracker.tracking_collection_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="pymatgen.db.builders.incr.DBError">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">DBError</span></code><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#DBError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.DBError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Generic database error.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.incr.Mark">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Mark</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#Mark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.Mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The position in a collection for the last record that was
+processed by a given operation.</p>
+<p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> (<em>pymongo.collection.Collection</em>) – Collection to track</p></li>
+<li><p><strong>operation</strong> (<a class="reference internal" href="#pymatgen.db.builders.incr.Operation" title="pymatgen.db.builders.incr.Operation"><em>Operation</em></a>) – Operation for this mark.</p></li>
+<li><p><strong>field</strong> (<em>str</em>) – Name of field to determine highest record</p></li>
+<li><p><strong>pos</strong> (<em>dict</em>) – Optional query for position</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.incr.Mark.FLD_FLD">
+<code class="sig-name descname"><span class="pre">FLD_FLD</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'field'</span></em><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.FLD_FLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.incr.Mark.FLD_MARK">
+<code class="sig-name descname"><span class="pre">FLD_MARK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'mark'</span></em><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.FLD_MARK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.incr.Mark.FLD_OP">
+<code class="sig-name descname"><span class="pre">FLD_OP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'operation'</span></em><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.FLD_OP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.Mark.as_dict">
+<code class="sig-name descname"><span class="pre">as_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#Mark.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation as a dict for JSON serialization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.Mark.from_dict">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#Mark.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct from dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coll</strong> – Collection for the mark</p></li>
+<li><p><strong>d</strong> (<em>dict</em>) – Input</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>new instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pymatgen.db.builders.incr.Mark" title="pymatgen.db.builders.incr.Mark">Mark</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.Mark.pos">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">pos</span></code><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.Mark.query">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">query</span></code><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>A mongdb query expression to find all records with higher values
+for this mark’s fields in the collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.Mark.to_dict">
+<code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation as a dict for JSON serialization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.Mark.update">
+<code class="sig-name descname"><span class="pre">update</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#Mark.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.Mark.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the position of the mark in the collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>this object, for chaining</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pymatgen.db.builders.incr.Mark" title="pymatgen.db.builders.incr.Mark">Mark</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="pymatgen.db.builders.incr.NoTrackingCollection">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">NoTrackingCollection</span></code><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#NoTrackingCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.NoTrackingCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised if no tracking collection is present,
+but some operation is requested on that collection.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.incr.Operation">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Operation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#Operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.Operation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>Enumeration of collection operations.</p>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.incr.Operation.build">
+<code class="sig-name descname"><span class="pre">build</span></code><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#pymatgen.db.builders.incr.Operation.build" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.incr.Operation.copy">
+<code class="sig-name descname"><span class="pre">copy</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#pymatgen.db.builders.incr.Operation.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.incr.Operation.other">
+<code class="sig-name descname"><span class="pre">other</span></code><em class="property"> <span class="pre">=</span> <span class="pre">99</span></em><a class="headerlink" href="#pymatgen.db.builders.incr.Operation.other" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.incr.TrackedCollection">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">TrackedCollection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackedCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wrapper on a pymongo collection to make <a href="#id1"><span class="problematic" id="id2">`</span></a>find’ operations start
+after the “tracking” mark.</p>
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.TrackedCollection.findall">
+<code class="sig-name descname"><span class="pre">findall</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackedCollection.findall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedCollection.findall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call non-tracked <code class="docutils literal notranslate"><span class="pre">find()</span></code> operation with same args.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.TrackedCollection.set_mark">
+<code class="sig-name descname"><span class="pre">set_mark</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackedCollection.set_mark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedCollection.set_mark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.TrackedCollection.set_tracking">
+<code class="sig-name descname"><span class="pre">set_tracking</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_tracked</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackedCollection.set_tracking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedCollection.set_tracking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set whether find() transparently starts from after the
+mark (True), or whether it ignores the tracking info and acts like
+a normal <code class="docutils literal notranslate"><span class="pre">find()</span></code> operation (False).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>is_tracked</strong> – Whether to use tracking info</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.TrackedCollection.tracked_find">
+<code class="sig-name descname"><span class="pre">tracked_find</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackedCollection.tracked_find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedCollection.tracked_find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replacement for regular <code class="docutils literal notranslate"><span class="pre">find()</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.incr.TrackedQueryEngine">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">TrackedQueryEngine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">track_operation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackedQueryEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedQueryEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine" title="pymatgen.db.query_engine.QueryEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.query_engine.QueryEngine</span></code></a>, <a class="reference internal" href="#pymatgen.db.builders.incr.TrackingInterface" title="pymatgen.db.builders.incr.TrackingInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.incr.TrackingInterface</span></code></a></p>
+<p>A QueryEngine subclass that only examines records
+past the last ‘mark’ that was set for the
+given operation and field.</p>
+<p>The concrete result is that for an object, <code class="docutils literal notranslate"><span class="pre">t</span></code>, the
+<code class="docutils literal notranslate"><span class="pre">t.find()</span></code> method will start <em>past</em> the “mark”.</p>
+<p>To go around this transparent change, use the <code class="docutils literal notranslate"><span class="pre">t.findall</span></code>
+instead.</p>
+<p>Constructor.</p>
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.TrackedQueryEngine.collection_name">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">collection_name</span></code><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedQueryEngine.collection_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override base class to make this a tracked collection.
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">&#64;collection_name.setter()</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.TrackedQueryEngine.set_mark">
+<code class="sig-name descname"><span class="pre">set_mark</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackedQueryEngine.set_mark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedQueryEngine.set_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#pymatgen.db.builders.incr.TrackingInterface.set_mark" title="pymatgen.db.builders.incr.TrackingInterface.set_mark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TrackingInterface.set_mark()</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.TrackedQueryEngine.tracking">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">tracking</span></code><a class="headerlink" href="#pymatgen.db.builders.incr.TrackedQueryEngine.tracking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether tracking is really enabled.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.incr.TrackingInterface">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">TrackingInterface</span></code><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackingInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackingInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.TrackingInterface.set_mark">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">set_mark</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#TrackingInterface.set_mark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.TrackingInterface.set_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the mark to the current end of the collection. This is saved in the database
+so it is available for later operations.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.incr.UnTrackedQueryEngine">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">UnTrackedQueryEngine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27017</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aliases_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replicaset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">ignore</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#UnTrackedQueryEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.UnTrackedQueryEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine" title="pymatgen.db.query_engine.QueryEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.query_engine.QueryEngine</span></code></a>, <a class="reference internal" href="#pymatgen.db.builders.incr.TrackingInterface" title="pymatgen.db.builders.incr.TrackingInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.incr.TrackingInterface</span></code></a></p>
+<p>A QE that has the interface for tracking, but does nothing for it.
+Allows for callers to do same operations regardless of whether tracking is
+activated or not.</p>
+<p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<em>str</em>) – Hostname of database machine.</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – Port for db access.</p></li>
+<li><p><strong>database</strong> (<em>str</em>) – Name of database to access.</p></li>
+<li><p><strong>user</strong> (<em>str</em>) – User for db access. <cite>None</cite> means no authentication.</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – Password for db access. <cite>None</cite> means no auth.</p></li>
+<li><p><strong>collection</strong> (<em>str</em>) – Collection to query. Defaults to “tasks”.</p></li>
+<li><p><strong>connection</strong> (<em>pymongo.Connection</em>) – If given, ignore ‘host’ and ‘port’
+and use existing connection.</p></li>
+<li><p><strong>aliases_config</strong> (<em>dict</em>) – <p>An alias dict to use. Defaults to None, which means the default
+aliases defined in “aliases.json” is used. The aliases config
+should be of the following format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;aliases&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;e_above_hull&quot;</span><span class="p">:</span> <span class="s2">&quot;analysis.e_above_hull&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="s2">&quot;output.final_energy&quot;</span><span class="p">,</span>
+        <span class="o">....</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;defaults&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;successful&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>aliases (dict): Keys are the incoming property, values are the</dt><dd><p>property it will be translated to. This makes it easier
+to organize the doc format in a way that is different from the
+query format.</p>
+</dd>
+<dt>defaults (dict): Criteria that should be applied</dt><dd><p>by default to all queries. For example, a collection may
+contain data from both successful and unsuccessful runs but
+for most querying purposes, you may want just successful runs
+only. Note that defaults do not affect explicitly specified
+criteria, i.e., if you suppy a query for {“state”: “killed”},
+this will override the default for {“state”: “successful”}.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>default_properties</strong> (<em>list</em>) – Property names (strings) to use by
+default, if no <cite>properties</cite> are given to query().</p></li>
+<li><p><strong>query_post</strong> (<em>list</em>) – Functions to post-process the <cite>criteria</cite> passed
+to <cite>query()</cite>, after aliases are resolved.
+Function takes two args, the criteria dict and list of
+result properties. Both may be modified in-place.</p></li>
+<li><p><strong>result_post</strong> (<em>list</em>) – Functions to post-process the cursor records.
+Function takes one arg, the document for the current record,
+that is modified in-place.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymatgen.db.builders.incr.UnTrackedQueryEngine.set_mark">
+<code class="sig-name descname"><span class="pre">set_mark</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/incr.html#UnTrackedQueryEngine.set_mark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.incr.UnTrackedQueryEngine.set_mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does nothing and returns None.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymatgen.db.builders.schema">
+<span id="pymatgen-db-builders-schema-module"></span><h2>pymatgen.db.builders.schema module<a class="headerlink" href="#module-pymatgen.db.builders.schema" title="Permalink to this headline">¶</a></h2>
+<p>Utility module for schema validation, for builder testing</p>
+<dl class="py class">
+<dt id="pymatgen.db.builders.schema.HasMeta">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">HasMeta</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#HasMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.HasMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Mix-in class to handle metadata.
+Adds the ‘meta’ class attribute.</p>
+<p>Create with new metadata (which may be empty).
+The metadata should be dict-like (i.e. __getitem__ and __setitem__) or
+be a string in the format “name1: value1, name2: value2, …”, where the
+white space is optional.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>meta</strong> (<em>str</em><em> or </em><em>dict</em>) – Init with this metadata.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.schema.HasMeta.FIELD_SEP">
+<code class="sig-name descname"><span class="pre">FIELD_SEP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">','</span></em><a class="headerlink" href="#pymatgen.db.builders.schema.HasMeta.FIELD_SEP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.schema.HasMeta.KV_SEP">
+<code class="sig-name descname"><span class="pre">KV_SEP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">':'</span></em><a class="headerlink" href="#pymatgen.db.builders.schema.HasMeta.KV_SEP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.schema.HasMeta.add_meta">
+<code class="sig-name descname"><span class="pre">add_meta</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#HasMeta.add_meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.HasMeta.add_meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.schema.Scalar">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Scalar</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typecode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#Scalar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.Scalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymatgen.db.builders.schema.HasMeta" title="pymatgen.db.builders.schema.HasMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.schema.HasMeta</span></code></a></p>
+<p>Create with new metadata (which may be empty).
+The metadata should be dict-like (i.e. __getitem__ and __setitem__) or
+be a string in the format “name1: value1, name2: value2, …”, where the
+white space is optional.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>meta</strong> (<em>str</em><em> or </em><em>dict</em>) – Init with this metadata.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.schema.Scalar.JSTYPES">
+<code class="sig-name descname"><span class="pre">JSTYPES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'bool':</span> <span class="pre">'boolean',</span> <span class="pre">'date':</span> <span class="pre">'string',</span> <span class="pre">'datetime':</span> <span class="pre">'string',</span> <span class="pre">'float':</span> <span class="pre">'number',</span> <span class="pre">'int':</span> <span class="pre">'integer',</span> <span class="pre">'null':</span> <span class="pre">'null',</span> <span class="pre">'string':</span> <span class="pre">'string'}</span></em><a class="headerlink" href="#pymatgen.db.builders.schema.Scalar.JSTYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.schema.Scalar.TYPES">
+<code class="sig-name descname"><span class="pre">TYPES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'array':</span> <span class="pre">&lt;function</span> <span class="pre">Scalar.&lt;lambda&gt;&gt;,</span> <span class="pre">'bool':</span> <span class="pre">&lt;function</span> <span class="pre">Scalar.&lt;lambda&gt;&gt;,</span> <span class="pre">'date':</span> <span class="pre">&lt;function</span> <span class="pre">_is_datetime&gt;,</span> <span class="pre">'datetime':</span> <span class="pre">&lt;function</span> <span class="pre">_is_datetime&gt;,</span> <span class="pre">'float':</span> <span class="pre">&lt;function</span> <span class="pre">Scalar.&lt;lambda&gt;&gt;,</span> <span class="pre">'int':</span> <span class="pre">&lt;function</span> <span class="pre">Scalar.&lt;lambda&gt;&gt;,</span> <span class="pre">'null':</span> <span class="pre">&lt;function</span> <span class="pre">Scalar.&lt;lambda&gt;&gt;,</span> <span class="pre">'object':</span> <span class="pre">&lt;function</span> <span class="pre">Scalar.&lt;lambda&gt;&gt;,</span> <span class="pre">'string':</span> <span class="pre">&lt;function</span> <span class="pre">Scalar.&lt;lambda&gt;&gt;}</span></em><a class="headerlink" href="#pymatgen.db.builders.schema.Scalar.TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.schema.Scalar.jstype">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">jstype</span></code><a class="headerlink" href="#pymatgen.db.builders.schema.Scalar.jstype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return JavaScript type.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymatgen.db.builders.schema.Schema">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Schema</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#Schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.Schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymatgen.db.builders.schema.HasMeta" title="pymatgen.db.builders.schema.HasMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.schema.HasMeta</span></code></a></p>
+<p>Create with new metadata (which may be empty).
+The metadata should be dict-like (i.e. __getitem__ and __setitem__) or
+be a string in the format “name1: value1, name2: value2, …”, where the
+white space is optional.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>meta</strong> (<em>str</em><em> or </em><em>dict</em>) – Init with this metadata.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.schema.Schema.IS_DICT">
+<code class="sig-name descname"><span class="pre">IS_DICT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#pymatgen.db.builders.schema.Schema.IS_DICT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.schema.Schema.IS_LIST">
+<code class="sig-name descname"><span class="pre">IS_LIST</span></code><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#pymatgen.db.builders.schema.Schema.IS_LIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="pymatgen.db.builders.schema.Schema.IS_SCALAR">
+<code class="sig-name descname"><span class="pre">IS_SCALAR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#pymatgen.db.builders.schema.Schema.IS_SCALAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.schema.Schema.json_schema">
+<code class="sig-name descname"><span class="pre">json_schema</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">add_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#Schema.json_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.Schema.json_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert our compact schema representation to the standard, but more verbose,
+JSON Schema standard.</p>
+<p>Example JSON schema: <a class="reference external" href="http://json-schema.org/examples.html">http://json-schema.org/examples.html</a>
+Core standard: <a class="reference external" href="http://json-schema.org/latest/json-schema-core.html">http://json-schema.org/latest/json-schema-core.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>add_keys</strong> – Key, default value pairs to add in,
+e.g. description=””</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymatgen.db.builders.schema.Schema.validate">
+<code class="sig-name descname"><span class="pre">validate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'(root)'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#Schema.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.Schema.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="pymatgen.db.builders.schema.SchemaError">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">SchemaError</span></code><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#SchemaError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.SchemaError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Base class of all errors raised by schema creation or validation.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="pymatgen.db.builders.schema.SchemaParseError">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">SchemaParseError</span></code><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#SchemaParseError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.SchemaParseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymatgen.db.builders.schema.SchemaError" title="pymatgen.db.builders.schema.SchemaError"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.schema.SchemaError</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="pymatgen.db.builders.schema.SchemaPathError">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">SchemaPathError</span></code><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#SchemaPathError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.SchemaPathError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymatgen.db.builders.schema.SchemaError" title="pymatgen.db.builders.schema.SchemaError"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.schema.SchemaError</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="pymatgen.db.builders.schema.SchemaTypeError">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">SchemaTypeError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#SchemaTypeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.SchemaTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymatgen.db.builders.schema.SchemaError" title="pymatgen.db.builders.schema.SchemaError"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.schema.SchemaError</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.schema.add_schemas">
+<code class="sig-name descname"><span class="pre">add_schemas</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#add_schemas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.add_schemas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add schemas from files in ‘path’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Path with schema files. Schemas are named by their file,
+with the extension stripped. e.g., if path is “/tmp/foo”,
+then the schema in “/tmp/foo/bar.json” will be named “bar”.</p></li>
+<li><p><strong>ext</strong> (<em>str</em>) – File extension that identifies schema files</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raise</dt>
+<dd class="field-odd"><p>SchemaPathError, if no such path. SchemaParseError, if a schema
+is not valid JSON.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.schema.get_schema">
+<code class="sig-name descname"><span class="pre">get_schema</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#get_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.get_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get schema by name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – name of schema</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>new schema</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pymatgen.db.builders.schema.Schema" title="pymatgen.db.builders.schema.Schema">Schema</a></p>
+</dd>
+<dt class="field-even">Raise</dt>
+<dd class="field-even"><p>KeyError, if schema is not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.schema.load_schema">
+<code class="sig-name descname"><span class="pre">load_schema</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_or_fp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/schema.html#load_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.schema.load_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load schema from file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_or_fp</strong> (<em>str</em><em>, </em><em>file</em>) – File name or file object</p>
+</dd>
+<dt class="field-even">Raise</dt>
+<dd class="field-even"><p>IOError if file cannot be opened or read, ValueError if
+file is not valid JSON or JSON is not a valid schema.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymatgen.db.builders.util">
+<span id="pymatgen-db-builders-util-module"></span><h2>pymatgen.db.builders.util module<a class="headerlink" href="#module-pymatgen.db.builders.util" title="Permalink to this headline">¶</a></h2>
+<p>Common utility functions for the database functions</p>
+<dl class="py function">
+<dt id="pymatgen.db.builders.util.get_builder_log">
+<code class="sig-name descname"><span class="pre">get_builder_log</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/util.html#get_builder_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.util.get_builder_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a logging object, in the right place in the
+hierarchy, for a given builder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Builder name, e.g. ‘my_builder’</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New logger</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>logging.Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.util.get_schema_dir">
+<code class="sig-name descname"><span class="pre">get_schema_dir</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/util.html#get_schema_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.util.get_schema_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get path to directory with schemata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>db_version</strong> (<em>int</em>) – Version of the database</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.util.get_schema_file">
+<code class="sig-name descname"><span class="pre">get_schema_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mg_core'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'materials'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/util.html#get_schema_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.util.get_schema_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get file with appropriate schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_version</strong> (<em>int</em>) – Version of the database</p></li>
+<li><p><strong>db</strong> (<em>str</em>) – Name of database, e.g. ‘mg_core’</p></li>
+<li><p><strong>collection</strong> (<em>str</em>) – Name of collection, e.g. ‘materials’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>File with schema</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>file</p>
+</dd>
+<dt class="field-even">Raise</dt>
+<dd class="field-even"><p>IOError, if file is not found or not accessible</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymatgen.db.builders.util.get_test_dir">
+<code class="sig-name descname"><span class="pre">get_test_dir</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/util.html#get_test_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.util.get_test_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get path to subdirectory with test files related
+to a given class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – Name of class</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymatgen.db.builders">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pymatgen.db.builders" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pymatgen.db.builders package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.builders.core">pymatgen.db.builders.core module</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.builders.incr">pymatgen.db.builders.incr module</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.builders.schema">pymatgen.db.builders.schema module</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.builders.util">pymatgen.db.builders.util module</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.builders">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="pymatgen.db.html">pymatgen.db package</a><ul>
+      <li>Previous: <a href="pymatgen.db.alchemy.html" title="previous chapter">pymatgen.db.alchemy package</a></li>
+      <li>Next: <a href="pymatgen.db.builders.examples.html" title="next chapter">pymatgen.db.builders.examples package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pymatgen.db.builders.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2016, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

@@ -31,10 +31,10 @@ NEW_VER = datetime.datetime.today().strftime("%Y.%-m.%-d")
 def make_doc(ctx):
     with cd("docs_rst"):
         ctx.run("cp ../CHANGES.rst change_log.rst")
-        ctx.run("sphinx-apidoc -d 6 -o . -f ../matgendb")
-        ctx.run("rm matgendb*.tests.rst")
+        ctx.run("sphinx-apidoc --implicit-namespaces -d 6 -o . -f ../pymatgen")
+        ctx.run("rm pymatgen*.tests.rst")
         for f in glob.glob("*.rst"):
-            if f.startswith('matgendb') and f.endswith('rst'):
+            if f.startswith('pymatgen') and f.endswith('rst'):
                 newoutput = []
                 suboutput = []
                 subpackage = False
@@ -67,13 +67,13 @@ def make_doc(ctx):
 @task
 def set_ver(ctx):
     lines = []
-    with open("matgendb/__init__.py", "rt") as f:
+    with open("pymatgen/db/__init__.py", "rt") as f:
         for l in f:
             if "__version__" in l:
                 lines.append('__version__ = "%s"' % NEW_VER)
             else:
                 lines.append(l.rstrip())
-    with open("matgendb/__init__.py", "wt") as f:
+    with open("pymatgen/db/__init__.py", "wt") as f:
         f.write("\n".join(lines))
 
     lines = []
@@ -120,7 +120,7 @@ def release_github(ctx):
 
 @task
 def test(ctx):
-    ctx.run("pytest matgendb")
+    ctx.run("pytest pymatgen")
 
 
 @task

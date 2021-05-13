@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pymatgen.db.dbconfig &#8212; pymatgen-db 2021.5.12 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2021.5.12 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pymatgen.db.dbconfig</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pymatgen.db.dbconfig</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Database configuration functions.</span>
+
+<span class="sd">Main class is DBConfig, which encapsulates a database configuration</span>
+<span class="sd">passed in as a file or object. For example::</span>
+
+<span class="sd">    cfg1 = DBConfig()  # use defaults</span>
+<span class="sd">    cfg2 = DBConfig(&quot;/path/to/myfile.json&quot;)  # read from file</span>
+<span class="sd">    f = open(&quot;/other/file.json&quot;)</span>
+<span class="sd">    cfg3 = DBConfig(f)  # read from file object</span>
+<span class="sd">    # access dict of parsed conf. settings</span>
+<span class="sd">    settings = cfg1.settings</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Dan Gunter &lt;dkgunter@lbl.gov&gt;&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;4/25/14&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="c1"># Constants for keys</span>
+<span class="n">HOST_KEY</span> <span class="o">=</span> <span class="s2">&quot;host&quot;</span>
+<span class="n">PORT_KEY</span> <span class="o">=</span> <span class="s2">&quot;port&quot;</span>
+<span class="n">DB_KEY</span> <span class="o">=</span> <span class="s2">&quot;database&quot;</span>
+<span class="n">COLL_KEY</span> <span class="o">=</span> <span class="s2">&quot;collection&quot;</span>
+<span class="n">USER_KEY</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>
+<span class="n">PASS_KEY</span> <span class="o">=</span> <span class="s2">&quot;password&quot;</span>
+<span class="n">ALIASES_KEY</span> <span class="o">=</span> <span class="s2">&quot;aliases&quot;</span>
+
+
+<div class="viewcode-block" id="ConfigurationFileError"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.dbconfig.ConfigurationFileError">[docs]</a><span class="k">class</span> <span class="nc">ConfigurationFileError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;reading &#39;</span><span class="si">{}</span><span class="s2">&#39;: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DBConfig"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.dbconfig.DBConfig">[docs]</a><span class="k">class</span> <span class="nc">DBConfig</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Database configuration.&quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT_PORT</span> <span class="o">=</span> <span class="mi">27017</span>
+    <span class="n">DEFAULT_FILE</span> <span class="o">=</span> <span class="s2">&quot;db.json&quot;</span>
+    <span class="n">ALL_SETTINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">HOST_KEY</span><span class="p">,</span>
+        <span class="n">PORT_KEY</span><span class="p">,</span>
+        <span class="n">DB_KEY</span><span class="p">,</span>
+        <span class="n">COLL_KEY</span><span class="p">,</span>
+        <span class="n">ALIASES_KEY</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">DEFAULT_SETTINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">HOST_KEY</span><span class="p">,</span> <span class="s2">&quot;localhost&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">PORT_KEY</span><span class="p">,</span> <span class="n">DEFAULT_PORT</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">DB_KEY</span><span class="p">,</span> <span class="s2">&quot;vasp&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">ALIASES_KEY</span><span class="p">,</span> <span class="p">{}),</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Settings are created from config_dict, if given,</span>
+<span class="sd">        or parsed config_file, if given, otherwise</span>
+<span class="sd">        the DEFAULT_FILE is tried and if that is not present</span>
+<span class="sd">        the DEFAULT_SETTINGS are used without modification.</span>
+
+<span class="sd">        :param config_file: Read configuration from this file.</span>
+<span class="sd">        :type config_file: file or str path</span>
+<span class="sd">        :param config_dict: Set configuration from this dictionary.</span>
+<span class="sd">        :raises: ConfigurationFileError if cannot read/parse config_file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SETTINGS</span><span class="p">)</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">config_dict</span><span class="p">:</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">config_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">auth_aliases</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Try to use DEFAULT_FILE if no config_file</span>
+            <span class="k">if</span> <span class="n">config_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_FILE</span><span class="p">):</span>
+                    <span class="n">config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_FILE</span>
+            <span class="c1"># If there was a config_file, parse it</span>
+            <span class="k">if</span> <span class="n">config_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">_as_file</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">raise</span> <span class="n">ConfigurationFileError</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="n">normalize_auth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DBConfig.copy"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.dbconfig.DBConfig.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a copy of self (internal settings are copied).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DBConfig</span><span class="p">(</span><span class="n">config_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">host</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">HOST_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PORT_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_PORT</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dbname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Name of the database.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DB_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@dbname</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">dbname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="p">[</span><span class="n">DB_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">collection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">COLL_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@collection</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="p">[</span><span class="n">COLL_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">USER_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">password</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PASS_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_settings"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.dbconfig.get_settings">[docs]</a><span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read settings from input file.</span>
+
+<span class="sd">    :param infile: Input file for JSON settings.</span>
+<span class="sd">    :type infile: file or str path</span>
+<span class="sd">    :return: Settings parsed from file</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">_as_file</span><span class="p">(</span><span class="n">infile</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Settings not found in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">infile</span><span class="p">))</span>
+
+    <span class="c1"># Processing of namespaced parameters in .pmgrc.yaml.</span>
+    <span class="n">processed_settings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PMG_DB_&quot;</span><span class="p">):</span>
+            <span class="n">processed_settings</span><span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">processed_settings</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="n">auth_aliases</span><span class="p">(</span><span class="n">processed_settings</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">processed_settings</span></div>
+
+
+<div class="viewcode-block" id="auth_aliases"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.dbconfig.auth_aliases">[docs]</a><span class="k">def</span> <span class="nf">auth_aliases</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interpret user/password aliases.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">alias</span><span class="p">,</span> <span class="n">real</span> <span class="ow">in</span> <span class="p">((</span><span class="n">USER_KEY</span><span class="p">,</span> <span class="s2">&quot;readonly_user&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">PASS_KEY</span><span class="p">,</span> <span class="s2">&quot;readonly_password&quot;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">real</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="normalize_auth"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.dbconfig.normalize_auth">[docs]</a><span class="k">def</span> <span class="nf">normalize_auth</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">readonly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">readonly_first</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform the readonly/admin user and password to simple user/password,</span>
+<span class="sd">    as expected by QueryEngine. If return value is true, then</span>
+<span class="sd">    admin or readonly password will be in keys &quot;user&quot; and &quot;password&quot;.</span>
+
+<span class="sd">    :param settings: Connection settings</span>
+<span class="sd">    :type settings: dict</span>
+<span class="sd">    :param admin: Check for admin password</span>
+<span class="sd">    :param readonly: Check for readonly password</span>
+<span class="sd">    :param readonly_first: Check for readonly password before admin</span>
+<span class="sd">    :return: Whether user/password were found</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">P</span> <span class="o">=</span> <span class="n">USER_KEY</span><span class="p">,</span> <span class="n">PASS_KEY</span>
+    <span class="c1"># If user/password, un-prefixed, exists, do nothing.</span>
+    <span class="k">if</span> <span class="n">U</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="n">P</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># Set prefixes</span>
+    <span class="n">prefixes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">readonly_first</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">readonly</span><span class="p">:</span>
+            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;readonly_&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
+            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;admin_&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
+            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;admin_&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">readonly</span><span class="p">:</span>
+            <span class="n">prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;readonly_&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Look for first user/password matching.</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">pfx</span> <span class="ow">in</span> <span class="n">prefixes</span><span class="p">:</span>
+        <span class="n">ukey</span><span class="p">,</span> <span class="n">pkey</span> <span class="o">=</span> <span class="n">pfx</span> <span class="o">+</span> <span class="n">U</span><span class="p">,</span> <span class="n">pfx</span> <span class="o">+</span> <span class="n">P</span>
+        <span class="k">if</span> <span class="n">ukey</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="n">pkey</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+            <span class="n">settings</span><span class="p">[</span><span class="n">U</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="n">ukey</span><span class="p">]</span>
+            <span class="n">settings</span><span class="p">[</span><span class="n">P</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">found</span></div>
+
+
+<span class="k">def</span> <span class="nf">_as_file</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2016, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

@@ -5,7 +5,7 @@ Database "Builders"
 
 The Materials Project relies on MongoDB databases. The common parts of the
 process of creating these databases from either files or other MongoDB databases
-are encapsulated in the ``matgendb.builders`` subpackage, and in the
+are encapsulated in the ``pymatgen.db.builders`` subpackage, and in the
 ``mgbuild`` command-line script. This package and script
 comprise a lightweight framework that is meant to
 automate, simplify, and ultimately streamline the process of creating databases.
@@ -14,7 +14,7 @@ methods are general-purpose, and thus could be useful to *any* project that need
 to perform extract-transform-load (ETL) operations with MongoDB.
 
 The code presented here can be found in the directory
-`matgendb/builders/examples` in the source code distribution.
+`pymatgen.db/builders/examples` in the source code distribution.
 
 .. contents::
     :depth: 3
@@ -59,8 +59,8 @@ Writing a builder
 ------------------
 
 To write a builder, you must create a Python class that inherits from
-`matgendb.builders.core.Builder`
-(see the :doc:`matgendb.builders <matgendb.builders>` package)
+`pymatgen.db.builders.core.Builder`
+(see the :doc:`pymatgen.db.builders <pymatgen.db.builders>` package)
 and implement a few methods on this class
 to perform the specific work for your builder. In this section we will
 give two example builders: a simple :ref:`FileCounter <bld-ex-filecounter>` builder
@@ -76,7 +76,7 @@ The first builder simply reads from a file, and counts the lines in that file.
 In this section we'll show the whole program, then walk through it one section
 at a time::
 
-    from matgendb.builders.core import Builder
+    from pymatgen.db.builders.core import Builder
     class FileCounter(Builder):
         """Count lines and characters in a file.
         """
@@ -102,7 +102,7 @@ at a time::
 
 **Initialization**::
 
-    from matgendb.builders.core import Builder
+    from pymatgen.db.builders.core import Builder
     class FileCounter(Builder):
         """Count lines and characters in a file.
         """
@@ -110,7 +110,7 @@ at a time::
             self.num_lines = 0
             Builder.__init__(self, **kwargs)
 
-The class inherits from the ``matgendb.core.Builder`` class. In this case, it includes
+The class inherits from the ``pymatgen.db.core.Builder`` class. In this case, it includes
 a constructor, but this is optional and often not needed. The constructor
 simply initializes the number of lines counter and then calls its parent.
 
@@ -187,8 +187,8 @@ The next builder does a simple DB operation: copying one MongoDB collection
 from a source to a destination. As before, we begin with the full program
 and then step through it one snippet at at time::
 
-    from matgendb.builders import core, util
-    from matgendb.query_engine import QueryEngine
+    from pymatgen.db.builders import core, util
+    from pymatgen.db.query_engine import QueryEngine
 
     _log = util.get_builder_log("copy")
 
@@ -275,7 +275,7 @@ that is in the docstring. Notice that the type of both the source and
 target is ``QueryEngine``. This is a special datatype that instructs the
 driver program (`mgbuild`) to expect a database configuration file with
 host name, user, password, database name, etc. and to automatically connect
-to this database and return a ``matgendb.query_engine.QueryEngine`` instance.
+to this database and return a ``pymatgen.db.query_engine.QueryEngine`` instance.
 These instances are passed in as arguments to the method. So, all the
 method has to do is to use the QueryEngine object. In this case,
 this means creating a cursor that iterates over the source collection
@@ -311,8 +311,8 @@ The incremental building concept was introduced in :ref:`bld-concepts`.
 The central idea of the incremental building implementation is that any builder
 can be run in "incremental mode". When this happens, any QueryEngine objects
 are replaced transparently by equivalent objects that track their last
-position, of class :class:`matgendb.builders.incr.TrackedQueryEngine`, which is
-documented in module :mod:`matgendb.builders.incr`. This tracking can be
+position, of class :class:`pymatgen.db.builders.incr.TrackedQueryEngine`, which is
+documented in module :mod:`pymatgen.db.builders.incr`. This tracking can be
 controlled, if necessary, with the instance variable ``tracking`` on the
 TrackedQueryEngine class.
 
@@ -344,9 +344,9 @@ any groups that are not in the new elements |ANEW|, yet non-trivial
 because in order to calculate the new maximum value one needs to examine
 all the elements in A::
 
-    from matgendb.builders import core
-    from matgendb.builders import util
-    from matgendb.query_engine import QueryEngine
+    from pymatgen.db.builders import core
+    from pymatgen.db.builders import util
+    from pymatgen.db.query_engine import QueryEngine
 
     class MaxValueBuilder(core.Builder):
         """Example of incremental builder that requires
@@ -495,7 +495,7 @@ like this::
 
 In the examples below, we will assume that you have pymatgen-db installed and
 in your Python path. We will use the example modules that are installed
-in ``matgendb.builders.examples``.
+in ``pymatgen.db.builders.examples``.
 
 .. _bld-run-show:
 
@@ -505,9 +505,9 @@ Displaying builder usage
 You can get the list of parameters and their types for a given builder
 by giving its full module path, and the ``-u`` or ``--usage`` option::
 
-    % mgbuild run -u matgendb.builders.examples.copy_builder.CopyBuilder
+    % mgbuild run -u pymatgen.db.builders.examples.copy_builder.CopyBuilder
 
-    matgendb.builders.examples.copy_builder.CopyBuilder
+    pymatgen.db.builders.examples.copy_builder.CopyBuilder
       Copy from one MongoDB collection to another.
       Parameters:
         crit (dict): Filter criteria, e.g. "{ 'flag': True }".
@@ -563,7 +563,7 @@ Basic usage
 
 Run the copy builder::
 
-     mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+     mgbuild run  pymatgen.db.builders.examples.copy_builder.CopyBuilder \
          source=conf/test1.json target=conf/test2.json crit='{}'
 
 In this example, we are running the CopyBuilder with configuration files
@@ -585,7 +585,7 @@ Most machines have multiple cores, and hundreds of cores will be common
 in the near future. If your item processing requires any
 real work, you will probably benefit by running in parallel::
 
-     mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+     mgbuild run  pymatgen.db.builders.examples.copy_builder.CopyBuilder \
          source=conf/test1.json target=conf/test2.json crit='{}' -n 8
 
 The same command as previously, but with **-n 8** added to cause 8 parallel
@@ -617,7 +617,7 @@ client is not always monotonic.
 
 **Basic incremental build**::
 
-    mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+    mgbuild run  pymatgen.db.builders.examples.copy_builder.CopyBuilder \
         source=conf/test1.json target=conf/test2.json crit='{}' \
         -i copy
 
@@ -627,7 +627,7 @@ than the last record from the previous run.
 
 **Incremental build with parallelism**::
 
-    mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+    mgbuild run  pymatgen.db.builders.examples.copy_builder.CopyBuilder \
         source=conf/test1.json target=conf/test2.json crit='{}' \
         -n 8 -i copy
 
@@ -636,7 +636,7 @@ simply add **-n 8** to the command-line.
 
 **Incremental build with custom identifier**::
 
-    mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+    mgbuild run  pymatgen.db.builders.examples.copy_builder.CopyBuilder \
         source=conf/test1.json target=conf/test2.json crit='{}' \
         -i copy:num
 
@@ -647,7 +647,7 @@ using the ``num`` field instead of the default ``_id``.
 
 **Incremental build skipped for some collections**::
 
-    mgbuild run  matgendb.builders.examples.copy_builder.CopyBuilder \
+    mgbuild run  pymatgen.db.builders.examples.copy_builder.CopyBuilder \
         source=conf/test1.json target=-conf/test2.json crit='{}' \
         -i copy:num
 

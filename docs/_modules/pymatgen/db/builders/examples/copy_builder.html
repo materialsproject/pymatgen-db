@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pymatgen.db.builders.examples.copy_builder &#8212; pymatgen-db 2021.5.12 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/flasky.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">pymatgen-db 2021.5.12 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pymatgen.db.builders.examples.copy_builder</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pymatgen.db.builders.examples.copy_builder</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Simple &quot;copy&quot; builder.</span>
+
+<span class="sd">Copies from one collection to another.</span>
+<span class="sd">With the optional incremental feature, running twice will only copy the new records, i.e.</span>
+<span class="sd">running twice in succession will cause the second run to do nothing.</span>
+
+<span class="sd">To run:</span>
+
+<span class="sd">mgbuild</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Dan Gunter &lt;dkgunter@lbl.gov&gt;&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;4/22/14&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pymatgen.db.builders</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">pymatgen.db.builders</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">pymatgen.db.query_engine</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
+
+<span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CopyBuilder"><a class="viewcode-back" href="../../../../../pymatgen.db.builders.examples.html#pymatgen.db.builders.examples.copy_builder.CopyBuilder">[docs]</a><span class="k">class</span> <span class="nc">CopyBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Copy from one MongoDB collection to another.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CopyBuilder.get_items"><a class="viewcode-back" href="../../../../../pymatgen.db.builders.examples.html#pymatgen.db.builders.examples.copy_builder.CopyBuilder.get_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Copy records from source to target collection.</span>
+
+<span class="sd">        :param source: Input collection</span>
+<span class="sd">        :type source: QueryEngine</span>
+<span class="sd">        :param target: Output collection</span>
+<span class="sd">        :type target: QueryEngine</span>
+<span class="sd">        :param crit: Filter criteria, e.g. &quot;{ &#39;flag&#39;: True }&quot;.</span>
+<span class="sd">        :type crit: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">collection</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">crit</span><span class="p">:</span>  <span class="c1"># reduce any False-y crit value to None</span>
+            <span class="n">crit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">criteria</span><span class="o">=</span><span class="n">crit</span><span class="p">)</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;source.collection=</span><span class="si">{}</span><span class="s2"> crit=</span><span class="si">{}</span><span class="s2"> source_records=</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">collection</span><span class="p">,</span> <span class="n">crit</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">cur</span></div>
+
+<div class="viewcode-block" id="CopyBuilder.process_item"><a class="viewcode-back" href="../../../../../pymatgen.db.builders.examples.html#pymatgen.db.builders.examples.copy_builder.CopyBuilder.process_item">[docs]</a>    <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2016, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>

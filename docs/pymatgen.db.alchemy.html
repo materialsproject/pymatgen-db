@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pymatgen.db.alchemy package &#8212; pymatgen-db 2021.5.12 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pymatgen.db.builders package" href="pymatgen.db.builders.html" />
+    <link rel="prev" title="pymatgen.db package" href="pymatgen.db.html" />
+
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38991557-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pymatgen.db.builders.html" title="pymatgen.db.builders package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pymatgen.db.html" title="pymatgen.db package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2021.5.12 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="pymatgen.db.html" accesskey="U">pymatgen.db package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pymatgen.db.alchemy package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pymatgen-db-alchemy-package">
+<h1>pymatgen.db.alchemy package<a class="headerlink" href="#pymatgen-db-alchemy-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pymatgen.db.alchemy.transmuters">
+<span id="pymatgen-db-alchemy-transmuters-module"></span><h2>pymatgen.db.alchemy.transmuters module<a class="headerlink" href="#module-pymatgen.db.alchemy.transmuters" title="Permalink to this headline">¶</a></h2>
+<p>This module implements a version of pymatgen’s Transmuter to generate
+TransformedStructures from DB data sources. They enable the
+high-throughput generation of new structures and input files.</p>
+<dl class="py class">
+<dt id="pymatgen.db.alchemy.transmuters.QeTransmuter">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">QeTransmuter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queryengine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extend_collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/alchemy/transmuters.html#QeTransmuter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.alchemy.transmuters.QeTransmuter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.alchemy.transmuters.StandardTransmuter</span></code></p>
+<p>The QeTransmuter uses a QueryEngine to retrieve and generate new structures
+from a database.</p>
+<p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>queryengine</strong> – QueryEngine object for database access</p></li>
+<li><p><strong>criteria</strong> – A criteria to search on, which is passed to queryengine’s
+get_entries method.</p></li>
+<li><p><strong>transformations</strong> – New transformations to be applied to all structures</p></li>
+<li><p><strong>extend_collection</strong> – Whether to use more than one output structure from one-to-many
+transformations. extend_collection can be a number, which
+determines the maximum branching for each transformation.</p></li>
+<li><p><strong>ncores</strong> – Number of cores to use for applying transformations.
+Uses multiprocessing.Pool</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymatgen.db.alchemy">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pymatgen.db.alchemy" title="Permalink to this headline">¶</a></h2>
+<p>This package provides a version of pymatgen’s alchemy transmuter for
+performing transformations on structures queried from a Materials Project
+style database.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pymatgen.db.alchemy package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.alchemy.transmuters">pymatgen.db.alchemy.transmuters module</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.alchemy">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="pymatgen.db.html">pymatgen.db package</a><ul>
+      <li>Previous: <a href="pymatgen.db.html" title="previous chapter">pymatgen.db package</a></li>
+      <li>Next: <a href="pymatgen.db.builders.html" title="next chapter">pymatgen.db.builders package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pymatgen.db.alchemy.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+    <div class="footer">
+      &copy; Copyright 2016, Shyue Ping Ong, Dan Gunter.
+    </div>
+<div class="footer">This page uses <a href="http://analytics.google.com/">
+Google Analytics</a> to collect statistics. You can disable it by blocking
+the JavaScript coming from www.google-analytics.com.
+<script type="text/javascript">
+  (function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ?
+              'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+  })();
+</script>
+</div>
+
+  </body>
+</html>
