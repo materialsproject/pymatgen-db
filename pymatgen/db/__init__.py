@@ -11,7 +11,7 @@ import os
 
 __author__ = "Shyue Ping Ong, Dan Gunter"
 __date__ = "Jul 22 2017"
-__version__ = "2021.5.12"
+__version__ = "2021.5.13"
 
 
 from .query_engine import QueryEngine
