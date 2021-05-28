@@ -4,11 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db package &#8212; pymatgen-db 2021.5.13 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>pymatgen.db package &#8212; pymatgen-db 2021.5.28 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -45,7 +46,7 @@
         <li class="right" >
           <a href="dbconfig.html" title="Database configuration"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2021.5.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2021.5.28 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db package</a></li> 
       </ul>
     </div>  
@@ -55,9 +56,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="pymatgen-db-package">
+  <section id="pymatgen-db-package">
 <h1>pymatgen.db package<a class="headerlink" href="#pymatgen-db-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -104,17 +105,17 @@
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
+</section>
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-pymatgen.db.creator">
+</section>
+<section id="module-pymatgen.db.creator">
 <span id="pymatgen-db-creator-module"></span><h2>pymatgen.db.creator module<a class="headerlink" href="#module-pymatgen.db.creator" title="Permalink to this headline">¶</a></h2>
 <p>This module defines a Drone to assimilate vasp data and insert it into a
 Mongo database.</p>
 <dl class="py class">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">VaspToDbTaskDrone</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27017</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse_dos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_dos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse_projected_eigen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapi_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_full_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">VaspToDbTaskDrone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27017</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse_dos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_dos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse_projected_eigen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapi_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_full_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.apps.borg.hive.AbstractDrone</span></code></p>
 <p>VaspToDbTaskDrone assimilates directories containing vasp input to
 inserted db tasks. This drone is meant ot be used with pymatgen’s
@@ -185,14 +186,14 @@ subfolder or file extension schema.</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.as_dict">
-<code class="sig-name descname"><span class="pre">as_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.as_dict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.as_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.as_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>A JSON serializable dict representation of an object.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.assimilate">
-<code class="sig-name descname"><span class="pre">assimilate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.assimilate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.assimilate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.assimilate">
+<span class="sig-name descname"><span class="pre">assimilate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.assimilate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.assimilate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses vasp runs. Then insert the result into the db. and return the
 task_id or doc of the insertion.</p>
 <dl class="field-list simple">
@@ -204,18 +205,18 @@ purposes. Else, only the task_id of the inserted doc is returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.calculate_stability">
-<code class="sig-name descname"><span class="pre">calculate_stability</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.calculate_stability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.calculate_stability" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.calculate_stability">
+<span class="sig-name descname"><span class="pre">calculate_stability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.calculate_stability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.calculate_stability" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.convert">
-<code class="sig-name descname"><span class="pre">convert</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.convert" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.convert" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.from_dict">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.from_dict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.from_dict">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.from_dict" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>d</strong> – Dict representation.</p>
@@ -227,21 +228,21 @@ purposes. Else, only the task_id of the inserted doc is returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.generate_doc">
-<code class="sig-name descname"><span class="pre">generate_doc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasprun_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.generate_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.generate_doc" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.generate_doc">
+<span class="sig-name descname"><span class="pre">generate_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasprun_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.generate_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.generate_doc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process aflow style runs, where each run is actually a combination of
 two vasp runs.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.get_task_doc">
-<code class="sig-name descname"><span class="pre">get_task_doc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.get_task_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.get_task_doc" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.get_task_doc">
+<span class="sig-name descname"><span class="pre">get_task_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.get_task_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.get_task_doc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the entire task doc for a path, including any post-processing.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.get_valid_paths">
-<code class="sig-name descname"><span class="pre">get_valid_paths</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.get_valid_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.get_valid_paths" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.get_valid_paths">
+<span class="sig-name descname"><span class="pre">get_valid_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.get_valid_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.get_valid_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>There are some restrictions on the valid directory structures:</p>
 <ol class="arabic simple">
 <li><p>There can be only one vasp run in each directory. Nested directories
@@ -254,8 +255,8 @@ also considered as 2 parts of an aflow style run.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.post_process">
-<code class="sig-name descname"><span class="pre">post_process</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.post_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.post_process" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.post_process">
+<span class="sig-name descname"><span class="pre">post_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.post_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.post_process" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple post-processing for various files other than the vasprun.xml.
 Called by generate_task_doc. Modify this if your runs have other
 kinds of processing requirements.</p>
@@ -270,22 +271,22 @@ kinds of processing requirements.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.process_killed_run">
-<code class="sig-name descname"><span class="pre">process_killed_run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.process_killed_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.process_killed_run" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.process_killed_run">
+<span class="sig-name descname"><span class="pre">process_killed_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.process_killed_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.process_killed_run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process a killed vasp run.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.creator.VaspToDbTaskDrone.process_vasprun">
-<code class="sig-name descname"><span class="pre">process_vasprun</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taskname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.process_vasprun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.process_vasprun" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone.process_vasprun">
+<span class="sig-name descname"><span class="pre">process_vasprun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taskname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone.process_vasprun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone.process_vasprun" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process a vasprun.xml file.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.creator.contains_vasp_input">
-<code class="sig-name descname"><span class="pre">contains_vasp_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#contains_vasp_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.contains_vasp_input" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.contains_vasp_input">
+<span class="sig-name descname"><span class="pre">contains_vasp_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#contains_vasp_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.contains_vasp_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if a directory contains valid VASP input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -299,13 +300,13 @@ KPOINTS and POTCAR).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.creator.get_basic_analysis_and_error_checks">
-<code class="sig-name descname"><span class="pre">get_basic_analysis_and_error_checks</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_force_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_change_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#get_basic_analysis_and_error_checks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.get_basic_analysis_and_error_checks" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.get_basic_analysis_and_error_checks">
+<span class="sig-name descname"><span class="pre">get_basic_analysis_and_error_checks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_force_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_change_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#get_basic_analysis_and_error_checks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.get_basic_analysis_and_error_checks" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.creator.get_coordination_numbers">
-<code class="sig-name descname"><span class="pre">get_coordination_numbers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#get_coordination_numbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.get_coordination_numbers" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.get_coordination_numbers">
+<span class="sig-name descname"><span class="pre">get_coordination_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#get_coordination_numbers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.get_coordination_numbers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method to get the coordination number of all sites in the final
 structure from a run.</p>
 <dl class="field-list simple">
@@ -323,8 +324,8 @@ structure from a run.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.creator.get_uri">
-<code class="sig-name descname"><span class="pre">get_uri</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#get_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.get_uri" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.creator.get_uri">
+<span class="sig-name descname"><span class="pre">get_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#get_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.get_uri" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the URI path for a directory. This allows files hosted on
 different file servers to have distinct locations.</p>
 <dl class="field-list simple">
@@ -340,8 +341,8 @@ different file servers to have distinct locations.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-pymatgen.db.dbconfig">
+</section>
+<section id="module-pymatgen.db.dbconfig">
 <span id="pymatgen-db-dbconfig-module"></span><h2>pymatgen.db.dbconfig module<a class="headerlink" href="#module-pymatgen.db.dbconfig" title="Permalink to this headline">¶</a></h2>
 <p>Database configuration functions.</p>
 <p>Main class is DBConfig, which encapsulates a database configuration
@@ -355,14 +356,14 @@ passed in as a file or object. For example:</p>
 </pre></div>
 </div>
 <dl class="py exception">
-<dt id="pymatgen.db.dbconfig.ConfigurationFileError">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">ConfigurationFileError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#ConfigurationFileError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.ConfigurationFileError" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.ConfigurationFileError">
+<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">ConfigurationFileError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#ConfigurationFileError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.ConfigurationFileError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="pymatgen.db.dbconfig.DBConfig">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">DBConfig</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#DBConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">DBConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#DBConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Database configuration.</p>
 <p>Constructor.</p>
@@ -382,78 +383,78 @@ the DEFAULT_SETTINGS are used without modification.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="pymatgen.db.dbconfig.DBConfig.ALL_SETTINGS">
-<code class="sig-name descname"><span class="pre">ALL_SETTINGS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['host',</span> <span class="pre">'port',</span> <span class="pre">'database',</span> <span class="pre">'collection',</span> <span class="pre">'aliases']</span></em><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.ALL_SETTINGS" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.ALL_SETTINGS">
+<span class="sig-name descname"><span class="pre">ALL_SETTINGS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['host',</span> <span class="pre">'port',</span> <span class="pre">'database',</span> <span class="pre">'collection',</span> <span class="pre">'aliases']</span></em><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.ALL_SETTINGS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.dbconfig.DBConfig.DEFAULT_FILE">
-<code class="sig-name descname"><span class="pre">DEFAULT_FILE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'db.json'</span></em><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.DEFAULT_FILE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.DEFAULT_FILE">
+<span class="sig-name descname"><span class="pre">DEFAULT_FILE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'db.json'</span></em><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.DEFAULT_FILE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.dbconfig.DBConfig.DEFAULT_PORT">
-<code class="sig-name descname"><span class="pre">DEFAULT_PORT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">27017</span></em><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.DEFAULT_PORT" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.DEFAULT_PORT">
+<span class="sig-name descname"><span class="pre">DEFAULT_PORT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">27017</span></em><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.DEFAULT_PORT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.dbconfig.DBConfig.DEFAULT_SETTINGS">
-<code class="sig-name descname"><span class="pre">DEFAULT_SETTINGS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[('host',</span> <span class="pre">'localhost'),</span> <span class="pre">('port',</span> <span class="pre">27017),</span> <span class="pre">('database',</span> <span class="pre">'vasp'),</span> <span class="pre">('aliases',</span> <span class="pre">{})]</span></em><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.DEFAULT_SETTINGS" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.DEFAULT_SETTINGS">
+<span class="sig-name descname"><span class="pre">DEFAULT_SETTINGS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[('host',</span> <span class="pre">'localhost'),</span> <span class="pre">('port',</span> <span class="pre">27017),</span> <span class="pre">('database',</span> <span class="pre">'vasp'),</span> <span class="pre">('aliases',</span> <span class="pre">{})]</span></em><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.DEFAULT_SETTINGS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.collection">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">collection</span></span><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.collection" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.dbconfig.DBConfig.collection">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">collection</span></code><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.collection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="pymatgen.db.dbconfig.DBConfig.copy">
-<code class="sig-name descname"><span class="pre">copy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#DBConfig.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.copy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#DBConfig.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a copy of self (internal settings are copied).</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pymatgen.db.dbconfig.DBConfig.dbname">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">dbname</span></code><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.dbname" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.dbname">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">dbname</span></span><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.dbname" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the database.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pymatgen.db.dbconfig.DBConfig.host">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">host</span></code><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.host" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.host">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">host</span></span><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.host" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="pymatgen.db.dbconfig.DBConfig.password">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">password</span></code><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.password" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.password">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.password" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="pymatgen.db.dbconfig.DBConfig.port">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">port</span></code><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.port" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.port">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">port</span></span><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.port" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="pymatgen.db.dbconfig.DBConfig.settings">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">settings</span></code><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.settings" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.settings">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">settings</span></span><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.settings" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="pymatgen.db.dbconfig.DBConfig.user">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">user</span></code><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.user" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.DBConfig.user">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#pymatgen.db.dbconfig.DBConfig.user" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.dbconfig.auth_aliases">
-<code class="sig-name descname"><span class="pre">auth_aliases</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#auth_aliases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.auth_aliases" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.auth_aliases">
+<span class="sig-name descname"><span class="pre">auth_aliases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#auth_aliases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.auth_aliases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interpret user/password aliases.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.dbconfig.get_settings">
-<code class="sig-name descname"><span class="pre">get_settings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#get_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.get_settings" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.get_settings">
+<span class="sig-name descname"><span class="pre">get_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#get_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.get_settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read settings from input file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -469,8 +470,8 @@ the DEFAULT_SETTINGS are used without modification.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.dbconfig.normalize_auth">
-<code class="sig-name descname"><span class="pre">normalize_auth</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readonly_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#normalize_auth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.normalize_auth" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbconfig.normalize_auth">
+<span class="sig-name descname"><span class="pre">normalize_auth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readonly_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbconfig.html#normalize_auth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbconfig.normalize_auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform the readonly/admin user and password to simple user/password,
 as expected by QueryEngine. If return value is true, then
 admin or readonly password will be in keys “user” and “password”.</p>
@@ -492,27 +493,27 @@ admin or readonly password will be in keys “user” and “password”.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-pymatgen.db.dbgroup">
+</section>
+<section id="module-pymatgen.db.dbgroup">
 <span id="pymatgen-db-dbgroup-module"></span><h2>pymatgen.db.dbgroup module<a class="headerlink" href="#module-pymatgen.db.dbgroup" title="Permalink to this headline">¶</a></h2>
 <p>Create and access groups of databases,
 each configured from different settings.</p>
 <dl class="py class">
-<dt id="pymatgen.db.dbgroup.ConfigGroup">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">ConfigGroup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">qe_class=&lt;class</span> <span class="pre">'pymatgen.db.query_engine.QueryEngine'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.ConfigGroup">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ConfigGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">qe_class=&lt;class</span> <span class="pre">'pymatgen.db.query_engine.QueryEngine'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Convenient storage and access to a group
 of database configurations.</p>
 <p>Will automatically instantiate these configurations,
 as query engines, on-demand.</p>
 <dl class="py attribute">
-<dt id="pymatgen.db.dbgroup.ConfigGroup.SEP">
-<code class="sig-name descname"><span class="pre">SEP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'.'</span></em><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.SEP" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.ConfigGroup.SEP">
+<span class="sig-name descname"><span class="pre">SEP</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'.'</span></em><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.SEP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.dbgroup.ConfigGroup.add">
-<code class="sig-name descname"><span class="pre">add</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.add" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.ConfigGroup.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a configuration object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -533,8 +534,8 @@ See discussion in method doc.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.dbgroup.ConfigGroup.add_path">
-<code class="sig-name descname"><span class="pre">add_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*.json'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.add_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.add_path" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.ConfigGroup.add_path">
+<span class="sig-name descname"><span class="pre">add_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*.json'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.add_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.add_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add configuration file(s)
 in <cite>path</cite>. The path can be a single file or a directory.
 If path is a directory, then <cite>pattern</cite>
@@ -553,8 +554,8 @@ and collection name (if any) combined with a ‘.’.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.dbgroup.ConfigGroup.expand">
-<code class="sig-name descname"><span class="pre">expand</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.expand" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.ConfigGroup.expand">
+<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.expand" title="Permalink to this definition">¶</a></dt>
 <dd><p>Expand config for <cite>name</cite> by adding a sub-configuration for every
 dot-separated collection “below” the given one (or all, if none given).</p>
 <dl class="simple">
@@ -579,13 +580,13 @@ and ‘spiderman.spectacular’, but <em>not</em> ‘spiderman2’.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.dbgroup.ConfigGroup.keys">
-<code class="sig-name descname"><span class="pre">keys</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.keys" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.ConfigGroup.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.keys" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.dbgroup.ConfigGroup.set_prefix">
-<code class="sig-name descname"><span class="pre">set_prefix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.set_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.set_prefix" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.ConfigGroup.set_prefix">
+<span class="sig-name descname"><span class="pre">set_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.set_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.set_prefix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set prefix to use as a namespace for item lookup.
 A dot (.) will be automatically added to the given string.</p>
 <dl class="field-list simple">
@@ -599,8 +600,8 @@ A dot (.) will be automatically added to the given string.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.dbgroup.ConfigGroup.uncache">
-<code class="sig-name descname"><span class="pre">uncache</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.uncache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.uncache" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.ConfigGroup.uncache">
+<span class="sig-name descname"><span class="pre">uncache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#ConfigGroup.uncache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.ConfigGroup.uncache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all created query engines that match <cite>name</cite> from
 the cache (this disconnects from MongoDB, which is the point).</p>
 <dl class="field-list simple">
@@ -616,14 +617,14 @@ the cache (this disconnects from MongoDB, which is the point).</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt id="pymatgen.db.dbgroup.CreateQueryEngineError">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">CreateQueryEngineError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#CreateQueryEngineError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.CreateQueryEngineError" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.CreateQueryEngineError">
+<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">CreateQueryEngineError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#CreateQueryEngineError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.CreateQueryEngineError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="pymatgen.db.dbgroup.RegexDict">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">RegexDict</span></code><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#RegexDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.RegexDict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.RegexDict">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">RegexDict</span></span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#RegexDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.RegexDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>Extend standard dict to include
 a function that finds values based on a
@@ -632,8 +633,8 @@ regular expression for the key. For example:</p>
 <div><p>d = RegexDict(tweedledee=1, tweedledum=2)</p>
 </div></blockquote>
 <dl class="py method">
-<dt id="pymatgen.db.dbgroup.RegexDict.re_get">
-<code class="sig-name descname"><span class="pre">re_get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#RegexDict.re_get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.RegexDict.re_get" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.RegexDict.re_get">
+<span class="sig-name descname"><span class="pre">re_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#RegexDict.re_get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.RegexDict.re_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return values whose key matches <cite>pattern</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -646,8 +647,8 @@ regular expression for the key. For example:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.dbgroup.RegexDict.re_keys">
-<code class="sig-name descname"><span class="pre">re_keys</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#RegexDict.re_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.RegexDict.re_keys" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.RegexDict.re_keys">
+<span class="sig-name descname"><span class="pre">re_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#RegexDict.re_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.RegexDict.re_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find keys matching <cite>pattern</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -665,8 +666,8 @@ regular expression for the key. For example:</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.dbgroup.create_query_engine">
-<code class="sig-name descname"><span class="pre">create_query_engine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clazz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#create_query_engine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.create_query_engine" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.dbgroup.create_query_engine">
+<span class="sig-name descname"><span class="pre">create_query_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clazz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/dbgroup.html#create_query_engine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.dbgroup.create_query_engine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create and return new query engine object from the
 given <cite>DBConfig</cite> object.</p>
 <dl class="field-list simple">
@@ -683,14 +684,14 @@ act like query_engine.QueryEngine.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-pymatgen.db.query_engine">
+</section>
+<section id="module-pymatgen.db.query_engine">
 <span id="pymatgen-db-query-engine-module"></span><h2>pymatgen.db.query_engine module<a class="headerlink" href="#module-pymatgen.db.query_engine" title="Permalink to this headline">¶</a></h2>
 <p>This module provides a QueryEngine that simplifies queries for Mongo databases
 generated using hive.</p>
 <dl class="py class">
-<dt id="pymatgen.db.query_engine.QueryEngine">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">QueryEngine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27017</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aliases_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replicaset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">ignore</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">QueryEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27017</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aliases_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replicaset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">ignore</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class defines a QueryEngine interface to a Mongo Collection based on
 a set of aliases. This query engine also provides convenient translation
@@ -761,78 +762,78 @@ that is modified in-place.</p></li>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.ALIASES_CONFIG_KEY">
-<code class="sig-name descname"><span class="pre">ALIASES_CONFIG_KEY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'aliases_config'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.ALIASES_CONFIG_KEY" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.ALIASES_CONFIG_KEY">
+<span class="sig-name descname"><span class="pre">ALIASES_CONFIG_KEY</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'aliases_config'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.ALIASES_CONFIG_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.COLLECTION_KEY">
-<code class="sig-name descname"><span class="pre">COLLECTION_KEY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'collection'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.COLLECTION_KEY" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.COLLECTION_KEY">
+<span class="sig-name descname"><span class="pre">COLLECTION_KEY</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'collection'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.COLLECTION_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.DB_KEY">
-<code class="sig-name descname"><span class="pre">DB_KEY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'database'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.DB_KEY" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.DB_KEY">
+<span class="sig-name descname"><span class="pre">DB_KEY</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'database'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.DB_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.HOST_KEY">
-<code class="sig-name descname"><span class="pre">HOST_KEY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'host'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.HOST_KEY" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.HOST_KEY">
+<span class="sig-name descname"><span class="pre">HOST_KEY</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'host'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.HOST_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.PASSWORD_KEY">
-<code class="sig-name descname"><span class="pre">PASSWORD_KEY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'password'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.PASSWORD_KEY" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.PASSWORD_KEY">
+<span class="sig-name descname"><span class="pre">PASSWORD_KEY</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'password'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.PASSWORD_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.PORT_KEY">
-<code class="sig-name descname"><span class="pre">PORT_KEY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'port'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.PORT_KEY" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.PORT_KEY">
+<span class="sig-name descname"><span class="pre">PORT_KEY</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'port'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.PORT_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.USER_KEY">
-<code class="sig-name descname"><span class="pre">USER_KEY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'user'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.USER_KEY" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.USER_KEY">
+<span class="sig-name descname"><span class="pre">USER_KEY</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'user'</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.USER_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.aliases">
-<code class="sig-name descname"><span class="pre">aliases</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.aliases" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.aliases">
+<span class="sig-name descname"><span class="pre">aliases</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.aliases" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <cite>aliases</cite> arg to constructor</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.close">
-<code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.close" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnects the connection.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.collection_name">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">collection_name</span></code><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.collection_name" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.collection_name">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">collection_name</span></span><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.collection_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.default_criteria">
-<code class="sig-name descname"><span class="pre">default_criteria</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.default_criteria" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.default_criteria">
+<span class="sig-name descname"><span class="pre">default_criteria</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.default_criteria" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <cite>default_criteria</cite> arg to constructor</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.default_properties">
-<code class="sig-name descname"><span class="pre">default_properties</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.default_properties" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.default_properties">
+<span class="sig-name descname"><span class="pre">default_properties</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.default_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <cite>default_properties</cite> arg to constructor</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.ensure_index">
-<code class="sig-name descname"><span class="pre">ensure_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.ensure_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.ensure_index" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.ensure_index">
+<span class="sig-name descname"><span class="pre">ensure_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.ensure_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.ensure_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper for pymongo.Collection.ensure_index</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.from_config">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">from_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_admin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.from_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.from_config" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.from_config">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_admin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.from_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.from_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a QueryEngine from a JSON config file generated using mgdb
 init.</p>
 <dl class="field-list simple">
@@ -851,14 +852,14 @@ Defaults to False.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.get_dos_from_id">
-<code class="sig-name descname"><span class="pre">get_dos_from_id</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_dos_from_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_dos_from_id" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.get_dos_from_id">
+<span class="sig-name descname"><span class="pre">get_dos_from_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_dos_from_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_dos_from_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overrides the get_dos_from_id for the MIT gridfs format.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.get_entries">
-<code class="sig-name descname"><span class="pre">get_entries</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criteria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_entries" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.get_entries">
+<span class="sig-name descname"><span class="pre">get_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criteria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_entries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get ComputedEntries satisfying a particular criteria.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -887,8 +888,8 @@ to be access via entry.data[key].</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.get_entries_in_system">
-<code class="sig-name descname"><span class="pre">get_entries_in_system</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_entries_in_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_entries_in_system" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.get_entries_in_system">
+<span class="sig-name descname"><span class="pre">get_entries_in_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_entries_in_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_entries_in_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets all entries in a chemical system, e.g. Li-Fe-O will return all
 Li-O, Fe-O, Li-Fe, Li-Fe-O compounds.</p>
 <div class="admonition note">
@@ -920,8 +921,8 @@ the chemical system.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.get_structure_from_id">
-<code class="sig-name descname"><span class="pre">get_structure_from_id</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_structure_from_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_structure_from_id" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.get_structure_from_id">
+<span class="sig-name descname"><span class="pre">get_structure_from_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_structure_from_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_structure_from_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a structure from the database given the task id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -935,8 +936,8 @@ True.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.query">
-<code class="sig-name descname"><span class="pre">query</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distinct_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.query" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distinct_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience method for database access.  All properties and criteria
 can be specified using simplified names defined in Aliases.  You can
 use the supported_properties property to get the list of supported
@@ -973,26 +974,26 @@ that the results are in the form of an iterable of dicts.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.query_one">
-<code class="sig-name descname"><span class="pre">query_one</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.query_one"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.query_one" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.query_one">
+<span class="sig-name descname"><span class="pre">query_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.query_one"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.query_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return first document from <a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.query" title="pymatgen.db.query_engine.QueryEngine.query"><code class="xref py py-meth docutils literal notranslate"><span class="pre">query()</span></code></a>, with same parameters.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.query_post">
-<code class="sig-name descname"><span class="pre">query_post</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.query_post" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.query_post">
+<span class="sig-name descname"><span class="pre">query_post</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.query_post" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <cite>query_post</cite> arg to constructor</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pymatgen.db.query_engine.QueryEngine.result_post">
-<code class="sig-name descname"><span class="pre">result_post</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.result_post" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.result_post">
+<span class="sig-name descname"><span class="pre">result_post</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.result_post" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <cite>result_post</cite> arg to constructor</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.set_aliases_and_defaults">
-<code class="sig-name descname"><span class="pre">set_aliases_and_defaults</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aliases_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.set_aliases_and_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.set_aliases_and_defaults" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.set_aliases_and_defaults">
+<span class="sig-name descname"><span class="pre">set_aliases_and_defaults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aliases_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.set_aliases_and_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.set_aliases_and_defaults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the alias config and defaults to use. Typically used when
 switching to a collection with a different schema.</p>
 <dl class="field-list simple">
@@ -1010,8 +1011,8 @@ query().</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryEngine.set_collection">
-<code class="sig-name descname"><span class="pre">set_collection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.set_collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.set_collection" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryEngine.set_collection">
+<span class="sig-name descname"><span class="pre">set_collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.set_collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.set_collection" title="Permalink to this definition">¶</a></dt>
 <dd><p>To Be Deprecated: this should be replaced with the &#64;property collection_name</p>
 <p>Switch to another collection. Note that you may have to set the
 aliases and default properties via set_aliases_and_defaults if the
@@ -1026,15 +1027,15 @@ schema of the new collection differs from the current collection.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt id="pymatgen.db.query_engine.QueryError">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">QueryError</span></code><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryError" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryError">
+<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">QueryError</span></span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Exception class for errors occuring during queries.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="pymatgen.db.query_engine.QueryListResults">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">QueryListResults</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_cursor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryListResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryListResults" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryListResults">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">QueryListResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_cursor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryListResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryListResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pymatgen.db.query_engine.QueryResults" title="pymatgen.db.query_engine.QueryResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.query_engine.QueryResults</span></code></a></p>
 <p>Set of QueryResults on a list instead of a MongoDB cursor.</p>
 <p>Constructor.</p>
@@ -1049,15 +1050,15 @@ modifying it in-place, or None, or an empty list</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryListResults.clone">
-<code class="sig-name descname"><span class="pre">clone</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryListResults.clone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryListResults.clone" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryListResults.clone">
+<span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryListResults.clone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryListResults.clone" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="pymatgen.db.query_engine.QueryResults">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">QueryResults</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_cursor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryResults" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryResults">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">QueryResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_cursor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Iterable</span></code></p>
 <p>Iterable wrapper for results from QueryEngine.
 Like pymongo’s cursor, this object should generally not be instantiated,
@@ -1077,25 +1078,25 @@ modifying it in-place, or None, or an empty list</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryResults.clone">
-<code class="sig-name descname"><span class="pre">clone</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryResults.clone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryResults.clone" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryResults.clone">
+<span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryResults.clone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryResults.clone" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pymatgen.db.query_engine.QueryResults.from_cursor">
-<code class="sig-name descname"><span class="pre">from_cursor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryResults.from_cursor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryResults.from_cursor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryResults.from_cursor">
+<span class="sig-name descname"><span class="pre">from_cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryResults.from_cursor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryResults.from_cursor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a QueryResults object from a cursor object</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-pymatgen.db.util">
+</section>
+<section id="module-pymatgen.db.util">
 <span id="pymatgen-db-util-module"></span><h2>pymatgen.db.util module<a class="headerlink" href="#module-pymatgen.db.util" title="Permalink to this headline">¶</a></h2>
 <p>Utility functions used across scripts.</p>
 <dl class="py class">
-<dt id="pymatgen.db.util.MongoJSONEncoder">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">MongoJSONEncoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#MongoJSONEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.MongoJSONEncoder" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.MongoJSONEncoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">MongoJSONEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#MongoJSONEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.MongoJSONEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
 <p>Constructor for JSONEncoder, with sensible defaults.</p>
 <p>If skipkeys is false, then it is a TypeError to attempt
@@ -1120,15 +1121,15 @@ elements and object members will be pretty-printed with that
 indent level.  An indent level of 0 will only insert newlines.
 None is the most compact representation.</p>
 <p>If specified, separators should be an (item_separator, key_separator)
-tuple.  The default is (‘, ‘, ‘: ‘) if <em>indent</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code> and
+tuple.  The default is (’, ‘, ‘: ‘) if <em>indent</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code> and
 (‘,’, ‘: ‘) otherwise.  To get the most compact JSON representation,
 you should specify (‘,’, ‘:’) to eliminate whitespace.</p>
 <p>If specified, default is a function that gets called for objects
 that can’t otherwise be serialized.  It should return a JSON encodable
 version of the object or raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>.</p>
 <dl class="py method">
-<dt id="pymatgen.db.util.MongoJSONEncoder.default">
-<code class="sig-name descname"><span class="pre">default</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#MongoJSONEncoder.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.MongoJSONEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.MongoJSONEncoder.default">
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#MongoJSONEncoder.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.MongoJSONEncoder.default" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement this method in a subclass such that it returns
 a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
 (to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
@@ -1150,8 +1151,8 @@ implement default like this:</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.util.collection_keys">
-<code class="sig-name descname"><span class="pre">collection_keys</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#collection_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.collection_keys" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.collection_keys">
+<span class="sig-name descname"><span class="pre">collection_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#collection_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.collection_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of all (including nested) keys in a collection.
 Examines the first document in the collection.</p>
 <dl class="field-list simple">
@@ -1165,45 +1166,45 @@ Examines the first document in the collection.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.util.csv_dict">
-<code class="sig-name descname"><span class="pre">csv_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#csv_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.csv_dict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.csv_dict">
+<span class="sig-name descname"><span class="pre">csv_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#csv_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.csv_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format dict to a string with comma-separated values.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.util.csv_list">
-<code class="sig-name descname"><span class="pre">csv_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#csv_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.csv_list" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.csv_list">
+<span class="sig-name descname"><span class="pre">csv_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#csv_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.csv_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format list to a string with comma-separated values.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.util.get_collection">
-<code class="sig-name descname"><span class="pre">get_collection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#get_collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.get_collection" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.get_collection">
+<span class="sig-name descname"><span class="pre">get_collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#get_collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.get_collection" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.util.get_database">
-<code class="sig-name descname"><span class="pre">get_database</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#get_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.get_database" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.get_database">
+<span class="sig-name descname"><span class="pre">get_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#get_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.get_database" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.util.get_settings">
-<code class="sig-name descname"><span class="pre">get_settings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#get_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.get_settings" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.get_settings">
+<span class="sig-name descname"><span class="pre">get_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#get_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.get_settings" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.util.kvp_dict">
-<code class="sig-name descname"><span class="pre">kvp_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#kvp_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.kvp_dict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.kvp_dict">
+<span class="sig-name descname"><span class="pre">kvp_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#kvp_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.kvp_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format dict to key=value pairs.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="pymatgen.db.util.quotable">
-<code class="sig-name descname"><span class="pre">quotable</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#quotable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.quotable" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.util.quotable">
+<span class="sig-name descname"><span class="pre">quotable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#quotable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.quotable" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</div>
-<div class="section" id="module-pymatgen.db">
+</section>
+<section id="module-pymatgen.db">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pymatgen.db" title="Permalink to this headline">¶</a></h2>
 <p>Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
 materials analysis library. It enables the creation of Materials
@@ -1211,8 +1212,8 @@ Project-style MongoDB databases for management of materials data and
 provides a clean and intuitive web ui for exploring that data. A query engine
 is also provided to enable the easy translation of MongoDB docs to useful
 pymatgen objects for analysis purposes.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>

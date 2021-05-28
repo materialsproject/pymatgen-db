@@ -4,11 +4,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.alchemy package &#8212; pymatgen-db 2021.5.13 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>pymatgen.db.alchemy package &#8212; pymatgen-db 2021.5.28 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -45,7 +46,7 @@
         <li class="right" >
           <a href="pymatgen.db.html" title="pymatgen.db package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2021.5.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2021.5.28 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="pymatgen.db.html" accesskey="U">pymatgen.db package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.alchemy package</a></li> 
       </ul>
@@ -56,24 +57,24 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="pymatgen-db-alchemy-package">
+  <section id="pymatgen-db-alchemy-package">
 <h1>pymatgen.db.alchemy package<a class="headerlink" href="#pymatgen-db-alchemy-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="submodules">
+</section>
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-pymatgen.db.alchemy.transmuters">
+</section>
+<section id="module-pymatgen.db.alchemy.transmuters">
 <span id="pymatgen-db-alchemy-transmuters-module"></span><h2>pymatgen.db.alchemy.transmuters module<a class="headerlink" href="#module-pymatgen.db.alchemy.transmuters" title="Permalink to this headline">¶</a></h2>
 <p>This module implements a version of pymatgen’s Transmuter to generate
 TransformedStructures from DB data sources. They enable the
 high-throughput generation of new structures and input files.</p>
 <dl class="py class">
-<dt id="pymatgen.db.alchemy.transmuters.QeTransmuter">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">QeTransmuter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queryengine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extend_collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/alchemy/transmuters.html#QeTransmuter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.alchemy.transmuters.QeTransmuter" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pymatgen.db.alchemy.transmuters.QeTransmuter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">QeTransmuter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queryengine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extend_collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/alchemy/transmuters.html#QeTransmuter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.alchemy.transmuters.QeTransmuter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.alchemy.transmuters.StandardTransmuter</span></code></p>
 <p>The QeTransmuter uses a QueryEngine to retrieve and generate new structures
 from a database.</p>
@@ -95,14 +96,14 @@ Uses multiprocessing.Pool</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-pymatgen.db.alchemy">
+</section>
+<section id="module-pymatgen.db.alchemy">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pymatgen.db.alchemy" title="Permalink to this headline">¶</a></h2>
 <p>This package provides a version of pymatgen’s alchemy transmuter for
 performing transformations on structures queried from a Materials Project
 style database.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
