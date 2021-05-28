@@ -19,7 +19,8 @@ setup(
     extras_require={
         'tests': 'mongomock'
     },
-    package_data={"matgendb": ["*.json"]},
+    package_data={"pymatgen": ["db/*.json"]},
+    include_package_data=True,
     author="Shyue Ping Ong, Dan Gunter",
     author_email="shyuep@gmail.com",
     maintainer="Dan Gunter",
