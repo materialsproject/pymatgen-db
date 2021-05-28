@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Deployment file to facilitate releases of matgendb.
+Deployment file to facilitate releases of pymatgen-db.
 """
 
 from __future__ import division
