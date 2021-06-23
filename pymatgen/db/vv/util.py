@@ -10,16 +10,13 @@ __email__ = "dkgunter@lbl.gov"
 __status__ = "Development"
 __date__ = "3/29/13"
 
-#!/usr/bin/env python3
-
-
 from argparse import Action
 from collections import deque
 from itertools import chain
 import logging
 import time
 from sys import getsizeof
-from yaml import load
+import ruamel.yaml as yaml
 
 TRACE = logging.DEBUG - 1
 
@@ -102,7 +99,7 @@ class Timing:
     """
 
     def __init__(
-        self, name="event", elapsed=None, log=None, level=logging.DEBUG, **kwargs
+            self, name="event", elapsed=None, log=None, level=logging.DEBUG, **kwargs
     ):
         self.name, self.kw, self.level = name, kwargs, level
         self.elapsed = elapsed
@@ -212,7 +209,7 @@ class YamlConfig(Action):
 
     def _get_config_from_file(self, filename):
         with open(filename) as f:
-            config = load(f)
+            config = yaml.load(f)
         return config
 
 
