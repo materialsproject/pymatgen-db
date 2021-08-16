@@ -26,9 +26,6 @@ jobs:
         mypy --version
         rm -rf .mypy_cache
         mypy pymatgen
-    - name: pydocstyle
-      run: |
-        pydocstyle --count pymatgen
     - name: pylint
       run: |
         pylint pymatgen
@@ -42,3 +39,6 @@ jobs:
         flake8 --count --show-source --statistics pymatgen
         # exit-zero treats all errors as warnings.
         flake8 --count --exit-zero --max-complexity=20 --statistics pymatgen
+    - name: pydocstyle
+      run: |
+        pydocstyle --count pymatgen
