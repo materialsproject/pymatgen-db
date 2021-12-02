@@ -635,7 +635,7 @@ class QueryResults(Iterable):
 
     def __len__(self):
         """Return length as a `count()` on the MongoDB cursor."""
-        return self._results.count()
+        return len(list(self._results.clone()))
 
     def __getitem__(self, i):
         return self._mapped_result(self._results[i])
