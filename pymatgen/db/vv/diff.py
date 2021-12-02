@@ -97,9 +97,7 @@ class Differ:
             for cfg in c1, c2:
                 settings = util.get_settings(cfg)
                 if not normalize_auth(settings):
-                    _log.warn(
-                        "Config file {} does not have a username/password".format(cfg)
-                    )
+                    _log.warn("Config file {} does not have a username/password".format(cfg))
                 settings["aliases_config"] = {"aliases": {}, "defaults": {}}
                 engine = QueryEngine(**settings)
                 engines.append(engine)
@@ -132,11 +130,7 @@ class Differ:
                 try:
                     key = rec[self._key_field]
                 except KeyError:
-                    _log.critical(
-                        "Key '{}' not found in record: {}. Abort.".format(
-                            self._key_field, rec
-                        )
-                    )
+                    _log.critical("Key '{}' not found in record: {}. Abort.".format(self._key_field, rec))
                     return {}
                 if not allow_dup and key in keys[i]:
                     raise ValueError("Duplicate key: {}".format(key))
@@ -177,17 +171,11 @@ class Differ:
 
             # Stop if we don't have properties on any record at all
             if 0 < count == missing_props:
-                _log.critical(
-                    "Missing one or more properties on all {:d} records".format(count)
-                )
+                _log.critical("Missing one or more properties on all {:d} records".format(count))
                 return {}
             # ..but only issue a warning for partially missing properties.
             elif missing_props > 0:
-                _log.warn(
-                    "Missing one or more properties for {:d}/{:d} records".format(
-                        missing_props, count
-                    )
-                )
+                _log.warn("Missing one or more properties for {:d}/{:d} records".format(missing_props, count))
         t1 = time.time()
         _log.info("query.end sec={:f}".format(t1 - t0))
 

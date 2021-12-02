@@ -69,11 +69,11 @@ class NormAuthTestCase(unittest.TestCase):
 class SettingsTestCase(unittest.TestCase):
     def setUp(self):
         self.cfg = {
-            "host": u"localhost",
+            "host": "localhost",
             "port": 27017,
-            "database": u"foo",
-            "user": u"guy",
-            "password": u"knock-knock",
+            "database": "foo",
+            "user": "guy",
+            "password": "knock-knock",
             "aliases": {},
         }
 

@@ -71,9 +71,7 @@ class ConfigGroupTestCase(unittest.TestCase):
         self.assertEqual(self.g["bar"], expect["bar"])
         self.assertEqual(self.g["bar*"], {"bar": expect["bar"]})
         self.assertEqual(self.g["foo.a"], expect["foo.a"])
-        self.assertEqual(
-            self.g["foo.*"], {"foo.a": expect["foo.a"], "foo.b": expect["foo.b"]}
-        )
+        self.assertEqual(self.g["foo.*"], {"foo.a": expect["foo.a"], "foo.b": expect["foo.b"]})
 
     def test_add_path(self):
         """Add set of query engines from a path."""

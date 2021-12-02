@@ -152,9 +152,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             self.assertEqual(e[0].parameters["xc_override"], "PS")
 
             # Test query one.
-            d = qe.query_one(
-                criteria={"pretty_formula": "TbZn(BO2)5"}, properties=["energy"]
-            )
+            d = qe.query_one(criteria={"pretty_formula": "TbZn(BO2)5"}, properties=["energy"])
             self.assertAlmostEqual(d["energy"], -526.66747274, 4)
 
             d = qe.get_entries_in_system(["Li", "O"])

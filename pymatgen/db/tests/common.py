@@ -26,7 +26,10 @@ _log = logging.getLogger("pymatgen.db.tests")
 
 TEST_FILES_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "..", "..", "..", "test_files",
+    "..",
+    "..",
+    "..",
+    "test_files",
 )
 
 
@@ -77,8 +80,7 @@ class MockQueryEngine(QueryEngine):
                 return  # actully connected! not mocked..
             except:
                 _log.debug(
-                    "Connection to real MongoDB at {}:{} failed. "
-                    "This is normal; using mock.".format(host, port)
+                    "Connection to real MongoDB at {}:{} failed. " "This is normal; using mock.".format(host, port)
                 )
         self.connection = MongoClient(host, port)
         self.db = self.connection[database]
@@ -88,9 +90,7 @@ class MockQueryEngine(QueryEngine):
         self.database_name = database
         # colllection name is now a @property. the setter will set "self.collection" internally
         self.collection_name = collection
-        self.set_aliases_and_defaults(
-            aliases_config=aliases_config, default_properties=default_properties
-        )
+        self.set_aliases_and_defaults(aliases_config=aliases_config, default_properties=default_properties)
 
 
 # -----------------------------------
@@ -123,9 +123,7 @@ class ComponentTest(unittest.TestCase):
 
     def mgbuild(self, args):
         try:
-            s = subprocess.check_output(
-                self.MGBUILD_CMD + args, stderr=subprocess.STDOUT
-            )
+            s = subprocess.check_output(self.MGBUILD_CMD + args, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as err:
             print("ERROR: {}".format(err.output))
             raise

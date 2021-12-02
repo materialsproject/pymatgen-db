@@ -136,9 +136,7 @@ class TrackedQueryEngine(QueryEngine, TrackingInterface):
         """
         self._collection_name = value
         self._mongo_coll = self.db[value]
-        self.collection = TrackedCollection(
-            self._mongo_coll, operation=self._t_op, field=self._t_field
-        )
+        self.collection = TrackedCollection(self._mongo_coll, operation=self._t_op, field=self._t_field)
 
     def set_mark(self):
         """See :meth:`TrackingInterface.set_mark`"""
@@ -199,11 +197,7 @@ class TrackedCollection:
         # update filter with tracker query
         filt.update(self._mark.query)
         # delegate to "real" find()
-        _log.info(
-            "tracked_find.end, call: {}.find(args={} kwargs={})".format(
-                self._coll.name, args, kwargs
-            )
-        )
+        _log.info("tracked_find.end, call: {}.find(args={} kwargs={})".format(self._coll.name, args, kwargs))
         return self._coll_find(*args, **kwargs)
 
     def set_mark(self):
@@ -267,11 +261,7 @@ class Mark:
         if rec is None:
             self._pos = self._empty_pos()
         elif not self._fld in rec:
-            _log.error(
-                "Tracking field not found. field={} collection={}".format(
-                    self._fld, self._c.name
-                )
-            )
+            _log.error("Tracking field not found. field={} collection={}".format(self._fld, self._c.name))
             _log.warn("Continuing without tracking")
             self._pos = self._empty_pos()
         else:

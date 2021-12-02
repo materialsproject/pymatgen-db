@@ -25,9 +25,7 @@ class QeTransmuter(StandardTransmuter):
     from a database.
     """
 
-    def __init__(
-        self, queryengine, criteria, transformations, extend_collection=0, ncores=None
-    ):
+    def __init__(self, queryengine, criteria, transformations, extend_collection=0, ncores=None):
         """Constructor.
 
         Args:
@@ -66,8 +64,7 @@ class QeTransmuter(StandardTransmuter):
             ]
 
         transformed_structures = [
-            TransformedStructure(entry.structure, [], history=get_history(entry))
-            for entry in entries
+            TransformedStructure(entry.structure, [], history=get_history(entry)) for entry in entries
         ]
         StandardTransmuter.__init__(
             self,

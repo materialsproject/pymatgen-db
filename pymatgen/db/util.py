@@ -60,10 +60,7 @@ def get_database(config_file=None, settings=None, admin=False, **kwargs):
         passwd = d["admin_password"] if admin else d["readonly_password"]
         db.authenticate(user, passwd)
     except (KeyError, TypeError, ValueError):
-        _log.warn(
-            "No {admin,readonly}_user/password found in config. file, "
-            "accessing DB without authentication"
-        )
+        _log.warn("No {admin,readonly}_user/password found in config. file, " "accessing DB without authentication")
     return db
 
 
@@ -109,9 +106,7 @@ def csv_dict(d):
     """Format dict to a string with comma-separated values."""
     if len(d) == 0:
         return "{}"
-    return (
-        "{" + ", ".join(["'{}': {}".format(k, quotable(v)) for k, v in d.items()]) + "}"
-    )
+    return "{" + ", ".join(["'{}': {}".format(k, quotable(v)) for k, v in d.items()]) + "}"
 
 
 def kvp_dict(d):

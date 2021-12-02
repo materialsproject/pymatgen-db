@@ -80,7 +80,7 @@ class QueryEngine:
         result_post=None,
         connection=None,
         replicaset=None,
-        **ignore
+        **ignore,
     ):
         """Constructor.
 
@@ -136,9 +136,7 @@ class QueryEngine:
         if connection is None:
             # can't pass replicaset=None to MongoClient (fails validation)
             if self.replicaset:
-                self.connection = MongoClient(
-                    self.host, self.port, replicaset=self.replicaset
-                )
+                self.connection = MongoClient(self.host, self.port, replicaset=self.replicaset)
             else:
                 self.connection = MongoClient(self.host, self.port)
         else:
@@ -147,9 +145,7 @@ class QueryEngine:
         if user:
             self.db.authenticate(user, password)
         self.collection_name = collection
-        self.set_aliases_and_defaults(
-            aliases_config=aliases_config, default_properties=default_properties
-        )
+        self.set_aliases_and_defaults(aliases_config=aliases_config, default_properties=default_properties)
         # Post-processing functions
         self.query_post = query_post or []
         self.result_post = result_post or []
@@ -209,9 +205,7 @@ class QueryEngine:
         if default_properties is None:
             self._default_props, self._default_prop_dict = None, None
         else:
-            self._default_props, self._default_prop_dict = self._parse_properties(
-                default_properties
-            )
+            self._default_props, self._default_prop_dict = self._parse_properties(default_properties)
 
     def __enter__(self):
         """Allows for use with the 'with' context manager"""
@@ -500,9 +494,7 @@ class QueryEngine:
         results = tuple(self.query([field], args))
 
         if len(results) > 1:
-            raise QueryError(
-                "More than one result found for task_id {}!".format(task_id)
-            )
+            raise QueryError("More than one result found for task_id {}!".format(task_id))
         elif len(results) == 0:
             raise QueryError("No structure found for task_id {}!".format(task_id))
         c = results[0]
@@ -575,9 +567,7 @@ class QueryEngine:
                     for j in range(len(ados)):
                         orb = Orbital(j)
                         odos = ados[str(orb)]
-                        all_ados[orb] = {
-                            Spin(int(k)): v for k, v in odos["densities"].items()
-                        }
+                        all_ados[orb] = {Spin(int(k)): v for k, v in odos["densities"].items()}
                     pdoss[structure[i]] = all_ados
                 return CompleteDos(structure, tdos, pdoss)
         return None

@@ -98,9 +98,7 @@ class Timing:
             do_foo2()
     """
 
-    def __init__(
-            self, name="event", elapsed=None, log=None, level=logging.DEBUG, **kwargs
-    ):
+    def __init__(self, name="event", elapsed=None, log=None, level=logging.DEBUG, **kwargs):
         self.name, self.kw, self.level = name, kwargs, level
         self.elapsed = elapsed
         self._log = log
@@ -112,9 +110,7 @@ class Timing:
         elapsed = time.time() - self.begin
         if self._log is not None:
             nvp = ", ".join(["{}={}".format(k, v) for k, v in self.kw.items()])
-            self._log.log(
-                self.level, "@{n}={s:f}s {kw}".format(n=self.name, s=elapsed, kw=nvp)
-            )
+            self._log.log(self.level, "@{n}={s:f}s {kw}".format(n=self.name, s=elapsed, kw=nvp))
         if self.elapsed:
             self.elapsed.value = elapsed
 

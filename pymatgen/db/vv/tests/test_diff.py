@@ -139,9 +139,7 @@ class MyTestCase(unittest.TestCase):
         """Keys and props, some props different, check pct change."""
         # Perform diff.
         minus, plus = 10, 20
-        df = Differ(
-            key="name", deltas={"energy": Delta("+{}-{}=%".format(plus, minus))}
-        )
+        df = Differ(key="name", deltas={"energy": Delta("+{}-{}=%".format(plus, minus))})
         d = df.diff(*self.engines)
 
         # Calculate expected results.

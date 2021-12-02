@@ -36,9 +36,7 @@ class MyTestCase(unittest.TestCase):
             "funny__char": [1, 2, 3],
             "listy": [{"item": "Ciaozinho"}],
         }
-        walker = JsonWalker(
-            value_transform=JsonWalker.value_json, dict_transform=JsonWalker.dict_expand
-        )
+        walker = JsonWalker(value_transform=JsonWalker.value_json, dict_transform=JsonWalker.dict_expand)
         result = walker.walk(doc)
         self.assertEqual(expected, result)
 
@@ -62,17 +60,13 @@ class MyTestCase(unittest.TestCase):
     def test_yaml_override(self):
         """YamlConfig arg overrides file, if given last."""
         expected = "42"
-        args = self.y_parser.parse_args(
-            "--config {} --spam {}".format(self.y_file, expected).split()
-        )
+        args = self.y_parser.parse_args("--config {} --spam {}".format(self.y_file, expected).split())
         assert getattr(args, self.y_name) == expected
 
     def test_yaml_override2(self):
         """YamlConfig file overrides arg, if given last."""
         value = 12
-        args = self.y_parser.parse_args(
-            "--spam {} --config {}".format(value, self.y_file).split()
-        )
+        args = self.y_parser.parse_args("--spam {} --config {}".format(value, self.y_file).split())
         assert getattr(args, self.y_name) == self.y_value
 
 

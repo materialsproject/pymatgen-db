@@ -172,11 +172,7 @@ class ConfigGroup:
             for k, v in self._d.re_get(name).items():
                 qe[k] = self._get_qe(k, v)
             if not qe:
-                raise KeyError(
-                    "No configuration found, name='{}' full-regex='{}'".format(
-                        orig_name, name
-                    )
-                )
+                raise KeyError("No configuration found, name='{}' full-regex='{}'".format(orig_name, name))
         else:
             qe = self._get_qe(name, self._d[name])
         return qe

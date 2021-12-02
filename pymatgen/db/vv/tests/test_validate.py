@@ -307,9 +307,7 @@ class TestCollectionFilter(unittest.TestCase):
         self.assertEqual(len(reasons), 2)
         for r in reasons:
             if r.field == "bar":
-                self.assertTrue(
-                    r.op == ">" and r.got_value == 0 and r.expected_value == 1
-                )
+                self.assertTrue(r.op == ">" and r.got_value == 0 and r.expected_value == 1)
         # all pass
         q = vv.MongoQuery()
         q.add_clause(vv.MongoClause(vv.Constraint("foo", "size>", 2)))

@@ -42,9 +42,7 @@ class QeTransmuterTest(unittest.TestCase):
         try:
             drone = VaspToDbTaskDrone(database="qetransmuter_unittest")
             queen = BorgQueen(drone)
-            queen.serial_assimilate(
-                os.path.join(test_dir, "db_test", "success_mp_aflow")
-            )
+            queen.serial_assimilate(os.path.join(test_dir, "db_test", "success_mp_aflow"))
             cls.conn = MongoClient()
             cls.qe = QueryEngine(database="qetransmuter_unittest")
         except ConnectionFailure:
@@ -58,17 +56,13 @@ class QeTransmuterTest(unittest.TestCase):
         trans = [
             SubstitutionTransformation({"Zn": "Mg"}),
             OxidationStateDecorationTransformation({"B": 3, "O": -2, "Mg": 2, "Tb": 3}),
-            PartialRemoveSpecieTransformation(
-                "Mg2+", 0.5, algo=PartialRemoveSpecieTransformation.ALGO_COMPLETE
-            ),
+            PartialRemoveSpecieTransformation("Mg2+", 0.5, algo=PartialRemoveSpecieTransformation.ALGO_COMPLETE),
         ]
         self.qep = QeTransmuter(QeTransmuterTest.qe, crit, trans, extend_collection=10)
         trans_structures = self.qep.transformed_structures
         self.assertEqual(len(trans_structures), 3)
         for s in trans_structures:
-            self.assertEqual(
-                s.final_structure.composition.reduced_formula, "Tb2Mg(BO2)10"
-            )
+            self.assertEqual(s.final_structure.composition.reduced_formula, "Tb2Mg(BO2)10")
 
     @classmethod
     def tearDownClass(cls):

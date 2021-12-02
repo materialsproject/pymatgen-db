@@ -40,11 +40,7 @@ class CopyBuilder(core.Builder):
         if not crit:  # reduce any False-y crit value to None
             crit = None
         cur = source.query(criteria=crit)
-        _log.info(
-            "source.collection={} crit={} source_records={:d}".format(
-                source.collection, crit, len(cur)
-            )
-        )
+        _log.info("source.collection={} crit={} source_records={:d}".format(source.collection, crit, len(cur)))
         return cur
 
     def process_item(self, item):

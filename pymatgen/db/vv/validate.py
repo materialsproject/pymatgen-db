@@ -229,9 +229,7 @@ class ProgressMeter:
         self._total += 1
         if self._n == 0 or self._count < self._n:
             return
-        sys.stderr.write(
-            self._fmt.format(*args, subject=self._subject, count=self.count)
-        )
+        sys.stderr.write(self._fmt.format(*args, subject=self._subject, count=self.count))
         sys.stderr.write("\n")
         sys.stderr.flush()
         self._count = 0
@@ -353,9 +351,7 @@ class Validator(DoesLogging):
                 report_fields,
             )
 
-    def __init__(
-        self, max_violations=50, max_dberrors=10, aliases=None, add_exists=False
-    ):
+    def __init__(self, max_violations=50, max_dberrors=10, aliases=None, add_exists=False):
         DoesLogging.__init__(self, name="mg.validator")
         self.set_progress(0)
         self._aliases = aliases if aliases else {}
@@ -375,9 +371,7 @@ class Validator(DoesLogging):
         :type num: int
         :return: None
         """
-        report_str = (
-            "Progress for {subject}: {count:d} invalid, {:d} db errors, {:d} bytes"
-        )
+        report_str = "Progress for {subject}: {count:d} invalid, {:d} db errors, {:d} bytes"
         self._progress = ProgressMeter(num, report_str)
 
     def num_violations(self):
@@ -486,26 +480,20 @@ class Validator(DoesLogging):
             fval = mongo_get(record, key)
             if fval is None:
                 expected = clause.constraint.value
-                reasons.append(
-                    ConstraintViolation(clause.constraint, "missing", expected)
-                )
+                reasons.append(ConstraintViolation(clause.constraint, "missing", expected))
                 continue
             if op.is_variable():
                 # retrieve value for variable
                 var_name = clause.constraint.value
                 value = mongo_get(record, var_name, default=None)
                 if value is None:
-                    reasons.append(
-                        ConstraintViolation(clause.constraint, "missing", var_name)
-                    )
+                    reasons.append(ConstraintViolation(clause.constraint, "missing", var_name))
                     continue
                 clause.constraint.value = value  # swap out value, temporarily
             # take length for size
             if op.is_size():
                 if isinstance(fval, str) or not hasattr(fval, "__len__"):
-                    reasons.append(
-                        ConstraintViolation(clause.constraint, type(fval), "sequence")
-                    )
+                    reasons.append(ConstraintViolation(clause.constraint, type(fval), "sequence"))
                     if op.is_variable():
                         clause.constraint.value = var_name  # put original value back
                     continue
@@ -561,9 +549,7 @@ class Validator(DoesLogging):
 
             cond_query = MongoQuery()
             if sval.filters is not None:
-                cond_groups = self._process_constraint_expressions(
-                    sval.filters, rev=False
-                )
+                cond_groups = self._process_constraint_expressions(sval.filters, rev=False)
                 for cg in cond_groups.values():
                     for c in cg:
                         cond_query.add_clause(MongoClause(c, rev=False))
@@ -600,9 +586,7 @@ class Validator(DoesLogging):
             for field_name, group in groups.items():
                 conflicts = group.get_conflicts()
                 if conflicts:
-                    raise ValueError(
-                        "Conflicts for field {}: {}".format(field_name, conflicts)
-                    )
+                    raise ValueError("Conflicts for field {}: {}".format(field_name, conflicts))
         return groups
 
     def _is_python(self, constraint_list):
@@ -613,13 +597,9 @@ class Validator(DoesLogging):
         :return: True if this refers to an import of code, False otherwise
         :raises: ValidatorSyntaxError
         """
-        if len(constraint_list) == 1 and PythonMethod.constraint_is_method(
-            constraint_list[0]
-        ):
+        if len(constraint_list) == 1 and PythonMethod.constraint_is_method(constraint_list[0]):
             return True
-        if len(constraint_list) > 1 and any(
-            filter(PythonMethod.constraint_is_method, constraint_list)
-        ):
+        if len(constraint_list) > 1 and any(filter(PythonMethod.constraint_is_method, constraint_list)):
             condensed_list = "/".join(constraint_list)
             err = PythonMethod.CANNOT_COMBINE_ERR
             raise ValidatorSyntaxError(condensed_list, err)
@@ -667,11 +647,7 @@ class Sampler(DoesLogging):
         if min_items < 0:
             raise ValueError("min_items cannot be negative ({:d})".format(min_items))
         if (max_items != 0) and (max_items < min_items):
-            raise ValueError(
-                "max_items must be zero or >= min_items ({:d} < {:d})".format(
-                    max_items, min_items
-                )
-            )
+            raise ValueError("max_items must be zero or >= min_items ({:d} < {:d})".format(max_items, min_items))
         if not (0.0 <= p <= 1.0):
             raise ValueError("probability, p, must be between 0 and 1 ({:f})".format(p))
         self.min_items = min_items

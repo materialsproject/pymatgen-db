@@ -92,9 +92,7 @@ class SandboxTest(unittest.TestCase):
             query_post=[self.qtx],
             result_post=[self.rtx],
         )
-        result = self._test_find(
-            qe, criteria={"e_above_hull": {"$lte": 0.0}}, properties={}
-        )
+        result = self._test_find(qe, criteria={"e_above_hull": {"$lte": 0.0}}, properties={})
 
     @unittest.skipUnless(has_mongo, "requires MongoDB server")
     def test_with_properties(self):
@@ -137,9 +135,7 @@ class SandboxTest(unittest.TestCase):
             query_post=[self.qtx],
             result_post=[self.rtx],
         )
-        result = qe.query(criteria={"e_above_hull": {"$lte": 0.0}}).sort(
-            "sbxd.e_above_hull", pymongo.ASCENDING
-        )
+        result = qe.query(criteria={"e_above_hull": {"$lte": 0.0}}).sort("sbxd.e_above_hull", pymongo.ASCENDING)
         self.assertTrue(isinstance(result, QueryResults))
         self.assertEqual(len(result), self.N)
         self.assertTrue(result[0]["e_above_hull"] < 0)

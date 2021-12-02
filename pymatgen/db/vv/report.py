@@ -113,9 +113,7 @@ class Table:
 
     def add(self, values):
         if len(values) != self._width:
-            raise ValueError(
-                "expected {:d} values, got {:d}".format(self._width, len(values))
-            )
+            raise ValueError("expected {:d} values, got {:d}".format(self._width, len(values)))
         self._rows.append(values)
         for i, v in enumerate(values):
             n = len(str(v))
@@ -144,9 +142,7 @@ class Table:
 
     @property
     def values(self):
-        return [
-            {self._colnames[i]: r[i] for i in range(self._width)} for r in self._rows
-        ]
+        return [{self._colnames[i]: r[i] for i in range(self._width)} for r in self._rows]
 
     @property
     def column_names(self):
@@ -285,10 +281,7 @@ class JSONFormatter:
                 dict(
                     title=s.header.title,
                     info=s.header,
-                    conditions=[
-                        dict(title=cs.header.title, info=cs.header, violations=cs.body)
-                        for cs in s
-                    ],
+                    conditions=[dict(title=cs.header.title, info=cs.header, violations=cs.body) for cs in s],
                 )
                 for s in report
             ],
@@ -315,9 +308,7 @@ class MarkdownFormatter:
         return ", ".join((("{}={}".format(k, v) for k, v in d.items())))
 
     def _fixed_width(self, values, widths):
-        s = "".join(
-            ["{{:{:d}s}}".format(w + 1).format(str(v)) for w, v in zip(widths, values)]
-        )
+        s = "".join(["{{:{:d}s}}".format(w + 1).format(str(v)) for w, v in zip(widths, values)])
         return s
 
     def format(self, report):
@@ -364,7 +355,7 @@ class Emailer(DoesLogging):
         subject="Report",
         server="localhost",
         port=None,
-        **kwargs
+        **kwargs,
     ):
         """Send reports as email.
 
@@ -417,15 +408,9 @@ class Emailer(DoesLogging):
             # s.set_debuglevel(2)
             refused = s.sendmail(self._sender, self._recipients, msg.as_string())
             if refused:
-                self._log.warn(
-                    "Email to {:d} recipients was refused".format(len(refused))
-                )
+                self._log.warn("Email to {:d} recipients was refused".format(len(refused)))
                 for person, (code, msg) in refused.items():
-                    self._log(
-                        "Email to {p} was refused ({c}): {m}".format(
-                            p=person, c=code, m=msg
-                        )
-                    )
+                    self._log("Email to {p} was refused ({c}): {m}".format(p=person, c=code, m=msg))
             s.quit()
             n_recip = len(self._recipients)
         except Exception as err:
@@ -489,9 +474,7 @@ class DiffFormatter:
         columns = list(columns)  # might be a tuple
         fixed_cols = [self.key]
         if section.lower() == "different":
-            fixed_cols.extend(
-                [Differ.CHANGED_MATCH_KEY, Differ.CHANGED_OLD, Differ.CHANGED_NEW]
-            )
+            fixed_cols.extend([Differ.CHANGED_MATCH_KEY, Differ.CHANGED_OLD, Differ.CHANGED_NEW])
         map(columns.remove, fixed_cols)
         columns.sort()
         return fixed_cols + columns
@@ -668,11 +651,7 @@ class DiffHtmlFormatter(DiffFormatter):
     def _body(self, result):
         body = ["<div class='content'>"]
         for section in result.keys():
-            body.append(
-                "<div class='section'{{ssec}}><h2{{sh2}}>{t}</h2>".format(
-                    t=section.title()
-                )
-            )
+            body.append("<div class='section'{{ssec}}><h2{{sh2}}>{t}</h2>".format(t=section.title()))
             if len(result[section]) == 0:
                 body.append("<div class='empty'>Empty</div>")
             else:
@@ -703,9 +682,7 @@ class DiffHtmlFormatter(DiffFormatter):
             cols = self.ordered_cols(subset, section)
             # Format the table.
             tables.extend(
-                ["<tr{tr1}>".format(**inline)]
-                + ["<th{th}>{c}</th>".format(c=c, **inline) for c in cols]
-                + ["</tr>"]
+                ["<tr{tr1}>".format(**inline)] + ["<th{th}>{c}</th>".format(c=c, **inline) for c in cols] + ["</tr>"]
             )
             self.sort_rows(rows, section)
             for i, r in enumerate(rows):
@@ -713,9 +690,7 @@ class DiffHtmlFormatter(DiffFormatter):
                 if tuple(sorted(r.keys())) != subset:
                     continue
                 if self._url is not None:
-                    r[cols[0]] = "<a href='{p}{v}'>{v}</a>".format(
-                        p=self._url, v=r[cols[0]]
-                    )
+                    r[cols[0]] = "<a href='{p}{v}'>{v}</a>".format(p=self._url, v=r[cols[0]])
                 tables.extend(
                     ["<tr{}>".format(tr).format(**inline)]
                     + ["<td{td}>{d}</td>".format(d=r[c], **inline) for c in cols]

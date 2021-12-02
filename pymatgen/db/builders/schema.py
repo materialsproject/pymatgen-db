@@ -152,9 +152,7 @@ class Schema(HasMeta):
     def validate(self, doc, path="(root)"):
         t = self._whatis(doc)
         if t != self._type:
-            return self._vresult(
-                path, "type mismatch: {} != {}", self._typestr(t), self
-            )
+            return self._vresult(path, "type mismatch: {} != {}", self._typestr(t), self)
         if t == self.IS_LIST:
             if len(doc) == 0:
                 return None
@@ -162,13 +160,9 @@ class Schema(HasMeta):
         elif t == self.IS_DICT:
             # fail if document is missing any required keys
             dkeys = set(doc.keys())
-            skeys = set(
-                filter(lambda k: not self._schema[k].is_optional, self._schema.keys())
-            )
+            skeys = set(filter(lambda k: not self._schema[k].is_optional, self._schema.keys()))
             if skeys - dkeys:
-                return self._vresult(
-                    path, "missing keys: ({})".format(", ".join(skeys - dkeys))
-                )
+                return self._vresult(path, "missing keys: ({})".format(", ".join(skeys - dkeys)))
             # check each item in document
             for k, v in doc.items():
                 if k in self._schema:
@@ -180,9 +174,7 @@ class Schema(HasMeta):
                     # return self._vresult(path, "missing key: {}", k)
         else:
             if not self._schema.check(doc):
-                return self._vresult(
-                    path, "bad value '{}' for type {}", doc, self._schema
-                )
+                return self._vresult(path, "bad value '{}' for type {}", doc, self._schema)
 
     def json_schema(self, **add_keys):
         """Convert our compact schema representation to the standard, but more verbose,
@@ -266,9 +258,7 @@ class Schema(HasMeta):
                 optional = True
             vinfo = VALUE_RE.match(value)
             if not vinfo:
-                raise ValueError(
-                    "bad type format, must be __<type>__ got {}".format(value)
-                )
+                raise ValueError("bad type format, must be __<type>__ got {}".format(value))
             dtype, meta = vinfo.groups()
             return Scalar(dtype, optional=optional, meta=meta)
 

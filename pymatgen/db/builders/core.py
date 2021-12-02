@@ -124,9 +124,7 @@ class Collections:
         """
         if not self.MIN_VER <= version <= self.MAX_VER:
             raise ValueError(
-                "Bad version ({v:d}) not in range {v0} .. {v1} ".format(
-                    v=version, v0=self.MIN_VER, v1=self.MAX_VER
-                )
+                "Bad version ({v:d}) not in range {v0} .. {v1} ".format(v=version, v0=self.MIN_VER, v1=self.MAX_VER)
             )
         self._names, self._coll = {}, {}
         if version == 1:
@@ -238,9 +236,7 @@ class HasExamples:
             _log.debug("validating example in collection {}".format(collection))
             sch = schema.get_schema(collection)  # with more err. checking
             result = sch.validate(doc)
-            _log.debug(
-                "validation result: {}".format("OK" if result is None else result)
-            )
+            _log.debug("validation result: {}".format("OK" if result is None else result))
             if result is not None:
                 fail_fn("Failed to validate sample document: {}".format(result))
 
@@ -394,10 +390,7 @@ class Builder(metaclass=ABCMeta):
         elif isinstance(config, dict):
             conn = dbutil.get_database(settings=config)
         else:
-            raise ValueError(
-                "Configuration, '{}',  must be a path to "
-                "a configuration file or dict".format(config)
-            )
+            raise ValueError("Configuration, '{}',  must be a path to " "a configuration file or dict".format(config))
         return conn
 
     # -----------------------------
@@ -547,9 +540,7 @@ def alphadump(d, indent=2, depth=0):
         (
             "{}: {}{}".format(
                 k,
-                alphadump(d[k], depth=depth + 1)
-                if isinstance(d[k], dict)
-                else str(d[k]),
+                alphadump(d[k], depth=depth + 1) if isinstance(d[k], dict) else str(d[k]),
                 sep,
             )
             for k in sorted(d.keys())

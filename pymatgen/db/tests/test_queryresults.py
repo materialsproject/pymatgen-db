@@ -12,6 +12,7 @@ has_mongo = common.has_mongo()
 
 test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "test_files")
 
+
 class QueryResultsTest(unittest.TestCase):
     def setUp(self):
         if has_mongo:
@@ -20,9 +21,7 @@ class QueryResultsTest(unittest.TestCase):
             self.db = self.conn[self.db_name]
             self.coll_name = "tasks_{}".format(uuid.uuid4())
             self.coll = self.db[self.coll_name]
-            with open(
-                os.path.join(test_dir, "db_test", "GaLa.task.json")
-            ) as f:
+            with open(os.path.join(test_dir, "db_test", "GaLa.task.json")) as f:
                 doc = bson.json_util.loads(f.read())
                 self.coll.insert_one(doc)
 
@@ -55,9 +54,7 @@ class QueryResultsTest(unittest.TestCase):
             self.assertIsInstance(elt, list)
             for n in elt:
                 self.assertIsInstance(n, float)
-        self.assertIn(
-            "calcs_reversed.output.ionic_steps.electronic_steps.e_0_energy", doc
-        )
+        self.assertIn("calcs_reversed.output.ionic_steps.electronic_steps.e_0_energy", doc)
         v = doc["calcs_reversed.output.ionic_steps.electronic_steps.e_0_energy"]
         for elt in v:
             self.assertIsInstance(elt, list)
