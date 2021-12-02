@@ -55,7 +55,7 @@ class MyTestCase(unittest.TestCase):
             # Create mock query engine.
             self.engines.append(MockQueryEngine(collection=c, **db_config))
         for ei, engine in enumerate(self.engines):
-            engine.collection.remove_many({})
+            engine.collection.delete_many({})
             for i in range(self.NUM_RECORDS):
                 rec = create_record(i)
                 engine.collection.insert_one(rec)
