@@ -201,7 +201,7 @@ class VaspToDbTaskDrone(AbstractDrone):
     def calculate_stability(self, d):
         m = MPRester(self.mapi_key)
         functional = d["pseudo_potential"]["functional"]
-        syms = ["{} {}".format(functional, l) for l in d["pseudo_potential"]["labels"]]
+        syms = [f"{functional} {l}" for l in d["pseudo_potential"]["labels"]]
         entry = ComputedEntry(
             Composition(d["unit_cell_formula"]),
             d["output"]["final_energy"],
@@ -215,7 +215,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         """
         Get the entire task doc for a path, including any post-processing.
         """
-        logger.info("Getting task doc for base dir :{}".format(path))
+        logger.info(f"Getting task doc for base dir :{path}")
         files = os.listdir(path)
         vasprun_files = OrderedDict()
         if "STOPCAR" in files:
@@ -228,7 +228,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                         vasprun_files[r] = os.path.join(r, f)
             else:  # try extension schema
                 for f in files:
-                    if fnmatch(f, "vasprun.xml.{}*".format(r)):
+                    if fnmatch(f, f"vasprun.xml.{r}*"):
                         vasprun_files[r] = f
         if len(vasprun_files) == 0:
             for f in files:  # get any vasprun from the folder
@@ -309,7 +309,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             d:
                 Current doc generated.
         """
-        logger.info("Post-processing dir:{}".format(dir_name))
+        logger.info(f"Post-processing dir:{dir_name}")
 
         fullpath = os.path.abspath(dir_name)
 
@@ -324,7 +324,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             with zopen(filenames[0], "rt") as f:
                 transformations = json.load(f)
                 try:
-                    m = re.match("(\d+)-ICSD", transformations["history"][0]["source"])
+                    m = re.match(r"(\d+)-ICSD", transformations["history"][0]["source"])
                     if m:
                         d["icsd_id"] = int(m.group(1))
                 except Exception as ex:
@@ -369,7 +369,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 d["calculations"][i]["output"]["outcar"] = outcar.as_dict()
                 run_stats[taskname] = outcar.run_stats
         except:
-            logger.error("Bad OUTCAR for {}.".format(fullpath))
+            logger.error(f"Bad OUTCAR for {fullpath}.")
 
         try:
             overall_run_stats = {}
@@ -379,10 +379,10 @@ class VaspToDbTaskDrone(AbstractDrone):
                 "System time (sec)",
                 "Elapsed time (sec)",
             ]:
-                overall_run_stats[key] = sum([v[key] for v in run_stats.values()])
+                overall_run_stats[key] = sum(v[key] for v in run_stats.values())
             run_stats["overall"] = overall_run_stats
         except:
-            logger.error("Bad run stats for {}.".format(fullpath))
+            logger.error(f"Bad run stats for {fullpath}.")
 
         d["run_stats"] = run_stats
 
@@ -426,13 +426,13 @@ class VaspToDbTaskDrone(AbstractDrone):
                         d["run_type"] = "GGA"
                 except Exception as ex:
                     print(str(ex))
-                    logger.error("Unable to parse INCAR for killed run {}.".format(dir_name))
+                    logger.error(f"Unable to parse INCAR for killed run {dir_name}.")
             elif fnmatch(f, "KPOINTS*"):
                 try:
                     kpoints = Kpoints.from_file(filename)
                     d["kpoints"] = kpoints.as_dict()
                 except:
-                    logger.error("Unable to parse KPOINTS for killed run {}.".format(dir_name))
+                    logger.error(f"Unable to parse KPOINTS for killed run {dir_name}.")
             elif fnmatch(f, "POSCAR*"):
                 try:
                     s = Poscar.from_file(filename).structure
@@ -452,7 +452,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                     )
                     d["poscar"] = s.as_dict()
                 except:
-                    logger.error("Unable to parse POSCAR for killed run {}.".format(dir_name))
+                    logger.error(f"Unable to parse POSCAR for killed run {dir_name}.")
             elif fnmatch(f, "POTCAR*"):
                 try:
                     potcar = Potcar.from_file(filename)
@@ -462,13 +462,13 @@ class VaspToDbTaskDrone(AbstractDrone):
                         "labels": potcar.symbols,
                     }
                 except:
-                    logger.error("Unable to parse POTCAR for killed run in {}.".format(dir_name))
+                    logger.error(f"Unable to parse POTCAR for killed run in {dir_name}.")
             elif fnmatch(f, "OSZICAR"):
                 try:
                     d["oszicar"]["root"] = Oszicar(os.path.join(dir_name, f)).as_dict()
                 except:
-                    logger.error("Unable to parse OSZICAR for killed run in {}.".format(dir_name))
-            elif re.match("relax\d", f):
+                    logger.error(f"Unable to parse OSZICAR for killed run in {dir_name}.")
+            elif re.match(r"relax\d", f):
                 if os.path.exists(os.path.join(dir_name, f, "OSZICAR")):
                     try:
                         d["oszicar"][f] = Oszicar(os.path.join(dir_name, f, "OSZICAR")).as_dict()
@@ -495,7 +495,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             try:
                 d["dos"] = r.complete_dos.as_dict()
             except Exception:
-                logger.warning("No valid dos data exist in {}.\n Skipping dos".format(dir_name))
+                logger.warning(f"No valid dos data exist in {dir_name}.\n Skipping dos")
         if taskname == "relax1" or taskname == "relax2":
             d["task"] = {"type": "aflow", "name": taskname}
         else:
@@ -661,24 +661,24 @@ def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5, volume_chang
     error_msgs = []
 
     if abs(percent_delta_vol) > volume_change_threshold:
-        warning_msgs.append("Volume change > {}%".format(volume_change_threshold * 100))
+        warning_msgs.append(f"Volume change > {volume_change_threshold * 100}%")
 
     bv_struct = Structure.from_dict(d["output"]["crystal"])
     try:
         bva = BVAnalyzer()
         bv_struct = bva.get_oxi_state_decorated_structure(bv_struct)
     except ValueError as e:
-        logger.error("Valence cannot be determined due to {e}.".format(e=e))
+        logger.error(f"Valence cannot be determined due to {e}.")
     except Exception as ex:
-        logger.error("BVAnalyzer error {e}.".format(e=str(ex)))
+        logger.error(f"BVAnalyzer error {str(ex)}.")
 
     max_force = None
     if d["state"] == "successful" and d["calculations"][0]["input"]["parameters"].get("NSW", 0) > 0:
         # handle the max force and max force error
-        max_force = max([np.linalg.norm(a) for a in d["calculations"][-1]["output"]["ionic_steps"][-1]["forces"]])
+        max_force = max(np.linalg.norm(a) for a in d["calculations"][-1]["output"]["ionic_steps"][-1]["forces"])
 
         if max_force > max_force_threshold:
-            error_msgs.append("Final max force exceeds {} eV".format(max_force_threshold))
+            error_msgs.append(f"Final max force exceeds {max_force_threshold} eV")
             d["state"] = "error"
 
         s = Structure.from_dict(d["output"]["crystal"])
@@ -762,4 +762,4 @@ def get_uri(dir_name):
         hostname = socket.gethostbyaddr(socket.gethostname())[0]
     except:
         hostname = socket.gethostname()
-    return "{}:{}".format(hostname, fullpath)
+    return f"{hostname}:{fullpath}"

@@ -13,7 +13,7 @@ class Jsonable:
         self.value = s
 
     def as_json(self):
-        return "{}zinho".format(self.value)
+        return f"{self.value}zinho"
 
 
 class MyTestCase(unittest.TestCase):
@@ -47,26 +47,26 @@ class MyTestCase(unittest.TestCase):
         self.y_name = "spam"
         self.y_value = "eggs"
         with open(self.y_file, mode="w") as f:
-            f.write("{}: {}".format(self.y_name, self.y_value))
+            f.write(f"{self.y_name}: {self.y_value}")
         self.y_parser = ArgumentParser()
         self.y_parser.add_argument("--config", action=YamlConfig)
-        self.y_parser.add_argument("--{}".format(self.y_name))
+        self.y_parser.add_argument(f"--{self.y_name}")
 
     def test_yaml_populate(self):
         """YamlConfig populates args."""
-        args = self.y_parser.parse_args("--config {}".format(self.y_file).split())
+        args = self.y_parser.parse_args(f"--config {self.y_file}".split())
         assert getattr(args, self.y_name) == self.y_value
 
     def test_yaml_override(self):
         """YamlConfig arg overrides file, if given last."""
         expected = "42"
-        args = self.y_parser.parse_args("--config {} --spam {}".format(self.y_file, expected).split())
+        args = self.y_parser.parse_args(f"--config {self.y_file} --spam {expected}".split())
         assert getattr(args, self.y_name) == expected
 
     def test_yaml_override2(self):
         """YamlConfig file overrides arg, if given last."""
         value = 12
-        args = self.y_parser.parse_args("--spam {} --config {}".format(value, self.y_file).split())
+        args = self.y_parser.parse_args(f"--spam {value} --config {self.y_file}".split())
         assert getattr(args, self.y_name) == self.y_value
 
 

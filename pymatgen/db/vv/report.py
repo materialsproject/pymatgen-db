@@ -113,7 +113,7 @@ class Table:
 
     def add(self, values):
         if len(values) != self._width:
-            raise ValueError("expected {:d} values, got {:d}".format(self._width, len(values)))
+            raise ValueError(f"expected {self._width:d} values, got {len(values):d}")
         self._rows.append(values)
         for i, v in enumerate(values):
             n = len(str(v))
@@ -130,10 +130,10 @@ class Table:
             try:
                 colnum = self._colnames.index(name)
             except ValueError:
-                raise ValueError("column {} not in {}".format(name, self._colnames))
+                raise ValueError(f"column {name} not in {self._colnames}")
         else:
             if index < 0 or index >= self._width:
-                raise ValueError("index out of range 0..{:d}".format(self._width - 1))
+                raise ValueError(f"index out of range 0..{self._width - 1:d}")
             colnum = index
         self._rows.sort(key=itemgetter(colnum))
 
@@ -211,7 +211,7 @@ class HTMLFormatter:
         text = []
         text.append("<!DOCTYPE html>")
         text.append("<html>")
-        text.append("<title>{}</title>".format(report.header.title))
+        text.append(f"<title>{report.header.title}</title>")
         text.append("<head>")
         if self._css:
             text.append("<style>")
@@ -219,30 +219,30 @@ class HTMLFormatter:
             text.append("</style>")
         text.append("</head>")
         text.append("<body>")
-        text.append("<h1>{}</h1>".format(report.header.title))
+        text.append(f"<h1>{report.header.title}</h1>")
         text.append('<dl class="rptmeta">')
         for key, value in report.header:
-            text.append("<dt>{}</dt>".format(key))
-            text.append("<dd>{}</dd>".format(value))
+            text.append(f"<dt>{key}</dt>")
+            text.append(f"<dd>{value}</dd>")
         text.append("</dl>")
         for section in report:
-            text.append("<h2>{}</h2>".format(section.header.title))
+            text.append(f"<h2>{section.header.title}</h2>")
             text.append('<dl class="sectmeta">')
             for key, value in section.header:
-                text.append("<dt>{}</dt>".format(key))
-                text.append("<dd>{}</dd>".format(value))
+                text.append(f"<dt>{key}</dt>")
+                text.append(f"<dd>{value}</dd>")
             text.append("</dl>")
             for cond_section in section:
-                text.append("<h3>{}</h3>".format(cond_section.header.title))
+                text.append(f"<h3>{cond_section.header.title}</h3>")
                 text.append('<dl class="subsectmeta">')
                 for key, value in cond_section.header:
-                    text.append("<dt>{}</dt>".format(key))
-                    text.append("<dd>{}</dd>".format(value))
+                    text.append(f"<dt>{key}</dt>")
+                    text.append(f"<dd>{value}</dd>")
                 text.append("</dl>")
                 text.append("<table>")
                 text.append("<tr>")
                 for name in cond_section.body.column_names:
-                    text.append("<th>{}</th>".format(name))
+                    text.append(f"<th>{name}</th>")
                 text.append("</tr>")
                 prev_key, i = None, 0
                 for row in cond_section.body:
@@ -254,9 +254,9 @@ class HTMLFormatter:
                         prev_key = key
                         i += 1
                     rclass = ("even", "odd")[i % 2]
-                    text.append('<tr class="{}">'.format(rclass))
+                    text.append(f'<tr class="{rclass}">')
                     for value in row:
-                        text.append("<td>{}</td>".format(value))
+                        text.append(f"<td>{value}</td>")
                     text.append("</tr>")
                 text.append("</table>")
         text.append("</body>")
@@ -305,10 +305,10 @@ class MarkdownFormatter:
         self._idcol = id_column
 
     def _mapdump(self, d):
-        return ", ".join((("{}={}".format(k, v) for k, v in d.items())))
+        return ", ".join((f"{k}={v}" for k, v in d.items()))
 
     def _fixed_width(self, values, widths):
-        s = "".join(["{{:{:d}s}}".format(w + 1).format(str(v)) for w, v in zip(widths, values)])
+        s = "".join([f"{{:{w + 1:d}s}}".format(str(v)) for w, v in zip(widths, values)])
         return s
 
     def format(self, report):
@@ -329,12 +329,12 @@ class MarkdownFormatter:
             return
         infodict = info.as_dict()
         if infodict:
-            text = "Info: {}".format(self._mapdump(infodict))
+            text = f"Info: {self._mapdump(infodict)}"
             lines.append(text)
 
     def _append_heading(self, lines, level, title):
         hashes = "#" * level
-        text = "\n{} {} {}\n".format(hashes, title, hashes)
+        text = f"\n{hashes} {title} {hashes}\n"
         lines.append(text)
 
     def _append_violations(self, lines, data):
@@ -394,7 +394,7 @@ class Emailer(DoesLogging):
         elif sub_fmt.lower() == "html":
             msg = MIMEText(text, "html")
         else:
-            raise ValueError("Unknown message format: {}".format(fmt))
+            raise ValueError(f"Unknown message format: {fmt}")
         msg["Subject"] = self._subject
         msg["From"] = self._sender
         msg["To"] = ", ".join(self._recipients)
@@ -402,19 +402,19 @@ class Emailer(DoesLogging):
             conn_kwargs = dict(host=self._server)
         else:
             conn_kwargs = dict(host=self._server, port=self._port)
-        self._log.info("connect to email server {}".format(conn_kwargs))
+        self._log.info(f"connect to email server {conn_kwargs}")
         try:
             s = smtplib.SMTP(**conn_kwargs)
             # s.set_debuglevel(2)
             refused = s.sendmail(self._sender, self._recipients, msg.as_string())
             if refused:
-                self._log.warn("Email to {:d} recipients was refused".format(len(refused)))
+                self._log.warn(f"Email to {len(refused):d} recipients was refused")
                 for person, (code, msg) in refused.items():
-                    self._log("Email to {p} was refused ({c}): {m}".format(p=person, c=code, m=msg))
+                    self._log(f"Email to {person} was refused ({code}): {msg}")
             s.quit()
             n_recip = len(self._recipients)
         except Exception as err:
-            self._log.error("connection to SMTP server failed: {}".format(err))
+            self._log.error(f"connection to SMTP server failed: {err}")
             n_recip = 0
         return n_recip
 
@@ -465,7 +465,7 @@ class DiffFormatter:
             if key not in maxwid:
                 maxwid[key] = [len(k) for k in key]
             for i, k in enumerate(key):
-                strlen = len("{}".format(r[k]))
+                strlen = len(f"{r[k]}")
                 maxwid[key][i] = max(maxwid[key][i], strlen)
         return keyset, maxwid
 
@@ -601,7 +601,7 @@ class DiffHtmlFormatter(DiffFormatter):
         :rtype: str
         """
         css = "\n".join(self.css)
-        content = "{}{}".format(self._header(), self._body(result))
+        content = f"{self._header()}{self._body(result)}"
         if self._email:
             text = """<!DOCTYPE html>
             <html>
@@ -622,7 +622,7 @@ class DiffHtmlFormatter(DiffFormatter):
 
     def _header(self):
         lines = [
-            "<div class='header'><h1{{sh1}}>{t}</h1>".format(t=self.TITLE),
+            f"<div class='header'><h1{{sh1}}>{self.TITLE}</h1>",
             "<p{sp}>Compared <em{sem}>{{db1}}</em> with <em{sem}>{{db2}}</em></p>",
             "<p{sp}>Filter: <span class='fixed'>{{filter}}</span></p>",
             "<p{sp}>Run time: <em{sem}>{{start_time}}</em> to <em{sem}>{{end_time}}</em> ",
@@ -645,13 +645,13 @@ class DiffHtmlFormatter(DiffFormatter):
     def style(self, css_class, elt):
         s = ""
         if css_class in self.styles and elt in self.styles[css_class]:
-            s = " style='{}'".format(self.styles[css_class][elt])
+            s = f" style='{self.styles[css_class][elt]}'"
         return s
 
     def _body(self, result):
         body = ["<div class='content'>"]
         for section in result.keys():
-            body.append("<div class='section'{{ssec}}><h2{{sh2}}>{t}</h2>".format(t=section.title()))
+            body.append(f"<div class='section'{{ssec}}><h2{{sh2}}>{section.title()}</h2>")
             if len(result[section]) == 0:
                 body.append("<div class='empty'>Empty</div>")
             else:
@@ -692,7 +692,7 @@ class DiffHtmlFormatter(DiffFormatter):
                 if self._url is not None:
                     r[cols[0]] = "<a href='{p}{v}'>{v}</a>".format(p=self._url, v=r[cols[0]])
                 tables.extend(
-                    ["<tr{}>".format(tr).format(**inline)]
+                    [f"<tr{tr}>".format(**inline)]
                     + ["<td{td}>{d}</td>".format(d=r[c], **inline) for c in cols]
                     + ["</tr>"]
                 )
@@ -723,14 +723,14 @@ class DiffTextFormatter(DiffFormatter):
             lines.append("* " + section.title())
             indent = " " * 4
             if len(result[section]) == 0:
-                lines.append("{}EMPTY".format(indent))
+                lines.append(f"{indent}EMPTY")
             else:
                 keyset, maxwid = self.result_subsets(result[section])
                 for columns in keyset:
                     ocol = self.ordered_cols(columns, section)
                     mw = maxwid[columns]
                     mw_i = [columns.index(c) for c in ocol]  # reorder indexes
-                    fmt = "  ".join(["{{:{:d}s}}".format(mw[i]) for i in mw_i])
+                    fmt = "  ".join([f"{{:{mw[i]:d}s}}" for i in mw_i])
                     lines.append("")
                     lines.append(indent + fmt.format(*ocol))
                     lines.append(indent + "-_" * (sum(mw) / 2 + len(columns)))
@@ -744,5 +744,5 @@ class DiffTextFormatter(DiffFormatter):
         return "\n".join(lines)
 
     def _record(self, rec):
-        fields = ["{}: {}".format(k, v) for k, v in rec.items()]
+        fields = [f"{k}: {v}" for k, v in rec.items()]
         return "{" + ", ".join(fields) + "}"

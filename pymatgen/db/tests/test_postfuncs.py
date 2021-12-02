@@ -35,12 +35,12 @@ class SandboxTest(unittest.TestCase):
             self.conn = pymongo.MongoClient()
             self.db_name = "test"
             self.db = self.conn[self.db_name]
-            self.coll_name = "sandboxes_{}".format(uuid.uuid4())
+            self.coll_name = f"sandboxes_{uuid.uuid4()}"
             self.coll = self.db[self.coll_name]
             for i in range(self.N):
                 core_v, sbx_v = 0.1 * (i + 1), -0.1 * (i + 1)
                 doc = {
-                    "task_id": "mp-{:d}".format(1000 + i),
+                    "task_id": f"mp-{1000 + i:d}",
                     "sbxd": [
                         {"id": "core", "e_above_hull": core_v},
                         {"id": self.SBX, "e_above_hull": sbx_v},
@@ -70,7 +70,7 @@ class SandboxTest(unittest.TestCase):
         self.assertTrue(isinstance(cursor, QueryResults))
         n = 0
         for rec in cursor:
-            pprint.pprint("RESULT: {}".format(rec))
+            pprint.pprint(f"RESULT: {rec}")
             # No Post proccessing should be done
             self.assertTrue("e_above_hull" not in rec)
             self.assertTrue("add_fake_field" not in rec)
@@ -117,7 +117,7 @@ class SandboxTest(unittest.TestCase):
         self.assertTrue(isinstance(cursor, QueryResults))
         n = 0
         for rec in cursor:
-            pprint.pprint("RESULT: {}".format(rec))
+            pprint.pprint(f"RESULT: {rec}")
             self.assertTrue(rec["e_above_hull"] < 0)
             self.assertEqual(rec["add_fake_field"], "test value")
             n += 1

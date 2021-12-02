@@ -31,7 +31,7 @@ _log = util.get_builder_log("core")
 
 class BuildError(Exception):
     def __init__(self, who, why):
-        errmsg = "Builder {} failed: {}".format(who, why)
+        errmsg = f"Builder {who} failed: {why}"
         Exception.__init__(self, errmsg)
 
 
@@ -69,7 +69,7 @@ def parse_fn_docstring(fn):
             _, name, desc = line.split(":", 2)
             name = name[5:].strip()  # skip 'type '
             if not name in params:
-                raise ValueError("'type' without 'param' for {}".format(name))
+                raise ValueError(f"'type' without 'param' for {name}")
             params[name]["type"] = desc.strip()
         elif line.startswith(":return"):
             _1, _2, desc = line.split(":", 2)
@@ -124,14 +124,14 @@ class Collections:
         """
         if not self.MIN_VER <= version <= self.MAX_VER:
             raise ValueError(
-                "Bad version ({v:d}) not in range {v0} .. {v1} ".format(v=version, v0=self.MIN_VER, v1=self.MAX_VER)
+                f"Bad version ({version:d}) not in range {self.MIN_VER} .. {self.MAX_VER} "
             )
         self._names, self._coll = {}, {}
         if version == 1:
             for name in self.known_collections:
-                full_name = "{}.{}".format(prefix, name) if prefix else name
+                full_name = f"{prefix}.{name}" if prefix else name
                 if name == "tasks" and task_suffix is not None:
-                    full_name = "{}.{}".format(full_name, task_suffix)
+                    full_name = f"{full_name}.{task_suffix}"
                 self._names[name] = full_name
                 self._coll[full_name] = None
         if db is None:
@@ -233,12 +233,12 @@ class HasExamples:
         :type fail_fn: function(str)
         """
         for collection, doc in self.examples():
-            _log.debug("validating example in collection {}".format(collection))
+            _log.debug(f"validating example in collection {collection}")
             sch = schema.get_schema(collection)  # with more err. checking
             result = sch.validate(doc)
             _log.debug("validation result: {}".format("OK" if result is None else result))
             if result is not None:
-                fail_fn("Failed to validate sample document: {}".format(result))
+                fail_fn(f"Failed to validate sample document: {result}")
 
 
 class Builder(metaclass=ABCMeta):
@@ -401,7 +401,7 @@ class Builder(metaclass=ABCMeta):
         :return: Number of items processed
         :rtype: int
         """
-        _log.debug("_build, chunk_size={:d}".format(chunk_size))
+        _log.debug(f"_build, chunk_size={chunk_size:d}")
         n, i = 0, 0
         for i, item in enumerate(items):
             if i == 0:
@@ -438,7 +438,7 @@ class Builder(metaclass=ABCMeta):
             processes[i].join()
             code = processes[i].exitcode
             self._status.success(i) if 0 == code else self._status.fail(i)
-        _log.debug("run.parallel.multiprocess.end states={}".format(self._status))
+        _log.debug(f"run.parallel.multiprocess.end states={self._status}")
 
     def _run(self, index):
         """Run method for one thread or process
@@ -455,7 +455,7 @@ class Builder(metaclass=ABCMeta):
             except Queue.Empty:
                 break
             except Exception as err:
-                _log.error("In _run(): {}".format(err))
+                _log.error(f"In _run(): {err}")
                 if _log.isEnabledFor(logging.DEBUG):
                     _log.error(traceback.format_exc())
                 self._status.fail(index)
@@ -537,12 +537,10 @@ def alphadump(d, indent=2, depth=0):
     """
     sep = "\n" + " " * depth * indent
     return "".join(
-        (
             "{}: {}{}".format(
                 k,
                 alphadump(d[k], depth=depth + 1) if isinstance(d[k], dict) else str(d[k]),
                 sep,
             )
             for k in sorted(d.keys())
-        )
     )

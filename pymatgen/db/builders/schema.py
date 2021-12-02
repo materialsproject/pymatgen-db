@@ -26,7 +26,7 @@ SPECIAL_LEN = len(SPECIAL)
 
 # Regex for values
 # Note that the special prefix/suffix is optional
-VALUE_RE = re.compile("(?:{spec})?([a-zA-Z]+)(?:{spec})?\s*(.*)".format(spec=SPECIAL))
+VALUE_RE = re.compile(r"(?:{spec})?([a-zA-Z]+)(?:{spec})?\s*(.*)".format(spec=SPECIAL))
 
 # Global obj with all collected schemas
 schemata = {}
@@ -40,7 +40,7 @@ class SchemaError(Exception):
 
 class SchemaTypeError(SchemaError):
     def __init__(self, typename):
-        SchemaError.__init__(self, "bad type ({})".format(typename))
+        SchemaError.__init__(self, f"bad type ({typename})")
 
 
 class SchemaPathError(SchemaError):
@@ -68,11 +68,11 @@ def add_schemas(path, ext="json"):
         raise SchemaPathError()
     filepat = "*." + ext if ext else "*"
     for f in glob.glob(os.path.join(path, filepat)):
-        with open(f, "r") as fp:
+        with open(f) as fp:
             try:
                 schema = json.load(fp)
             except ValueError:
-                raise SchemaParseError("error parsing '{}'".format(f))
+                raise SchemaParseError(f"error parsing '{f}'")
         name = os.path.splitext(os.path.basename(f))[0]
         schemata[name] = Schema(schema)
 
@@ -97,7 +97,7 @@ def load_schema(file_or_fp):
     :raise: IOError if file cannot be opened or read, ValueError if
             file is not valid JSON or JSON is not a valid schema.
     """
-    fp = open(file_or_fp, "r") if isinstance(file_or_fp, str) else file_or_fp
+    fp = open(file_or_fp) if isinstance(file_or_fp, str) else file_or_fp
     obj = json.load(fp)
     schema = Schema(obj)
     return schema
@@ -228,7 +228,7 @@ class Schema(HasMeta):
         meta_info = ""
         if self.meta and "desc" in self.meta:
             meta_info = '="{}"'.format(self.meta["desc"])
-        return "{}{}: ".format(path, meta_info) + fmt.format(*args)
+        return f"{path}{meta_info}: " + fmt.format(*args)
 
     def _parse(self, value):
         t = self._type = self._whatis(value)
@@ -258,7 +258,7 @@ class Schema(HasMeta):
                 optional = True
             vinfo = VALUE_RE.match(value)
             if not vinfo:
-                raise ValueError("bad type format, must be __<type>__ got {}".format(value))
+                raise ValueError(f"bad type format, must be __<type>__ got {value}")
             dtype, meta = vinfo.groups()
             return Scalar(dtype, optional=optional, meta=meta)
 
@@ -276,7 +276,7 @@ class Schema(HasMeta):
         return self._typestr(self._type)
 
     def __repr__(self):
-        return "document::{}".format(self)
+        return f"document::{self}"
 
 
 def _is_datetime(d):
@@ -327,4 +327,4 @@ class Scalar(HasMeta):
         return self._type
 
     def __repr__(self):
-        return "scalar::{}".format(self)
+        return f"scalar::{self}"

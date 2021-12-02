@@ -83,8 +83,7 @@ def collection_keys(coll, sep="."):
         for k in x:
             yield (pre + k)
             if isinstance(x[k], dict):
-                for nested in _keys(x[k], pre + k + sep):
-                    yield nested
+                yield from _keys(x[k], pre + k + sep)
 
     return list(_keys(coll.find_one()))
 
@@ -99,16 +98,16 @@ def csv_list(l):
 def quotable(v):
     if isinstance(v, int) or isinstance(v, float):
         return str(v)
-    return "'{}'".format(v)
+    return f"'{v}'"
 
 
 def csv_dict(d):
     """Format dict to a string with comma-separated values."""
     if len(d) == 0:
         return "{}"
-    return "{" + ", ".join(["'{}': {}".format(k, quotable(v)) for k, v in d.items()]) + "}"
+    return "{" + ", ".join([f"'{k}': {quotable(v)}" for k, v in d.items()]) + "}"
 
 
 def kvp_dict(d):
     """Format dict to key=value pairs."""
-    return ", ".join(["{}={}".format(k, quotable(v)) for k, v in d.items()])
+    return ", ".join([f"{k}={quotable(v)}" for k, v in d.items()])

@@ -213,13 +213,13 @@ class TestCollectionFilter(unittest.TestCase):
         # reversed
         for op, r_op in (("size>", "<="), ("size<", ">=")):
             obj = vv.MongoClause(vv.Constraint(fld, op, val))
-            expected = "this.{}.length {} {}".format(fld, r_op, val)
+            expected = f"this.{fld}.length {r_op} {val}"
             self.assertEqual(obj.query_loc, vv.MongoClause.LOC_WHERE)
             self.assertEqual(obj.expr, expected)
         # not reversed
         for op, r_op in (("size>", ">"), ("size<", "<")):
             obj = vv.MongoClause(vv.Constraint(fld, op, val), rev=False)
-            expected = "this.{}.length {} {}".format(fld, r_op, val)
+            expected = f"this.{fld}.length {r_op} {val}"
             self.assertEqual(obj.query_loc, vv.MongoClause.LOC_WHERE)
             self.assertEqual(obj.expr, expected)
         # variable
@@ -251,7 +251,7 @@ class TestCollectionFilter(unittest.TestCase):
             ):
                 obj = vv.MongoClause(vv.Constraint(fld, op, val), rev=rev)
                 self.assertEqual(obj.query_loc, vv.MongoClause.LOC_WHERE)
-                expected = 'typeof this.{} {} "{}"'.format(fld, whereop, type_js)
+                expected = f'typeof this.{fld} {whereop} "{type_js}"'
                 self.assertEqual(obj.expr, expected)
 
     def test_MongoQuery_base(self):

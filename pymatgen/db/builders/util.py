@@ -60,8 +60,8 @@ def get_schema_file(db_version=1, db="mg_core", collection="materials"):
     :raise: IOError, if file is not found or not accessible
     """
     d = get_schema_dir(db_version=db_version)
-    schemafile = "{}.{}.json".format(db, collection)
-    f = open(os.path.join(d, schemafile), "r")
+    schemafile = f"{db}.{collection}.json"
+    f = open(os.path.join(d, schemafile))
     return f
 
 

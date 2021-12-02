@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Utility functions and classes for validation.
 """
@@ -29,7 +28,7 @@ class DoesLogging:
     def __init__(self, name=None):
         if name is None:
             if self.__module__ != "__main__":
-                name = "%s.%s" % (self.__module__, self.__class__.__name__)
+                name = f"{self.__module__}.{self.__class__.__name__}"
             else:
                 name = self.__class__.__name__
         self._log = logging.getLogger(name)
@@ -109,8 +108,8 @@ class Timing:
     def __exit__(self, type, value, tb):
         elapsed = time.time() - self.begin
         if self._log is not None:
-            nvp = ", ".join(["{}={}".format(k, v) for k, v in self.kw.items()])
-            self._log.log(self.level, "@{n}={s:f}s {kw}".format(n=self.name, s=elapsed, kw=nvp))
+            nvp = ", ".join([f"{k}={v}" for k, v in self.kw.items()])
+            self._log.log(self.level, f"@{self.name}={elapsed:f}s {nvp}")
         if self.elapsed:
             self.elapsed.value = elapsed
 
@@ -201,7 +200,7 @@ class YamlConfig(Action):
         config = self._get_config_from_file(values)
         for key, value in config.items():
             setattr(namespace, key, value)
-        _alog.debug("YamlConfig.namespace={}".format(namespace))
+        _alog.debug(f"YamlConfig.namespace={namespace}")
 
     def _get_config_from_file(self, filename):
         with open(filename) as f:
@@ -224,12 +223,12 @@ def args_kvp_nodup(s):
         try:
             key, value = item.split("=", 1)
         except ValueError:
-            msg = "argument item '{}' not in form key=value".format(item)
+            msg = f"argument item '{item}' not in form key=value"
             if _argparse_is_dumb:
                 _alog.warn(msg)
             raise ValueError(msg)
         if key in d:
-            msg = "Duplicate key for '{}' not allowed".format(key)
+            msg = f"Duplicate key for '{key}' not allowed"
             if _argparse_is_dumb:
                 _alog.warn(msg)
             raise ValueError(msg)

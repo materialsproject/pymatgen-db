@@ -30,7 +30,7 @@ class KeysTestCase(unittest.TestCase):
         input = {"a": {"b": {"c": 1}}}
         coll = FakeCollection(input)
         result = collection_keys(coll)
-        print("@@Result: {}".format(result))
+        print(f"@@Result: {result}")
         keys = ["a", "a.b", "a.b.c"]
         self.assertEqual(set(keys), set(result))
 

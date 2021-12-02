@@ -53,9 +53,9 @@ class DBGroupComponentTest(ComponentTest):
             cfg[DB_KEY] = db
             for coll in collections:
                 cfg[COLL_KEY] = coll
-                with open(_opj(p, "{}_{}.json".format(db, coll)), "w") as f:
+                with open(_opj(p, f"{db}_{coll}.json"), "w") as f:
                     json.dump(cfg, f)
-                self._config_names.append("{}.{}".format(db, coll))
+                self._config_names.append(f"{db}.{coll}")
 
     def create_dbs(self):
         for dbname, collections in self.DB_COLL.items():
@@ -70,7 +70,7 @@ class DBGroupComponentTest(ComponentTest):
         t0 = time.time()
         g.add_path(self._tmpdir)
         t1 = time.time()
-        _log.debug("Time to scan directory = {:.3g}s".format(t1 - t0))
+        _log.debug(f"Time to scan directory = {t1 - t0:.3g}s")
         expect = set(self._config_names)
         got = set(g.keys())
         self.assertEqual(expect, got)
@@ -78,11 +78,11 @@ class DBGroupComponentTest(ComponentTest):
     def test_expand(self):
         """Expand configurations to get full list of collections."""
         g = ConfigGroup().add_path(self._tmpdir)
-        _log.debug("Base: {}".format(g.keys()))
+        _log.debug(f"Base: {g.keys()}")
         t0 = time.time()
         g.expand("marvel.*")
         t1 = time.time()
-        _log.debug("Expanded in {:.3g}s: {}".format(t1 - t0, g.keys()))
+        _log.debug(f"Expanded in {t1 - t0:.3g}s: {g.keys()}")
         # expect expanded marvel, but just configured dc
         marvel = map(lambda val: "marvel." + val, self.DB_COLL["marvel"])
         dc = map(lambda val: "dc." + val, self.DB_COLL_CFG["dc"])
@@ -94,24 +94,24 @@ class DBGroupComponentTest(ComponentTest):
         """Combine expand and prefix to make a sandbox."""
         g = ConfigGroup().add_path(self._tmpdir)
         for i, sandbox in enumerate(["marvel.spiderman", "dc.flash"]):
-            g.expand("{}*".format(sandbox))
-            _log.debug("Expanded {} keys: {}".format(sandbox, g.keys()))
+            g.expand(f"{sandbox}*")
+            _log.debug(f"Expanded {sandbox} keys: {g.keys()}")
             g.set_prefix(sandbox)
             qe, expect_name = None, None
             if i == 0:
                 for wow in "amazing", "spectacular":
                     qe = g[wow]
-                    expect_name = "spiderman.{}".format(wow)
+                    expect_name = f"spiderman.{wow}"
                     self.assertEqual(qe.collection.name, expect_name)
                     self.assertEqual(qe.db.name, "marvel")
             elif i == 1:
                 for who in "garrick", "barry", "wally":
                     qe = g[who]
-                    expect_name = "flash.{}".format(who)
+                    expect_name = f"flash.{who}"
                     self.assertEqual(qe.collection.name, expect_name)
                     self.assertEqual(qe.db.name, "dc")
             # only entry in db should be hello:<collname>
-            _log.debug("Query QE={} collection={}".format(qe, qe.collection.name))
+            _log.debug(f"Query QE={qe} collection={qe.collection.name}")
             cur = qe.query()
             row = cur[0]
             self.assertEqual(row["hello"], expect_name)

@@ -39,7 +39,7 @@ class BuilderComponentTest(ComponentTest):
         if _log.isEnabledFor(logging.DEBUG):
             bld_args.append("-vv")
         # Insert a new record #x
-        addrec = lambda x: self.src.insert_one({"number": x, "data": [1, 2, 3], "name": "mp-{:d}".format(x)})
+        addrec = lambda x: self.src.insert_one({"number": x, "data": [1, 2, 3], "name": f"mp-{x:d}"})
         # Add first batch of records
         map(addrec, list(range(1000)))
         # Run builder
@@ -50,7 +50,7 @@ class BuilderComponentTest(ComponentTest):
         # do a few more copies
         total, m, ovhd, rectm = n, (1, 100, 500, 1000, 501, 101), 0, {}
         for i, newrec in enumerate(m):
-            _log.info("Build, #records = {:d}".format(newrec))
+            _log.info(f"Build, #records = {newrec:d}")
             # Add records
             map(addrec, list(range(total, total + newrec)))
             # Copy
@@ -69,9 +69,9 @@ class BuilderComponentTest(ComponentTest):
                 total,
                 "Bad count after copy #{:d}: " "expected={:d} got={:d}".format(i + 2, total, n),
             )
-        _log.info("Overhead = {:.1f} seconds".format(ovhd))
+        _log.info(f"Overhead = {ovhd:.1f} seconds")
         for sz in m[1:]:
-            _log.info("{:d} = {:g}s, {:.0f}us/rec".format(sz, rectm[sz], rectm[sz] / sz * 1e6))
+            _log.info(f"{sz:d} = {rectm[sz]:g}s, {rectm[sz] / sz * 1e6:.0f}us/rec")
 
     def test_maxval_builder(self):
         self._test_maxval_builder(1)

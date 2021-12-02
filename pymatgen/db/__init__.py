@@ -23,9 +23,9 @@ def _load_mgdb_settings():
     try:
         import ruamel.yaml as yaml
 
-        with open(SETTINGS_FILE, "rt") as f:
+        with open(SETTINGS_FILE) as f:
             d = yaml.load(f)
-    except IOError:
+    except OSError:
         return {}
     return d
 

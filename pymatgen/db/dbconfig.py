@@ -30,7 +30,7 @@ ALIASES_KEY = "aliases"
 
 class ConfigurationFileError(Exception):
     def __init__(self, filename, err):
-        msg = "reading '{}': {}".format(filename, err)
+        msg = f"reading '{filename}': {err}"
         Exception.__init__(self, msg)
 
 
@@ -142,7 +142,7 @@ def get_settings(infile):
     """
     settings = yaml.safe_load(_as_file(infile))
     if not hasattr(settings, "keys"):
-        raise ValueError("Settings not found in {}".format(infile))
+        raise ValueError(f"Settings not found in {infile}")
 
     # Processing of namespaced parameters in .pmgrc.yaml.
     processed_settings = {}

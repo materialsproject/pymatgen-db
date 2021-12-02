@@ -22,10 +22,9 @@ class FileCounter(Builder):
         return {"input_file": {"type": "str", "desc": "Input file path"}}
 
     def get_items(self, input_file=None):
-        with open(input_file, "r") as f:
+        with open(input_file) as f:
             # print("Reading from {}".format(f.name))
-            for line in f:
-                yield line
+            yield from f
 
     def process_item(self, item):
         self.num_chars += len(item)
@@ -34,5 +33,5 @@ class FileCounter(Builder):
         #    self.num_lines, self.num_chars))
 
     def finalize(self, errors):
-        print("{:d} lines, {:d} characters".format(self.num_lines, self.num_chars))
+        print(f"{self.num_lines:d} lines, {self.num_chars:d} characters")
         return True

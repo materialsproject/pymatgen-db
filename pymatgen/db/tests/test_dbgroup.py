@@ -58,7 +58,7 @@ class Cfg:
 class ConfigGroupTestCase(unittest.TestCase):
     def setUp(self):
         self.g = ConfigGroup(qe_class=MockQueryEngine)
-        self.configs = [Cfg("qe{:d}".format(i)) for i in range(5)]
+        self.configs = [Cfg(f"qe{i:d}") for i in range(5)]
 
     def test_add(self):
         """ConfigGroup add and lookup"""
@@ -83,10 +83,10 @@ class ConfigGroupTestCase(unittest.TestCase):
             for root in ("foo", "bar"):
                 for sub in ("a", "b.1", "b.2"):
                     config = {dbconfig.DB_KEY: root, dbconfig.COLL_KEY: sub}
-                    filename = "mg_core_{}_{}.json".format(root, sub)
+                    filename = f"mg_core_{root}_{sub}.json"
                     with open(_opj(d, filename), "w") as fp:
                         json.dump(config, fp)
-                    c["{}.{}".format(root, sub)] = config
+                    c[f"{root}.{sub}"] = config
             # read them
             self.g.add_path(d)
             # check all were added

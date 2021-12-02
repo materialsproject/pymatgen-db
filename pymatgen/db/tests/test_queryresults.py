@@ -19,7 +19,7 @@ class QueryResultsTest(unittest.TestCase):
             self.conn = pymongo.MongoClient()
             self.db_name = "test"
             self.db = self.conn[self.db_name]
-            self.coll_name = "tasks_{}".format(uuid.uuid4())
+            self.coll_name = f"tasks_{uuid.uuid4()}"
             self.coll = self.db[self.coll_name]
             with open(os.path.join(test_dir, "db_test", "GaLa.task.json")) as f:
                 doc = bson.json_util.loads(f.read())

@@ -60,9 +60,9 @@ class ConfigGroup:
             cfg = dbconfig.DBConfig(config_file=config)
             cs = cfg.settings
             if dbconfig.DB_KEY not in cs:
-                raise ValueError("No database in '{}'".format(config))
+                raise ValueError(f"No database in '{config}'")
             if dbconfig.COLL_KEY in cs:
-                name = "{}.{}".format(cs[dbconfig.DB_KEY], cs[dbconfig.COLL_KEY])
+                name = f"{cs[dbconfig.DB_KEY]}.{cs[dbconfig.COLL_KEY]}"
             else:
                 name = cs[dbconfig.DB_KEY]
             self.add(name, cfg)
@@ -172,7 +172,7 @@ class ConfigGroup:
             for k, v in self._d.re_get(name).items():
                 qe[k] = self._get_qe(k, v)
             if not qe:
-                raise KeyError("No configuration found, name='{}' full-regex='{}'".format(orig_name, name))
+                raise KeyError(f"No configuration found, name='{orig_name}' full-regex='{name}'")
         else:
             qe = self._get_qe(name, self._d[name])
         return qe

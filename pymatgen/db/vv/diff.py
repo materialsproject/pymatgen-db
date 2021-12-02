@@ -97,7 +97,7 @@ class Differ:
             for cfg in c1, c2:
                 settings = util.get_settings(cfg)
                 if not normalize_auth(settings):
-                    _log.warn("Config file {} does not have a username/password".format(cfg))
+                    _log.warn(f"Config file {cfg} does not have a username/password")
                 settings["aliases_config"] = {"aliases": {}, "defaults": {}}
                 engine = QueryEngine(**settings)
                 engines.append(engine)
@@ -117,12 +117,12 @@ class Differ:
         info = {}  # per-key information
         has_info, has_props = bool(self._info), bool(self._all_props)
         has_numprops, has_eqprops = bool(self._prop_deltas), bool(self._props)
-        _log.info("query.start query={} fields={}".format(self._filter, fields))
+        _log.info(f"query.start query={self._filter} fields={fields}")
         t0 = time.time()
 
         # Main query loop.
         for i, coll in enumerate(engines):
-            _log.debug("collection {:d}".format(i))
+            _log.debug(f"collection {i:d}")
             count, missing_props = 0, 0
             for rec in coll.query(criteria=self._filter, properties=fields):
                 count += 1
@@ -130,10 +130,10 @@ class Differ:
                 try:
                     key = rec[self._key_field]
                 except KeyError:
-                    _log.critical("Key '{}' not found in record: {}. Abort.".format(self._key_field, rec))
+                    _log.critical(f"Key '{self._key_field}' not found in record: {rec}. Abort.")
                     return {}
                 if not allow_dup and key in keys[i]:
-                    raise ValueError("Duplicate key: {}".format(key))
+                    raise ValueError(f"Duplicate key: {key}")
                 keys[i].add(key)
                 # Extract numeric properties.
                 if has_numprops:
@@ -155,7 +155,7 @@ class Differ:
                 # Extract properties for exact match.
                 if has_eqprops:
                     try:
-                        propval = tuple([(p, str(rec[p])) for p in self._props])
+                        propval = tuple((p, str(rec[p])) for p in self._props)
                     except KeyError:
                         missing_props += 1
                         # print("@@ missing {} on {}".format(pkey, rec))
@@ -171,13 +171,13 @@ class Differ:
 
             # Stop if we don't have properties on any record at all
             if 0 < count == missing_props:
-                _log.critical("Missing one or more properties on all {:d} records".format(count))
+                _log.critical(f"Missing one or more properties on all {count:d} records")
                 return {}
             # ..but only issue a warning for partially missing properties.
             elif missing_props > 0:
-                _log.warn("Missing one or more properties for {:d}/{:d} records".format(missing_props, count))
+                _log.warn(f"Missing one or more properties for {missing_props:d}/{count:d} records")
         t1 = time.time()
-        _log.info("query.end sec={:f}".format(t1 - t0))
+        _log.info(f"query.end sec={t1 - t0:f}")
 
         # Compute missing and new keys.
         if only_values:
@@ -245,10 +245,10 @@ class Differ:
                             self.CHANGED_MATCH_KEY: self.CHANGED_MATCH_DELTA,
                             self._key_field: key,
                             "property": pkey,
-                            self.CHANGED_OLD: "{:f}".format(oldval),
-                            self.CHANGED_NEW: "{:f}".format(newval),
+                            self.CHANGED_OLD: f"{oldval:f}",
+                            self.CHANGED_NEW: f"{newval:f}",
                             "rule": self._prop_deltas[pkey],
-                            self.CHANGED_DELTA: "{:f}".format(newval - oldval),
+                            self.CHANGED_DELTA: f"{newval - oldval:f}",
                         }
                         changed.append(_up(change, info[key]) if info else change)
             # Exact property comparison.
@@ -279,11 +279,11 @@ class Delta:
         ...%     Instead of (v2 - v1), use 100*(v2 - v1)/v1
     """
 
-    _num = "\d+(\.\d+)?"
+    _num = r"\d+(\.\d+)?"
     _expr = re.compile(
         "(?:"
-        "\+(?P<X>{n})?-(?P<Y>{n})?|"  # both + and -
-        "\+(?P<X2>{n})?|"  # only +
+        r"\+(?P<X>{n})?-(?P<Y>{n})?|"  # both + and -
+        r"\+(?P<X2>{n})?|"  # only +
         "-(?P<Y2>{n})?"  # only -
         ")"
         "(?P<eq>=)?(?P<pct>%)?".format(n=_num)
@@ -299,10 +299,10 @@ class Delta:
         # Match expression.
         m = self._expr.match(s)
         if m is None:
-            raise ValueError("Bad syntax for delta '{}'".format(s))
+            raise ValueError(f"Bad syntax for delta '{s}'")
         if m.span()[1] != len(s):
             p = m.span()[1]
-            raise ValueError("Junk at end of delta '{}': {}".format(s, s[p:]))
+            raise ValueError(f"Junk at end of delta '{s}': {s[p:]}")
 
         # Save a copy of orig.
         self._orig_expr = s
@@ -316,12 +316,12 @@ class Delta:
         # Set parsed values.
         d = m.groupdict()
         # print("@@ expr :: {}".format(d))
-        if all((d[k] is None for k in ("X", "Y", "X2", "Y2"))):
+        if all(d[k] is None for k in ("X", "Y", "X2", "Y2")):
             # Change in sign only
             self._sign = True
             self._eq = d["eq"] is not None
         elif d["X"] is not None and d["Y"] is None:
-            raise ValueError("Missing value for negative delta '{}'".format(s))
+            raise ValueError(f"Missing value for negative delta '{s}'")
         else:
             if d["X2"] is not None:
                 # Positive only

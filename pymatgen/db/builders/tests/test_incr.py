@@ -32,15 +32,15 @@ def clear():
 def add_records(n, offs=0):
     obj = None
     for i in range(n):
-        obj = {"n": i + offs, "s": "foo-{:d}".format(i)}
+        obj = {"n": i + offs, "s": f"foo-{i:d}"}
         coll.insert_one(obj)
     return obj
 
 
 def dumpcoll(c):
-    print("-- Collection '{}' --".format(c.name))
+    print(f"-- Collection '{c.name}' --")
     for rec in c.find():
-        print(">> {}".format(rec))
+        print(f">> {rec}")
 
 
 class TestCollectionTrackerLL(TestCase):

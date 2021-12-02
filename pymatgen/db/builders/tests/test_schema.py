@@ -63,10 +63,10 @@ class MyTestCase(unittest.TestCase):
             self.assertFalse(expect_ok, self.false_negative(doc, result))
 
     def false_positive(self, input_):
-        return "input ({}) should have failed to validate".format(input_)
+        return f"input ({input_}) should have failed to validate"
 
     def false_negative(self, input_, result):
-        return "input ({}) should have been valid, got {}".format(input_, result)
+        return f"input ({input_}) should have been valid, got {result}"
 
 
 class JsonSchemaTests(unittest.TestCase):

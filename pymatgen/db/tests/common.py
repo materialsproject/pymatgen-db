@@ -76,7 +76,7 @@ class MockQueryEngine(QueryEngine):
                     aliases_config=aliases_config,
                     default_properties=default_properties,
                 )
-                _log.warning("Connected to real MongoDB at {}:{}".format(host, port))
+                _log.warning(f"Connected to real MongoDB at {host}:{port}")
                 return  # actully connected! not mocked..
             except:
                 _log.debug(
@@ -125,7 +125,7 @@ class ComponentTest(unittest.TestCase):
         try:
             s = subprocess.check_output(self.MGBUILD_CMD + args, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as err:
-            print("ERROR: {}".format(err.output))
+            print(f"ERROR: {err.output}")
             raise
         return s
 
@@ -144,7 +144,7 @@ class ComponentTest(unittest.TestCase):
         return db
 
     def get_record(self, i):
-        return {"number": i, "data": [1, 2, 3], "name": "mp-{:d}".format(i)}
+        return {"number": i, "data": [1, 2, 3], "name": f"mp-{i:d}"}
 
     def add_records(self, coll, n):
         for i in range(n):
@@ -175,7 +175,7 @@ class ComponentTest(unittest.TestCase):
         options as long-form --{key}=value pairs.
         """
         for key, value in options:
-            args.append("--{}".format(key))
+            args.append(f"--{key}")
             if value:
                 args.append(value)
         return subprocess.call(args)

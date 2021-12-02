@@ -26,7 +26,7 @@ class ValidatorSyntaxError(Exception):
     "Syntax error in configuration of Validator"
 
     def __init__(self, target, desc):
-        msg = 'Invalid syntax: {} -> "{}"'.format(desc, target)
+        msg = f'Invalid syntax: {desc} -> "{target}"'
         Exception.__init__(self, msg)
 
 
@@ -58,7 +58,7 @@ class PythonMethod:
         """
         if not self._PATTERN.match(text):
             raise ValidatorSyntaxError(text, self.BAD_CONSTRAINT_ERR)
-        tokens = re.split("@?\s+", text)
+        tokens = re.split(r"@?\s+", text)
         if len(tokens) < 1:
             raise ValidatorSyntaxError(text, self.BAD_CONSTRAINT_ERR)
         self.method = tokens[0]
@@ -252,7 +252,7 @@ class ConstraintSpec(DoesLogging):
         DoesLogging.__init__(self, name="mg.ConstraintSpec")
         self._sections, _slist = {}, []
         for item in spec:
-            self._log.debug("build constraint from: {}".format(item))
+            self._log.debug(f"build constraint from: {item}")
             if isinstance(item, dict):
                 self._add_complex_section(item)
             else:
@@ -279,7 +279,7 @@ class ConstraintSpec(DoesLogging):
         try:
             fltr = item[self.FILTER_SECT]
         except KeyError:
-            raise ValueError("configuration requires '{}'".format(self.FILTER_SECT))
+            raise ValueError(f"configuration requires '{self.FILTER_SECT}'")
         sample = item.get(self.SAMPLE_SECT, None)
         constraints = item.get(self.CONSTRAINT_SECT, None)
 
@@ -424,8 +424,8 @@ class Validator(DoesLogging):
         query = parts.cond.to_mongo(disjunction=False)
         query.update(parts.body.to_mongo())
         cvgroup.condition = parts.cond.to_mongo(disjunction=False)
-        self._log.debug("Query spec: {}".format(query))
-        self._log.debug("Query fields: {}".format(parts.report_fields))
+        self._log.debug(f"Query spec: {query}")
+        self._log.debug(f"Query fields: {parts.report_fields}")
         # Find records that violate 1 or more constraints
         cursor = coll.find(query, parts.report_fields, **self._find_kw)
         if parts.sampler is not None:
@@ -447,7 +447,7 @@ class Validator(DoesLogging):
                 num_dberr += 1
                 if num_dberr > self._max_dberr > 0:
                     raise DBError("Too many errors")
-                self._log.warn("DB.{:d}: {}".format(num_dberr, err))
+                self._log.warn(f"DB.{num_dberr:d}: {err}")
                 continue
 
             # report progress
@@ -586,7 +586,7 @@ class Validator(DoesLogging):
             for field_name, group in groups.items():
                 conflicts = group.get_conflicts()
                 if conflicts:
-                    raise ValueError("Conflicts for field {}: {}".format(field_name, conflicts))
+                    raise ValueError(f"Conflicts for field {field_name}: {conflicts}")
         return groups
 
     def _is_python(self, constraint_list):
@@ -619,7 +619,7 @@ class Validator(DoesLogging):
         try:
             self.aliases = new_value
         except Exception as err:
-            raise ValueError("invalid value: {}".format(err))
+            raise ValueError(f"invalid value: {err}")
 
 
 class Sampler(DoesLogging):
@@ -645,11 +645,11 @@ class Sampler(DoesLogging):
         DoesLogging.__init__(self, "mg.sampler")
         # Sanity checks
         if min_items < 0:
-            raise ValueError("min_items cannot be negative ({:d})".format(min_items))
+            raise ValueError(f"min_items cannot be negative ({min_items:d})")
         if (max_items != 0) and (max_items < min_items):
-            raise ValueError("max_items must be zero or >= min_items ({:d} < {:d})".format(max_items, min_items))
+            raise ValueError(f"max_items must be zero or >= min_items ({max_items:d} < {min_items:d})")
         if not (0.0 <= p <= 1.0):
-            raise ValueError("probability, p, must be between 0 and 1 ({:f})".format(p))
+            raise ValueError(f"probability, p, must be between 0 and 1 ({p:f})")
         self.min_items = min_items
         self.max_items = max_items
         self.p = p
@@ -660,7 +660,7 @@ class Sampler(DoesLogging):
         if distrib == self.DIST_RUNIF:
             self._keep = self._keep_runif
         else:
-            raise ValueError("unrecognized distribution: {}".format(distrib))
+            raise ValueError(f"unrecognized distribution: {distrib}")
 
     @property
     def is_empty(self):

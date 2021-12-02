@@ -318,7 +318,7 @@ class QueryEngine:
         for c in self.query(fields, criteria):
             func = c["pseudo_potential.functional"]
             labels = c["pseudo_potential.labels"]
-            symbols = ["{} {}".format(func, label) for label in labels]
+            symbols = [f"{func} {label}" for label in labels]
             parameters = {
                 "run_type": c["run_type"],
                 "is_hubbard": c["is_hubbard"],
@@ -378,7 +378,7 @@ class QueryEngine:
                 comp = Composition(crit)
                 crit = comp.as_dict()
                 for el, amt in crit.items():
-                    parsed_crit["{}.{}".format(self.aliases[key], el)] = amt
+                    parsed_crit[f"{self.aliases[key]}.{el}"] = amt
                 parsed_crit["nelements"] = len(crit)
                 parsed_crit["pretty_formula"] = comp.reduced_formula
             elif key in ["$or", "$and"]:
@@ -392,7 +392,7 @@ class QueryEngine:
         return self.collection.ensure_index(key, unique=unique)
 
     def query(self, properties=None, criteria=None, distinct_key=None, **kwargs):
-        """
+        r"""
         Convenience method for database access.  All properties and criteria
         can be specified using simplified names defined in Aliases.  You can
         use the supported_properties property to get the list of supported
@@ -494,14 +494,14 @@ class QueryEngine:
         results = tuple(self.query([field], args))
 
         if len(results) > 1:
-            raise QueryError("More than one result found for task_id {}!".format(task_id))
+            raise QueryError(f"More than one result found for task_id {task_id}!")
         elif len(results) == 0:
-            raise QueryError("No structure found for task_id {}!".format(task_id))
+            raise QueryError(f"No structure found for task_id {task_id}!")
         c = results[0]
         return Structure.from_dict(c[field])
 
     def __repr__(self):
-        return "QueryEngine: {}:{}/{}".format(self.host, self.port, self.database_name)
+        return f"QueryEngine: {self.host}:{self.port}/{self.database_name}"
 
     @staticmethod
     def from_config(config_file, use_admin=False):

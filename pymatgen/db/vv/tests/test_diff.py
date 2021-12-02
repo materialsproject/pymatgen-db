@@ -21,7 +21,7 @@ db_config = {
 
 
 def recname(num):
-    return "item-{:d}".format(num)
+    return f"item-{num:d}"
 
 
 def create_record(num):
@@ -100,7 +100,7 @@ class MyTestCase(unittest.TestCase):
         df = Differ(key="name", props=["color"])
         d = df.diff(*self.engines)
         # Calculate expected results.
-        changed = sum((int(c[0] != c[1]) for c in self.colors))
+        changed = sum(int(c[0] != c[1]) for c in self.colors)
         # Check results.
         self.assertEqual(len(d[Differ.CHANGED]), changed)
 
@@ -116,11 +116,11 @@ class MyTestCase(unittest.TestCase):
         """Keys and props, some props different."""
         # Perform diff.
         delta = 0.5
-        df = Differ(key="name", deltas={"energy": Delta("+-{:f}".format(delta))})
+        df = Differ(key="name", deltas={"energy": Delta(f"+-{delta:f}")})
         d = df.diff(*self.engines)
         # Calculate expected results.
         is_different = lambda a, b: abs(a - b) > delta
-        changed = sum((int(is_different(e[0], e[1])) for e in self.energies))
+        changed = sum(int(is_different(e[0], e[1])) for e in self.energies)
         # Check results.
         self.assertEqual(len(d[Differ.CHANGED]), changed)
 
@@ -131,7 +131,7 @@ class MyTestCase(unittest.TestCase):
         d = df.diff(*self.engines)
         # Calculate expected results.
         is_different = lambda a, b: a < 0 < b or b < 0 < a
-        changed = sum((int(is_different(e[0], e[1])) for e in self.energies))
+        changed = sum(int(is_different(e[0], e[1])) for e in self.energies)
         # Check results.
         self.assertEqual(len(d[Differ.CHANGED]), changed)
 
@@ -139,7 +139,7 @@ class MyTestCase(unittest.TestCase):
         """Keys and props, some props different, check pct change."""
         # Perform diff.
         minus, plus = 10, 20
-        df = Differ(key="name", deltas={"energy": Delta("+{}-{}=%".format(plus, minus))})
+        df = Differ(key="name", deltas={"energy": Delta(f"+{plus}-{minus}=%")})
         d = df.diff(*self.engines)
 
         # Calculate expected results.
@@ -147,7 +147,7 @@ class MyTestCase(unittest.TestCase):
             pct = 100.0 * (b - a) / a
             return pct <= -minus or pct >= plus
 
-        changed = sum((int(is_different(e[0], e[1])) for e in self.energies))
+        changed = sum(int(is_different(e[0], e[1])) for e in self.energies)
 
         # Check results.
         if len(d[Differ.CHANGED]) != changed:
@@ -156,7 +156,7 @@ class MyTestCase(unittest.TestCase):
             for i, e in enumerate(self.energies):
                 if not is_different(*e):
                     continue
-                msg += "{:d}) {:f} {:f}\n".format(i, e[0], e[1])
+                msg += f"{i:d}) {e[0]:f} {e[1]:f}\n"
             msg += "Result:\n"
             for i, r in enumerate(result):
                 msg += "{:d}) {} {}\n".format(i, r["old"], r["new"])

@@ -177,7 +177,7 @@ class TrackedCollection:
             return getattr(self._coll, item)
 
     def __str__(self):
-        return "Tracked collection ({})".format(self._coll)
+        return f"Tracked collection ({self._coll})"
 
     def tracked_find(self, *args, **kwargs):
         """Replacement for regular ``find()``."""
@@ -197,7 +197,7 @@ class TrackedCollection:
         # update filter with tracker query
         filt.update(self._mark.query)
         # delegate to "real" find()
-        _log.info("tracked_find.end, call: {}.find(args={} kwargs={})".format(self._coll.name, args, kwargs))
+        _log.info(f"tracked_find.end, call: {self._coll.name}.find(args={args} kwargs={kwargs})")
         return self._coll_find(*args, **kwargs)
 
     def set_mark(self):
@@ -261,7 +261,7 @@ class Mark:
         if rec is None:
             self._pos = self._empty_pos()
         elif not self._fld in rec:
-            _log.error("Tracking field not found. field={} collection={}".format(self._fld, self._c.name))
+            _log.error(f"Tracking field not found. field={self._fld} collection={self._c.name}")
             _log.warn("Continuing without tracking")
             self._pos = self._empty_pos()
         else:
@@ -374,10 +374,10 @@ class CollectionTracker:
             # Make a 'filter' to find/update existing record, which uses
             # the field name and operation (but not the position).
             filt = {k: obj[k] for k in (mark.FLD_FLD, mark.FLD_OP)}
-            _log.debug("save: upsert-spec={} upsert-obj={}".format(filt, obj))
+            _log.debug(f"save: upsert-spec={filt} upsert-obj={obj}")
             self._track.update(filt, obj, upsert=True)
         except pymongo.errors.PyMongoError as err:
-            raise DBError("{}".format(err))
+            raise DBError(f"{err}")
 
     def retrieve(self, operation, field=None):
         """Retrieve a position in this collection.
