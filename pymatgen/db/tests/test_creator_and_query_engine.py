@@ -78,6 +78,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
         self.assertEqual(len(data), 6)
         if VaspToDbTaskDroneTest.conn:
             db = VaspToDbTaskDroneTest.conn["creator_unittest"]
+            data = db.tasks.find()
             self.assertEqual(db.tasks.count_documents({}), 6)
             warnings.warn("Actual db insertion mode.")
 
