@@ -174,7 +174,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             db = conn[self.database]
             if self.user:
                 db.authenticate(self.user, self.password)
-            if db.counter.find({"_id": "taskid"}).count() == 0:
+            if db.counter.count_documents({"_id": "taskid"}) == 0:
                 db.counter.insert_one({"_id": "taskid", "c": 1})
 
     def assimilate(self, path):
