@@ -437,8 +437,8 @@ class QueryEngine:
         if distinct_key is not None:
             cur = cur.distinct(distinct_key)
             return QueryListResults(prop_dict, cur, postprocess=self.result_post)
-        else:
-            return QueryResults(prop_dict, cur, postprocess=self.result_post)
+
+        return QueryResults(prop_dict, cur, postprocess=self.result_post)
 
     def _parse_properties(self, properties):
         """Make list of properties into 2 things:
