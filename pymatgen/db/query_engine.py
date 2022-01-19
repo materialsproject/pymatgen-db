@@ -18,7 +18,8 @@ import logging
 import os
 import gridfs
 import zlib
-from collections import OrderedDict, Iterable
+from collections import OrderedDict
+from collections.abc import Iterable
 
 import pymongo
 from pymongo import MongoClient
