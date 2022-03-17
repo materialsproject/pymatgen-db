@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>pymatgen.db.builders.examples package &#8212; pymatgen-db 2021.5.28 documentation</title>
+    <title>pymatgen.db.builders.examples package &#8212; pymatgen-db 2022.3.17 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="pymatgen.db.builders.html" title="pymatgen.db.builders package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2021.5.28 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.3.17 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="pymatgen.db.html" >pymatgen.db package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="pymatgen.db.builders.html" accesskey="U">pymatgen.db.builders package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.builders.examples package</a></li> 
@@ -73,7 +73,7 @@ running twice in succession will cause the second run to do nothing.</p>
 <p>mgbuild</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pymatgen.db.builders.examples.copy_builder.CopyBuilder">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">CopyBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/examples/copy_builder.html#CopyBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.examples.copy_builder.CopyBuilder" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CopyBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/examples/copy_builder.html#CopyBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.examples.copy_builder.CopyBuilder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pymatgen.db.builders.html#pymatgen.db.builders.core.Builder" title="pymatgen.db.builders.core.Builder"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.core.Builder</span></code></a></p>
 <p>Copy from one MongoDB collection to another.</p>
 <p>Create new builder for threaded or multiprocess execution.</p>
@@ -126,7 +126,7 @@ was returned by the <cite>setup</cite> method).</p>
 <p>Example builders that read or write files.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pymatgen.db.builders.examples.file_builders.FileCounter">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">FileCounter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/examples/file_builders.html#FileCounter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.examples.file_builders.FileCounter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FileCounter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/examples/file_builders.html#FileCounter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.examples.file_builders.FileCounter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pymatgen.db.builders.html#pymatgen.db.builders.core.Builder" title="pymatgen.db.builders.core.Builder"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.core.Builder</span></code></a></p>
 <p>Count lines and characters in a file.</p>
 <p>Create new builder for threaded or multiprocess execution.</p>
@@ -233,7 +233,7 @@ value from each ‘group’ defined in the source
 collection.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pymatgen.db.builders.examples.maxvalue_builder.MaxValueBuilder">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">MaxValueBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/examples/maxvalue_builder.html#MaxValueBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.examples.maxvalue_builder.MaxValueBuilder" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MaxValueBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ncores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/builders/examples/maxvalue_builder.html#MaxValueBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.builders.examples.maxvalue_builder.MaxValueBuilder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pymatgen.db.builders.html#pymatgen.db.builders.core.Builder" title="pymatgen.db.builders.core.Builder"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.core.Builder</span></code></a></p>
 <p>Example of incremental builder that requires
 some custom logic for incremental case.</p>
@@ -289,8 +289,9 @@ for “new” items only.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">pymatgen.db.builders.examples package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-pymatgen.db.builders.examples.copy_builder">pymatgen.db.builders.examples.copy_builder module</a></li>
@@ -300,7 +301,8 @@ for “new” items only.</p>
 </ul>
 </li>
 </ul>
-<h3>Related Topics</h3>
+
+  </div><h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="pymatgen.db.html">pymatgen.db package</a><ul>
@@ -322,7 +324,7 @@ for “new” items only.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

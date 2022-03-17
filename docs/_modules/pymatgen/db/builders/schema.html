@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.builders.schema &#8212; pymatgen-db 2021.5.28 documentation</title>
+    <title>pymatgen.db.builders.schema &#8212; pymatgen-db 2022.3.17 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/flasky.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">pymatgen-db 2021.5.28 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">pymatgen-db 2022.3.17 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.builders.schema</a></li> 
       </ul>
@@ -77,7 +77,7 @@
 
 <span class="c1"># Regex for values</span>
 <span class="c1"># Note that the special prefix/suffix is optional</span>
-<span class="n">VALUE_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(?:</span><span class="si">{spec}</span><span class="s2">)?([a-zA-Z]+)(?:</span><span class="si">{spec}</span><span class="s2">)?\s*(.*)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="n">SPECIAL</span><span class="p">))</span>
+<span class="n">VALUE_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?:</span><span class="si">{spec}</span><span class="s2">)?([a-zA-Z]+)(?:</span><span class="si">{spec}</span><span class="s2">)?\s*(.*)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="n">SPECIAL</span><span class="p">))</span>
 
 <span class="c1"># Global obj with all collected schemas</span>
 <span class="n">schemata</span> <span class="o">=</span> <span class="p">{}</span>
@@ -91,7 +91,7 @@
 
 <div class="viewcode-block" id="SchemaTypeError"><a class="viewcode-back" href="../../../../pymatgen.db.builders.html#pymatgen.db.builders.schema.SchemaTypeError">[docs]</a><span class="k">class</span> <span class="nc">SchemaTypeError</span><span class="p">(</span><span class="n">SchemaError</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typename</span><span class="p">):</span>
-        <span class="n">SchemaError</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;bad type (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">typename</span><span class="p">))</span></div>
+        <span class="n">SchemaError</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;bad type (</span><span class="si">{</span><span class="n">typename</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SchemaPathError"><a class="viewcode-back" href="../../../../pymatgen.db.builders.html#pymatgen.db.builders.schema.SchemaPathError">[docs]</a><span class="k">class</span> <span class="nc">SchemaPathError</span><span class="p">(</span><span class="n">SchemaError</span><span class="p">):</span>
@@ -119,11 +119,11 @@
         <span class="k">raise</span> <span class="n">SchemaPathError</span><span class="p">()</span>
     <span class="n">filepat</span> <span class="o">=</span> <span class="s2">&quot;*.&quot;</span> <span class="o">+</span> <span class="n">ext</span> <span class="k">if</span> <span class="n">ext</span> <span class="k">else</span> <span class="s2">&quot;*&quot;</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filepat</span><span class="p">)):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">schema</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">SchemaParseError</span><span class="p">(</span><span class="s2">&quot;error parsing &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="n">SchemaParseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;error parsing &#39;</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">schemata</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span></div>
 
@@ -148,7 +148,7 @@
 <span class="sd">    :raise: IOError if file cannot be opened or read, ValueError if</span>
 <span class="sd">            file is not valid JSON or JSON is not a valid schema.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_or_fp</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file_or_fp</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">file_or_fp</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_or_fp</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file_or_fp</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">file_or_fp</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">schema</span></div>
@@ -203,9 +203,7 @@
 <div class="viewcode-block" id="Schema.validate"><a class="viewcode-back" href="../../../../pymatgen.db.builders.html#pymatgen.db.builders.schema.Schema.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;(root)&quot;</span><span class="p">):</span>
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whatis</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">t</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span>
-                <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;type mismatch: </span><span class="si">{}</span><span class="s2"> != </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typestr</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span>
-            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;type mismatch: </span><span class="si">{}</span><span class="s2"> != </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typestr</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_LIST</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
@@ -213,13 +211,9 @@
         <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_DICT</span><span class="p">:</span>
             <span class="c1"># fail if document is missing any required keys</span>
             <span class="n">dkeys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="n">skeys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-                <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">is_optional</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="p">)</span>
+            <span class="n">skeys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">is_optional</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
             <span class="k">if</span> <span class="n">skeys</span> <span class="o">-</span> <span class="n">dkeys</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span>
-                    <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;missing keys: (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">skeys</span> <span class="o">-</span> <span class="n">dkeys</span><span class="p">))</span>
-                <span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;missing keys: (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">skeys</span> <span class="o">-</span> <span class="n">dkeys</span><span class="p">)))</span>
             <span class="c1"># check each item in document</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">:</span>
@@ -231,9 +225,7 @@
                     <span class="c1"># return self._vresult(path, &quot;missing key: {}&quot;, k)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span>
-                    <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bad value &#39;</span><span class="si">{}</span><span class="s2">&#39; for type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span>
-                <span class="p">)</span></div>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vresult</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bad value &#39;</span><span class="si">{}</span><span class="s2">&#39; for type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">doc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Schema.json_schema"><a class="viewcode-back" href="../../../../pymatgen.db.builders.html#pymatgen.db.builders.schema.Schema.json_schema">[docs]</a>    <span class="k">def</span> <span class="nf">json_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">add_keys</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert our compact schema representation to the standard, but more verbose,</span>
@@ -287,7 +279,7 @@
         <span class="n">meta_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="ow">and</span> <span class="s2">&quot;desc&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
             <span class="n">meta_info</span> <span class="o">=</span> <span class="s1">&#39;=&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;desc&quot;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">meta_info</span><span class="p">)</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">meta_info</span><span class="si">}</span><span class="s2">: &quot;</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whatis</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -317,9 +309,7 @@
                 <span class="n">optional</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">vinfo</span> <span class="o">=</span> <span class="n">VALUE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">vinfo</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;bad type format, must be __&lt;type&gt;__ got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bad type format, must be __&lt;type&gt;__ got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">dtype</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">vinfo</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">Scalar</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="n">optional</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
 
@@ -337,7 +327,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typestr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;document::</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;document::</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 
 <span class="k">def</span> <span class="nf">_is_datetime</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
@@ -388,7 +378,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;scalar::</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;scalar::</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -407,7 +397,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

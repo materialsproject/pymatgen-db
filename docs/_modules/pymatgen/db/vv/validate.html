@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.vv.validate &#8212; pymatgen-db 2021.5.28 documentation</title>
+    <title>pymatgen.db.vv.validate &#8212; pymatgen-db 2022.3.17 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/flasky.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">pymatgen-db 2021.5.28 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">pymatgen-db 2022.3.17 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.vv.validate</a></li> 
       </ul>
@@ -77,7 +77,7 @@
     <span class="s2">&quot;Syntax error in configuration of Validator&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">desc</span><span class="p">):</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Invalid syntax: </span><span class="si">{}</span><span class="s1"> -&gt; &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Invalid syntax: </span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="s1"> -&gt; &quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
         <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
 
 
@@ -109,7 +109,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PATTERN</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ValidatorSyntaxError</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BAD_CONSTRAINT_ERR</span><span class="p">)</span>
-        <span class="n">tokens</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;@?\s+&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;@?\s+&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ValidatorSyntaxError</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BAD_CONSTRAINT_ERR</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -280,9 +280,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_total</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_subject</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_subject</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">))</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span></div></div>
@@ -305,7 +303,7 @@
         <span class="n">DoesLogging</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mg.ConstraintSpec&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="p">,</span> <span class="n">_slist</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">spec</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;build constraint from: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;build constraint from: </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_add_complex_section</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -332,7 +330,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fltr</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">FILTER_SECT</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;configuration requires &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILTER_SECT</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;configuration requires &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILTER_SECT</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
         <span class="n">sample</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SAMPLE_SECT</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">constraints</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CONSTRAINT_SECT</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -404,9 +402,7 @@
                 <span class="n">report_fields</span><span class="p">,</span>
             <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">max_violations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_dberrors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_exists</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_violations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_dberrors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_exists</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">DoesLogging</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mg.validator&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_progress</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_aliases</span> <span class="o">=</span> <span class="n">aliases</span> <span class="k">if</span> <span class="n">aliases</span> <span class="k">else</span> <span class="p">{}</span>
@@ -426,9 +422,7 @@
 <span class="sd">        :type num: int</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">report_str</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;Progress for </span><span class="si">{subject}</span><span class="s2">: </span><span class="si">{count:d}</span><span class="s2"> invalid, </span><span class="si">{:d}</span><span class="s2"> db errors, </span><span class="si">{:d}</span><span class="s2"> bytes&quot;</span>
-        <span class="p">)</span>
+        <span class="n">report_str</span> <span class="o">=</span> <span class="s2">&quot;Progress for </span><span class="si">{subject}</span><span class="s2">: </span><span class="si">{count:d}</span><span class="s2"> invalid, </span><span class="si">{:d}</span><span class="s2"> db errors, </span><span class="si">{:d}</span><span class="s2"> bytes&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">ProgressMeter</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">report_str</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Validator.num_violations"><a class="viewcode-back" href="../../../../pymatgen.db.vv.html#pymatgen.db.vv.validate.Validator.num_violations">[docs]</a>    <span class="k">def</span> <span class="nf">num_violations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -481,8 +475,8 @@
         <span class="n">query</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">cond</span><span class="o">.</span><span class="n">to_mongo</span><span class="p">(</span><span class="n">disjunction</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">query</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parts</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">to_mongo</span><span class="p">())</span>
         <span class="n">cvgroup</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">cond</span><span class="o">.</span><span class="n">to_mongo</span><span class="p">(</span><span class="n">disjunction</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Query spec: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">query</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Query fields: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">parts</span><span class="o">.</span><span class="n">report_fields</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query spec: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query fields: </span><span class="si">{</span><span class="n">parts</span><span class="o">.</span><span class="n">report_fields</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># Find records that violate 1 or more constraints</span>
         <span class="n">cursor</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parts</span><span class="o">.</span><span class="n">report_fields</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_kw</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">parts</span><span class="o">.</span><span class="n">sampler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -504,7 +498,7 @@
                 <span class="n">num_dberr</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">num_dberr</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_dberr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">DBError</span><span class="p">(</span><span class="s2">&quot;Too many errors&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;DB.</span><span class="si">{:d}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_dberr</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DB.</span><span class="si">{</span><span class="n">num_dberr</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
 
             <span class="c1"># report progress</span>
@@ -537,26 +531,20 @@
             <span class="n">fval</span> <span class="o">=</span> <span class="n">mongo_get</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">fval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">expected</span> <span class="o">=</span> <span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">value</span>
-                <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">ConstraintViolation</span><span class="p">(</span><span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="p">,</span> <span class="s2">&quot;missing&quot;</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
-                <span class="p">)</span>
+                <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ConstraintViolation</span><span class="p">(</span><span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="p">,</span> <span class="s2">&quot;missing&quot;</span><span class="p">,</span> <span class="n">expected</span><span class="p">))</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_variable</span><span class="p">():</span>
                 <span class="c1"># retrieve value for variable</span>
                 <span class="n">var_name</span> <span class="o">=</span> <span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">value</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">mongo_get</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">ConstraintViolation</span><span class="p">(</span><span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="p">,</span> <span class="s2">&quot;missing&quot;</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
-                    <span class="p">)</span>
+                    <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ConstraintViolation</span><span class="p">(</span><span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="p">,</span> <span class="s2">&quot;missing&quot;</span><span class="p">,</span> <span class="n">var_name</span><span class="p">))</span>
                     <span class="k">continue</span>
                 <span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>  <span class="c1"># swap out value, temporarily</span>
             <span class="c1"># take length for size</span>
             <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_size</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fval</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fval</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
-                    <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">ConstraintViolation</span><span class="p">(</span><span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">fval</span><span class="p">),</span> <span class="s2">&quot;sequence&quot;</span><span class="p">)</span>
-                    <span class="p">)</span>
+                    <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ConstraintViolation</span><span class="p">(</span><span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">fval</span><span class="p">),</span> <span class="s2">&quot;sequence&quot;</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_variable</span><span class="p">():</span>
                         <span class="n">clause</span><span class="o">.</span><span class="n">constraint</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">var_name</span>  <span class="c1"># put original value back</span>
                     <span class="k">continue</span>
@@ -612,9 +600,7 @@
 
             <span class="n">cond_query</span> <span class="o">=</span> <span class="n">MongoQuery</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">sval</span><span class="o">.</span><span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">cond_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_constraint_expressions</span><span class="p">(</span>
-                    <span class="n">sval</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span> <span class="n">rev</span><span class="o">=</span><span class="kc">False</span>
-                <span class="p">)</span>
+                <span class="n">cond_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_constraint_expressions</span><span class="p">(</span><span class="n">sval</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span> <span class="n">rev</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">cg</span> <span class="ow">in</span> <span class="n">cond_groups</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cg</span><span class="p">:</span>
                         <span class="n">cond_query</span><span class="o">.</span><span class="n">add_clause</span><span class="p">(</span><span class="n">MongoClause</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">rev</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
@@ -651,9 +637,7 @@
             <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">conflicts</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">get_conflicts</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">conflicts</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;Conflicts for field </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">conflicts</span><span class="p">)</span>
-                    <span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Conflicts for field </span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">conflicts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">groups</span>
 
     <span class="k">def</span> <span class="nf">_is_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint_list</span><span class="p">):</span>
@@ -664,13 +648,9 @@
 <span class="sd">        :return: True if this refers to an import of code, False otherwise</span>
 <span class="sd">        :raises: ValidatorSyntaxError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraint_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">PythonMethod</span><span class="o">.</span><span class="n">constraint_is_method</span><span class="p">(</span>
-            <span class="n">constraint_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraint_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">PythonMethod</span><span class="o">.</span><span class="n">constraint_is_method</span><span class="p">(</span><span class="n">constraint_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraint_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="nb">filter</span><span class="p">(</span><span class="n">PythonMethod</span><span class="o">.</span><span class="n">constraint_is_method</span><span class="p">,</span> <span class="n">constraint_list</span><span class="p">)</span>
-        <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraint_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">PythonMethod</span><span class="o">.</span><span class="n">constraint_is_method</span><span class="p">,</span> <span class="n">constraint_list</span><span class="p">)):</span>
             <span class="n">condensed_list</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">constraint_list</span><span class="p">)</span>
             <span class="n">err</span> <span class="o">=</span> <span class="n">PythonMethod</span><span class="o">.</span><span class="n">CANNOT_COMBINE_ERR</span>
             <span class="k">raise</span> <span class="n">ValidatorSyntaxError</span><span class="p">(</span><span class="n">condensed_list</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
@@ -690,7 +670,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span> <span class="o">=</span> <span class="n">new_value</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid value: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span></div></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid value: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Sampler"><a class="viewcode-back" href="../../../../pymatgen.db.vv.html#pymatgen.db.vv.validate.Sampler">[docs]</a><span class="k">class</span> <span class="nc">Sampler</span><span class="p">(</span><span class="n">DoesLogging</span><span class="p">):</span>
@@ -716,15 +696,11 @@
         <span class="n">DoesLogging</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;mg.sampler&quot;</span><span class="p">)</span>
         <span class="c1"># Sanity checks</span>
         <span class="k">if</span> <span class="n">min_items</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;min_items cannot be negative (</span><span class="si">{:d}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_items</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;min_items cannot be negative (</span><span class="si">{</span><span class="n">min_items</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">max_items</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">max_items</span> <span class="o">&lt;</span> <span class="n">min_items</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;max_items must be zero or &gt;= min_items (</span><span class="si">{:d}</span><span class="s2"> &lt; </span><span class="si">{:d}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">max_items</span><span class="p">,</span> <span class="n">min_items</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;max_items must be zero or &gt;= min_items (</span><span class="si">{</span><span class="n">max_items</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> &lt; </span><span class="si">{</span><span class="n">min_items</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;probability, p, must be between 0 and 1 (</span><span class="si">{:f}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;probability, p, must be between 0 and 1 (</span><span class="si">{</span><span class="n">p</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_items</span> <span class="o">=</span> <span class="n">min_items</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_items</span> <span class="o">=</span> <span class="n">max_items</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
@@ -735,7 +711,7 @@
         <span class="k">if</span> <span class="n">distrib</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DIST_RUNIF</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_keep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_runif</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unrecognized distribution: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">distrib</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unrecognized distribution: </span><span class="si">{</span><span class="n">distrib</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -817,7 +793,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

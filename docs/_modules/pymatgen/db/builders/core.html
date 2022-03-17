@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.builders.core &#8212; pymatgen-db 2021.5.28 documentation</title>
+    <title>pymatgen.db.builders.core &#8212; pymatgen-db 2022.3.17 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/flasky.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">pymatgen-db 2021.5.28 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">pymatgen-db 2022.3.17 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.builders.core</a></li> 
       </ul>
@@ -82,7 +82,7 @@
 
 <div class="viewcode-block" id="BuildError"><a class="viewcode-back" href="../../../../pymatgen.db.builders.html#pymatgen.db.builders.core.BuildError">[docs]</a><span class="k">class</span> <span class="nc">BuildError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">who</span><span class="p">,</span> <span class="n">why</span><span class="p">):</span>
-        <span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Builder </span><span class="si">{}</span><span class="s2"> failed: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">who</span><span class="p">,</span> <span class="n">why</span><span class="p">)</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Builder </span><span class="si">{</span><span class="n">who</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">)</span></div>
 
 
@@ -120,7 +120,7 @@
             <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># skip &#39;type &#39;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;type&#39; without &#39;param&#39; for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;type&#39; without &#39;param&#39; for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:return&quot;</span><span class="p">):</span>
             <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -175,16 +175,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_VER</span> <span class="o">&lt;=</span> <span class="n">version</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_VER</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Bad version (</span><span class="si">{v:d}</span><span class="s2">) not in range </span><span class="si">{v0}</span><span class="s2"> .. </span><span class="si">{v1}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">v</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">v0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_VER</span><span class="p">,</span> <span class="n">v1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_VER</span>
-                <span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Bad version (</span><span class="si">{</span><span class="n">version</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">) not in range </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_VER</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_VER</span><span class="si">}</span><span class="s2"> &quot;</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coll</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_collections</span><span class="p">:</span>
-                <span class="n">full_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">prefix</span> <span class="k">else</span> <span class="n">name</span>
+                <span class="n">full_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">prefix</span> <span class="k">else</span> <span class="n">name</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;tasks&quot;</span> <span class="ow">and</span> <span class="n">task_suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">full_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">full_name</span><span class="p">,</span> <span class="n">task_suffix</span><span class="p">)</span>
+                    <span class="n">full_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">task_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_name</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_coll</span><span class="p">[</span><span class="n">full_name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">db</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -286,14 +284,12 @@
 <span class="sd">        :type fail_fn: function(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">collection</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">examples</span><span class="p">():</span>
-            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;validating example in collection </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">collection</span><span class="p">))</span>
+            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;validating example in collection </span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">sch</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>  <span class="c1"># with more err. checking</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">sch</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
-            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="s2">&quot;validation result: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;OK&quot;</span> <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">result</span><span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;validation result: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;OK&quot;</span> <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">result</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">fail_fn</span><span class="p">(</span><span class="s2">&quot;Failed to validate sample document: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="p">))</span></div></div>
+                <span class="n">fail_fn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to validate sample document: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Builder"><a class="viewcode-back" href="../../../../pymatgen.db.builders.html#pymatgen.db.builders.core.Builder">[docs]</a><span class="k">class</span> <span class="nc">Builder</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
@@ -445,10 +441,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">conn</span> <span class="o">=</span> <span class="n">dbutil</span><span class="o">.</span><span class="n">get_database</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Configuration, &#39;</span><span class="si">{}</span><span class="s2">&#39;,  must be a path to &quot;</span>
-                <span class="s2">&quot;a configuration file or dict&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Configuration, &#39;</span><span class="si">{}</span><span class="s2">&#39;,  must be a path to &quot;</span> <span class="s2">&quot;a configuration file or dict&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">conn</span></div>
 
     <span class="c1"># -----------------------------</span>
@@ -459,7 +452,7 @@
 <span class="sd">        :return: Number of items processed</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;_build, chunk_size=</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">))</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_build, chunk_size=</span><span class="si">{</span><span class="n">chunk_size</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -496,7 +489,7 @@
             <span class="n">processes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
             <span class="n">code</span> <span class="o">=</span> <span class="n">processes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">exitcode</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">code</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;run.parallel.multiprocess.end states=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="p">))</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;run.parallel.multiprocess.end states=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run method for one thread or process</span>
@@ -513,7 +506,7 @@
             <span class="k">except</span> <span class="n">Queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
                 <span class="k">break</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                <span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;In _run(): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+                <span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In _run(): </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">_log</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
                     <span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
@@ -595,16 +588,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">depth</span> <span class="o">*</span> <span class="n">indent</span>
     <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-        <span class="p">(</span>
             <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">k</span><span class="p">,</span>
-                <span class="n">alphadump</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
-                <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span>
+                <span class="n">alphadump</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span>
                 <span class="n">sep</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="p">)</span>
     <span class="p">)</span></div>
 </pre></div>
 
@@ -624,7 +613,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

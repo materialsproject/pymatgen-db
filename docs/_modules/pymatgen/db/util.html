@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.util &#8212; pymatgen-db 2021.5.28 documentation</title>
+    <title>pymatgen.db.util &#8212; pymatgen-db 2022.3.17 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/flasky.css" />
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2021.5.28 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2022.3.17 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.util</a></li> 
       </ul>
@@ -111,10 +111,7 @@
         <span class="n">passwd</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;admin_password&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">admin</span> <span class="k">else</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;readonly_password&quot;</span><span class="p">]</span>
         <span class="n">db</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">passwd</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-        <span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;No {admin,readonly}_user/password found in config. file, &quot;</span>
-            <span class="s2">&quot;accessing DB without authentication&quot;</span>
-        <span class="p">)</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No {admin,readonly}_user/password found in config. file, &quot;</span> <span class="s2">&quot;accessing DB without authentication&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db</span></div>
 
 
@@ -137,8 +134,7 @@
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
             <span class="k">yield</span> <span class="p">(</span><span class="n">pre</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">nested</span> <span class="ow">in</span> <span class="n">_keys</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">pre</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="n">sep</span><span class="p">):</span>
-                    <span class="k">yield</span> <span class="n">nested</span>
+                <span class="k">yield from</span> <span class="n">_keys</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">pre</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="n">sep</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_keys</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">find_one</span><span class="p">()))</span></div>
 
@@ -153,21 +149,19 @@
 <div class="viewcode-block" id="quotable"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.quotable">[docs]</a><span class="k">def</span> <span class="nf">quotable</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&#39;&quot;</span></div>
 
 
 <div class="viewcode-block" id="csv_dict"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.csv_dict">[docs]</a><span class="k">def</span> <span class="nf">csv_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Format dict to a string with comma-separated values.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39;: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">quotable</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
-    <span class="p">)</span></div>
+    <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">quotable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span></div>
 
 
 <div class="viewcode-block" id="kvp_dict"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.kvp_dict">[docs]</a><span class="k">def</span> <span class="nf">kvp_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Format dict to key=value pairs.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">quotable</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span></div>
+    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">quotable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -186,7 +180,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
