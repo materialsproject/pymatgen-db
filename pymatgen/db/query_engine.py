@@ -546,7 +546,7 @@ class QueryEngine:
                 s = dosfile.read()
                 try:
                     d = json.loads(s)
-                except:
+                except Exception:
                     s = zlib.decompress(s)
                     d = json.loads(s.decode("utf-8"))
                 tdos = Dos.from_dict(d)

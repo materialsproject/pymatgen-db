@@ -191,7 +191,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 self.calculate_stability(d)
             tid = self._insert_doc(d)
             return tid
-        except Exception as ex:
+        except Exception:
             import traceback
 
             logger.error(traceback.format_exc())
@@ -370,7 +370,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 taskname = "relax2" if re.search("relax2", filename) else "relax1"
                 d["calculations"][i]["output"]["outcar"] = outcar.as_dict()
                 run_stats[taskname] = outcar.run_stats
-        except:
+        except Exception:
             logger.error(f"Bad OUTCAR for {fullpath}.")
 
         try:
@@ -383,7 +383,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             ]:
                 overall_run_stats[key] = sum(v[key] for v in run_stats.values())
             run_stats["overall"] = overall_run_stats
-        except:
+        except Exception:
             logger.error(f"Bad run stats for {fullpath}.")
 
         d["run_stats"] = run_stats
@@ -433,7 +433,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 try:
                     kpoints = Kpoints.from_file(filename)
                     d["kpoints"] = kpoints.as_dict()
-                except:
+                except Exception:
                     logger.error(f"Unable to parse KPOINTS for killed run {dir_name}.")
             elif fnmatch(f, "POSCAR*"):
                 try:
@@ -453,7 +453,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                         }
                     )
                     d["poscar"] = s.as_dict()
-                except:
+                except Exception:
                     logger.error(f"Unable to parse POSCAR for killed run {dir_name}.")
             elif fnmatch(f, "POTCAR*"):
                 try:
@@ -463,18 +463,18 @@ class VaspToDbTaskDrone(AbstractDrone):
                         "pot_type": "paw",
                         "labels": potcar.symbols,
                     }
-                except:
+                except Exception:
                     logger.error(f"Unable to parse POTCAR for killed run in {dir_name}.")
             elif fnmatch(f, "OSZICAR"):
                 try:
                     d["oszicar"]["root"] = Oszicar(os.path.join(dir_name, f)).as_dict()
-                except:
+                except Exception:
                     logger.error(f"Unable to parse OSZICAR for killed run in {dir_name}.")
             elif re.match(r"relax\d", f):
                 if os.path.exists(os.path.join(dir_name, f, "OSZICAR")):
                     try:
                         d["oszicar"][f] = Oszicar(os.path.join(dir_name, f, "OSZICAR")).as_dict()
-                    except:
+                    except Exception:
                         logger.error(f"Unable to parse OSZICAR for killed run in {dir_name}.")
         return d
 
@@ -585,7 +585,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             d["oxide_type"] = d2["oxide_type"]
             d["last_updated"] = datetime.datetime.today()
             return d
-        except Exception as ex:
+        except Exception:
             import traceback
 
             print(traceback.format_exc())
@@ -772,6 +772,6 @@ def get_uri(dir_name):
     fullpath = os.path.abspath(dir_name)
     try:
         hostname = socket.gethostbyaddr(socket.gethostname())[0]
-    except:
+    except Exception:
         hostname = socket.gethostname()
     return f"{hostname}:{fullpath}"
