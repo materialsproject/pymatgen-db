@@ -329,7 +329,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                     m = re.match(r"(\d+)-ICSD", transformations["history"][0]["source"])
                     if m:
                         d["icsd_id"] = int(m.group(1))
-                except Exception as ex:
+                except Exception:
                     logger.warning("Cannot parse ICSD from transformations " "file.")
                     pass
         else:
