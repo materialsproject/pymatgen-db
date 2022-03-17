@@ -12,21 +12,21 @@ __email__ = "shyuep@gmail.com"
 __status__ = "Production"
 __date__ = "Mar 2 2013"
 
-import json
 import itertools
+import json
 import logging
 import os
-import gridfs
 import zlib
 from collections import OrderedDict
 from collections.abc import Iterable
 
+import gridfs
 import pymongo
-from pymongo import MongoClient
-from pymatgen.core import Structure, Composition
+from pymatgen.core import Composition, Structure
 from pymatgen.electronic_structure.core import Orbital, Spin
 from pymatgen.electronic_structure.dos import CompleteDos, Dos
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
+from pymongo import MongoClient
 
 _log = logging.getLogger("mg." + __name__)
 

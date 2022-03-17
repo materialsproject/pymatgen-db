@@ -10,17 +10,16 @@ __date__ = "2012-12-01"
 
 ## Imports
 
-import bson
 import datetime
 import json
 import logging
-from pymongo.mongo_client import MongoClient
 
-from pymatgen.db.dbconfig import DBConfig
+import bson
+from pymongo.mongo_client import MongoClient
 
 # Backwards compatibility from refactor to `dbconfig` module
 # Copy of functions that were moved
-from pymatgen.db.dbconfig import normalize_auth
+from pymatgen.db.dbconfig import DBConfig, normalize_auth
 
 # Copy of global constants that were moved
 DEFAULT_PORT = DBConfig.DEFAULT_PORT

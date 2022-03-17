@@ -8,7 +8,7 @@ import random
 import unittest
 
 from pymatgen.db.tests.common import MockQueryEngine
-from pymatgen.db.vv.diff import Differ, Delta
+from pymatgen.db.vv.diff import Delta, Differ
 
 #
 

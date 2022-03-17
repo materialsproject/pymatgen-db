@@ -5,15 +5,16 @@ __author__ = "Dan Gunter <dkgunter@lbl.gov>"
 __date__ = "2/21/13"
 
 
-from email.mime.text import MIMEText
 import json
-from operator import itemgetter
 import smtplib
+from email.mime.text import MIMEText
+from operator import itemgetter
+
+from ..util import MongoJSONEncoder
+from .diff import Delta, Differ  # for field constants, formatting
 
 #
 from .util import DoesLogging, JsonWalker
-from ..util import MongoJSONEncoder
-from .diff import Differ, Delta  # for field constants, formatting
 
 
 class Report:

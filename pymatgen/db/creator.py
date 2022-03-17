@@ -6,35 +6,34 @@ Mongo database.
 """
 
 
+import datetime
+import glob
+import json
+import logging
 import os
 import re
-import glob
-import logging
-import datetime
-import string
-import json
 import socket
-import numpy as np
+import string
 import zlib
-from fnmatch import fnmatch
 from collections import OrderedDict
+from fnmatch import fnmatch
 
-from pymongo import MongoClient
 import gridfs
-
-from pymatgen.apps.borg.hive import AbstractDrone
-from pymatgen.analysis.local_env import VoronoiNN
-from pymatgen.core.structure import Structure
-from pymatgen.core.composition import Composition
-from pymatgen.io.vasp import Vasprun, Incar, Kpoints, Potcar, Poscar, Outcar, Oszicar
-from pymatgen.io.cif import CifWriter
-from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymatgen.analysis.bond_valence import BVAnalyzer
+import numpy as np
 from monty.io import zopen
-from pymatgen.ext.matproj import MPRester
-from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.analysis.structure_analyzer import oxide_type
 from monty.json import MontyEncoder
+from pymatgen.analysis.bond_valence import BVAnalyzer
+from pymatgen.analysis.local_env import VoronoiNN
+from pymatgen.analysis.structure_analyzer import oxide_type
+from pymatgen.apps.borg.hive import AbstractDrone
+from pymatgen.core.composition import Composition
+from pymatgen.core.structure import Structure
+from pymatgen.entries.computed_entries import ComputedEntry
+from pymatgen.ext.matproj import MPRester
+from pymatgen.io.cif import CifWriter
+from pymatgen.io.vasp import Incar, Kpoints, Oszicar, Outcar, Poscar, Potcar, Vasprun
+from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+from pymongo import MongoClient
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"

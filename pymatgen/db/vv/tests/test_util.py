@@ -3,8 +3,9 @@ Test vv.util module
 """
 __author__ = "Dan Gunter <dkgunter@lbl.gov>"
 
-from argparse import ArgumentParser
 import unittest
+from argparse import ArgumentParser
+
 from pymatgen.db.vv.util import JsonWalker, YamlConfig
 
 

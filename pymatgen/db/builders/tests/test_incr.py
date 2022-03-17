@@ -8,10 +8,11 @@ from unittest import TestCase
 __author__ = "Dan Gunter"
 __created__ = "April 12, 2014"
 
-import mongomock
 import unittest
-from pymatgen.db.builders.incr import *
 
+import mongomock
+
+from pymatgen.db.builders.incr import *
 
 COLLECTION = "my_collection"
 DATABASE = "db"

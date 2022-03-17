@@ -11,8 +11,9 @@ __date__ = "1/31/13"
 
 import time
 import unittest
-import pymatgen.db.vv.validate as vv
+
 import pymatgen.db.vv.util as vu
+import pymatgen.db.vv.validate as vv
 
 
 class TestCollectionFilter(unittest.TestCase):

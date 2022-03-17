@@ -7,12 +7,14 @@ __email__ = "dkgunter@lbl.gov"
 __date__ = "2014-04-29"
 
 import json
-import mongomock
 import os
 import tempfile
 import unittest
-from pymatgen.db.dbgroup import ConfigGroup
+
+import mongomock
+
 from pymatgen.db import dbconfig
+from pymatgen.db.dbgroup import ConfigGroup
 
 _opj = os.path.join
 

@@ -14,13 +14,15 @@ import tempfile
 import traceback
 import unittest
 
+import pymongo
+
 # Third-party
 from mongomock import MongoClient
-import pymongo
+
+from pymatgen.db.builders.incr import CollectionTracker
 
 # Package
 from pymatgen.db.query_engine import QueryEngine
-from pymatgen.db.builders.incr import CollectionTracker
 
 _log = logging.getLogger("pymatgen.db.tests")
 

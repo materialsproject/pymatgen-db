@@ -9,18 +9,19 @@ __date__ = "5/29/13"
 
 ## Imports
 
-# system
-from abc import ABCMeta, abstractmethod
 import copy
 import logging
 import multiprocessing
-
 import queue as Queue
 import traceback
 
+# system
+from abc import ABCMeta, abstractmethod
+
+from pymatgen.db import util as dbutil
+
 # local
 from pymatgen.db.builders import schema, util
-from pymatgen.db import util as dbutil
 
 ## Logging
 
@@ -123,9 +124,7 @@ class Collections:
         :raise: ValueError if `version` is not known
         """
         if not self.MIN_VER <= version <= self.MAX_VER:
-            raise ValueError(
-                f"Bad version ({version:d}) not in range {self.MIN_VER} .. {self.MAX_VER} "
-            )
+            raise ValueError(f"Bad version ({version:d}) not in range {self.MIN_VER} .. {self.MAX_VER} ")
         self._names, self._coll = {}, {}
         if version == 1:
             for name in self.known_collections:
@@ -537,10 +536,10 @@ def alphadump(d, indent=2, depth=0):
     """
     sep = "\n" + " " * depth * indent
     return "".join(
-            "{}: {}{}".format(
-                k,
-                alphadump(d[k], depth=depth + 1) if isinstance(d[k], dict) else str(d[k]),
-                sep,
-            )
-            for k in sorted(d.keys())
+        "{}: {}{}".format(
+            k,
+            alphadump(d[k], depth=depth + 1) if isinstance(d[k], dict) else str(d[k]),
+            sep,
+        )
+        for k in sorted(d.keys())
     )

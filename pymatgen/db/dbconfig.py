@@ -16,6 +16,7 @@ __author__ = "Dan Gunter <dkgunter@lbl.gov>"
 __date__ = "4/25/14"
 
 import os
+
 import ruamel.yaml as yaml
 
 # Constants for keys

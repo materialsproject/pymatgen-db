@@ -12,8 +12,7 @@ mgbuild
 __author__ = "Dan Gunter <dkgunter@lbl.gov>"
 __date__ = "4/22/14"
 
-from pymatgen.db.builders import core
-from pymatgen.db.builders import util
+from pymatgen.db.builders import core, util
 from pymatgen.db.query_engine import QueryEngine
 
 _log = util.get_builder_log("copy")

@@ -36,11 +36,13 @@ The main classes are Mark and CollectionTracker. Usage example::
 __author__ = "Dan Gunter <dkgunter@lbl.gov>"
 __date__ = "4/11/14"
 
-from abc import abstractmethod, ABCMeta
-import pymongo
+from abc import ABCMeta, abstractmethod
 from enum import Enum
-from pymatgen.db.query_engine import QueryEngine
+
+import pymongo
+
 from pymatgen.db.builders import util as bld_util
+from pymatgen.db.query_engine import QueryEngine
 
 # Logging
 

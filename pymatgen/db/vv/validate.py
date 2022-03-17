@@ -9,13 +9,15 @@ __email__ = "dkgunter@lbl.gov"
 __status__ = "Development"
 __date__ = "1/31/13"
 
-import pymongo
-import random
-import sys
 import collections
+import random
 import re
-from .util import DoesLogging, total_size
+import sys
+
+import pymongo
 from smoqe.query import *
+
+from .util import DoesLogging, total_size
 
 
 class DBError(Exception):

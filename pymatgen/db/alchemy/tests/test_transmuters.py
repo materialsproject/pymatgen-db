@@ -12,22 +12,21 @@ __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Mar 5, 2012"
 
-import unittest
 import os
+import unittest
 
+from pymatgen.apps.borg.queen import BorgQueen
+from pymatgen.transformations.standard_transformations import (
+    OxidationStateDecorationTransformation,
+    PartialRemoveSpecieTransformation,
+    SubstitutionTransformation,
+)
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
-from pymatgen.transformations.standard_transformations import (
-    SubstitutionTransformation,
-    OxidationStateDecorationTransformation,
-    PartialRemoveSpecieTransformation,
-)
-
-from pymatgen.db.query_engine import QueryEngine
 from pymatgen.db.alchemy.transmuters import QeTransmuter
-from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.db.creator import VaspToDbTaskDrone
+from pymatgen.db.query_engine import QueryEngine
 
 test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "test_files")
 

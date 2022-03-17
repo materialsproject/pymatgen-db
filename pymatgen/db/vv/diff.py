@@ -11,8 +11,8 @@ import time
 
 # Package
 from pymatgen.db import util
-from pymatgen.db.query_engine import QueryEngine
 from pymatgen.db.dbconfig import normalize_auth
+from pymatgen.db.query_engine import QueryEngine
 
 _log = logging.getLogger("mg.vv.diff")
 

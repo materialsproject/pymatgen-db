@@ -9,12 +9,13 @@ __email__ = "dkgunter@lbl.gov"
 __status__ = "Development"
 __date__ = "3/29/13"
 
+import logging
+import time
 from argparse import Action
 from collections import deque
 from itertools import chain
-import logging
-import time
 from sys import getsizeof
+
 import ruamel.yaml as yaml
 
 TRACE = logging.DEBUG - 1

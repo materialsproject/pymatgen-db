@@ -1,6 +1,6 @@
 import os
-import uuid
 import unittest
+import uuid
 
 import bson
 import pymongo

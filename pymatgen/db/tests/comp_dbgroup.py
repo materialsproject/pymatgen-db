@@ -7,8 +7,9 @@ __date__ = "5/2/14"
 # Stdlib
 import json
 import logging
-import pymongo
 import os
+
+import pymongo
 
 _opj = os.path.join
 import sys
@@ -16,10 +17,11 @@ import tempfile
 import time
 import unittest
 
+from pymatgen.db.dbconfig import COLL_KEY, DB_KEY
+from pymatgen.db.dbgroup import ConfigGroup
+
 # Package
 from pymatgen.db.tests.common import ComponentTest
-from pymatgen.db.dbconfig import DB_KEY, COLL_KEY
-from pymatgen.db.dbgroup import ConfigGroup
 
 _log = logging.getLogger("comp_dbgroup")
 _h = logging.StreamHandler(sys.stdout)

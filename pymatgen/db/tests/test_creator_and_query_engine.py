@@ -5,20 +5,19 @@ Created on Jun 19, 2012
 """
 
 
-import unittest
 import os
+import unittest
 import warnings
 
+from pymatgen.apps.borg.queen import BorgQueen
+from pymatgen.core.structure import Structure
+from pymatgen.electronic_structure.dos import CompleteDos
+from pymatgen.entries.computed_entries import ComputedEntry
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
-from pymatgen.apps.borg.queen import BorgQueen
-from pymatgen.entries.computed_entries import ComputedEntry
-from pymatgen.electronic_structure.dos import CompleteDos
-from pymatgen.core.structure import Structure
-
-from pymatgen.db.query_engine import QueryEngine
 from pymatgen.db.creator import VaspToDbTaskDrone
+from pymatgen.db.query_engine import QueryEngine
 from pymatgen.db.tests import common
 
 __author__ = "Shyue Ping Ong"

@@ -1,9 +1,10 @@
+import pprint
+import unittest
+import uuid
+
 import pymongo
 from pymongo import MongoClient
 
-import uuid
-import unittest
-import pprint
 from pymatgen.db.query_engine import QueryEngine, QueryResults
 from pymatgen.db.tests import common
 

@@ -7,8 +7,8 @@ __date__ = "2014-04-25"
 import json
 import tempfile
 import unittest
-from pymatgen.db.dbconfig import DBConfig, normalize_auth
-from pymatgen.db.dbconfig import ConfigurationFileError
+
+from pymatgen.db.dbconfig import ConfigurationFileError, DBConfig, normalize_auth
 
 
 class NormAuthTestCase(unittest.TestCase):

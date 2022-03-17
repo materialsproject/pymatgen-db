@@ -4,6 +4,7 @@ Tests for pymatgen.db.util
 __author__ = "dang"
 
 import unittest
+
 from pymatgen.db.util import collection_keys
 
 

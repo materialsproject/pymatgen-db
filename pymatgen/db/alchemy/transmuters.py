@@ -15,6 +15,7 @@ __email__ = "shyue@mit.edu"
 __date__ = "Mar 4, 2012"
 
 import datetime
+
 from pymatgen.alchemy.materials import TransformedStructure
 from pymatgen.alchemy.transmuters import StandardTransmuter
 
