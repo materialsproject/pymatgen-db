@@ -675,6 +675,9 @@ class QueryListResults(QueryResults):
     """Set of QueryResults on a list instead of a MongoDB cursor."""
 
     def clone(self):
+        """
+        Return a clone of the QueryListResults.
+        """
         return QueryResults(self._prop_dict, self._results[:])
 
     def __len__(self):
