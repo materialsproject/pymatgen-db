@@ -13,16 +13,16 @@ setup(
     packages=find_namespace_packages(include=["pymatgen.*"]),
     version="2022.3.17",
     setup_requires=["numpy"],
-    install_requires=["pymatgen>=2022.0.3", "monty>=0.9.6", "pymongo>=2.8", "smoqe"],
+    install_requires=["pymatgen>=2022.0.3", "monty>=0.9.6", "pymongo>=2.8"],
     extras_require={
         'tests': 'mongomock'
     },
     package_data={"pymatgen": ["db/*.json"]},
     include_package_data=True,
-    author="Shyue Ping Ong, Dan Gunter",
+    author="Shyue Ping Ong",
     author_email="shyuep@gmail.com",
-    maintainer="Dan Gunter",
-    maintainer_email="dkgunter@lbl.gov",
+    maintainer="Shyue Ping Ong",
+    maintainer_email="shyuep@gmail.com",
     url="https://github.com/materialsproject/pymatgen-db",
     license="MIT",
     description="Pymatgen-db is a database add-on for the Python Materials "
