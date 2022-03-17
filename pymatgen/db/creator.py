@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 This module defines a Drone to assimilate vasp data and insert it into a
 Mongo database.
@@ -22,6 +20,8 @@ import gridfs
 import numpy as np
 from monty.io import zopen
 from monty.json import MontyEncoder
+from pymongo import MongoClient
+
 from pymatgen.analysis.bond_valence import BVAnalyzer
 from pymatgen.analysis.local_env import VoronoiNN
 from pymatgen.analysis.structure_analyzer import oxide_type
@@ -33,7 +33,7 @@ from pymatgen.ext.matproj import MPRester
 from pymatgen.io.cif import CifWriter
 from pymatgen.io.vasp import Incar, Kpoints, Oszicar, Outcar, Poscar, Potcar, Vasprun
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymongo import MongoClient
+
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
@@ -198,6 +198,9 @@ class VaspToDbTaskDrone(AbstractDrone):
             return False
 
     def calculate_stability(self, d):
+        """
+        Calculate the stability (e_above_hull and decomposes_to) for a entry dict.
+        """
         m = MPRester(self.mapi_key)
         functional = d["pseudo_potential"]["functional"]
         syms = [f"{functional} {l}" for l in d["pseudo_potential"]["labels"]]
@@ -282,19 +285,19 @@ class VaspToDbTaskDrone(AbstractDrone):
                     if ("task_id" not in d) or (not d["task_id"]):
                         result = db.counter.find_one_and_update(filter={"_id": "taskid"}, update={"$inc": {"c": 1}})
                         d["task_id"] = result["c"]
-                    logger.info("Inserting {} with taskid = {}".format(d["dir_name"], d["task_id"]))
+                    logger.info(f"Inserting {d['dir_name']} with taskid = {d['task_id']}")
                 elif self.update_duplicates:
                     d["task_id"] = result["task_id"]
-                    logger.info("Updating {} with taskid = {}".format(d["dir_name"], d["task_id"]))
+                    logger.info(f"Updating {d['dir_name']} with taskid = {d['task_id']}")
 
                 coll.update_one({"dir_name": d["dir_name"]}, {"$set": d}, upsert=True)
                 return d["task_id"]
-            else:
-                logger.info("Skipping duplicate {}".format(d["dir_name"]))
+            logger.info(f"Skipping duplicate {d['dir_name']}")
         else:
             d["task_id"] = 0
-            logger.info("Simulated insert into database for {} with task_id {}".format(d["dir_name"], d["task_id"]))
+            logger.info(f"Simulated insert into database for {d['dir_name']} with task_id {d['task_id']}")
             return d
+        return None
 
     def post_process(self, dir_name, d):
         """
@@ -394,7 +397,7 @@ class VaspToDbTaskDrone(AbstractDrone):
 
         logger.info("Post-processed " + fullpath)
 
-    def process_killed_run(self, dir_name):
+    def process_killed_run(self, dir_name):  # pylint: disable=R0201
         """
         Process a killed vasp run.
         """
@@ -472,7 +475,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                     try:
                         d["oszicar"][f] = Oszicar(os.path.join(dir_name, f, "OSZICAR")).as_dict()
                     except:
-                        logger.error("Unable to parse OSZICAR for killed " "run in {}.".format(dir_name))
+                        logger.error(f"Unable to parse OSZICAR for killed run in {dir_name}.")
         return d
 
     def process_vasprun(self, dir_name, taskname, filename):
@@ -480,10 +483,9 @@ class VaspToDbTaskDrone(AbstractDrone):
         Process a vasprun.xml file.
         """
         vasprun_file = os.path.join(dir_name, filename)
-        if self.parse_projected_eigen and (self.parse_projected_eigen != "final" or taskname == self.runs[-1]):
-            parse_projected_eigen = True
-        else:
-            parse_projected_eigen = False
+        parse_projected_eigen = self.parse_projected_eigen and (
+            self.parse_projected_eigen != "final" or taskname == self.runs[-1]
+        )
         r = Vasprun(vasprun_file, parse_projected_eigen=parse_projected_eigen)
         d = r.as_dict()
         d["dir_name"] = os.path.abspath(dir_name)
@@ -495,7 +497,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 d["dos"] = r.complete_dos.as_dict()
             except Exception:
                 logger.warning(f"No valid dos data exist in {dir_name}.\n Skipping dos")
-        if taskname == "relax1" or taskname == "relax2":
+        if taskname in ("relax1", "relax2"):
             d["task"] = {"type": "aflow", "name": taskname}
         else:
             d["task"] = {"type": taskname, "name": taskname}
@@ -512,7 +514,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             # Defensively copy the additional fields first.  This is a MUST.
             # Otherwise, parallel updates will see the same object and inserts
             # will be overridden!!
-            d = {k: v for k, v in self.additional_fields.items()}
+            d = dict(self.additional_fields.items())
             d["dir_name"] = fullpath
             d["schema_version"] = VaspToDbTaskDrone.__version__
             d["calculations"] = [
@@ -606,13 +608,16 @@ class VaspToDbTaskDrone(AbstractDrone):
         if set(self.runs).intersection(subdirs):
             return [parent]
         if (
-            not any([parent.endswith(os.sep + r) for r in self.runs])
+            not any(parent.endswith(os.sep + r) for r in self.runs)
             and len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0
         ):
             return [parent]
         return []
 
-    def convert(self, d):
+    def convert(self, d):  # pylint: disable=R0201
+        """
+        Just return the dict.
+        """
         return d
 
     def __str__(self):
@@ -644,7 +649,9 @@ class VaspToDbTaskDrone(AbstractDrone):
 
 
 def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5, volume_change_threshold=0.2):
-
+    """
+    Generate basic analysis and error checks data for a run.
+    """
     initial_vol = d["input"]["crystal"]["lattice"]["volume"]
     final_vol = d["output"]["crystal"]["lattice"]["volume"]
     delta_vol = final_vol - initial_vol

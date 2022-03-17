@@ -79,9 +79,7 @@ class MockQueryEngine(QueryEngine):
                 _log.warning(f"Connected to real MongoDB at {host}:{port}")
                 return  # actully connected! not mocked..
             except:
-                _log.debug(
-                    "Connection to real MongoDB at {}:{} failed. " "This is normal; using mock.".format(host, port)
-                )
+                _log.debug(f"Connection to real MongoDB at {host}:{port} failed. This is normal; using mock.")
         self.connection = MongoClient(host, port)
         self.db = self.connection[database]
         self._user, self._password = user, password
