@@ -1,7 +1,5 @@
 monty==2022.3.12
 pymatgen==2022.2.10
 pymongo==4.0.1
-smoqe==0.1.3
 pybtex==0.24.0
-enum34==1.1.6
 ruamel.yaml==0.17.21
