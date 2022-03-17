@@ -5,15 +5,8 @@ __author__ = "Dan Gunter <dkgunter@lbl.gov>"
 __date__ = "10/29/13"
 
 # Stdlib
-import json
 import logging
 import os
-import subprocess
-import sys
-import tempfile
-import traceback
-import unittest
-
 import pymongo
 
 # Third-party
