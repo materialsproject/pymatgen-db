@@ -47,12 +47,7 @@ class QeTransmuter(StandardTransmuter):
         """
         entries = queryengine.get_entries(criteria, inc_structure=True)
 
-        source = "{}:{}/{}/{}".format(
-            queryengine.host,
-            queryengine.port,
-            queryengine.database_name,
-            queryengine.collection_name,
-        )
+        source = f"{queryengine.host}:{queryengine.port}/{queryengine.database_name}/{queryengine.collection_name}"
 
         def get_history(entry):
             return [

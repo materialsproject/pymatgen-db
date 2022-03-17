@@ -21,8 +21,8 @@ SETTINGS_FILE = os.path.join(os.path.expanduser("~"), ".pmgrc.yaml")
 
 def _load_mgdb_settings():
     try:
-        import ruamel.yaml as yaml
-
+        from ruamel.yaml import YAML
+        yaml = YAML()
         with open(SETTINGS_FILE) as f:
             d = yaml.load(f)
     except OSError:

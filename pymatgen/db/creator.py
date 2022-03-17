@@ -625,9 +625,15 @@ class VaspToDbTaskDrone(AbstractDrone):
 
     @classmethod
     def from_dict(cls, d):
+        """
+        From dict
+        """
         return cls(**d["init_args"])
 
     def as_dict(self):
+        """
+        Dict representation.
+        """
         init_args = {
             "host": self.host,
             "port": self.port,

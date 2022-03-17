@@ -22,11 +22,12 @@ from collections.abc import Iterable
 
 import gridfs
 import pymongo
+
 from pymatgen.core import Composition, Structure
 from pymatgen.electronic_structure.core import Orbital, Spin
 from pymatgen.electronic_structure.dos import CompleteDos, Dos
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
-from pymongo import MongoClient
+
 
 _log = logging.getLogger("mg." + __name__)
 
@@ -137,9 +138,9 @@ class QueryEngine:
         if connection is None:
             # can't pass replicaset=None to MongoClient (fails validation)
             if self.replicaset:
-                self.connection = MongoClient(self.host, self.port, replicaset=self.replicaset)
+                self.connection = pymongo.MongoClient(self.host, self.port, replicaset=self.replicaset)
             else:
-                self.connection = MongoClient(self.host, self.port)
+                self.connection = pymongo.MongoClient(self.host, self.port)
         else:
             self.connection = connection
         self.db = self.connection[database]
@@ -153,6 +154,9 @@ class QueryEngine:
 
     @property
     def collection_name(self):
+        """
+        Returns collection name.
+        """
         return self._collection_name
 
     @collection_name.setter
@@ -163,21 +167,6 @@ class QueryEngine:
         """
         self._collection_name = value
         self.collection = self.db[value]
-
-    def set_collection(self, collection):
-        """
-        To Be Deprecated: this should be replaced with the @property collection_name
-
-        Switch to another collection. Note that you may have to set the
-        aliases and default properties via set_aliases_and_defaults if the
-        schema of the new collection differs from the current collection.
-
-        Args:
-            collection:
-                Name of collection.
-        """
-        # Use the @property setter collection_name setter above
-        self.collection_name = collection
 
     def set_aliases_and_defaults(self, aliases_config=None, default_properties=None):
         """
@@ -294,10 +283,10 @@ class QueryEngine:
         Returns:
             List of pymatgen.entries.ComputedEntries satisfying criteria.
         """
-        all_entries = list()
+        all_entries = []
         optional_data = [] if not optional_data else list(optional_data)
         optional_data.append("oxide_type")
-        fields = [k for k in optional_data]
+        fields = list(optional_data)
         fields.extend(
             [
                 "task_id",
@@ -365,8 +354,8 @@ class QueryEngine:
         when there are no criteria.
         """
         if criteria is None:
-            return dict()
-        parsed_crit = dict()
+            return {}
+        parsed_crit = {}
         for k, v in self.default_criteria.items():
             if k not in criteria:
                 parsed_crit[self.aliases.get(k, k)] = v
@@ -496,7 +485,7 @@ class QueryEngine:
 
         if len(results) > 1:
             raise QueryError(f"More than one result found for task_id {task_id}!")
-        elif len(results) == 0:
+        if len(results) == 0:
             raise QueryError(f"No structure found for task_id {task_id}!")
         c = results[0]
         return Structure.from_dict(c[field])
@@ -624,8 +613,12 @@ class QueryResults(Iterable):
             if callable(ret_val):
                 return self._wrapper(ret_val)
             return ret_val
+        raise AttributeError
 
     def clone(self):
+        """
+        Provide a clone of the QueryResults.
+        """
         return QueryResults(self._prop_dict, self._results.clone())
 
     def from_cursor(self, cursor):
@@ -653,7 +646,7 @@ class QueryResults(Iterable):
         if not self._prop_dict:
             result = r
         else:
-            result = dict()
+            result = {}
             # Map aliased keys back to original key
             for k, v in self._prop_dict.items():
                 try:
@@ -668,11 +661,10 @@ class QueryResults(Iterable):
             return data
         if isinstance(data, list):
             return [QueryResults._mapped_result_path(path, d) for d in data]
-        else:
-            try:
-                return QueryResults._mapped_result_path(path[1:], data[path[0]])
-            except (IndexError, KeyError, ValueError):
-                return None
+        try:
+            return QueryResults._mapped_result_path(path[1:], data[path[0]])
+        except (IndexError, KeyError, ValueError):
+            return None
 
     def _result_generator(self):
         for r in self._results:
@@ -691,8 +683,7 @@ class QueryListResults(QueryResults):
         """
         if hasattr(self._results, "__len__"):
             return len(self._results)
-        else:
-            return QueryResults.__len__(self)
+        return QueryResults.__len__(self)
 
 
 class QueryError(Exception):
