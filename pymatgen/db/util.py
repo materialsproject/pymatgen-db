@@ -8,7 +8,7 @@ import json
 import logging
 from pymongo.mongo_client import MongoClient
 
-from pymatgen.db.dbconfig import DBConfig
+from pymatgen.db.config import DBConfig
 
 DEFAULT_PORT = DBConfig.DEFAULT_PORT
 DEFAULT_CONFIG_FILE = DBConfig.DEFAULT_FILE
@@ -50,6 +50,9 @@ def get_database(config_file=None, settings=None, admin=False, **kwargs):
 def get_collection(config_file, admin=False, settings=None):
     """
     Get a collection from a config file.
+    :param config_file Path to filename
+    :param admin Whether to use admin credentials. Default to False.
+    :param settings Whether to override settings or obtain from config file (None).
     """
     if settings is None:
         settings = get_settings(config_file)
