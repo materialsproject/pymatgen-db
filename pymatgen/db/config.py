@@ -11,7 +11,8 @@ passed in as a file or object. For example::
 """
 
 import os
-import ruamel.yaml as yaml
+
+from ruamel import yaml
 
 __author__ = "Dan Gunter <dkgunter@lbl.gov>"
 __date__ = "4/25/14"
@@ -27,6 +28,10 @@ ALIASES_KEY = "aliases"
 
 
 class ConfigurationFileError(Exception):
+    """
+    Error for Config File
+    """
+
     def __init__(self, filename, err):
         msg = f"reading '{filename}': {err}"
         Exception.__init__(self, msg)
@@ -92,14 +97,23 @@ class DBConfig:
 
     @property
     def settings(self):
+        """
+        Return settings
+        """
         return self._cfg
 
     @property
     def host(self):
+        """
+        Return host
+        """
         return self._cfg.get(HOST_KEY, None)
 
     @property
     def port(self):
+        """
+        Return port.
+        """
         return self._cfg.get(PORT_KEY, self.DEFAULT_PORT)
 
     @property
@@ -109,22 +123,37 @@ class DBConfig:
 
     @dbname.setter
     def dbname(self, value):
+        """
+        Set dbname.
+        """
         self._cfg[DB_KEY] = value
 
     @property
     def collection(self):
+        """
+        Return collection.
+        """
         return self._cfg.get(COLL_KEY, None)
 
     @collection.setter
     def collection(self, value):
+        """
+        Set collection.
+        """
         self._cfg[COLL_KEY] = value
 
     @property
     def user(self):
+        """
+        Return user.
+        """
         return self._cfg.get(USER_KEY, None)
 
     @property
     def password(self):
+        """
+        Return password.
+        """
         return self._cfg.get(PASS_KEY, None)
 
 
@@ -135,7 +164,8 @@ def get_settings(infile):
     :return: Settings parsed from file
     :rtype: dict
     """
-    settings = yaml.safe_load(_as_file(infile))
+    yml = yaml.YAML()
+    settings = yml.load(_as_file(infile))
     if not hasattr(settings, "keys"):
         raise ValueError(f"Settings not found in {infile}")
 

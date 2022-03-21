@@ -22,12 +22,10 @@ from collections.abc import Iterable
 
 import gridfs
 import pymongo
-
 from pymatgen.core import Composition, Structure
 from pymatgen.electronic_structure.core import Orbital, Spin
 from pymatgen.electronic_structure.dos import CompleteDos, Dos
 from pymatgen.entries.computed_entries import ComputedEntry, ComputedStructureEntry
-
 
 _log = logging.getLogger("mg." + __name__)
 

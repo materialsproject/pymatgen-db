@@ -2,10 +2,11 @@
 Utility functions used across scripts.
 """
 
-import bson
 import datetime
 import json
 import logging
+
+import bson
 from pymongo.mongo_client import MongoClient
 
 from pymatgen.db.config import DBConfig
@@ -18,6 +19,10 @@ _log = logging.getLogger("mg.util")
 
 
 class MongoJSONEncoder(json.JSONEncoder):
+    """
+    JSON encoder to support ObjectIDs and datetime used in Mongo.
+    """
+
     def default(self, o):
         if isinstance(o, bson.objectid.ObjectId):
             return str(o)
@@ -27,6 +32,9 @@ class MongoJSONEncoder(json.JSONEncoder):
 
 
 def get_settings(config_file):
+    """
+    Get settings from file.
+    """
     cfg = DBConfig(config_file)
     return cfg.settings
 
@@ -69,7 +77,7 @@ def collection_keys(coll, sep="."):
 
     def _keys(x, pre=""):
         for k in x:
-            yield (pre + k)
+            yield pre + k
             if isinstance(x[k], dict):
                 yield from _keys(x[k], pre + k + sep)
 
