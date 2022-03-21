@@ -188,6 +188,49 @@ def auth_aliases(d):
             del d[alias]
 
 
+def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
+    """Transform the readonly/admin user and password to simple user/password,
+    as expected by QueryEngine. If return value is true, then
+    admin or readonly password will be in keys "user" and "password".
+    :param settings: Connection settings
+    :type settings: dict
+    :param admin: Check for admin password
+    :param readonly: Check for readonly password
+    :param readonly_first: Check for readonly password before admin
+    :return: Whether user/password were found
+    :rtype: bool
+    """
+    U, P = USER_KEY, PASS_KEY
+    # If user/password, un-prefixed, exists, do nothing.
+    if U in settings and P in settings:
+        return True
+
+    # Set prefixes
+    prefixes = []
+    if readonly_first:
+        if readonly:
+            prefixes.append("readonly_")
+        if admin:
+            prefixes.append("admin_")
+    else:
+        if admin:
+            prefixes.append("admin_")
+        if readonly:
+            prefixes.append("readonly_")
+
+    # Look for first user/password matching.
+    found = False
+    for pfx in prefixes:
+        ukey, pkey = pfx + U, pfx + P
+        if ukey in settings and pkey in settings:
+            settings[U] = settings[ukey]
+            settings[P] = settings[pkey]
+            found = True
+            break
+
+    return found
+
+
 def _as_file(f, mode="r"):
     if isinstance(f, str):
         return open(f, mode)

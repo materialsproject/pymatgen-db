@@ -18,6 +18,7 @@ from fnmatch import fnmatch
 
 import gridfs
 import numpy as np
+from pymongo import MongoClient
 from monty.io import zopen
 from monty.json import MontyEncoder
 from pymatgen.analysis.bond_valence import BVAnalyzer
@@ -31,7 +32,7 @@ from pymatgen.ext.matproj import MPRester
 from pymatgen.io.cif import CifWriter
 from pymatgen.io.vasp import Incar, Kpoints, Oszicar, Outcar, Poscar, Potcar, Vasprun
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymongo import MongoClient
+
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
