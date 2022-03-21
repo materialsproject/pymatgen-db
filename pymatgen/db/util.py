@@ -24,6 +24,9 @@ class MongoJSONEncoder(json.JSONEncoder):
     """
 
     def default(self, o):
+        """
+        Override default to support ObjectID and datetime.
+        """
         if isinstance(o, bson.objectid.ObjectId):
             return str(o)
         if isinstance(o, datetime.datetime):

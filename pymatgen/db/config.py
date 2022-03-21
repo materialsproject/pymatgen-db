@@ -33,6 +33,9 @@ class ConfigurationFileError(Exception):
     """
 
     def __init__(self, filename, err):
+        """
+        Init for ConfigurationFileError.
+        """
         msg = f"reading '{filename}': {err}"
         Exception.__init__(self, msg)
 
