@@ -4,8 +4,9 @@ A module for replicating the MP database creator.
 See https://medium.com/@shyuep/a-local-materials-project-database-1ea909430c95
 """
 
-import pymongo
 import itertools
+
+import pymongo
 
 from pymatgen.ext.matproj import MPRester
 from pymatgen.entries.computed_entries import ComputedStructureEntry
