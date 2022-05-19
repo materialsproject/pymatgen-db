@@ -11,5 +11,5 @@ class MPDBTest(unittest.TestCase):
     def test_queryresult(self):
         mpdb = MPDB()
         mpdb.create({"chemsys": "Fe-O"})
-        entries = mpdb.get_entries_in_chemsys(["Fe"])
+        entries = mpdb.get_entries_in_chemsys(["Fe", "O"])
         self.assertTrue(len(entries) > 0)
