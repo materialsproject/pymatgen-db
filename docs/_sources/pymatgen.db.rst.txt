@@ -8,32 +8,22 @@ Subpackages
    :maxdepth: 6
 
    pymatgen.db.alchemy
-   pymatgen.db.builders
-   pymatgen.db.vv
 
 Submodules
 ----------
+
+pymatgen.db.config module
+-------------------------
+
+.. automodule:: pymatgen.db.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 pymatgen.db.creator module
 --------------------------
 
 .. automodule:: pymatgen.db.creator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pymatgen.db.dbconfig module
----------------------------
-
-.. automodule:: pymatgen.db.dbconfig
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pymatgen.db.dbgroup module
---------------------------
-
-.. automodule:: pymatgen.db.dbgroup
    :members:
    :undoc-members:
    :show-inheritance:

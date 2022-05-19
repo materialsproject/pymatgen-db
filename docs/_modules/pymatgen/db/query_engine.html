@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.query_engine &#8212; pymatgen-db 2022.3.17 documentation</title>
+    <title>pymatgen.db.query_engine &#8212; pymatgen-db 2022.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/flasky.css" />
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2022.3.17 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2022.5.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.query_engine</a></li> 
       </ul>
@@ -63,18 +63,17 @@
 <span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Production&quot;</span>
 <span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;Mar 2 2013&quot;</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">gridfs</span>
 <span class="kn">import</span> <span class="nn">zlib</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
 
+<span class="kn">import</span> <span class="nn">gridfs</span>
 <span class="kn">import</span> <span class="nn">pymongo</span>
-<span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
-<span class="kn">from</span> <span class="nn">pymatgen.core</span> <span class="kn">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Composition</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core</span> <span class="kn">import</span> <span class="n">Composition</span><span class="p">,</span> <span class="n">Structure</span>
 <span class="kn">from</span> <span class="nn">pymatgen.electronic_structure.core</span> <span class="kn">import</span> <span class="n">Orbital</span><span class="p">,</span> <span class="n">Spin</span>
 <span class="kn">from</span> <span class="nn">pymatgen.electronic_structure.dos</span> <span class="kn">import</span> <span class="n">CompleteDos</span><span class="p">,</span> <span class="n">Dos</span>
 <span class="kn">from</span> <span class="nn">pymatgen.entries.computed_entries</span> <span class="kn">import</span> <span class="n">ComputedEntry</span><span class="p">,</span> <span class="n">ComputedStructureEntry</span>
@@ -188,9 +187,9 @@
         <span class="k">if</span> <span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># can&#39;t pass replicaset=None to MongoClient (fails validation)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">replicaset</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">replicaset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">replicaset</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">replicaset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">replicaset</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">[</span><span class="n">database</span><span class="p">]</span>
@@ -204,6 +203,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">collection_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns collection name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collection_name</span>
 
     <span class="nd">@collection_name</span><span class="o">.</span><span class="n">setter</span>
@@ -214,21 +216,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_collection_name</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
-
-<div class="viewcode-block" id="QueryEngine.set_collection"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.set_collection">[docs]</a>    <span class="k">def</span> <span class="nf">set_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        To Be Deprecated: this should be replaced with the @property collection_name</span>
-
-<span class="sd">        Switch to another collection. Note that you may have to set the</span>
-<span class="sd">        aliases and default properties via set_aliases_and_defaults if the</span>
-<span class="sd">        schema of the new collection differs from the current collection.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            collection:</span>
-<span class="sd">                Name of collection.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Use the @property setter collection_name setter above</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span> <span class="o">=</span> <span class="n">collection</span></div>
 
 <div class="viewcode-block" id="QueryEngine.set_aliases_and_defaults"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.set_aliases_and_defaults">[docs]</a>    <span class="k">def</span> <span class="nf">set_aliases_and_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aliases_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -345,10 +332,10 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            List of pymatgen.entries.ComputedEntries satisfying criteria.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">all_entries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">all_entries</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">optional_data</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">optional_data</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">optional_data</span><span class="p">)</span>
         <span class="n">optional_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;oxide_type&quot;</span><span class="p">)</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">optional_data</span><span class="p">]</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">optional_data</span><span class="p">)</span>
         <span class="n">fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="s2">&quot;task_id&quot;</span><span class="p">,</span>
@@ -416,8 +403,8 @@
 <span class="sd">        when there are no criteria.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">parsed_crit</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="n">parsed_crit</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_criteria</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">criteria</span><span class="p">:</span>
                 <span class="n">parsed_crit</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
@@ -547,7 +534,7 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">QueryError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;More than one result found for task_id </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">QueryError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No structure found for task_id </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">field</span><span class="p">])</span></div>
@@ -608,7 +595,7 @@
                 <span class="n">s</span> <span class="o">=</span> <span class="n">dosfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="n">s</span> <span class="o">=</span> <span class="n">zlib</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
                     <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
                 <span class="n">tdos</span> <span class="o">=</span> <span class="n">Dos</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
@@ -675,8 +662,12 @@
             <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">ret_val</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="p">(</span><span class="n">ret_val</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret_val</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span>
 
 <div class="viewcode-block" id="QueryResults.clone"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.query_engine.QueryResults.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provide a clone of the QueryResults.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">clone</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="QueryResults.from_cursor"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.query_engine.QueryResults.from_cursor">[docs]</a>    <span class="k">def</span> <span class="nf">from_cursor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">):</span>
@@ -704,7 +695,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">r</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="c1"># Map aliased keys back to original key</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -719,11 +710,10 @@
             <span class="k">return</span> <span class="n">data</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">QueryResults</span><span class="o">.</span><span class="n">_mapped_result_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">QueryResults</span><span class="o">.</span><span class="n">_mapped_result_path</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">data</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">QueryResults</span><span class="o">.</span><span class="n">_mapped_result_path</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">data</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_result_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
@@ -734,6 +724,9 @@
     <span class="sd">&quot;&quot;&quot;Set of QueryResults on a list instead of a MongoDB cursor.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="QueryListResults.clone"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.query_engine.QueryListResults.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a clone of the QueryListResults.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">QueryResults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:])</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -742,8 +735,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">QueryResults</span><span class="o">.</span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">QueryResults</span><span class="o">.</span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="QueryError"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.query_engine.QueryError">[docs]</a><span class="k">class</span> <span class="nc">QueryError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>

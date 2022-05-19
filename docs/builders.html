@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Database “Builders” &#8212; pymatgen-db 2022.3.17 documentation</title>
+    <title>Database “Builders” &#8212; pymatgen-db 2022.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.3.17 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Database “Builders”</a></li> 
       </ul>
     </div>  
@@ -355,8 +355,8 @@ the copying would automatically work with the incremental mode.</p>
 The central idea of the incremental building implementation is that any builder
 can be run in “incremental mode”. When this happens, any QueryEngine objects
 are replaced transparently by equivalent objects that track their last
-position, of class <a class="reference internal" href="pymatgen.db.builders.html#pymatgen.db.builders.incr.TrackedQueryEngine" title="pymatgen.db.builders.incr.TrackedQueryEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.incr.TrackedQueryEngine</span></code></a>, which is
-documented in module <a class="reference internal" href="pymatgen.db.builders.html#module-pymatgen.db.builders.incr" title="pymatgen.db.builders.incr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pymatgen.db.builders.incr</span></code></a>. This tracking can be
+position, of class <code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.builders.incr.TrackedQueryEngine</span></code>, which is
+documented in module <code class="xref py py-mod docutils literal notranslate"><span class="pre">pymatgen.db.builders.incr</span></code>. This tracking can be
 controlled, if necessary, with the instance variable <code class="docutils literal notranslate"><span class="pre">tracking</span></code> on the
 TrackedQueryEngine class.</p>
 <p>The <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">Database “CopyBuilder”</span></a> is an example of a trivial builder that can work with

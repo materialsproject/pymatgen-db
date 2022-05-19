@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.util &#8212; pymatgen-db 2022.3.17 documentation</title>
+    <title>pymatgen.db.util &#8212; pymatgen-db 2022.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/flasky.css" />
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2022.3.17 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2022.5.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.util</a></li> 
       </ul>
@@ -52,41 +52,32 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Utility functions used across scripts.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Shyue Ping Ong, Dan Gunter&quot;</span>
-<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2012-2014, The Materials Project&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.1&quot;</span>
-<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Dan Gunter&quot;</span>
-<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;dkgunter@lbl.gov&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2012-12-01&quot;</span>
 
-<span class="c1">## Imports</span>
-
-<span class="kn">import</span> <span class="nn">bson</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">bson</span>
 <span class="kn">from</span> <span class="nn">pymongo.mongo_client</span> <span class="kn">import</span> <span class="n">MongoClient</span>
 
-<span class="kn">from</span> <span class="nn">pymatgen.db.dbconfig</span> <span class="kn">import</span> <span class="n">DBConfig</span>
+<span class="kn">from</span> <span class="nn">pymatgen.db.config</span> <span class="kn">import</span> <span class="n">DBConfig</span>
 
-<span class="c1"># Backwards compatibility from refactor to `dbconfig` module</span>
-<span class="c1"># Copy of functions that were moved</span>
-<span class="kn">from</span> <span class="nn">pymatgen.db.dbconfig</span> <span class="kn">import</span> <span class="n">normalize_auth</span>
-
-<span class="c1"># Copy of global constants that were moved</span>
 <span class="n">DEFAULT_PORT</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="o">.</span><span class="n">DEFAULT_PORT</span>
 <span class="n">DEFAULT_CONFIG_FILE</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="o">.</span><span class="n">DEFAULT_FILE</span>
 <span class="n">DEFAULT_SETTINGS</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="o">.</span><span class="n">DEFAULT_SETTINGS</span>
 
-<span class="c1">## Logging</span>
-
 <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;mg.util&quot;</span><span class="p">)</span>
-
-<span class="c1">## Classes</span>
 
 
 <div class="viewcode-block" id="MongoJSONEncoder"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.MongoJSONEncoder">[docs]</a><span class="k">class</span> <span class="nc">MongoJSONEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    JSON encoder to support ObjectIDs and datetime used in Mongo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="MongoJSONEncoder.default"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.MongoJSONEncoder.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Override default to support ObjectID and datetime.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">bson</span><span class="o">.</span><span class="n">objectid</span><span class="o">.</span><span class="n">ObjectId</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
@@ -94,15 +85,18 @@
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div></div>
 
 
-<span class="c1">## Functions</span>
-
-
 <div class="viewcode-block" id="get_settings"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.get_settings">[docs]</a><span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get settings from file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cfg</span> <span class="o">=</span> <span class="n">DBConfig</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cfg</span><span class="o">.</span><span class="n">settings</span></div>
 
 
 <div class="viewcode-block" id="get_database"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.get_database">[docs]</a><span class="k">def</span> <span class="nf">get_database</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a database object from a config file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span> <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">settings</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;port&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">]]</span>
@@ -111,11 +105,17 @@
         <span class="n">passwd</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;admin_password&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">admin</span> <span class="k">else</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;readonly_password&quot;</span><span class="p">]</span>
         <span class="n">db</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">passwd</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-        <span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No {admin,readonly}_user/password found in config. file, &quot;</span> <span class="s2">&quot;accessing DB without authentication&quot;</span><span class="p">)</span>
+        <span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No {admin,readonly}_user/password found in config. file, accessing DB without authentication&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db</span></div>
 
 
 <div class="viewcode-block" id="get_collection"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.get_collection">[docs]</a><span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a collection from a config file.</span>
+<span class="sd">    :param config_file Path to filename</span>
+<span class="sd">    :param admin Whether to use admin credentials. Default to False.</span>
+<span class="sd">    :param settings Whether to override settings or obtain from config file (None).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">get_database</span><span class="p">(</span><span class="n">admin</span><span class="o">=</span><span class="n">admin</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
@@ -125,43 +125,17 @@
 <div class="viewcode-block" id="collection_keys"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.collection_keys">[docs]</a><span class="k">def</span> <span class="nf">collection_keys</span><span class="p">(</span><span class="n">coll</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get a list of all (including nested) keys in a collection.</span>
 <span class="sd">    Examines the first document in the collection.</span>
-
 <span class="sd">    :param sep: Separator for nested keys</span>
 <span class="sd">    :return: List of str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_keys</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="p">(</span><span class="n">pre</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">pre</span> <span class="o">+</span> <span class="n">k</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="k">yield from</span> <span class="n">_keys</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">pre</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="n">sep</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_keys</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">find_one</span><span class="p">()))</span></div>
-
-
-<div class="viewcode-block" id="csv_list"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.csv_list">[docs]</a><span class="k">def</span> <span class="nf">csv_list</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Format list to a string with comma-separated values.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span></div>
-
-
-<div class="viewcode-block" id="quotable"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.quotable">[docs]</a><span class="k">def</span> <span class="nf">quotable</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&#39;&quot;</span></div>
-
-
-<div class="viewcode-block" id="csv_dict"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.csv_dict">[docs]</a><span class="k">def</span> <span class="nf">csv_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Format dict to a string with comma-separated values.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">quotable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span></div>
-
-
-<div class="viewcode-block" id="kvp_dict"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.util.kvp_dict">[docs]</a><span class="k">def</span> <span class="nf">kvp_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Format dict to key=value pairs.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">quotable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span></div>
 </pre></div>
 
             <div class="clearer"></div>
