@@ -1,3 +1,7 @@
+v2022.5.20
+----------
+* New module to create local MP database.
+
 v0.7.0
 ------
 * Fix deprecation.
