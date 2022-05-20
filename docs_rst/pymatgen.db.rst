@@ -28,6 +28,14 @@ pymatgen.db.creator module
    :undoc-members:
    :show-inheritance:
 
+pymatgen.db.matproj module
+--------------------------
+
+.. automodule:: pymatgen.db.matproj
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pymatgen.db.query\_engine module
 --------------------------------
 

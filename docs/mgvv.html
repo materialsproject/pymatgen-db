@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2022.5.2 documentation</title>
+    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2022.5.20 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="index.html" title="Pymatgen-db"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.20 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Materials Project Database Validation: mgvv</a></li> 
       </ul>
     </div>  
@@ -182,11 +182,11 @@ administrative user, if both are present.</p>
 <p>Reports can be sent by email. This can be configured on the command-line,
 or within the main configuration file.</p>
 <p>Here is an example configuration:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_email</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">you@host.org</span><span class="w"></span>
-<span class="w">  </span><span class="nt">to</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">you@host.org</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">othersucker@host.otherorg</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_email</span><span class="p">:</span>
+  <span class="nt">from</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
+  <span class="nt">to</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">othersucker@host.otherorg</span>
 </pre></div>
 </div>
 <p>The section for email must always be named <cite>_email</cite>.
@@ -212,10 +212,10 @@ on which to apply the constraints. The specification of the constraints in
 each collection takes two possible forms, simple and complex. In both cases
 the syntax of the constraints is the same, see <a class="reference internal" href="#constraint-syntax"><span class="std std-ref">Constraint syntax</span></a>.</p>
 <p><strong>Simple</strong>: A list of constraints, which are simply combined. Any document in the collection that violates any of the constraints will generate a validation error.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field1 &lt;= value</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field2 &gt; value</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="c1"># ..etc..</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 &lt;= value</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field2 &gt; value</span>
+    <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
 </pre></div>
 </div>
 <p><strong>Complex</strong>: An initial filter, given as a map with an <cite>filter</cite> key, and
@@ -224,21 +224,21 @@ The <cite>filter</cite> key selects records for applying the constraints.
 The <cite>constraints</cite> key provides the list of constraints associated with that condition.
 As in the simple format, any document in the collection
 that violates any of the constraints will generate a validation error.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">mycollection</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"></span>
-<span class="w">        </span><span class="nt">filter</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field1 = &#39;negatory&#39;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">constraints</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field2 &lt;= value</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field3 &gt; value</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="c1"># ..etc..</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"></span>
-<span class="w">        </span><span class="nt">filter</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field1 = &#39;excellent&#39;</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field4 &gt; 0</span><span class="w"></span>
-<span class="w">        </span><span class="nt">then</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field5 &lt; value</span><span class="w"></span>
-<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="c1"># ..etc..</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">mycollection</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span>
+        <span class="nt">filter</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 = &#39;negatory&#39;</span>
+        <span class="nt">constraints</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field2 &lt;= value</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field3 &gt; value</span>
+            <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
+    <span class="p p-Indicator">-</span>
+        <span class="nt">filter</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 = &#39;excellent&#39;</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field4 &gt; 0</span>
+        <span class="nt">then</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field5 &lt; value</span>
+            <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
 </pre></div>
 </div>
 <p>As shown in the second constraint block above, there may also be a
@@ -249,15 +249,15 @@ to pass the filter and be evaluated according to the constraints.</p>
 Constraints that use these aliases will automatically be converted to the aliased name before the query
 is submitted to the database. The aliases are simply a list in the format “name = value”
 in a section called <cite>_aliases</cite>, as shown below.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_aliases</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">snl_id = mps_id</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">energy = analysis.e_above_hull</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_aliases</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">snl_id = mps_id</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">energy = analysis.e_above_hull</span>
 </pre></div>
 </div>
 <p><strong>Partial arrays</strong> can be fetched, which is very useful for not spending a ton of bandwidth, by adding <cite>/&lt;path&gt;</cite>
 after the name of the field. For example:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">calculations/density size 2</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">calculations/density size 2</span>
 </pre></div>
 </div>
 <p>If, for exampe, the <cite>calculations</cite> array was full of large sub-arrays

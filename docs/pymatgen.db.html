@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>pymatgen.db package &#8212; pymatgen-db 2022.5.2 documentation</title>
+    <title>pymatgen.db package &#8212; pymatgen-db 2022.5.20 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="dbconfig.html" title="Database configuration"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.20 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db package</a></li> 
       </ul>
     </div>  
@@ -440,6 +440,53 @@ different file servers to have distinct locations.</p>
 <dd class="field-odd"><p>Full URI path, e.g., fileserver.host.com</p>
 </dd>
 </dl>
+</dd></dl>
+
+</section>
+<section id="module-pymatgen.db.matproj">
+<span id="pymatgen-db-matproj-module"></span><h2>pymatgen.db.matproj module<a class="headerlink" href="#module-pymatgen.db.matproj" title="Permalink to this headline">¶</a></h2>
+<p>A module for replicating the MP database creator.</p>
+<p>See <a class="reference external" href="https://medium.com/&#64;shyuep/a-local-materials-project-database-1ea909430c95">https://medium.com/&#64;shyuep/a-local-materials-project-database-1ea909430c95</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pymatgen.db.matproj.MPDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MPDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/matproj.html#MPDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.matproj.MPDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This module allows you to create a local MP database based on ComputedStructureEntries.</p>
+<p>&#64;param args: Pass through to MongoClient. E.g., you can create a connection using uri strings, etc.
+&#64;param kwargs: Pass through to MongoClient. E.g., you can create a connection using uri strings, etc.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pymatgen.db.matproj.MPDB.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/matproj.html#MPDB.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.matproj.MPDB.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the database. Typically only used once.</p>
+<dl class="simple">
+<dt>&#64;param criteria: Criteria passed to MPRester.get_entries to obtain the entries. None means you get the entire</dt><dd><p>MP database.</p>
+</dd>
+</dl>
+<p>&#64;param property_data: List of additional property data to obtain. These are stored in the data.* keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymatgen.db.matproj.MPDB.get_entries_in_chemsys">
+<span class="sig-name descname"><span class="pre">get_entries_in_chemsys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/matproj.html#MPDB.get_entries_in_chemsys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.matproj.MPDB.get_entries_in_chemsys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method to get a list of ComputedEntries in a chemical system. For example, elements = [“Li”, “Fe”, “O”]
+will return a list of all entries in the Li-Fe-O chemical system, i.e., all LixOy, FexOy, LixFey, LixFeyOz,
+Li, Fe and O phases. Extremely useful for creating phase diagrams of entire chemical systems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elements</strong> (<em>str</em><em> or </em><em>[</em><em>str</em><em>]</em>) – Chemical system string comprising element
+symbols separated by dashes, e.g., “Li-Fe-O” or List of element
+symbols, e.g., [“Li”, “Fe”, “O”].</p></li>
+<li><p><strong>additional_criteria</strong> (<em>dict</em>) – Any additional criteria to pass. For instance, if you are only interested in
+stable entries, you can pass {“e_above_hull”: {“$lte”: 0.001}}.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of ComputedStructureEntries.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -940,6 +987,7 @@ pymatgen objects for analysis purposes.</p>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-pymatgen.db.config">pymatgen.db.config module</a></li>
 <li><a class="reference internal" href="#module-pymatgen.db.creator">pymatgen.db.creator module</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.matproj">pymatgen.db.matproj module</a></li>
 <li><a class="reference internal" href="#module-pymatgen.db.query_engine">pymatgen.db.query_engine module</a></li>
 <li><a class="reference internal" href="#module-pymatgen.db.util">pymatgen.db.util module</a></li>
 <li><a class="reference internal" href="#module-pymatgen.db">Module contents</a></li>
