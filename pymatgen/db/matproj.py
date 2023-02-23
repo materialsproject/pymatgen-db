@@ -3,6 +3,7 @@ A module for replicating the MP database creator.
 
 See https://medium.com/@shyuep/a-local-materials-project-database-1ea909430c95
 """
+from __future__ import annotations
 
 import itertools
 
@@ -26,7 +27,7 @@ class MPDB:
         db = client.matproj
         self.collection = db.entries
 
-    def create(self, criteria=None, property_data: list = None):
+    def create(self, criteria=None, property_data: list | None = None):
         """
         Creates the database. Typically only used once.
 
