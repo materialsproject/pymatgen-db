@@ -1,19 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Database “Builders” &#8212; pymatgen-db 2022.5.20 documentation</title>
+    <title>Database “Builders” &#8212; pymatgen-db 2023.2.23 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Database configuration" href="dbconfig.html" />
@@ -46,7 +45,7 @@
         <li class="right" >
           <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.20 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2023.2.23 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Database “Builders”</a></li> 
       </ul>
     </div>  
@@ -57,7 +56,7 @@
           <div class="body" role="main">
             
   <section id="database-builders">
-<span id="builders"></span><h1><a class="toc-backref" href="#id1">Database “Builders”</a><a class="headerlink" href="#database-builders" title="Permalink to this headline">¶</a></h1>
+<span id="builders"></span><h1><a class="toc-backref" href="#id1" role="doc-backlink">Database “Builders”</a><a class="headerlink" href="#database-builders" title="Permalink to this heading">¶</a></h1>
 <p>The Materials Project relies on MongoDB databases. The common parts of the
 process of creating these databases from either files or other MongoDB databases
 are encapsulated in the <code class="docutils literal notranslate"><span class="pre">pymatgen.db.builders</span></code> subpackage, and in the
@@ -69,7 +68,7 @@ methods are general-purpose, and thus could be useful to <em>any</em> project th
 to perform extract-transform-load (ETL) operations with MongoDB.</p>
 <p>The code presented here can be found in the directory
 <cite>pymatgen.db/builders/examples</cite> in the source code distribution.</p>
-<div class="contents topic" id="contents">
+<nav class="contents" id="contents">
 <p class="topic-title">Contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#database-builders" id="id1">Database “Builders”</a></p>
@@ -96,11 +95,11 @@ to perform extract-transform-load (ETL) operations with MongoDB.</p>
 </ul>
 </li>
 </ul>
-</div>
+</nav>
 <section id="features">
-<span id="bld-concepts"></span><h2><a class="toc-backref" href="#id2">Features</a><a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<span id="bld-concepts"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Features</a><a class="headerlink" href="#features" title="Permalink to this heading">¶</a></h2>
 <section id="parallel-building">
-<h3><a class="toc-backref" href="#id3">Parallel building</a><a class="headerlink" href="#parallel-building" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id3" role="doc-backlink">Parallel building</a><a class="headerlink" href="#parallel-building" title="Permalink to this heading">¶</a></h3>
 <p>Builders can be run in parallel without explicit coding of parallelism by
 the author. This allows CPU-intensive transformations of the data to run
 much faster on multicore machines, which includes most modern hardware.
@@ -115,7 +114,7 @@ querying the DB happens sequentially (unless you write explicit parallel
 code inside <code class="docutils literal notranslate"><span class="pre">get_items()</span></code>).</p>
 </section>
 <section id="incremental-building">
-<h3><a class="toc-backref" href="#id4">Incremental building</a><a class="headerlink" href="#incremental-building" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Incremental building</a><a class="headerlink" href="#incremental-building" title="Permalink to this heading">¶</a></h3>
 <p>Incremental building allows successive builds of source MongoDB collection(s)
 to only operate on the records added since the last build. This can save
 huge amounts of time. An illustration of the difference between an incremental and
@@ -124,7 +123,7 @@ full (non-incremental) build is shown below.</p>
 </section>
 </section>
 <section id="writing-a-builder">
-<span id="bld-writing"></span><h2><a class="toc-backref" href="#id5">Writing a builder</a><a class="headerlink" href="#writing-a-builder" title="Permalink to this headline">¶</a></h2>
+<span id="bld-writing"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">Writing a builder</a><a class="headerlink" href="#writing-a-builder" title="Permalink to this heading">¶</a></h2>
 <p>To write a builder, you must create a Python class that inherits from
 <cite>pymatgen.db.builders.core.Builder</cite>
 (see the <a class="reference internal" href="pymatgen.db.builders.html"><span class="doc">pymatgen.db.builders</span></a> package)
@@ -134,7 +133,7 @@ give two example builders: a simple <a class="reference internal" href="#bld-ex-
 that just counts the lines in a file,
 and a <a class="reference internal" href="#bld-ex-copy"><span class="std std-ref">CopyBuilder</span></a> that copies a MongoDB collection.</p>
 <section id="simple-filecounter-builder">
-<span id="bld-ex-filecounter"></span><h3><a class="toc-backref" href="#id6">Simple “FileCounter” builder</a><a class="headerlink" href="#simple-filecounter-builder" title="Permalink to this headline">¶</a></h3>
+<span id="bld-ex-filecounter"></span><h3><a class="toc-backref" href="#id6" role="doc-backlink">Simple “FileCounter” builder</a><a class="headerlink" href="#simple-filecounter-builder" title="Permalink to this heading">¶</a></h3>
 <p>The first builder simply reads from a file, and counts the lines in that file.
 In this section we’ll show the whole program, then walk through it one section
 at a time:</p>
@@ -235,7 +234,7 @@ of None will read as <code class="docutils literal notranslate"><span class="pre
 The next example will show MongoDB access and other features.</p>
 </section>
 <section id="database-copybuilder">
-<span id="bld-ex-copy"></span><h3><a class="toc-backref" href="#id7">Database “CopyBuilder”</a><a class="headerlink" href="#database-copybuilder" title="Permalink to this headline">¶</a></h3>
+<span id="bld-ex-copy"></span><h3><a class="toc-backref" href="#id7" role="doc-backlink">Database “CopyBuilder”</a><a class="headerlink" href="#database-copybuilder" title="Permalink to this heading">¶</a></h3>
 <p>The next builder does a simple DB operation: copying one MongoDB collection
 from a source to a destination. As before, we begin with the full program
 and then step through it one snippet at at time:</p>
@@ -350,7 +349,7 @@ logic inside the builder itself, but in a very simple case like this
 the copying would automatically work with the incremental mode.</p>
 </section>
 <section id="incremental-builder-maxvaluebuilder">
-<span id="bld-writing-incr"></span><h3><a class="toc-backref" href="#id8">Incremental builder “MaxValueBuilder”</a><a class="headerlink" href="#incremental-builder-maxvaluebuilder" title="Permalink to this headline">¶</a></h3>
+<span id="bld-writing-incr"></span><h3><a class="toc-backref" href="#id8" role="doc-backlink">Incremental builder “MaxValueBuilder”</a><a class="headerlink" href="#incremental-builder-maxvaluebuilder" title="Permalink to this heading">¶</a></h3>
 <p>The incremental building concept was introduced in <a class="reference internal" href="#bld-concepts"><span class="std std-ref">Features</span></a>.
 The central idea of the incremental building implementation is that any builder
 can be run in “incremental mode”. When this happens, any QueryEngine objects
@@ -515,7 +514,7 @@ incremental building.</p>
 </section>
 </section>
 <section id="running-a-builder">
-<span id="bld-running"></span><h2><a class="toc-backref" href="#id9">Running a builder</a><a class="headerlink" href="#running-a-builder" title="Permalink to this headline">¶</a></h2>
+<span id="bld-running"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">Running a builder</a><a class="headerlink" href="#running-a-builder" title="Permalink to this heading">¶</a></h2>
 <p>This section describes how,
 once you have written a builder class, you can use <cite>mgbuild</cite> to run
 it, possibly in parallel and possibly “incrementally”, on some inputs.</p>
@@ -533,7 +532,7 @@ like this:</p>
 in your Python path. We will use the example modules that are installed
 in <code class="docutils literal notranslate"><span class="pre">pymatgen.db.builders.examples</span></code>.</p>
 <section id="displaying-builder-usage">
-<span id="bld-run-show"></span><h3><a class="toc-backref" href="#id10">Displaying builder usage</a><a class="headerlink" href="#displaying-builder-usage" title="Permalink to this headline">¶</a></h3>
+<span id="bld-run-show"></span><h3><a class="toc-backref" href="#id10" role="doc-backlink">Displaying builder usage</a><a class="headerlink" href="#displaying-builder-usage" title="Permalink to this heading">¶</a></h3>
 <p>You can get the list of parameters and their types for a given builder
 by giving its full module path, and the <code class="docutils literal notranslate"><span class="pre">-u</span></code> or <code class="docutils literal notranslate"><span class="pre">--usage</span></code> option:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="o">-</span><span class="n">u</span> <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span>
@@ -554,7 +553,7 @@ see some error messages.</p>
 </div>
 </section>
 <section id="running-the-builder">
-<span id="bld-run-exe"></span><h3><a class="toc-backref" href="#id11">Running the builder</a><a class="headerlink" href="#running-the-builder" title="Permalink to this headline">¶</a></h3>
+<span id="bld-run-exe"></span><h3><a class="toc-backref" href="#id11" role="doc-backlink">Running the builder</a><a class="headerlink" href="#running-the-builder" title="Permalink to this heading">¶</a></h3>
 <p>The usage of the <cite>mgbuild run</cite> command is as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">mgbuild</span> <span class="n">run</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">quiet</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">OPER</span><span class="p">[:</span><span class="n">FIELD</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NUM_CORES</span><span class="p">]</span>
                    <span class="p">[</span><span class="o">-</span><span class="n">u</span><span class="p">]</span>
@@ -587,7 +586,7 @@ builder class, and then values for each parameter. There are also optional
 arguments for building in parallel and building incrementally. This section will
 walk through from simple to more complex examples.</p>
 <section id="basic-usage">
-<h4>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h4>
+<h4>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading">¶</a></h4>
 <p>Run the copy builder:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgbuild</span> <span class="n">run</span>  <span class="n">pymatgen</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">builders</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">copy_builder</span><span class="o">.</span><span class="n">CopyBuilder</span> \
     <span class="n">source</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test1</span><span class="o">.</span><span class="n">json</span> <span class="n">target</span><span class="o">=</span><span class="n">conf</span><span class="o">/</span><span class="n">test2</span><span class="o">.</span><span class="n">json</span> <span class="n">crit</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
@@ -605,7 +604,7 @@ copy will be run in a single thread.</p>
 <p>See <a class="reference internal" href="dbconfig.html"><span class="doc">Database configuration</span></a> for more details.</p>
 </section>
 <section id="running-in-parallel">
-<h4>Running in parallel<a class="headerlink" href="#running-in-parallel" title="Permalink to this headline">¶</a></h4>
+<h4>Running in parallel<a class="headerlink" href="#running-in-parallel" title="Permalink to this heading">¶</a></h4>
 <p>Most machines have multiple cores, and hundreds of cores will be common
 in the near future. If your item processing requires any
 real work, you will probably benefit by running in parallel:</p>
@@ -622,7 +621,7 @@ The <code class="docutils literal notranslate"><span class="pre">get_items()</sp
 </div>
 </section>
 <section id="incremental-builds">
-<h4>Incremental builds<a class="headerlink" href="#incremental-builds" title="Permalink to this headline">¶</a></h4>
+<h4>Incremental builds<a class="headerlink" href="#incremental-builds" title="Permalink to this heading">¶</a></h4>
 <p>The concept of incremental building was introduced in <a class="reference internal" href="#bld-writing-incr"><span class="std std-ref">Incremental builder “MaxValueBuilder”</span></a>.
 From the command-line, incremental building is controlled by the <code class="docutils literal notranslate"><span class="pre">-i/--incr</span></code> option.
 What this really does is to add some behind-the-scenes bookkeeping for every
@@ -738,7 +737,7 @@ in the source collection.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

@@ -1,3 +1,7 @@
+v2023.2.23
+----------
+* Update pymongo and interface for new API.
+
 v2022.5.20
 ----------
 * New module to create local MP database.

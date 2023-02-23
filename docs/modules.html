@@ -1,19 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>pymatgen &#8212; pymatgen-db 2022.5.20 documentation</title>
+    <title>pymatgen &#8212; pymatgen-db 2023.2.23 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 
@@ -38,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.20 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2023.2.23 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen</a></li> 
       </ul>
     </div>  
@@ -49,7 +48,7 @@
           <div class="body" role="main">
             
   <section id="pymatgen">
-<h1>pymatgen<a class="headerlink" href="#pymatgen" title="Permalink to this headline">¶</a></h1>
+<h1>pymatgen<a class="headerlink" href="#pymatgen" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pymatgen.html">pymatgen namespace</a><ul>
@@ -66,11 +65,107 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.config">pymatgen.db.config module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.creator">pymatgen.db.creator module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.matproj">pymatgen.db.matproj module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.query_engine">pymatgen.db.query_engine module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.util">pymatgen.db.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.config">pymatgen.db.config module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.ConfigurationFileError"><code class="docutils literal notranslate"><span class="pre">ConfigurationFileError</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig"><code class="docutils literal notranslate"><span class="pre">DBConfig</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.ALL_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DBConfig.ALL_SETTINGS</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.DEFAULT_FILE"><code class="docutils literal notranslate"><span class="pre">DBConfig.DEFAULT_FILE</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.DEFAULT_PORT"><code class="docutils literal notranslate"><span class="pre">DBConfig.DEFAULT_PORT</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.DEFAULT_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DBConfig.DEFAULT_SETTINGS</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.collection"><code class="docutils literal notranslate"><span class="pre">DBConfig.collection</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.copy"><code class="docutils literal notranslate"><span class="pre">DBConfig.copy()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.dbname"><code class="docutils literal notranslate"><span class="pre">DBConfig.dbname</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.host"><code class="docutils literal notranslate"><span class="pre">DBConfig.host</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.password"><code class="docutils literal notranslate"><span class="pre">DBConfig.password</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.port"><code class="docutils literal notranslate"><span class="pre">DBConfig.port</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.settings"><code class="docutils literal notranslate"><span class="pre">DBConfig.settings</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.DBConfig.user"><code class="docutils literal notranslate"><span class="pre">DBConfig.user</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.auth_aliases"><code class="docutils literal notranslate"><span class="pre">auth_aliases()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.config.normalize_auth"><code class="docutils literal notranslate"><span class="pre">normalize_auth()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.creator">pymatgen.db.creator module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.as_dict"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.as_dict()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.assimilate"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.assimilate()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.calculate_stability"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.calculate_stability()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.convert"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.convert()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.from_dict"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.from_dict()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.generate_doc"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.generate_doc()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.get_task_doc"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.get_task_doc()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.get_valid_paths"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.get_valid_paths()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.post_process"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.post_process()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.process_killed_run"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.process_killed_run()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.VaspToDbTaskDrone.process_vasprun"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.process_vasprun()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.contains_vasp_input"><code class="docutils literal notranslate"><span class="pre">contains_vasp_input()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.get_basic_analysis_and_error_checks"><code class="docutils literal notranslate"><span class="pre">get_basic_analysis_and_error_checks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.get_coordination_numbers"><code class="docutils literal notranslate"><span class="pre">get_coordination_numbers()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.creator.get_uri"><code class="docutils literal notranslate"><span class="pre">get_uri()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.matproj">pymatgen.db.matproj module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.matproj.MPDB"><code class="docutils literal notranslate"><span class="pre">MPDB</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.matproj.MPDB.create"><code class="docutils literal notranslate"><span class="pre">MPDB.create()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.matproj.MPDB.get_entries_in_chemsys"><code class="docutils literal notranslate"><span class="pre">MPDB.get_entries_in_chemsys()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.query_engine">pymatgen.db.query_engine module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine"><code class="docutils literal notranslate"><span class="pre">QueryEngine</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.ALIASES_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.ALIASES_CONFIG_KEY</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.COLLECTION_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.COLLECTION_KEY</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.DB_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.DB_KEY</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.HOST_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.HOST_KEY</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.PASSWORD_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.PASSWORD_KEY</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.PORT_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.PORT_KEY</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.USER_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.USER_KEY</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.aliases"><code class="docutils literal notranslate"><span class="pre">QueryEngine.aliases</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.close"><code class="docutils literal notranslate"><span class="pre">QueryEngine.close()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.collection_name"><code class="docutils literal notranslate"><span class="pre">QueryEngine.collection_name</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.default_criteria"><code class="docutils literal notranslate"><span class="pre">QueryEngine.default_criteria</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.default_properties"><code class="docutils literal notranslate"><span class="pre">QueryEngine.default_properties</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.ensure_index"><code class="docutils literal notranslate"><span class="pre">QueryEngine.ensure_index()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.from_config"><code class="docutils literal notranslate"><span class="pre">QueryEngine.from_config()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.get_dos_from_id"><code class="docutils literal notranslate"><span class="pre">QueryEngine.get_dos_from_id()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.get_entries"><code class="docutils literal notranslate"><span class="pre">QueryEngine.get_entries()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.get_entries_in_system"><code class="docutils literal notranslate"><span class="pre">QueryEngine.get_entries_in_system()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.get_structure_from_id"><code class="docutils literal notranslate"><span class="pre">QueryEngine.get_structure_from_id()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.query"><code class="docutils literal notranslate"><span class="pre">QueryEngine.query()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.query_one"><code class="docutils literal notranslate"><span class="pre">QueryEngine.query_one()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.query_post"><code class="docutils literal notranslate"><span class="pre">QueryEngine.query_post</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.result_post"><code class="docutils literal notranslate"><span class="pre">QueryEngine.result_post</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryEngine.set_aliases_and_defaults"><code class="docutils literal notranslate"><span class="pre">QueryEngine.set_aliases_and_defaults()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryError"><code class="docutils literal notranslate"><span class="pre">QueryError</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryListResults"><code class="docutils literal notranslate"><span class="pre">QueryListResults</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryListResults.clone"><code class="docutils literal notranslate"><span class="pre">QueryListResults.clone()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryResults"><code class="docutils literal notranslate"><span class="pre">QueryResults</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryResults.clone"><code class="docutils literal notranslate"><span class="pre">QueryResults.clone()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.query_engine.QueryResults.from_cursor"><code class="docutils literal notranslate"><span class="pre">QueryResults.from_cursor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db.util">pymatgen.db.util module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.util.MongoJSONEncoder"><code class="docutils literal notranslate"><span class="pre">MongoJSONEncoder</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.util.MongoJSONEncoder.default"><code class="docutils literal notranslate"><span class="pre">MongoJSONEncoder.default()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.util.collection_keys"><code class="docutils literal notranslate"><span class="pre">collection_keys()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.util.get_collection"><code class="docutils literal notranslate"><span class="pre">get_collection()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.util.get_database"><code class="docutils literal notranslate"><span class="pre">get_database()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="pymatgen.db.html#pymatgen.db.util.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="pymatgen.db.html#module-pymatgen.db">Module contents</a></li>
 </ul>
 </li>
@@ -109,7 +204,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

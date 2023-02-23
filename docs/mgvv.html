@@ -1,19 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2022.5.20 documentation</title>
+    <title>Materials Project Database Validation: mgvv &#8212; pymatgen-db 2023.2.23 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Database “Builders”" href="builders.html" />
@@ -46,7 +45,7 @@
         <li class="right" >
           <a href="index.html" title="Pymatgen-db"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.20 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2023.2.23 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Materials Project Database Validation: mgvv</a></li> 
       </ul>
     </div>  
@@ -57,19 +56,19 @@
           <div class="body" role="main">
             
   <section id="materials-project-database-validation-mgvv">
-<h1>Materials Project Database Validation: mgvv<a class="headerlink" href="#materials-project-database-validation-mgvv" title="Permalink to this headline">¶</a></h1>
+<h1>Materials Project Database Validation: mgvv<a class="headerlink" href="#materials-project-database-validation-mgvv" title="Permalink to this heading">¶</a></h1>
 <p>The command-line program, <cite>mgvv</cite>, is used to validate MongoDB databases. This command has two sub-commands:</p>
 <ol class="arabic simple">
 <li><p><a class="reference internal" href="#mgvv-validate"><span class="std std-ref">mgvv validate</span></a> - Filter records on a set of criteria (conjunction) and apply a set of constraints.</p></li>
 <li><p><a class="reference internal" href="#mgvv-diff"><span class="std std-ref">mgvv diff</span></a> - Look at the “diff” of any two collections, for identifiers that are missing from one or the other, or for mis-matching values for identifiers that are the same.</p></li>
 </ol>
 <section id="mgvv-validate-subcommand">
-<span id="mgvv-validate"></span><h2>mgvv validate subcommand<a class="headerlink" href="#mgvv-validate-subcommand" title="Permalink to this headline">¶</a></h2>
+<span id="mgvv-validate"></span><h2>mgvv validate subcommand<a class="headerlink" href="#mgvv-validate-subcommand" title="Permalink to this heading">¶</a></h2>
 <p>Database connections are configured from a file, exactly as for <cite>mgdb</cite>/
 The patterns to validate against can come from a file or the command-line.</p>
 </section>
 <section id="arguments">
-<h2>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h2>
+<h2>Arguments<a class="headerlink" href="#arguments" title="Permalink to this heading">¶</a></h2>
 <p>Constraints can be provided on the command line.
 The syntax of each constraint is given in <a class="reference internal" href="#constraint-syntax"><span class="std std-ref">Constraint syntax</span></a>.
 It is usually wise to quote the constraints so that the operators are not
@@ -84,7 +83,7 @@ equivalent:</p>
 <cite>–file</cite> option, as described below.</p>
 </section>
 <section id="options">
-<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this heading">¶</a></h2>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-mgvv-help">
 <span id="cmdoption-mgvv-h"></span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-mgvv-help" title="Permalink to this definition">¶</a></dt>
@@ -168,25 +167,25 @@ to read from the console.</p>
 <p>Increase log message verbosity. Repeatable. Messages are logged to standard error.</p>
 </section>
 <section id="configuration-files">
-<span id="id1"></span><h2>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading">¶</a></h2>
 <p>You can use up to two configuration files: one for constraints (and aliases), one for
 the database, and one for the constraints and email.</p>
 <section id="database-configuration">
-<span id="db-config"></span><h3>Database configuration<a class="headerlink" href="#database-configuration" title="Permalink to this headline">¶</a></h3>
+<span id="db-config"></span><h3>Database configuration<a class="headerlink" href="#database-configuration" title="Permalink to this heading">¶</a></h3>
 <p>The database connection uses the same format as the <cite>mgdb</cite> command for
 its <a class="reference internal" href="dbconfig.html"><span class="doc">configuration file</span></a>. The <cite>readonly_user</cite> is preferred over the
 administrative user, if both are present.</p>
 </section>
 <section id="email-configuration">
-<span id="email-config"></span><h3>Email configuration<a class="headerlink" href="#email-configuration" title="Permalink to this headline">¶</a></h3>
+<span id="email-config"></span><h3>Email configuration<a class="headerlink" href="#email-configuration" title="Permalink to this heading">¶</a></h3>
 <p>Reports can be sent by email. This can be configured on the command-line,
 or within the main configuration file.</p>
 <p>Here is an example configuration:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_email</span><span class="p">:</span>
-  <span class="nt">from</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
-  <span class="nt">to</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">you@host.org</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">othersucker@host.otherorg</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_email</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">you@host.org</span><span class="w"></span>
+<span class="w">  </span><span class="nt">to</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">you@host.org</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">othersucker@host.otherorg</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The section for email must always be named <cite>_email</cite>.
@@ -205,17 +204,17 @@ The following keywords are recognized:</p>
 </dl>
 </section>
 <section id="constraint-configuration">
-<span id="constraint-config"></span><h3>Constraint configuration<a class="headerlink" href="#constraint-configuration" title="Permalink to this headline">¶</a></h3>
+<span id="constraint-config"></span><h3>Constraint configuration<a class="headerlink" href="#constraint-configuration" title="Permalink to this heading">¶</a></h3>
 <p>The constraints are configured from a YAML file.</p>
 <p>At the top level are keys, which are the names of the collection
 on which to apply the constraints. The specification of the constraints in
 each collection takes two possible forms, simple and complex. In both cases
 the syntax of the constraints is the same, see <a class="reference internal" href="#constraint-syntax"><span class="std std-ref">Constraint syntax</span></a>.</p>
 <p><strong>Simple</strong>: A list of constraints, which are simply combined. Any document in the collection that violates any of the constraints will generate a validation error.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 &lt;= value</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field2 &gt; value</span>
-    <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field1 &lt;= value</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field2 &gt; value</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="c1"># ..etc..</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>Complex</strong>: An initial filter, given as a map with an <cite>filter</cite> key, and
@@ -224,21 +223,21 @@ The <cite>filter</cite> key selects records for applying the constraints.
 The <cite>constraints</cite> key provides the list of constraints associated with that condition.
 As in the simple format, any document in the collection
 that violates any of the constraints will generate a validation error.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">mycollection</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span>
-        <span class="nt">filter</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 = &#39;negatory&#39;</span>
-        <span class="nt">constraints</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field2 &lt;= value</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field3 &gt; value</span>
-            <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
-    <span class="p p-Indicator">-</span>
-        <span class="nt">filter</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field1 = &#39;excellent&#39;</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field4 &gt; 0</span>
-        <span class="nt">then</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">field5 &lt; value</span>
-            <span class="p p-Indicator">-</span> <span class="c1"># ..etc..</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">mycollection</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"></span>
+<span class="w">        </span><span class="nt">filter</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field1 = &#39;negatory&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="nt">constraints</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field2 &lt;= value</span><span class="w"></span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field3 &gt; value</span><span class="w"></span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="c1"># ..etc..</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"></span>
+<span class="w">        </span><span class="nt">filter</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field1 = &#39;excellent&#39;</span><span class="w"></span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field4 &gt; 0</span><span class="w"></span>
+<span class="w">        </span><span class="nt">then</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">field5 &lt; value</span><span class="w"></span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="c1"># ..etc..</span><span class="w"></span>
 </pre></div>
 </div>
 <p>As shown in the second constraint block above, there may also be a
@@ -249,15 +248,15 @@ to pass the filter and be evaluated according to the constraints.</p>
 Constraints that use these aliases will automatically be converted to the aliased name before the query
 is submitted to the database. The aliases are simply a list in the format “name = value”
 in a section called <cite>_aliases</cite>, as shown below.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_aliases</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">snl_id = mps_id</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">energy = analysis.e_above_hull</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_aliases</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">snl_id = mps_id</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">energy = analysis.e_above_hull</span><span class="w"></span>
 </pre></div>
 </div>
 <p><strong>Partial arrays</strong> can be fetched, which is very useful for not spending a ton of bandwidth, by adding <cite>/&lt;path&gt;</cite>
 after the name of the field. For example:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">calculations/density size 2</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">collection_name</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">calculations/density size 2</span><span class="w"></span>
 </pre></div>
 </div>
 <p>If, for exampe, the <cite>calculations</cite> array was full of large sub-arrays
@@ -269,11 +268,11 @@ Note that this only applies to constraints that use the ‘size’ family of arr
 </section>
 </section>
 <section id="constraint-syntax">
-<span id="id2"></span><h2>Constraint syntax<a class="headerlink" href="#constraint-syntax" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>Constraint syntax<a class="headerlink" href="#constraint-syntax" title="Permalink to this heading">¶</a></h2>
 <p>The constraint syntax is taken from the <a class="reference external" href="http://pythonhosted.org/smoqe/">smoqe package</a>.</p>
 </section>
 <section id="mgvv-diff-subcommand">
-<span id="mgvv-diff"></span><h2>mgvv diff subcommand<a class="headerlink" href="#mgvv-diff-subcommand" title="Permalink to this headline">¶</a></h2>
+<span id="mgvv-diff"></span><h2>mgvv diff subcommand<a class="headerlink" href="#mgvv-diff-subcommand" title="Permalink to this heading">¶</a></h2>
 <p>The <cite>diff</cite> sub-command takes options and two DB configurations:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mgvv</span> <span class="n">diff</span> <span class="p">[</span><span class="n">options</span><span class="o">..</span><span class="p">]</span> <span class="n">old</span><span class="o">.</span><span class="n">json</span> <span class="n">new</span><span class="o">.</span><span class="n">json</span>
 </pre></div>
@@ -285,7 +284,7 @@ exactly as for <cite>mgdb</cite>.
 See the <a class="reference internal" href="#mgvv-diff-examples"><span class="std std-ref">examples</span></a> at the end of this section for full usage examples.</p>
 </section>
 <section id="id3">
-<h2>Arguments<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<h2>Arguments<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
 <p>Two positional arguments are required, to set the two collections.
 These are called the <cite>old</cite> and <cite>new</cite> collections, respectively. Both
 are configured using a pymatgen-db JSON config file.</p>
@@ -310,7 +309,7 @@ or <cite>admin_user</cite> and <cite>admin_password</cite>) are required:</p>
 </div>
 </section>
 <section id="id4">
-<h2>Options<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<h2>Options<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
 <p>usage: mgvv diff [-h] [–verbose] [-D CONFIG] [-E ADDR] [-f FILE] [-F FORMAT] [-s HOST] [-i INFO] [-k KEY] [-m] [-n EXPR] [-p PROPERTIES] [-P] [-q EXPR] [-u URL] [-V] old new</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-mgvv-diff-help">
@@ -398,10 +397,6 @@ command-line key/value pair lists become config file mappings.</p>
 <p>Fields with numeric values that must match, with a tolerance, as a comma-separated list, e.g.,
 <code class="docutils literal notranslate"><span class="pre">&lt;name1&gt;=&lt;expr1&gt;,</span> <span class="pre">&lt;name2&gt;=&lt;expr2&gt;,</span> <span class="pre">..</span></code>. &lt;name&gt; is a field name, &lt;expr&gt; syntax is:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 12%" />
-<col style="width: 88%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Expression</p></th>
 <th class="head"><p>Meaning</p></th>
@@ -495,7 +490,7 @@ the Materials Project webpages:</p>
 </div>
 </section>
 <section id="examples">
-<span id="mgvv-diff-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<span id="mgvv-diff-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
 <p>Let’s say you want to compare the ‘materials’ collection in a development and production database.
 You could have two JSON configuration files, <cite>prod.json</cite> and <cite>dev.json</cite> that specified the servers,
 user and password, and database and collection names:</p>
@@ -606,7 +601,7 @@ text.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

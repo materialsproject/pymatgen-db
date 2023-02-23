@@ -1,19 +1,18 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>pymatgen.db package &#8212; pymatgen-db 2022.5.20 documentation</title>
+    <title>pymatgen.db package &#8212; pymatgen-db 2023.2.23 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="pymatgen.db.alchemy package" href="pymatgen.db.alchemy.html" />
@@ -46,7 +45,7 @@
         <li class="right" >
           <a href="dbconfig.html" title="Database configuration"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2022.5.20 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2023.2.23 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db package</a></li> 
       </ul>
     </div>  
@@ -57,9 +56,9 @@
           <div class="body" role="main">
             
   <section id="pymatgen-db-package">
-<h1>pymatgen.db package<a class="headerlink" href="#pymatgen-db-package" title="Permalink to this headline">¶</a></h1>
+<h1>pymatgen.db package<a class="headerlink" href="#pymatgen-db-package" title="Permalink to this heading">¶</a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pymatgen.db.alchemy.html">pymatgen.db.alchemy package</a><ul>
@@ -67,7 +66,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pymatgen.db.alchemy.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pymatgen.db.alchemy.html#module-pymatgen.db.alchemy.transmuters">pymatgen.db.alchemy.transmuters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pymatgen.db.alchemy.html#module-pymatgen.db.alchemy.transmuters">pymatgen.db.alchemy.transmuters module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pymatgen.db.alchemy.html#pymatgen.db.alchemy.transmuters.QeTransmuter"><code class="docutils literal notranslate"><span class="pre">QeTransmuter</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="pymatgen.db.alchemy.html#module-pymatgen.db.alchemy">Module contents</a></li>
 </ul>
 </li>
@@ -75,10 +77,10 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-pymatgen.db.config">
-<span id="pymatgen-db-config-module"></span><h2>pymatgen.db.config module<a class="headerlink" href="#module-pymatgen.db.config" title="Permalink to this headline">¶</a></h2>
+<span id="pymatgen-db-config-module"></span><h2>pymatgen.db.config module<a class="headerlink" href="#module-pymatgen.db.config" title="Permalink to this heading">¶</a></h2>
 <p>Database configuration functions.
 Main class is DBConfig, which encapsulates a database configuration
 passed in as a file or object. For example:</p>
@@ -215,13 +217,13 @@ admin or readonly password will be in keys “user” and “password”.
 
 </section>
 <section id="module-pymatgen.db.creator">
-<span id="pymatgen-db-creator-module"></span><h2>pymatgen.db.creator module<a class="headerlink" href="#module-pymatgen.db.creator" title="Permalink to this headline">¶</a></h2>
+<span id="pymatgen-db-creator-module"></span><h2>pymatgen.db.creator module<a class="headerlink" href="#module-pymatgen.db.creator" title="Permalink to this heading">¶</a></h2>
 <p>This module defines a Drone to assimilate vasp data and insert it into a
 Mongo database.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pymatgen.db.creator.VaspToDbTaskDrone">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VaspToDbTaskDrone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27017</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse_dos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_dos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse_projected_eigen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapi_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_full_uri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#VaspToDbTaskDrone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.VaspToDbTaskDrone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.apps.borg.hive.AbstractDrone</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDrone</span></code></p>
 <p>VaspToDbTaskDrone assimilates directories containing vasp input to
 inserted db tasks. This drone is meant ot be used with pymatgen’s
 BorgQueen to assimilate entire directory structures and insert them into
@@ -241,7 +243,7 @@ also considered as 2 parts of an aflow style run.</p></li>
 </div></blockquote>
 <p>Constructor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>host</strong> – Hostname of database machine. Defaults to 127.0.0.1 or
 localhost.</p></li>
@@ -302,7 +304,7 @@ subfolder or file extension schema.</p></li>
 <dd><p>Parses vasp runs. Then insert the result into the db. and return the
 task_id or doc of the insertion.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>If in simulate_mode, the entire doc is returned for debugging
 purposes. Else, only the task_id of the inserted doc is returned.</p>
 </dd>
@@ -361,7 +363,7 @@ also considered as 2 parts of an aflow style run.</p></li>
 Called by generate_task_doc. Modify this if your runs have other
 kinds of processing requirements.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dir_name</strong> – The dir_name.</p></li>
 <li><p><strong>d</strong> – Current doc generated.</p></li>
@@ -389,10 +391,10 @@ kinds of processing requirements.</p>
 <span class="sig-name descname"><span class="pre">contains_vasp_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/creator.html#contains_vasp_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.creator.contains_vasp_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if a directory contains valid VASP input.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>dir_name</strong> – Directory name to check.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if directory contains all four VASP input files (INCAR, POSCAR,
 KPOINTS and POTCAR).</p>
 </dd>
@@ -411,14 +413,14 @@ KPOINTS and POTCAR).</p>
 <dd><p>Helper method to get the coordination number of all sites in the final
 structure from a run.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>d</strong> – Run dict generated by VaspToDbTaskDrone.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>site_dict,
 “coordination”: number}, …].</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Coordination numbers as a list of dict of [{“site”</p>
 </dd>
 </dl>
@@ -430,13 +432,13 @@ structure from a run.</p>
 <dd><p>Returns the URI path for a directory. This allows files hosted on
 different file servers to have distinct locations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>dir_name</strong> – A directory name.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>/full/path/of/dir_name.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Full URI path, e.g., fileserver.host.com</p>
 </dd>
 </dl>
@@ -444,7 +446,7 @@ different file servers to have distinct locations.</p>
 
 </section>
 <section id="module-pymatgen.db.matproj">
-<span id="pymatgen-db-matproj-module"></span><h2>pymatgen.db.matproj module<a class="headerlink" href="#module-pymatgen.db.matproj" title="Permalink to this headline">¶</a></h2>
+<span id="pymatgen-db-matproj-module"></span><h2>pymatgen.db.matproj module<a class="headerlink" href="#module-pymatgen.db.matproj" title="Permalink to this heading">¶</a></h2>
 <p>A module for replicating the MP database creator.</p>
 <p>See <a class="reference external" href="https://medium.com/&#64;shyuep/a-local-materials-project-database-1ea909430c95">https://medium.com/&#64;shyuep/a-local-materials-project-database-1ea909430c95</a></p>
 <dl class="py class">
@@ -456,7 +458,7 @@ different file servers to have distinct locations.</p>
 &#64;param kwargs: Pass through to MongoClient. E.g., you can create a connection using uri strings, etc.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pymatgen.db.matproj.MPDB.create">
-<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/matproj.html#MPDB.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.matproj.MPDB.create" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/matproj.html#MPDB.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.matproj.MPDB.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the database. Typically only used once.</p>
 <dl class="simple">
 <dt>&#64;param criteria: Criteria passed to MPRester.get_entries to obtain the entries. None means you get the entire</dt><dd><p>MP database.</p>
@@ -472,7 +474,7 @@ different file servers to have distinct locations.</p>
 will return a list of all entries in the Li-Fe-O chemical system, i.e., all LixOy, FexOy, LixFey, LixFeyOz,
 Li, Fe and O phases. Extremely useful for creating phase diagrams of entire chemical systems.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>elements</strong> (<em>str</em><em> or </em><em>[</em><em>str</em><em>]</em>) – Chemical system string comprising element
 symbols separated by dashes, e.g., “Li-Fe-O” or List of element
@@ -481,7 +483,7 @@ symbols, e.g., [“Li”, “Fe”, “O”].</p></li>
 stable entries, you can pass {“e_above_hull”: {“$lte”: 0.001}}.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of ComputedStructureEntries.</p>
 </dd>
 </dl>
@@ -491,7 +493,7 @@ stable entries, you can pass {“e_above_hull”: {“$lte”: 0.001}}.</p></li>
 
 </section>
 <section id="module-pymatgen.db.query_engine">
-<span id="pymatgen-db-query-engine-module"></span><h2>pymatgen.db.query_engine module<a class="headerlink" href="#module-pymatgen.db.query_engine" title="Permalink to this headline">¶</a></h2>
+<span id="pymatgen-db-query-engine-module"></span><h2>pymatgen.db.query_engine module<a class="headerlink" href="#module-pymatgen.db.query_engine" title="Permalink to this heading">¶</a></h2>
 <p>This module provides a QueryEngine that simplifies queries for Mongo databases
 generated using hive.</p>
 <dl class="py class">
@@ -515,7 +517,7 @@ QueryEngine.query(properties=[“a.b”], you will obtain a result that can be
 accessed simply as doc[“a.b”].</p>
 <p>Constructor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>host</strong> (<em>str</em>) – Hostname of database machine.</p></li>
 <li><p><strong>port</strong> (<em>int</em>) – Port for db access.</p></li>
@@ -643,7 +645,7 @@ that is modified in-place.</p></li>
 <dd><p>Initialize a QueryEngine from a JSON config file generated using mgdb
 init.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>config_file</strong> – Filename of config file.</p></li>
 <li><p><strong>use_admin</strong> – If True, the admin user and password in the config file is
@@ -651,7 +653,7 @@ used. Otherwise, the readonly_user and password is used.
 Defaults to False.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>QueryEngine</p>
 </dd>
 </dl>
@@ -676,7 +678,7 @@ directly comparable.  It is highly recommended that you perform
 post-processing using pymatgen.entries.compatibility.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>criteria</strong> – Criteria obeying the same syntax as query.</p></li>
 <li><p><strong>inc_structure</strong> – Optional parameter as to whether to include a structure with
@@ -687,7 +689,7 @@ down your code to a crawl.</p></li>
 to be access via entry.data[key].</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of pymatgen.entries.ComputedEntries satisfying criteria.</p>
 </dd>
 </dl>
@@ -707,7 +709,7 @@ directly comparable.  It is highly recommended that you perform
 post-processing using pymatgen.entries.compatibility.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>elements</strong> – Sequence of element symbols, e.g. [‘Li’,’Fe’,’O’]</p></li>
 <li><p><strong>inc_structure</strong> – Optional parameter as to whether to include a structure with
@@ -720,7 +722,7 @@ to be access via entry.data[key].</p></li>
 the chemical system.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of ComputedEntries in the chemical system.</p>
 </dd>
 </dl>
@@ -731,7 +733,7 @@ the chemical system.</p></li>
 <span class="sig-name descname"><span class="pre">get_structure_from_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryEngine.get_structure_from_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryEngine.get_structure_from_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a structure from the database given the task id.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>task_id</strong> – The task_id to query for.</p></li>
 <li><p><strong>final_structure</strong> – Whether to obtain the final or initial structure. Defaults to
@@ -761,7 +763,7 @@ to some recursion to go deep into the result.</p>
 returned as r[‘analysis’] and then the subkeys can be accessed in the
 usual form, i.e., r[‘analysis’][‘e_above_hull’]</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>properties</strong> – Properties to query for. Defaults to None which means all supported properties.</p></li>
 <li><p><strong>criteria</strong> – Criteria to query for as a dict.</p></li>
@@ -770,7 +772,7 @@ usual form, i.e., r[‘analysis’][‘e_above_hull’]</p>
 Useful examples are limit, skip, sort, etc.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A QueryResults Iterable, which is somewhat like pymongo’s
 cursor except that it performs mapping. In general, the dev does
 not need to concern himself with the form. It is sufficient to know
@@ -803,7 +805,7 @@ that the results are in the form of an iterable of dicts.</p>
 <dd><p>Set the alias config and defaults to use. Typically used when
 switching to a collection with a different schema.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>aliases_config</strong> – An alias dict to use. Defaults to None, which means the default
 aliases defined in “aliases.json” is used. See constructor
@@ -828,11 +830,11 @@ query().</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryListResults">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QueryListResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_cursor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryListResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryListResults" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pymatgen.db.query_engine.QueryResults" title="pymatgen.db.query_engine.QueryResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymatgen.db.query_engine.QueryResults</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pymatgen.db.query_engine.QueryResults" title="pymatgen.db.query_engine.QueryResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResults</span></code></a></p>
 <p>Set of QueryResults on a list instead of a MongoDB cursor.</p>
 <p>Constructor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prop_dict</strong> – Properties</p></li>
 <li><p><strong>result_cursor</strong> – Iterable returning records</p></li>
@@ -852,7 +854,7 @@ modifying it in-place, or None, or an empty list</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="pymatgen.db.query_engine.QueryResults">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QueryResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_cursor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/query_engine.html#QueryResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.query_engine.QueryResults" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Iterable</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></p>
 <p>Iterable wrapper for results from QueryEngine.
 Like pymongo’s cursor, this object should generally not be instantiated,
 but should be obtained from a queryengine.
@@ -861,7 +863,7 @@ support nearly all cursor like attributes such as count(), explain(),
 hint(), etc. Please see pymongo cursor documentation for details.</p>
 <p>Constructor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prop_dict</strong> – Properties</p></li>
 <li><p><strong>result_cursor</strong> – Iterable returning records</p></li>
@@ -886,12 +888,12 @@ modifying it in-place, or None, or an empty list</p></li>
 
 </section>
 <section id="module-pymatgen.db.util">
-<span id="pymatgen-db-util-module"></span><h2>pymatgen.db.util module<a class="headerlink" href="#module-pymatgen.db.util" title="Permalink to this headline">¶</a></h2>
+<span id="pymatgen-db-util-module"></span><h2>pymatgen.db.util module<a class="headerlink" href="#module-pymatgen.db.util" title="Permalink to this heading">¶</a></h2>
 <p>Utility functions used across scripts.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pymatgen.db.util.MongoJSONEncoder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MongoJSONEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pymatgen/db/util.html#MongoJSONEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pymatgen.db.util.MongoJSONEncoder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">JSONEncoder</span></code></p>
 <p>JSON encoder to support ObjectIDs and datetime used in Mongo.</p>
 <p>Constructor for JSONEncoder, with sensible defaults.</p>
 <p>If skipkeys is false, then it is a TypeError to attempt
@@ -962,7 +964,7 @@ Examines the first document in the collection.
 
 </section>
 <section id="module-pymatgen.db">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pymatgen.db" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pymatgen.db" title="Permalink to this heading">¶</a></h2>
 <p>Pymatgen-db is a database add-on for the Python Materials Genomics (pymatgen)
 materials analysis library. It enables the creation of Materials
 Project-style MongoDB databases for management of materials data and
@@ -985,11 +987,107 @@ pymatgen objects for analysis purposes.</p>
 <li><a class="reference internal" href="#">pymatgen.db package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-pymatgen.db.config">pymatgen.db.config module</a></li>
-<li><a class="reference internal" href="#module-pymatgen.db.creator">pymatgen.db.creator module</a></li>
-<li><a class="reference internal" href="#module-pymatgen.db.matproj">pymatgen.db.matproj module</a></li>
-<li><a class="reference internal" href="#module-pymatgen.db.query_engine">pymatgen.db.query_engine module</a></li>
-<li><a class="reference internal" href="#module-pymatgen.db.util">pymatgen.db.util module</a></li>
+<li><a class="reference internal" href="#module-pymatgen.db.config">pymatgen.db.config module</a><ul>
+<li><a class="reference internal" href="#pymatgen.db.config.ConfigurationFileError"><code class="docutils literal notranslate"><span class="pre">ConfigurationFileError</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig"><code class="docutils literal notranslate"><span class="pre">DBConfig</span></code></a><ul>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.ALL_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DBConfig.ALL_SETTINGS</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.DEFAULT_FILE"><code class="docutils literal notranslate"><span class="pre">DBConfig.DEFAULT_FILE</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.DEFAULT_PORT"><code class="docutils literal notranslate"><span class="pre">DBConfig.DEFAULT_PORT</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.DEFAULT_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DBConfig.DEFAULT_SETTINGS</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.collection"><code class="docutils literal notranslate"><span class="pre">DBConfig.collection</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.copy"><code class="docutils literal notranslate"><span class="pre">DBConfig.copy()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.dbname"><code class="docutils literal notranslate"><span class="pre">DBConfig.dbname</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.host"><code class="docutils literal notranslate"><span class="pre">DBConfig.host</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.password"><code class="docutils literal notranslate"><span class="pre">DBConfig.password</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.port"><code class="docutils literal notranslate"><span class="pre">DBConfig.port</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.settings"><code class="docutils literal notranslate"><span class="pre">DBConfig.settings</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.DBConfig.user"><code class="docutils literal notranslate"><span class="pre">DBConfig.user</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymatgen.db.config.auth_aliases"><code class="docutils literal notranslate"><span class="pre">auth_aliases()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.config.normalize_auth"><code class="docutils literal notranslate"><span class="pre">normalize_auth()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pymatgen.db.creator">pymatgen.db.creator module</a><ul>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone</span></code></a><ul>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.as_dict"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.as_dict()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.assimilate"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.assimilate()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.calculate_stability"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.calculate_stability()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.convert"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.convert()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.from_dict"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.generate_doc"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.generate_doc()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.get_task_doc"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.get_task_doc()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.get_valid_paths"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.get_valid_paths()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.post_process"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.post_process()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.process_killed_run"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.process_killed_run()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.VaspToDbTaskDrone.process_vasprun"><code class="docutils literal notranslate"><span class="pre">VaspToDbTaskDrone.process_vasprun()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymatgen.db.creator.contains_vasp_input"><code class="docutils literal notranslate"><span class="pre">contains_vasp_input()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.get_basic_analysis_and_error_checks"><code class="docutils literal notranslate"><span class="pre">get_basic_analysis_and_error_checks()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.get_coordination_numbers"><code class="docutils literal notranslate"><span class="pre">get_coordination_numbers()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.creator.get_uri"><code class="docutils literal notranslate"><span class="pre">get_uri()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pymatgen.db.matproj">pymatgen.db.matproj module</a><ul>
+<li><a class="reference internal" href="#pymatgen.db.matproj.MPDB"><code class="docutils literal notranslate"><span class="pre">MPDB</span></code></a><ul>
+<li><a class="reference internal" href="#pymatgen.db.matproj.MPDB.create"><code class="docutils literal notranslate"><span class="pre">MPDB.create()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.matproj.MPDB.get_entries_in_chemsys"><code class="docutils literal notranslate"><span class="pre">MPDB.get_entries_in_chemsys()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pymatgen.db.query_engine">pymatgen.db.query_engine module</a><ul>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine"><code class="docutils literal notranslate"><span class="pre">QueryEngine</span></code></a><ul>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.ALIASES_CONFIG_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.ALIASES_CONFIG_KEY</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.COLLECTION_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.COLLECTION_KEY</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.DB_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.DB_KEY</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.HOST_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.HOST_KEY</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.PASSWORD_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.PASSWORD_KEY</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.PORT_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.PORT_KEY</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.USER_KEY"><code class="docutils literal notranslate"><span class="pre">QueryEngine.USER_KEY</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.aliases"><code class="docutils literal notranslate"><span class="pre">QueryEngine.aliases</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.close"><code class="docutils literal notranslate"><span class="pre">QueryEngine.close()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.collection_name"><code class="docutils literal notranslate"><span class="pre">QueryEngine.collection_name</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.default_criteria"><code class="docutils literal notranslate"><span class="pre">QueryEngine.default_criteria</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.default_properties"><code class="docutils literal notranslate"><span class="pre">QueryEngine.default_properties</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.ensure_index"><code class="docutils literal notranslate"><span class="pre">QueryEngine.ensure_index()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.from_config"><code class="docutils literal notranslate"><span class="pre">QueryEngine.from_config()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.get_dos_from_id"><code class="docutils literal notranslate"><span class="pre">QueryEngine.get_dos_from_id()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.get_entries"><code class="docutils literal notranslate"><span class="pre">QueryEngine.get_entries()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.get_entries_in_system"><code class="docutils literal notranslate"><span class="pre">QueryEngine.get_entries_in_system()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.get_structure_from_id"><code class="docutils literal notranslate"><span class="pre">QueryEngine.get_structure_from_id()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.query"><code class="docutils literal notranslate"><span class="pre">QueryEngine.query()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.query_one"><code class="docutils literal notranslate"><span class="pre">QueryEngine.query_one()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.query_post"><code class="docutils literal notranslate"><span class="pre">QueryEngine.query_post</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.result_post"><code class="docutils literal notranslate"><span class="pre">QueryEngine.result_post</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryEngine.set_aliases_and_defaults"><code class="docutils literal notranslate"><span class="pre">QueryEngine.set_aliases_and_defaults()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryError"><code class="docutils literal notranslate"><span class="pre">QueryError</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryListResults"><code class="docutils literal notranslate"><span class="pre">QueryListResults</span></code></a><ul>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryListResults.clone"><code class="docutils literal notranslate"><span class="pre">QueryListResults.clone()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryResults"><code class="docutils literal notranslate"><span class="pre">QueryResults</span></code></a><ul>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryResults.clone"><code class="docutils literal notranslate"><span class="pre">QueryResults.clone()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.query_engine.QueryResults.from_cursor"><code class="docutils literal notranslate"><span class="pre">QueryResults.from_cursor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pymatgen.db.util">pymatgen.db.util module</a><ul>
+<li><a class="reference internal" href="#pymatgen.db.util.MongoJSONEncoder"><code class="docutils literal notranslate"><span class="pre">MongoJSONEncoder</span></code></a><ul>
+<li><a class="reference internal" href="#pymatgen.db.util.MongoJSONEncoder.default"><code class="docutils literal notranslate"><span class="pre">MongoJSONEncoder.default()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pymatgen.db.util.collection_keys"><code class="docutils literal notranslate"><span class="pre">collection_keys()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.util.get_collection"><code class="docutils literal notranslate"><span class="pre">get_collection()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.util.get_database"><code class="docutils literal notranslate"><span class="pre">get_database()</span></code></a></li>
+<li><a class="reference internal" href="#pymatgen.db.util.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-pymatgen.db">Module contents</a></li>
 </ul>
 </li>
@@ -1018,7 +1116,7 @@ pymatgen objects for analysis purposes.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
