@@ -32,7 +32,6 @@ test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "test
 
 
 class QeTransmuterTest(unittest.TestCase):
-
     qe = None
     conn = None
 
