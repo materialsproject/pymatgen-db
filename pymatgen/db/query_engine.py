@@ -691,5 +691,3 @@ class QueryError(Exception):
     """
     Exception class for errors occuring during queries.
     """
-
-    pass

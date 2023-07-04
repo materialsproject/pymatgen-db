@@ -3,7 +3,7 @@
 
 import os
 
-from setuptools import setup, find_namespace_packages
+from setuptools import find_namespace_packages, setup
 
 with open("README.rst") as f:
     long_desc = f.read()
@@ -14,9 +14,7 @@ setup(
     version="2023.2.23",
     setup_requires=["numpy"],
     install_requires=["pymatgen>=2022.0.3", "monty>=0.9.6", "pymongo>=2.8"],
-    extras_require={
-        'tests': 'mongomock'
-    },
+    extras_require={"tests": "mongomock"},
     package_data={"pymatgen": ["db/*.json"]},
     include_package_data=True,
     author="Shyue Ping Ong",
@@ -26,10 +24,9 @@ setup(
     url="https://github.com/materialsproject/pymatgen-db",
     license="MIT",
     description="Pymatgen-db is a database add-on for the Python Materials "
-                "Genomics (pymatgen) materials analysis library.",
+    "Genomics (pymatgen) materials analysis library.",
     long_description=long_desc,
-    keywords=["vasp", "gaussian", "materials", "project", "electronic",
-              "structure", "mongo"],
+    keywords=["vasp", "gaussian", "materials", "project", "electronic", "structure", "mongo"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
@@ -42,8 +39,9 @@ setup(
         "Topic :: Scientific/Engineering :: Physics",
         "Topic :: Scientific/Engineering :: Chemistry",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Database"
+        "Topic :: Database",
     ],
-    scripts=[os.path.join("scripts", f) for f in os.listdir("scripts")
-             if not os.path.isdir(os.path.join("scripts", f))]
+    scripts=[
+        os.path.join("scripts", f) for f in os.listdir("scripts") if not os.path.isdir(os.path.join("scripts", f))
+    ],
 )
