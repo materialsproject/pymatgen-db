@@ -168,12 +168,10 @@ class VaspToDbTaskDrone(AbstractDrone):
         self.use_full_uri = use_full_uri
         self.runs = runs or ["relax1", "relax2"]
         if not simulate_mode:
-            conn = MongoClient(self.host, self.port)
-            db = conn[self.database]
-            if self.user:
-                db.authenticate(self.user, self.password)
-            if db.counter.count_documents({"_id": "taskid"}) == 0:
-                db.counter.insert_one({"_id": "taskid", "c": 1})
+            self.connection = MongoClient(self.host, self.port, username=user, password=password)
+            self.db = self.connection[self.database]
+            if self.db.counter.count_documents({"_id": "taskid"}) == 0:
+                self.db.counter.insert_one({"_id": "taskid", "c": 1})
 
     def assimilate(self, path):
         """
@@ -251,10 +249,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             # Perform actual insertion into db. Because db connections cannot
             # be pickled, every insertion needs to create a new connection
             # to the db.
-            conn = MongoClient(self.host, self.port)
-            db = conn[self.database]
-            if self.user:
-                db.authenticate(self.user, self.password)
+            db = self.db
             coll = db[self.collection]
 
             # Insert dos data into gridfs and then remove it from the dict.
