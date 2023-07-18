@@ -6,6 +6,7 @@ provides a clean and intuitive web ui for exploring that data. A query engine
 is also provided to enable the easy translation of MongoDB docs to useful
 pymatgen objects for analysis purposes.
 """
+from __future__ import annotations
 
 import os
 
@@ -13,8 +14,6 @@ __author__ = "Shyue Ping Ong, Dan Gunter"
 __date__ = "Jul 22 2017"
 __version__ = "2023.2.23"
 
-
-from .query_engine import QueryEngine
 
 SETTINGS_FILE = os.path.join(os.path.expanduser("~"), ".pmgrc.yaml")
 
