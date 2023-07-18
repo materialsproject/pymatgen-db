@@ -129,6 +129,8 @@ class QueryEngine:
             result_post (list): Functions to post-process the cursor records.
                 Function takes one arg, the document for the current record,
                 that is modified in-place.
+            replicaset: Replica set to use.
+            **ignore: Not used.
         """
         self.host = host
         self.port = port
@@ -137,14 +139,14 @@ class QueryEngine:
         if connection is None:
             # can't pass replicaset=None to MongoClient (fails validation)
             if self.replicaset:
-                self.connection = pymongo.MongoClient(self.host, self.port, replicaset=self.replicaset)
+                self.connection = pymongo.MongoClient(
+                    self.host, self.port, replicaset=self.replicaset, username=user, password=password
+                )
             else:
-                self.connection = pymongo.MongoClient(self.host, self.port)
+                self.connection = pymongo.MongoClient(self.host, self.port, username=user, password=password)
         else:
             self.connection = connection
         self.db = self.connection[database]
-        if user:
-            self.db.authenticate(user, password)
         self.collection_name = collection
         self.set_aliases_and_defaults(aliases_config=aliases_config, default_properties=default_properties)
         # Post-processing functions
