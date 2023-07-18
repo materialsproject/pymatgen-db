@@ -234,7 +234,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             if not d:
                 d = self.process_killed_run(path)
             self.post_process(path, d)
-        elif (not (path.endswith(("relax1", "relax2")))) and contains_vasp_input(path):
+        elif (not path.endswith(("relax1", "relax2"))) and contains_vasp_input(path):
             # If not Materials Project style, process as a killed run.
             logger.warning(path + " contains killed run")
             d = self.process_killed_run(path)
