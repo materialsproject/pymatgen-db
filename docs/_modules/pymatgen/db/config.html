@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.config &#8212; pymatgen-db 2023.2.23 documentation</title>
+    <title>pymatgen.db.config &#8212; pymatgen-db 2023.7.18 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/flasky.css" />
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2023.2.23 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2023.7.18 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.config</a></li> 
       </ul>
@@ -78,12 +77,12 @@
 
 
 <div class="viewcode-block" id="ConfigurationFileError"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.config.ConfigurationFileError">[docs]</a><span class="k">class</span> <span class="nc">ConfigurationFileError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Error for Config File</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Init for ConfigurationFileError.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;reading &#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -91,7 +90,7 @@
 
 
 <div class="viewcode-block" id="DBConfig"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.config.DBConfig">[docs]</a><span class="k">class</span> <span class="nc">DBConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Database configuration.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Database configuration.&quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_PORT</span> <span class="o">=</span> <span class="mi">27017</span>
     <span class="n">DEFAULT_FILE</span> <span class="o">=</span> <span class="s2">&quot;db.json&quot;</span>
@@ -110,7 +109,7 @@
     <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor.</span>
 <span class="sd">        Settings are created from config_dict, if given,</span>
 <span class="sd">        or parsed config_file, if given, otherwise</span>
@@ -145,73 +144,73 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DBConfig.copy"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.config.DBConfig.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a copy of self (internal settings are copied).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of self (internal settings are copied).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DBConfig</span><span class="p">(</span><span class="n">config_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return settings</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">host</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return host</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">HOST_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return port.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PORT_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_PORT</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dbname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Name of the database.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Name of the database.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DB_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@dbname</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">dbname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set dbname.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="p">[</span><span class="n">DB_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">collection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return collection.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">COLL_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@collection</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set collection.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="p">[</span><span class="n">COLL_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return user.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">USER_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">password</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return password.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PASS_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_settings"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.config.get_settings">[docs]</a><span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Read settings from input file.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read settings from input file.</span>
 <span class="sd">    :param infile: Input file for JSON settings.</span>
 <span class="sd">    :type infile: file or str path</span>
 <span class="sd">    :return: Settings parsed from file</span>
@@ -234,7 +233,7 @@
 
 
 <div class="viewcode-block" id="auth_aliases"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.config.auth_aliases">[docs]</a><span class="k">def</span> <span class="nf">auth_aliases</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Interpret user/password aliases.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpret user/password aliases.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">alias</span><span class="p">,</span> <span class="n">real</span> <span class="ow">in</span> <span class="p">((</span><span class="n">USER_KEY</span><span class="p">,</span> <span class="s2">&quot;readonly_user&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">PASS_KEY</span><span class="p">,</span> <span class="s2">&quot;readonly_password&quot;</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
             <span class="n">d</span><span class="p">[</span><span class="n">real</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span>
@@ -242,7 +241,7 @@
 
 
 <div class="viewcode-block" id="normalize_auth"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.config.normalize_auth">[docs]</a><span class="k">def</span> <span class="nf">normalize_auth</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">admin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">readonly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">readonly_first</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Transform the readonly/admin user and password to simple user/password,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transform the readonly/admin user and password to simple user/password,</span>
 <span class="sd">    as expected by QueryEngine. If return value is true, then</span>
 <span class="sd">    admin or readonly password will be in keys &quot;user&quot; and &quot;password&quot;.</span>
 <span class="sd">    :param settings: Connection settings</span>

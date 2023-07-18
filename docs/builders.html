@@ -1,12 +1,11 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Database “Builders” &#8212; pymatgen-db 2023.2.23 documentation</title>
+    <title>Database “Builders” &#8212; pymatgen-db 2023.7.18 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/flasky.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -45,7 +44,7 @@
         <li class="right" >
           <a href="mgvv.html" title="Materials Project Database Validation: mgvv"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2023.2.23 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pymatgen-db 2023.7.18 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Database “Builders”</a></li> 
       </ul>
     </div>  
@@ -139,7 +138,7 @@ In this section we’ll show the whole program, then walk through it one section
 at a time:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.db.builders.core</span> <span class="kn">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">=</span> <span class="mi">0</span>
@@ -165,7 +164,7 @@ at a time:</p>
 <p><strong>Initialization</strong>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.db.builders.core</span> <span class="kn">import</span> <span class="n">Builder</span>
 <span class="k">class</span> <span class="nc">FileCounter</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Count lines and characters in a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span> <span class="o">=</span> <span class="mi">0</span>
@@ -244,14 +243,14 @@ and then step through it one snippet at at time:</p>
 <span class="n">_log</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_log</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">CopyBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Copy from one MongoDB collection to another.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Copy from one MongoDB collection to another.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_target_coll</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Copy records from source to target collection.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Copy records from source to target collection.</span>
 
 <span class="sd">        :param source: Input collection</span>
 <span class="sd">        :type source: QueryEngine</span>
@@ -289,7 +288,7 @@ Python logging.Logger instance with a standard name and format.</p>
 later use to remember the target collection.</p>
 <p><strong>get_items</strong>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Copy records from source to target collection.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Copy records from source to target collection.</span>
 
 <span class="sd">    :param source: Input collection</span>
 <span class="sd">    :type source: QueryEngine</span>
@@ -391,11 +390,11 @@ all the elements in A:</p>
 <span class="kn">from</span> <span class="nn">pymatgen.db.query_engine</span> <span class="kn">import</span> <span class="n">QueryEngine</span>
 
 <span class="k">class</span> <span class="nc">MaxValueBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
 <span class="sd">    some custom logic for incremental case.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get all records from source collection to add to target.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all records from source collection to add to target.</span>
 
 <span class="sd">        :param source: Input collection</span>
 <span class="sd">        :type source: QueryEngine</span>
@@ -408,7 +407,7 @@ all the elements in A:</p>
         <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">query</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate new maximum value for each group,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate new maximum value for each group,</span>
 <span class="sd">        for &quot;new&quot; items only.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
@@ -429,7 +428,7 @@ all the elements in A:</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_max</span>
 
     <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Update target collection with calculated maximum values.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update target collection with calculated maximum values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">doc</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
@@ -439,11 +438,11 @@ all the elements in A:</p>
 </div>
 <p><strong>Initialization</strong>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MaxValueBuilder</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Builder</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example of incremental builder that requires</span>
 <span class="sd">       some custom logic for incremental case.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get all records from source collection to add to target.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all records from source collection to add to target.</span>
 
 <span class="sd">        :param source: Input collection</span>
 <span class="sd">        :type source: QueryEngine</span>
@@ -464,7 +463,7 @@ that can be shared between parallel processes. Finally, this method returns
 a query on all items in the collection.</p>
 <p><strong>Processing</strong>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Calculate new maximum value for each group,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate new maximum value for each group,</span>
 <span class="sd">    for &quot;new&quot; items only.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
@@ -497,7 +496,7 @@ These turn off the “incremental mode” so that the query will start at the
 beginning of the collection instead of from the start of A<sub>new</sub>.</p>
 <p><strong>Finalization</strong>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Update target collection with calculated maximum values.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update target collection with calculated maximum values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">doc</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>

@@ -5,7 +5,7 @@ This module implements a version of pymatgen's Transmuter to generate
 TransformedStructures from DB data sources. They enable the
 high-throughput generation of new structures and input files.
 """
-
+from __future__ import annotations
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"

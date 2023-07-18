@@ -12,7 +12,7 @@ import os
 
 __author__ = "Shyue Ping Ong, Dan Gunter"
 __date__ = "Jul 22 2017"
-__version__ = "2023.2.23"
+__version__ = "2023.7.18"
 
 
 SETTINGS_FILE = os.path.join(os.path.expanduser("~"), ".pmgrc.yaml")

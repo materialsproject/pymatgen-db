@@ -7,8 +7,9 @@ passed in as a file or object. For example::
     f = open("/other/file.json")
     cfg3 = DBConfig(f)  # read from file object
     # access dict of parsed conf. settings
-    settings = cfg1.settings
+    settings = cfg1.settings.
 """
+from __future__ import annotations
 
 import os
 
@@ -28,14 +29,10 @@ ALIASES_KEY = "aliases"
 
 
 class ConfigurationFileError(Exception):
-    """
-    Error for Config File
-    """
+    """Error for Config File."""
 
     def __init__(self, filename, err):
-        """
-        Init for ConfigurationFileError.
-        """
+        """Init for ConfigurationFileError."""
         msg = f"reading '{filename}': {err}"
         Exception.__init__(self, msg)
 
@@ -69,7 +66,7 @@ class DBConfig:
         :param config_file: Read configuration from this file.
         :type config_file: file or str path
         :param config_dict: Set configuration from this dictionary.
-        :raises: ConfigurationFileError if cannot read/parse config_file
+        :raises: ConfigurationFileError if cannot read/parse config_file.
         """
         self._cfg = dict(self.DEFAULT_SETTINGS)
         settings = {}
@@ -78,9 +75,8 @@ class DBConfig:
             auth_aliases(settings)
         else:
             # Try to use DEFAULT_FILE if no config_file
-            if config_file is None:
-                if os.path.exists(self.DEFAULT_FILE):
-                    config_file = self.DEFAULT_FILE
+            if config_file is None and os.path.exists(self.DEFAULT_FILE):
+                config_file = self.DEFAULT_FILE
             # If there was a config_file, parse it
             if config_file is not None:
                 try:
@@ -100,23 +96,17 @@ class DBConfig:
 
     @property
     def settings(self):
-        """
-        Return settings
-        """
+        """Return settings."""
         return self._cfg
 
     @property
     def host(self):
-        """
-        Return host
-        """
+        """Return host."""
         return self._cfg.get(HOST_KEY, None)
 
     @property
     def port(self):
-        """
-        Return port.
-        """
+        """Return port."""
         return self._cfg.get(PORT_KEY, self.DEFAULT_PORT)
 
     @property
@@ -126,37 +116,27 @@ class DBConfig:
 
     @dbname.setter
     def dbname(self, value):
-        """
-        Set dbname.
-        """
+        """Set dbname."""
         self._cfg[DB_KEY] = value
 
     @property
     def collection(self):
-        """
-        Return collection.
-        """
+        """Return collection."""
         return self._cfg.get(COLL_KEY, None)
 
     @collection.setter
     def collection(self, value):
-        """
-        Set collection.
-        """
+        """Set collection."""
         self._cfg[COLL_KEY] = value
 
     @property
     def user(self):
-        """
-        Return user.
-        """
+        """Return user."""
         return self._cfg.get(USER_KEY, None)
 
     @property
     def password(self):
-        """
-        Return password.
-        """
+        """Return password."""
         return self._cfg.get(PASS_KEY, None)
 
 
@@ -165,7 +145,7 @@ def get_settings(infile):
     :param infile: Input file for JSON settings.
     :type infile: file or str path
     :return: Settings parsed from file
-    :rtype: dict
+    :rtype: dict.
     """
     yml = yaml.YAML()
     settings = yml.load(_as_file(infile))
@@ -201,7 +181,7 @@ def normalize_auth(settings, admin=True, readonly=True, readonly_first=False):
     :param readonly: Check for readonly password
     :param readonly_first: Check for readonly password before admin
     :return: Whether user/password were found
-    :rtype: bool
+    :rtype: bool.
     """
     U, P = USER_KEY, PASS_KEY
     # If user/password, un-prefixed, exists, do nothing.

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import unittest
 import uuid
@@ -43,22 +45,22 @@ class QueryResultsTest(unittest.TestCase):
                 "calcs_reversed.output.ionic_steps.electronic_steps.e_0_energy",
             ],
         )
-        self.assertTrue(isinstance(result, QueryResults))
+        assert isinstance(result, QueryResults)
         print(list(qe.query(criteria={"task_id": "mp-1002133"})))
-        self.assertEqual(len(result), 1)
-        doc = list(result)[0]
-        self.assertIn("calcs_reversed.output.ionic_steps.e_0_energy", doc)
+        assert len(result) == 1
+        doc = next(iter(result))
+        assert "calcs_reversed.output.ionic_steps.e_0_energy" in doc
         v = doc["calcs_reversed.output.ionic_steps.e_0_energy"]
-        self.assertIsInstance(v, list)
+        assert isinstance(v, list)
         for elt in v:
-            self.assertIsInstance(elt, list)
+            assert isinstance(elt, list)
             for n in elt:
-                self.assertIsInstance(n, float)
-        self.assertIn("calcs_reversed.output.ionic_steps.electronic_steps.e_0_energy", doc)
+                assert isinstance(n, float)
+        assert "calcs_reversed.output.ionic_steps.electronic_steps.e_0_energy" in doc
         v = doc["calcs_reversed.output.ionic_steps.electronic_steps.e_0_energy"]
         for elt in v:
-            self.assertIsInstance(elt, list)
+            assert isinstance(elt, list)
             for _elt in elt:
-                self.assertIsInstance(_elt, list)
+                assert isinstance(_elt, list)
                 for n in _elt:
-                    self.assertIsInstance(n, float)
+                    assert isinstance(n, float)

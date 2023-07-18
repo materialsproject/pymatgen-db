@@ -1,6 +1,5 @@
-"""
-Utility functions used across scripts.
-"""
+"""Utility functions used across scripts."""
+from __future__ import annotations
 
 import datetime
 import json
@@ -19,14 +18,10 @@ _log = logging.getLogger("mg.util")
 
 
 class MongoJSONEncoder(json.JSONEncoder):
-    """
-    JSON encoder to support ObjectIDs and datetime used in Mongo.
-    """
+    """JSON encoder to support ObjectIDs and datetime used in Mongo."""
 
     def default(self, o):
-        """
-        Override default to support ObjectID and datetime.
-        """
+        """Override default to support ObjectID and datetime."""
         if isinstance(o, bson.objectid.ObjectId):
             return str(o)
         if isinstance(o, datetime.datetime):
@@ -35,17 +30,13 @@ class MongoJSONEncoder(json.JSONEncoder):
 
 
 def get_settings(config_file):
-    """
-    Get settings from file.
-    """
+    """Get settings from file."""
     cfg = DBConfig(config_file)
     return cfg.settings
 
 
 def get_database(config_file=None, settings=None, admin=False, **kwargs):
-    """
-    Get a database object from a config file.
-    """
+    """Get a database object from a config file."""
     d = get_settings(config_file) if settings is None else settings
 
     try:
@@ -78,7 +69,7 @@ def collection_keys(coll, sep="."):
     """Get a list of all (including nested) keys in a collection.
     Examines the first document in the collection.
     :param sep: Separator for nested keys
-    :return: List of str
+    :return: List of str.
     """
 
     def _keys(x, pre=""):

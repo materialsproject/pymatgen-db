@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unittest
 
 from pymatgen.db.matproj import MPDB
@@ -12,4 +14,4 @@ class MPDBTest(unittest.TestCase):
         mpdb = MPDB()
         mpdb.create({"chemsys": "Fe-O"})
         entries = mpdb.get_entries_in_chemsys(["Fe", "O"])
-        self.assertTrue(len(entries) > 0)
+        assert len(entries) > 0

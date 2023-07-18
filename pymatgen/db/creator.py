@@ -2,7 +2,7 @@
 This module defines a Drone to assimilate vasp data and insert it into a
 Mongo database.
 """
-
+from __future__ import annotations
 
 import datetime
 import glob
@@ -21,6 +21,7 @@ import numpy as np
 from monty.io import zopen
 from monty.json import MontyEncoder
 from pymongo import MongoClient
+
 from pymatgen.analysis.bond_valence import BVAnalyzer
 from pymatgen.analysis.local_env import VoronoiNN
 from pymatgen.analysis.structure_analyzer import oxide_type
@@ -32,7 +33,6 @@ from pymatgen.ext.matproj import MPRester
 from pymatgen.io.cif import CifWriter
 from pymatgen.io.vasp import Incar, Kpoints, Oszicar, Outcar, Poscar, Potcar, Vasprun
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
@@ -188,8 +188,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             d = self.get_task_doc(path)
             if self.mapi_key is not None and d["state"] == "successful":
                 self.calculate_stability(d)
-            tid = self._insert_doc(d)
-            return tid
+            return self._insert_doc(d)
         except Exception:
             import traceback
 
@@ -197,9 +196,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             return False
 
     def calculate_stability(self, d):
-        """
-        Calculate the stability (e_above_hull and decomposes_to) for a entry dict.
-        """
+        """Calculate the stability (e_above_hull and decomposes_to) for a entry dict."""
         m = MPRester(self.mapi_key)
         functional = d["pseudo_potential"]["functional"]
         syms = [f"{functional} {l}" for l in d["pseudo_potential"]["labels"]]
@@ -213,9 +210,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             d["analysis"][k] = data[k]
 
     def get_task_doc(self, path):
-        """
-        Get the entire task doc for a path, including any post-processing.
-        """
+        """Get the entire task doc for a path, including any post-processing."""
         logger.info(f"Getting task doc for base dir :{path}")
         files = os.listdir(path)
         vasprun_files = OrderedDict()
@@ -241,7 +236,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             if not d:
                 d = self.process_killed_run(path)
             self.post_process(path, d)
-        elif (not (path.endswith("relax1") or path.endswith("relax2"))) and contains_vasp_input(path):
+        elif (not (path.endswith(("relax1", "relax2")))) and contains_vasp_input(path):
             # If not Materials Project style, process as a killed run.
             logger.warning(path + " contains killed run")
             d = self.process_killed_run(path)
@@ -329,7 +324,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                     if m:
                         d["icsd_id"] = int(m.group(1))
                 except Exception:
-                    logger.warning("Cannot parse ICSD from transformations " "file.")
+                    logger.warning("Cannot parse ICSD from transformations file.")
                     pass
         else:
             logger.warning("Transformations file does not exist.")
@@ -397,9 +392,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         logger.info("Post-processed " + fullpath)
 
     def process_killed_run(self, dir_name):  # pylint: disable=R0201
-        """
-        Process a killed vasp run.
-        """
+        """Process a killed vasp run."""
         fullpath = os.path.abspath(dir_name)
         logger.info("Processing Killed run " + fullpath)
         d = {"dir_name": fullpath, "state": "killed", "oszicar": {}}
@@ -469,18 +462,15 @@ class VaspToDbTaskDrone(AbstractDrone):
                     d["oszicar"]["root"] = Oszicar(os.path.join(dir_name, f)).as_dict()
                 except Exception:
                     logger.error(f"Unable to parse OSZICAR for killed run in {dir_name}.")
-            elif re.match(r"relax\d", f):
-                if os.path.exists(os.path.join(dir_name, f, "OSZICAR")):
-                    try:
-                        d["oszicar"][f] = Oszicar(os.path.join(dir_name, f, "OSZICAR")).as_dict()
-                    except Exception:
-                        logger.error(f"Unable to parse OSZICAR for killed run in {dir_name}.")
+            elif re.match(r"relax\d", f) and os.path.exists(os.path.join(dir_name, f, "OSZICAR")):
+                try:
+                    d["oszicar"][f] = Oszicar(os.path.join(dir_name, f, "OSZICAR")).as_dict()
+                except Exception:
+                    logger.error(f"Unable to parse OSZICAR for killed run in {dir_name}.")
         return d
 
     def process_vasprun(self, dir_name, taskname, filename):
-        """
-        Process a vasprun.xml file.
-        """
+        """Process a vasprun.xml file."""
         vasprun_file = os.path.join(dir_name, filename)
         parse_projected_eigen = self.parse_projected_eigen and (
             self.parse_projected_eigen != "final" or taskname == self.runs[-1]
@@ -614,9 +604,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         return []
 
     def convert(self, d):  # pylint: disable=R0201
-        """
-        Just return the dict.
-        """
+        """Just return the dict."""
         return d
 
     def __str__(self):
@@ -624,15 +612,11 @@ class VaspToDbTaskDrone(AbstractDrone):
 
     @classmethod
     def from_dict(cls, d):
-        """
-        From dict
-        """
+        """From dict."""
         return cls(**d["init_args"])
 
     def as_dict(self):
-        """
-        Dict representation.
-        """
+        """Dict representation."""
         init_args = {
             "host": self.host,
             "port": self.port,
@@ -645,18 +629,15 @@ class VaspToDbTaskDrone(AbstractDrone):
             "additional_fields": self.additional_fields,
             "update_duplicates": self.update_duplicates,
         }
-        output = {
+        return {
             "name": self.__class__.__name__,
             "init_args": init_args,
             "version": __version__,
         }
-        return output
 
 
 def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5, volume_change_threshold=0.2):
-    """
-    Generate basic analysis and error checks data for a run.
-    """
+    """Generate basic analysis and error checks data for a run."""
     initial_vol = d["input"]["crystal"]["lattice"]["volume"]
     final_vol = d["output"]["crystal"]["lattice"]["volume"]
     delta_vol = final_vol - initial_vol
@@ -681,7 +662,7 @@ def get_basic_analysis_and_error_checks(d, max_force_threshold=0.5, volume_chang
     except ValueError as e:
         logger.error(f"Valence cannot be determined due to {e}.")
     except Exception as ex:
-        logger.error(f"BVAnalyzer error {str(ex)}.")
+        logger.error(f"BVAnalyzer error {ex!s}.")
 
     max_force = None
     if d["state"] == "successful" and d["calculations"][0]["input"]["parameters"].get("NSW", 0) > 0:

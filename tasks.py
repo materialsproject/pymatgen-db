@@ -125,7 +125,7 @@ def test(ctx):
 @task
 def release(ctx):
     set_ver(ctx)
-    #test(ctx)
+    ctx.run("ruff --fix setup.py")
     update_doc(ctx)
     publish(ctx)
     release_github(ctx)

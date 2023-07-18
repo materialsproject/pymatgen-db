@@ -3,7 +3,7 @@
 """
 TODO: Change the module doc.
 """
-
+from __future__ import annotations
 
 __author__ = "shyuepingong"
 __version__ = "0.1"

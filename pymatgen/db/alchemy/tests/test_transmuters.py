@@ -3,7 +3,7 @@
 """
 Created on Mar 5, 2012
 """
-
+from __future__ import annotations
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
@@ -15,18 +15,18 @@ __date__ = "Mar 5, 2012"
 import os
 import unittest
 
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
+
 from pymatgen.apps.borg.queen import BorgQueen
+from pymatgen.db.alchemy.transmuters import QeTransmuter
+from pymatgen.db.creator import VaspToDbTaskDrone
+from pymatgen.db.query_engine import QueryEngine
 from pymatgen.transformations.standard_transformations import (
     OxidationStateDecorationTransformation,
     PartialRemoveSpecieTransformation,
     SubstitutionTransformation,
 )
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
-
-from pymatgen.db.alchemy.transmuters import QeTransmuter
-from pymatgen.db.creator import VaspToDbTaskDrone
-from pymatgen.db.query_engine import QueryEngine
 
 test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "test_files")
 
@@ -58,9 +58,9 @@ class QeTransmuterTest(unittest.TestCase):
         ]
         self.qep = QeTransmuter(QeTransmuterTest.qe, crit, trans, extend_collection=10)
         trans_structures = self.qep.transformed_structures
-        self.assertEqual(len(trans_structures), 3)
+        assert len(trans_structures) == 3
         for s in trans_structures:
-            self.assertEqual(s.final_structure.composition.reduced_formula, "Tb2Mg(BO2)10")
+            assert s.final_structure.composition.reduced_formula == "Tb2Mg(BO2)10"
 
     @classmethod
     def tearDownClass(cls):

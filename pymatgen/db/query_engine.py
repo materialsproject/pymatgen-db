@@ -2,7 +2,7 @@
 This module provides a QueryEngine that simplifies queries for Mongo databases
 generated using hive.
 """
-
+from __future__ import annotations
 
 __author__ = "Shyue Ping Ong, Michael Kocher, Dan Gunter"
 __copyright__ = "Copyright 2011, The Materials Project"
@@ -22,6 +22,7 @@ from collections.abc import Iterable
 
 import gridfs
 import pymongo
+
 from pymatgen.core import Composition, Structure
 from pymatgen.electronic_structure.core import Orbital, Spin
 from pymatgen.electronic_structure.dos import CompleteDos, Dos
@@ -117,7 +118,7 @@ class QueryEngine:
                     contain data from both successful and unsuccessful runs but
                     for most querying purposes, you may want just successful runs
                     only. Note that defaults do not affect explicitly specified
-                    criteria, i.e., if you suppy a query for {"state": "killed"},
+                    criteria, i.e., if you supply a query for {"state": "killed"},
                     this will override the default for {"state": "successful"}.
             default_properties (list): Property names (strings) to use by
                 default, if no `properties` are given to query().
@@ -152,9 +153,7 @@ class QueryEngine:
 
     @property
     def collection_name(self):
-        """
-        Returns collection name.
-        """
+        """Returns collection name."""
         return self._collection_name
 
     @collection_name.setter
@@ -196,11 +195,11 @@ class QueryEngine:
             self._default_props, self._default_prop_dict = self._parse_properties(default_properties)
 
     def __enter__(self):
-        """Allows for use with the 'with' context manager"""
+        """Allows for use with the 'with' context manager."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Allows for use with the 'with' context manager"""
+        """Allows for use with the 'with' context manager."""
         self.close()
 
     def close(self):
@@ -376,7 +375,7 @@ class QueryEngine:
         return parsed_crit
 
     def ensure_index(self, key, unique=False):
-        """Wrapper for pymongo.Collection.ensure_index"""
+        """Wrapper for pymongo.Collection.ensure_index."""
         return self.collection.ensure_index(key, unique=unique)
 
     def query(self, properties=None, criteria=None, distinct_key=None, **kwargs):
@@ -431,7 +430,7 @@ class QueryEngine:
     def _parse_properties(self, properties):
         """Make list of properties into 2 things:
         (1) dictionary of { 'aliased-field': 1, ... } for a mongodb query eg. {''}
-        (2) dictionary, keyed by aliased field, for display
+        (2) dictionary, keyed by aliased field, for display.
         """
         props = {}
         # TODO: clean up prop_dict?
@@ -529,9 +528,7 @@ class QueryEngine:
         return self.db[item]
 
     def get_dos_from_id(self, task_id):
-        """
-        Overrides the get_dos_from_id for the MIT gridfs format.
-        """
+        """Overrides the get_dos_from_id for the MIT gridfs format."""
         args = {"task_id": task_id}
         fields = ["calculations"]
         structure = self.get_structure_from_id(task_id)
@@ -587,7 +584,7 @@ class QueryResults(Iterable):
         """
         This function wraps all callable objects returned by self.__getattr__.
         If the result is a cursor, wrap it into a QueryResults object
-        so that you can invoke postprocess functions in self._pproc
+        so that you can invoke postprocess functions in self._pproc.
         """
 
         def wrapped(*args, **kwargs):
@@ -614,15 +611,11 @@ class QueryResults(Iterable):
         raise AttributeError
 
     def clone(self):
-        """
-        Provide a clone of the QueryResults.
-        """
+        """Provide a clone of the QueryResults."""
         return QueryResults(self._prop_dict, self._results.clone())
 
     def from_cursor(self, cursor):
-        """
-        Create a QueryResults object from a cursor object
-        """
+        """Create a QueryResults object from a cursor object."""
         return QueryResults(self._prop_dict, cursor, self._pproc)
 
     def __len__(self):
@@ -673,9 +666,7 @@ class QueryListResults(QueryResults):
     """Set of QueryResults on a list instead of a MongoDB cursor."""
 
     def clone(self):
-        """
-        Return a clone of the QueryListResults.
-        """
+        """Return a clone of the QueryListResults."""
         return QueryResults(self._prop_dict, self._results[:])
 
     def __len__(self):
@@ -688,8 +679,4 @@ class QueryListResults(QueryResults):
 
 
 class QueryError(Exception):
-    """
-    Exception class for errors occuring during queries.
-    """
-
-    pass
+    """Exception class for errors occurring during queries."""

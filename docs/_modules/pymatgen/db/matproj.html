@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pymatgen.db.matproj &#8212; pymatgen-db 2023.2.23 documentation</title>
+    <title>pymatgen.db.matproj &#8212; pymatgen-db 2023.7.18 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/flasky.css" />
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
@@ -36,7 +35,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2023.2.23 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pymatgen-db 2023.7.18 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pymatgen.db.matproj</a></li> 
       </ul>
@@ -63,12 +62,12 @@
 
 
 <div class="viewcode-block" id="MPDB"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.matproj.MPDB">[docs]</a><span class="k">class</span> <span class="nc">MPDB</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This module allows you to create a local MP database based on ComputedStructureEntries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        @param args: Pass through to MongoClient. E.g., you can create a connection using uri strings, etc.</span>
 <span class="sd">        @param kwargs: Pass through to MongoClient. E.g., you can create a connection using uri strings, etc.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -77,7 +76,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">entries</span>
 
 <div class="viewcode-block" id="MPDB.create"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.matproj.MPDB.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">property_data</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the database. Typically only used once.</span>
 
 <span class="sd">        @param criteria: Criteria passed to MPRester.get_entries to obtain the entries. None means you get the entire</span>
@@ -114,7 +113,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="s2">&quot;elements&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MPDB.get_entries_in_chemsys"><a class="viewcode-back" href="../../../pymatgen.db.html#pymatgen.db.matproj.MPDB.get_entries_in_chemsys">[docs]</a>    <span class="k">def</span> <span class="nf">get_entries_in_chemsys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="n">additional_criteria</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to get a list of ComputedEntries in a chemical system. For example, elements = [&quot;Li&quot;, &quot;Fe&quot;, &quot;O&quot;]</span>
 <span class="sd">        will return a list of all entries in the Li-Fe-O chemical system, i.e., all LixOy, FexOy, LixFey, LixFeyOz,</span>
 <span class="sd">        Li, Fe and O phases. Extremely useful for creating phase diagrams of entire chemical systems.</span>

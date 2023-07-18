@@ -8,14 +8,13 @@ from __future__ import annotations
 import itertools
 
 import pymongo
+
 from pymatgen.entries.computed_entries import ComputedStructureEntry
 from pymatgen.ext.matproj import MPRester
 
 
 class MPDB:
-    """
-    This module allows you to create a local MP database based on ComputedStructureEntries.
-    """
+    """This module allows you to create a local MP database based on ComputedStructureEntries."""
 
     def __init__(self, *args, **kwargs):
         """
