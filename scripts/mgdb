@@ -23,11 +23,11 @@ from pymongo import MongoClient, ASCENDING
 
 from pymatgen.apps.borg.queen import BorgQueen
 
-from matgendb import SETTINGS
-from matgendb.query_engine import QueryEngine
-from matgendb.creator import VaspToDbTaskDrone
-from matgendb.dbconfig import DBConfig
-from matgendb.util import get_settings, DEFAULT_SETTINGS, MongoJSONEncoder
+from pymatgen.db import SETTINGS
+from pymatgen.db.query_engine import QueryEngine
+from pymatgen.db.creator import VaspToDbTaskDrone
+from pymatgen.db.config import DBConfig
+from pymatgen.db.util import get_settings, DEFAULT_SETTINGS, MongoJSONEncoder
 
 _log = logging.getLogger("mg")  # parent
 
