@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 Created on Jun 19, 2012
 """
@@ -9,6 +7,7 @@ import os
 import unittest
 import warnings
 
+import pytest
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
@@ -93,11 +92,11 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             elif dir_name.endswith("success_mp_aflow"):
                 assert d["state"] == "successful"
                 assert d["pretty_formula"] == "TbZn(BO2)5"
-                self.assertAlmostEqual(d["output"]["final_energy"], -526.66747274, 4)
+                assert d["output"]["final_energy"] == pytest.approx(-526.66747274, 4)
             elif dir_name.endswith("Li2O_aflow"):
                 assert d["state"] == "successful"
                 assert d["pretty_formula"] == "Li2O"
-                self.assertAlmostEqual(d["output"]["final_energy"], -14.31446494, 6)
+                assert d["output"]["final_energy"] == pytest.approx(-14.31446494, 6)
                 assert len(d["calculations"]) == 2
                 assert d["input"]["is_lasph"] is False
                 assert d["input"]["xc_override"] is None
@@ -105,14 +104,14 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
             elif dir_name.endswith("Li2O"):
                 assert d["state"] == "successful"
                 assert d["pretty_formula"] == "Li2O"
-                self.assertAlmostEqual(d["output"]["final_energy"], -14.31337758, 6)
+                assert d["output"]["final_energy"] == pytest.approx(-14.31337758, 6)
                 assert len(d["calculations"]) == 1
                 assert len(d["custodian"]) == 1
                 assert len(d["custodian"][0]["corrections"]) == 1
             elif dir_name.endswith("Li2O_aflow_lasph"):
                 assert d["state"] == "successful"
                 assert d["pretty_formula"] == "Li2O"
-                self.assertAlmostEqual(d["output"]["final_energy"], -13.998171, 6)
+                assert d["output"]["final_energy"] == pytest.approx(-13.998171, 6)
                 assert len(d["calculations"]) == 2
                 assert d["input"]["is_lasph"] is True
                 assert d["input"]["xc_override"] == "PS"
@@ -133,13 +132,13 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
                 ],
             ):
                 if r["dir_name"].endswith("Li2O_aflow"):
-                    self.assertAlmostEqual(r["energy"], -14.31446494, 4)
+                    assert r["energy"] == pytest.approx(-14.31446494, 4)
                     assert len(r["calculations"]) == 2
                     assert r["input"]["is_lasph"] is False
                     assert r["input"]["xc_override"] is None
                     assert r["oxide_type"] == "oxide"
                 elif r["dir_name"].endswith("Li2O"):
-                    self.assertAlmostEqual(r["energy"], -14.31337758, 4)
+                    assert r["energy"] == pytest.approx(-14.31337758, 4)
                     assert len(r["calculations"]) == 1
                     assert r["input"]["is_lasph"] is False
                     assert r["input"]["xc_override"] is None
@@ -152,7 +151,7 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
 
             # Test query one.
             d = qe.query_one(criteria={"pretty_formula": "TbZn(BO2)5"}, properties=["energy"])
-            self.assertAlmostEqual(d["energy"], -526.66747274, 4)
+            assert d["energy"] == pytest.approx(-526.66747274, 4)
 
             d = qe.get_entries_in_system(["Li", "O"])
             assert len(d) == 3
@@ -169,7 +168,3 @@ class VaspToDbTaskDroneTest(unittest.TestCase):
     def tearDownClass(cls):
         if cls.conn is not None:
             cls.conn.drop_database("creator_unittest")
-
-
-if __name__ == "__main__":
-    unittest.main()

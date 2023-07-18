@@ -125,7 +125,7 @@ def test(ctx):
 @task
 def release(ctx):
     set_ver(ctx)
-    ctx.run("ruff --fix setup.py")
+    ctx.run("ruff --fix setup.py pymatgen")
     update_doc(ctx)
     publish(ctx)
     release_github(ctx)

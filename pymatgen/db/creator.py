@@ -199,7 +199,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         """Calculate the stability (e_above_hull and decomposes_to) for a entry dict."""
         m = MPRester(self.mapi_key)
         functional = d["pseudo_potential"]["functional"]
-        syms = [f"{functional} {l}" for l in d["pseudo_potential"]["labels"]]
+        syms = [f"{functional} {label}" for label in d["pseudo_potential"]["labels"]]
         entry = ComputedEntry(
             Composition(d["unit_cell_formula"]),
             d["output"]["final_energy"],
@@ -583,8 +583,7 @@ class VaspToDbTaskDrone(AbstractDrone):
             return None
 
     def get_valid_paths(self, path):
-        """
-        There are some restrictions on the valid directory structures:
+        """There are some restrictions on the valid directory structures.
 
         1. There can be only one vasp run in each directory. Nested directories
            are fine.

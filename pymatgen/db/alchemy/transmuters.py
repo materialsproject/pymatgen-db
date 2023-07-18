@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 This module implements a version of pymatgen's Transmuter to generate
 TransformedStructures from DB data sources. They enable the

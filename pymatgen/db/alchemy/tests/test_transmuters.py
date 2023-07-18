@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 Created on Mar 5, 2012
 """
@@ -66,7 +64,3 @@ class QeTransmuterTest(unittest.TestCase):
     def tearDownClass(cls):
         if cls.conn is not None:
             cls.conn.drop_database("qetransmuter_unittest")
-
-
-if __name__ == "__main__":
-    unittest.main()
