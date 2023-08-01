@@ -551,7 +551,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 "pot_type": pot_type.lower(),
                 "labels": d2["input"]["potcar"],
             }
-            if len(d["calculations"]) == len(self.runs) or list(vasprun_files.keys())[0] != "relax1":
+            if len(d["calculations"]) == len(self.runs) or next(iter(vasprun_files.keys())) != "relax1":
                 d["state"] = "successful" if d2["has_vasp_completed"] else "unsuccessful"
             else:
                 d["state"] = "stopped"
