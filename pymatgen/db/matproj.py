@@ -3,6 +3,7 @@ A module for replicating the MP database creator.
 
 See https://medium.com/@shyuep/a-local-materials-project-database-1ea909430c95
 """
+
 from __future__ import annotations
 
 import itertools

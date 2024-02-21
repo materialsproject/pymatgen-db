@@ -9,6 +9,7 @@ passed in as a file or object. For example::
     # access dict of parsed conf. settings
     settings = cfg1.settings.
 """
+
 from __future__ import annotations
 
 import os
