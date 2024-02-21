@@ -2,6 +2,7 @@
 This module provides a QueryEngine that simplifies queries for Mongo databases
 generated using hive.
 """
+
 from __future__ import annotations
 
 __author__ = "Shyue Ping Ong, Michael Kocher, Dan Gunter"

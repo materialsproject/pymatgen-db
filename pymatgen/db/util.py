@@ -1,4 +1,5 @@
 """Utility functions used across scripts."""
+
 from __future__ import annotations
 
 import datetime

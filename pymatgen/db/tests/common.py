@@ -1,6 +1,7 @@
 """
 Common functions for tests
 """
+
 from __future__ import annotations
 
 __author__ = "Dan Gunter <dkgunter@lbl.gov>"
