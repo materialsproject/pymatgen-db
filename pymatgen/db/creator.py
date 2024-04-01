@@ -2,6 +2,7 @@
 This module defines a Drone to assimilate vasp data and insert it into a
 Mongo database.
 """
+
 from __future__ import annotations
 
 import datetime
@@ -320,7 +321,6 @@ class VaspToDbTaskDrone(AbstractDrone):
                         d["icsd_id"] = int(m.group(1))
                 except Exception:
                     logger.warning("Cannot parse ICSD from transformations file.")
-                    pass
         else:
             logger.warning("Transformations file does not exist.")
 

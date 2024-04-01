@@ -6,6 +6,7 @@ provides a clean and intuitive web ui for exploring that data. A query engine
 is also provided to enable the easy translation of MongoDB docs to useful
 pymatgen objects for analysis purposes.
 """
+
 from __future__ import annotations
 
 import os
