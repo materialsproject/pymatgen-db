@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from src.pymatgen.db.matproj import MPDB
+from pymatgen.db.matproj import MPDB
 from tests import common
 
 has_mongo = common.has_mongo()
