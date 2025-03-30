@@ -23,11 +23,11 @@ from pymatgen.transformations.standard_transformations import (
     PartialRemoveSpecieTransformation,
     SubstitutionTransformation,
 )
-from src.pymatgen.db.alchemy.transmuters import QeTransmuter
-from src.pymatgen.db.creator import VaspToDbTaskDrone
-from src.pymatgen.db.query_engine import QueryEngine
+from pymatgen.db.alchemy.transmuters import QeTransmuter
+from pymatgen.db.creator import VaspToDbTaskDrone
+from pymatgen.db.query_engine import QueryEngine
 
-test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "test_files")
+test_dir = os.path.join(os.path.dirname(__file__), "test_files")
 
 
 class QeTransmuterTest(unittest.TestCase):

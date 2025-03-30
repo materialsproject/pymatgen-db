@@ -16,9 +16,9 @@ from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.core.structure import Structure
 from pymatgen.electronic_structure.dos import CompleteDos
 from pymatgen.entries.computed_entries import ComputedEntry
-from src.pymatgen.db.creator import VaspToDbTaskDrone
-from src.pymatgen.db.query_engine import QueryEngine
-from src.pymatgen.db.tests import common
+from pymatgen.db.creator import VaspToDbTaskDrone
+from pymatgen.db.query_engine import QueryEngine
+from tests import common
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
@@ -27,7 +27,7 @@ __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Jun 19, 2012"
 
-test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "test_files")
+test_dir = os.path.join(os.path.dirname(__file__), "test_files")
 
 has_mongo = common.has_mongo()
 

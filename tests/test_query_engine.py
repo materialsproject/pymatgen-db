@@ -7,12 +7,12 @@ import uuid
 import bson
 import pymongo
 
-from src.pymatgen.db.query_engine import QueryEngine, QueryResults
-from src.pymatgen.db.tests import common
+from pymatgen.db.query_engine import QueryEngine, QueryResults
+from tests import common
 
 has_mongo = common.has_mongo()
 
-test_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "test_files")
+test_dir = os.path.join(os.path.dirname(__file__), "test_files")
 
 
 class QueryResultsTest(unittest.TestCase):

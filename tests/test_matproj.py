@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 from src.pymatgen.db.matproj import MPDB
-from src.pymatgen.db.tests import common
+from tests import common
 
 has_mongo = common.has_mongo()
 

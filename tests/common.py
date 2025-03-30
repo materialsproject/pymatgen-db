@@ -16,16 +16,12 @@ import pymongo
 # Third-party
 from mongomock import MongoClient
 
-# Package
-from src.pymatgen.db.query_engine import QueryEngine
+from pymatgen.db.query_engine import QueryEngine
 
 _log = logging.getLogger("pymatgen.db.tests")
 
 TEST_FILES_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "..",
-    "..",
-    "..",
     "test_files",
 )
 
