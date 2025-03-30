@@ -37,7 +37,7 @@ class MPDB:
         mpr = MPRester()
         criteria = criteria or {}
         property_data = property_data or []
-        entries = mpr.get_entries(
+        entries = mpr.get_entries(  # type:ignore[attr-defined]
             criteria,
             inc_structure=True,
             property_data=property_data,
