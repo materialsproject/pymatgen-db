@@ -17,7 +17,7 @@ import pymongo
 from mongomock import MongoClient
 
 # Package
-from pymatgen.db.query_engine import QueryEngine
+from src.pymatgen.db.query_engine import QueryEngine
 
 _log = logging.getLogger("pymatgen.db.tests")
 

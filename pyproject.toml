@@ -1,8 +1,46 @@
+[project]
+name = "pymatgen-db"
+version = "2023.7.18"
+authors = [{ name = "Shyue Ping Ong", email = "ongsp@ucsd.edu" }]
+maintainers = [
+    { name = "Shyue Ping Ong", email = "ongsp@ucsd.edu" },
+]
+description = "Pymatgen-db provides an addon for the creation of Materials Project-style databases for materials data."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "monty>=2025.3.3",
+    "pymatgen>=2025.3.10",
+    "pymongo>=4.11.3",
+]
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pymatgen", "pymatgen.*"]
+
+[tool.setuptools.package-data]
+"pymatgen.db" = ["*.json"]
+
 [tool.black]
 line-length = 120
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py310"
 line-length = 120
 select = [
   "B",    # flake8-bugbear
@@ -102,3 +140,8 @@ fase,rute,reson,titels,ges,scalr,strat,struc,hda,nin,ons,pres,kno,loos,lamda,lew
 """
 skip = "pymatgen/analysis/aflow_prototypes.json"
 check-filenames = true
+
+[dependency-groups]
+dev = [
+    "mongomock>=4.3.0",
+]

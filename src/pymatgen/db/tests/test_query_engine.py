@@ -7,8 +7,8 @@ import uuid
 import bson
 import pymongo
 
-from pymatgen.db.query_engine import QueryEngine, QueryResults
-from pymatgen.db.tests import common
+from src.pymatgen.db.query_engine import QueryEngine, QueryResults
+from src.pymatgen.db.tests import common
 
 has_mongo = common.has_mongo()
 

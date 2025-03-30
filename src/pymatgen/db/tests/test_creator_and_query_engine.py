@@ -14,9 +14,9 @@ from pymongo.errors import ConnectionFailure
 
 from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.core.structure import Structure
-from pymatgen.db.creator import VaspToDbTaskDrone
-from pymatgen.db.query_engine import QueryEngine
-from pymatgen.db.tests import common
+from src.pymatgen.db.creator import VaspToDbTaskDrone
+from src.pymatgen.db.query_engine import QueryEngine
+from src.pymatgen.db.tests import common
 from pymatgen.electronic_structure.dos import CompleteDos
 from pymatgen.entries.computed_entries import ComputedEntry
 

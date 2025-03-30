@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.dirname(".."))
 sys.path.insert(0, os.path.dirname("../.."))
 
-from pymatgen.db import __version__, __author__
+from src.pymatgen.db import __version__, __author__
 
 # -- General configuration -----------------------------------------------------
 

@@ -9,7 +9,7 @@ import logging
 import bson
 from pymongo.mongo_client import MongoClient
 
-from pymatgen.db.config import DBConfig
+from src.pymatgen.db.config import DBConfig
 
 DEFAULT_PORT = DBConfig.DEFAULT_PORT
 DEFAULT_CONFIG_FILE = DBConfig.DEFAULT_FILE
