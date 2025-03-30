@@ -93,7 +93,7 @@ lint.ignore = [
 lint.pydocstyle.convention = "google"
 lint.isort.required-imports = ["from __future__ import annotations"]
 lint.isort.split-on-trailing-comma = false
-extend-exclude = ["tests", "conf.py"]
+extend-exclude = ["tests", "conf.py", "flask_theme_support.py", "tasks.py"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
