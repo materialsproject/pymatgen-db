@@ -1,4 +1,4 @@
-name: Testing
+name: Test
 
 on: [push, pull_request]
 
@@ -9,7 +9,7 @@ jobs:
       max-parallel: 20
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.8]
+        python-version: [3.10]
         mongodb-version: [4.4]
 
     runs-on: ${{ matrix.os }}
