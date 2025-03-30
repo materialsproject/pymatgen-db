@@ -1,14 +1,6 @@
-#!/usr/bin/env python
-
 """A helper script for many matgendb functions."""
-from __future__ import annotations
 
-__author__ = "Shyue Ping Ong"
-__copyright__ = "Copyright 2012, The Materials Project"
-__version__ = "1.2"
-__maintainer__ = "Shyue Ping Ong"
-__email__ = "shyue@mit.edu"
-__date__ = "Dec 1, 2012"
+from __future__ import annotations
 
 import argparse
 import datetime
@@ -17,19 +9,38 @@ import logging
 import multiprocessing
 import sys
 
-from pymongo import ASCENDING, MongoClient
-
 from pymatgen.apps.borg.queen import BorgQueen
-from src.pymatgen.db import SETTINGS
-from src.pymatgen.db import DBConfig
-from src.pymatgen.db import VaspToDbTaskDrone
-from src.pymatgen.db import QueryEngine
-from src.pymatgen.db import DEFAULT_SETTINGS, MongoJSONEncoder, get_settings
+from pymatgen.db import (
+    DEFAULT_SETTINGS,
+    SETTINGS,
+    DBConfig,
+    MongoJSONEncoder,
+    QueryEngine,
+    VaspToDbTaskDrone,
+    get_settings,
+)
+from pymongo import ASCENDING, MongoClient
 
 _log = logging.getLogger("mg")  # parent
 
 
 def init_db(args):
+    """
+    Initializes the database configuration and stores it in a specified configuration file.
+    Prompts the user for configuration inputs with the ability to accept default values.
+
+    Parameters:
+        args (Namespace): Command line arguments namespace object. Should contain 'config_file',
+        which specifies the target file to save configuration.
+
+    Raises:
+        FileNotFoundError: Raised if the specified config file cannot be created or written to.
+        ValueError: Raised if the provided or default port value is not a valid integer.
+
+    Notes:
+        Default settings for the configuration values are prepopulated from DBConfig.ALL_SETTINGS
+        and DEFAULT_SETTINGS.
+    """
     settings = DBConfig.ALL_SETTINGS
     defaults = dict(DEFAULT_SETTINGS)
     doc = {}
@@ -50,6 +61,29 @@ def init_db(args):
 
 
 def update_db(args):
+    """
+    Update the database with computational task data based on the provided arguments.
+
+    This function is responsible for configuring logging, extracting settings from the
+    provided configuration file, and performing parallel database insertion of tasks
+    from a specified directory. It utilizes multiprocessing for parallelism and supports
+    overwriting duplicate records if specified.
+
+    Arguments:
+        args: argparse.Namespace
+            A namespace object containing the following attributes:
+            - logfile: Optional list containing a single logging file path (list[str])
+            - config_file: Path to the configuration file (str)
+            - author: Name of the author to include in the task (Optional[str])
+            - tag: Tags to append to the tasks in the database (Optional[list[str]])
+            - parse_dos: Boolean indicating whether to parse density of states (bool)
+            - force_update_dupes: Boolean to indicate updating duplicates in the database (bool)
+            - ncpus: Number of CPUs to use for parallel processing (Optional[int])
+            - directory: Directory path with task data to assimilate (str)
+
+    Supported types for attributes are either explicitly stated in the function's input
+    or inferred through parameter type hints.
+    """
     FORMAT = "%(relativeCreated)d msecs : %(message)s"
 
     if args.logfile:
@@ -83,6 +117,25 @@ def update_db(args):
 
 
 def optimize_indexes(args):
+    """
+    Optimize indexes for a MongoDB collection based on provided configuration.
+
+    This function reads database settings from a configuration file, connects to
+    the MongoDB instance, and modifies the indexes for a specified collection.
+    It removes all existing indexes, creates a unique index on the "task_id" field,
+    and builds indexes on a predefined set of fields. Additionally, it creates
+    a compound index based on "nelements" and "elements".
+
+    Parameters:
+        args (argparse.Namespace): The arguments provided to the function,
+            containing a "config_file" attribute that specifies the file path
+            to read the database configuration.
+
+    Raises:
+        pymongo.errors.PyMongoError: If an error occurs while interacting with
+            the MongoDB server.
+
+    """
     d = get_settings(args.config_file)
     c = MongoClient(d["host"], d["port"])
     db = c[d["database"]]
@@ -108,6 +161,21 @@ def optimize_indexes(args):
 
 
 def query_db(args):
+    """
+    Query the database based on specified properties and criteria, and output the
+    results in either JSON format or as a tabulated table. The function retrieves
+    database connection settings, initializes a query engine, processes input
+    parameters, and executes a query with the provided properties and criteria.
+
+    Parameters:
+        args: argparse.Namespace
+            Command-line arguments containing configuration file path, query
+            criteria, database properties, and output format options.
+
+    Raises:
+        SystemExit
+            Raised when the specified criteria argument is not a valid JSON string.
+    """
     from tabulate import tabulate
 
     d = get_settings(args.config_file)
@@ -148,123 +216,37 @@ def query_db(args):
         print(tabulate(t, headers=props))
 
 
-class StatsCommands:
-    """Encapsulate statistics commands."""
-
-    #: Constants for names of format options
-    FORMAT_YAML, FORMAT_CLEAN = "yaml", "simple"
-
-    def __init__(self, query_engine, output_format=None, latest_prop=None, **extra_kw):
-        """Constructor.
-
-        :param query_engine: Connection to Mongo
-        :type query_engine: matgendb.query_engine.QueryEngine
-        """
-        self._qe = query_engine
-        self._db, self._coll = query_engine.db, query_engine.collection
-        self.indent = " " * 4
-        # Keywords
-        self._latest = latest_prop
-        if output_format == self.FORMAT_YAML:
-            self._format = self.yaml_format
-            self._show_header = True
-        elif output_format == self.FORMAT_CLEAN:
-            self._format = self.clean_format
-            self._show_header = False
-
-    def header(self):
-        if not self._show_header:
-            return ""
-        return self._format((("Database", self._db.name), ("Collection", self._coll.name), ("Values", "")))
-
-    def stat(self, name):
-        func = f"stat_{name}"
-        return getattr(self, func)()
-
-    def stat_latest(self):
-        cur = self._coll.find({}, [self._latest]).sort(self._latest, -1).limit(1)
-        try:
-            value = f"{cur[0][self._latest]}"
-        except IndexError:
-            _log.error(f"Cannot get latest value: no records with field '{self._latest}'")
-            return ""
-        return self._format([("Latest", value)], depth=1)
-
-    def stat_count(self):
-        value = f"{self._coll.count():d}"
-        return self._format([("Count", value)], depth=1)
-
-    def yaml_format(self, data, depth=0):
-        rows, ind = [], self.indent * depth
-        for k, v in data:
-            rows.append(f"{ind}{k}: {v}")
-        return "\n".join(rows) + "\n"
-
-    def clean_format(self, data, depth=0):
-        rows = [f"{d[0].lower()} {d[1]}" for d in data]
-        return "\n".join(rows) + "\n"
-
-
-def db_stats(args):
-    """Database and/or collection statistics."""
-    # Init db.
-    cfg = get_settings(args.config_file)
-    normalize_userpass(cfg)
-    qe = QueryEngine(**cfg)
-
-    # Copy stat args and keywords.
-    stats, kw = {}, {}
-    for k, v in vars(args).iteritems():
-        if k.startswith("st_"):
-            stats[k[3:]] = v
-        else:
-            kw[k] = v
-
-    # Process 'show all'.
-    if stats["showall"]:
-        for k in stats.iterkeys():
-            stats[k] = True
-    del stats["showall"]
-
-    # Output destination.
-    w = sys.stdout
-
-    # Run commands.
-    cmd = StatsCommands(qe, **kw)
-    w.write(cmd.header())
-    for k in stats.iterkeys():
-        if stats[k]:
-            w.write(cmd.stat(k))
-
-
-def normalize_userpass(cfg):
-    """In DB conn. config, normalize user/password from readonly and admin prefixes.
-    In the end, there will be only keys 'user' and 'password'.
-    """
-    for pfx in "readonly", "admin":  # in reverse order of priority, to overwrite
-        if (pfx + "_user") in cfg and (pfx + "_password") in cfg:
-            cfg[QueryEngine.USER_KEY] = cfg[pfx + "_user"]
-            cfg[QueryEngine.PASSWORD_KEY] = cfg[pfx + "_password"]
-            del cfg[pfx + "_user"]
-            del cfg[pfx + "_password"]
-
-
-def init_logging(args):
-    """Initialize verbosity."""
-    _log.propagate = False
-    hndlr = logging.StreamHandler()
-    hndlr.setFormatter(logging.Formatter("[%(levelname)-6s] %(asctime)s %(name)s :: %(message)s"))
-    _log.addHandler(hndlr)
-    if "quiet" in args and args.quiet:
-        lvl = logging.CRITICAL
-    else:
-        vb = args.vb if "vb" in args else 0
-        # Level:  default      -v            -vv
-        lvl = (logging.WARN, logging.INFO, logging.DEBUG)[min(vb, 2)]
-    _log.setLevel(lvl)
-
-
 def main():
+    """
+    Main function for handling pymatgen-db management commands.
+
+    This function serves as the entry point for the mgdb command line utility, which provides
+    tools for database management, including inserting VASP calculation data, running queries,
+    and initializing configurations. The main subcommands available are `init`, `insert`,
+    `query`, and `optimize`.
+
+    Summary:
+    - `init`: Sets up an initial database configuration file.
+    - `insert`: Inserts VASP calculation data from specified directory into the database.
+    - `query`: Allows querying the database for specific properties or criteria.
+    - `optimize`: Tools for optimizing database indexes.
+    - Configuration options and verbosity levels can be specified globally for the commands.
+
+    Subcommands:
+    - init: Sets up an initial configuration file.
+    - insert: Inserts calculation data into the database.
+    - query: Queries the database for specified criteria and properties.
+    - optimize: Optimizes database indexes.
+
+    Raises:
+    - SystemExit: In the case of argument parsing errors or invalid subcommands.
+
+    Parameters:
+    - None
+
+    Returns:
+    - None
+    """
     db_file = SETTINGS.get("PMGDB_DB_FILE")
     parser = argparse.ArgumentParser(
         description="""
@@ -389,7 +371,7 @@ def main():
         dest="criteria",
         type=str,
         default=None,
-        help="Query criteria in typical json format. E.g., " '{"task_id": 1}.',
+        help="Query criteria in typical json format. E.g., {'task_id': 1}.",
     )
     pquery.add_argument(
         "--props",
@@ -409,34 +391,8 @@ def main():
     )
     pquery.set_defaults(func=query_db)
 
-    # The 'stats' subcommand.
-    pstats = subparsers.add_parser(
-        "stats", help="Database and/or collection statistics.", parents=[parent_vb, parent_cfg]
-    )
-    pstats.add_argument("--count", help="Show count of records", dest="st_count", action="store_true")
-    pstats.add_argument("--latest", help="Show time of latest record", dest="st_latest", action="store_true")
-    # pstats.add_argument("--size", help="Show min/max/avg/total record sizes", dest="", action="store_true")
-    pstats.add_argument("--all", help="Show all stats", dest="st_showall", action="store_true")
-    pstats.add_argument(
-        "--latest-prop",
-        help="Property to use for latest record (default='updated_at')",
-        default="updated_at",
-        dest="latest_prop",
-    )
-    pstats.add_argument(
-        "-f",
-        "--format",
-        help="Output format",
-        choices=[StatsCommands.FORMAT_YAML, StatsCommands.FORMAT_CLEAN],
-        default="yaml",
-        dest="output_format",
-    )
-    pstats.set_defaults(func=db_stats)
-
     # Parse args
     args = parser.parse_args()
-
-    init_logging(args)
 
     # Run appropriate subparser function.
     args.func(args)

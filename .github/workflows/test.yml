@@ -30,7 +30,9 @@ jobs:
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
       - name: Install dependencies
-        run: uv pip install -e .
+        run: |
+          uv sync
+          uv pip install -e .
       - name: pytest
         run: uv run pytest --cov=pymatgen.db --cov-report=xml tests --color=yes
 #      - name: Upload coverage reports to Codecov
