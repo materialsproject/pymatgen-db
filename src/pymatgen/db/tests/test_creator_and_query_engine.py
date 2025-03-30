@@ -14,11 +14,11 @@ from pymongo.errors import ConnectionFailure
 
 from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.core.structure import Structure
+from pymatgen.electronic_structure.dos import CompleteDos
+from pymatgen.entries.computed_entries import ComputedEntry
 from src.pymatgen.db.creator import VaspToDbTaskDrone
 from src.pymatgen.db.query_engine import QueryEngine
 from src.pymatgen.db.tests import common
-from pymatgen.electronic_structure.dos import CompleteDos
-from pymatgen.entries.computed_entries import ComputedEntry
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"

@@ -65,19 +65,16 @@ class MPDB:
 
     def get_entries_in_chemsys(self, elements, additional_criteria=None, **kwargs):
         """
-        Helper method to get a list of ComputedEntries in a chemical system. For example, elements = ["Li", "Fe", "O"]
-        will return a list of all entries in the Li-Fe-O chemical system, i.e., all LixOy, FexOy, LixFey, LixFeyOz,
-        Li, Fe and O phases. Extremely useful for creating phase diagrams of entire chemical systems.
+        Method get_entries_in_chemsys.
 
-        Args:
-            elements (str or [str]): Chemical system string comprising element
-                symbols separated by dashes, e.g., "Li-Fe-O" or List of element
-                symbols, e.g., ["Li", "Fe", "O"].
-            additional_criteria (dict): Any additional criteria to pass. For instance, if you are only interested in
-                stable entries, you can pass {"e_above_hull": {"$lte": 0.001}}.
+        Parameters:
+        elements (str): A string of chemical elements separated by '-'. Can also be a list of chemical elements.
+        additional_criteria (dict, optional): Additional criteria to filter entries. Default is None.
+        **kwargs: Additional keyword arguments.
 
         Returns:
-            List of ComputedStructureEntries.
+        list: A list of ComputedStructureEntry objects retrieved based on the given chemical systems and criteria.
+
         """
         if isinstance(elements, str):
             elements = elements.split("-")

@@ -3,15 +3,15 @@
 """
 Deployment file to facilitate releases of pymatgen-db.
 """
+from __future__ import annotations
 
-
-import glob
 import datetime
-import re
+import glob
 import json
-import requests
 import os
+import re
 
+import requests
 from invoke import task
 from monty.os import cd
 
@@ -33,7 +33,7 @@ def make_doc(ctx):
         ctx.run("sphinx-apidoc --implicit-namespaces -d 6 -o . -f ../pymatgen")
         ctx.run("rm pymatgen*.tests.rst")
         for f in glob.glob("*.rst"):
-            if f.startswith('pymatgen') and f.endswith('rst'):
+            if f.startswith("pymatgen") and f.endswith("rst"):
                 newoutput = []
                 suboutput = []
                 subpackage = False
@@ -52,7 +52,7 @@ def make_doc(ctx):
                                 subpackage = False
                                 suboutput = []
 
-                with open(f, 'w') as fid:
+                with open(f, "w") as fid:
                     fid.write("".join(newoutput))
         ctx.run("make html")
         ctx.run("cp _static/* ../docs/html/_static")
@@ -72,15 +72,15 @@ def set_ver(ctx):
                 lines.append('__version__ = "%s"' % NEW_VER)
             else:
                 lines.append(l.rstrip())
-    with open("src/pymatgen/db/__init__.py", "wt") as f:
+    with open("src/pymatgen/db/__init__.py", "w") as f:
         f.write("\n".join(lines))
 
     lines = []
     with open("setup.py") as f:
         for l in f:
-            lines.append(re.sub(r'version=([^,]+),', 'version="%s",' % NEW_VER,
+            lines.append(re.sub(r"version=([^,]+),", 'version="%s",' % NEW_VER,
                                 l.rstrip()))
-    with open("setup.py", "wt") as f:
+    with open("setup.py", "w") as f:
         f.write("\n".join(lines))
 
 
@@ -89,7 +89,7 @@ def update_doc(ctx):
     make_doc(ctx)
     with cd("docs"):
         ctx.run("git add .")
-        ctx.run("git commit -a -m \"Update dev docs\"")
+        ctx.run('git commit -a -m "Update dev docs"')
         ctx.run("git push")
 
 
