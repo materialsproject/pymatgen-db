@@ -1,9 +1,0 @@
-pytest==7.4.0
-mongomock==4.1.2
-pytest-cov==4.1.0
-coverage
-mypy
-pydocstyle
-flake8
-pylint
-black

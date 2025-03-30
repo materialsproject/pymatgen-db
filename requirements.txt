@@ -1,5 +1,0 @@
-monty==2022.9.9
-pymatgen==2023.7.14
-pymongo==4.4.0
-pybtex==0.24.0
-ruamel.yaml==0.17.32
