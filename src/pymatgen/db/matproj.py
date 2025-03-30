@@ -63,14 +63,13 @@ class MPDB:
         self.collection.create_index("nelements")
         self.collection.create_index("elements")
 
-    def get_entries_in_chemsys(self, elements, additional_criteria=None, **kwargs):
+    def get_entries_in_chemsys(self, elements, additional_criteria=None):
         """
         Method get_entries_in_chemsys.
 
         Parameters:
         elements (str): A string of chemical elements separated by '-'. Can also be a list of chemical elements.
         additional_criteria (dict, optional): Additional criteria to filter entries. Default is None.
-        **kwargs: Additional keyword arguments.
 
         Returns:
         list: A list of ComputedStructureEntry objects retrieved based on the given chemical systems and criteria.
