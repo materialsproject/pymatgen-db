@@ -28,10 +28,12 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+[project.scripts]
+mgdb = "pymatgen.db.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["pymatgen", "pymatgen.*"]
+include = ["pymatgen.db.*"]
 
 [tool.setuptools.package-data]
 "pymatgen.db" = ["*.json"]

@@ -264,7 +264,7 @@ def init_logging(args):
     _log.setLevel(lvl)
 
 
-if __name__ == "__main__":
+def main():
     db_file = SETTINGS.get("PMGDB_DB_FILE")
     parser = argparse.ArgumentParser(
         description="""
