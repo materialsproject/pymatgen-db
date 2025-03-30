@@ -33,7 +33,7 @@ mgdb = "pymatgen.db.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["pymatgen.db.*"]
+include = ["pymatgen.*"]
 
 [tool.setuptools.package-data]
 "pymatgen.db" = ["*.json"]
