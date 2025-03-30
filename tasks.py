@@ -67,18 +67,18 @@ def make_doc(ctx):
 def set_ver(ctx):
     lines = []
     with open("src/pymatgen/db/__init__.py") as f:
-        for l in f:
+        for line in f:
             if "__version__" in l:
-                lines.append('__version__ = "%s"' % NEW_VER)
+                lines.append(f'__version__ = "{NEW_VER}"')
             else:
-                lines.append(l.rstrip())
+                lines.append(line.rstrip())
     with open("src/pymatgen/db/__init__.py", "w") as f:
         f.write("\n".join(lines))
 
     lines = []
     with open("setup.py") as f:
         for l in f:
-            lines.append(re.sub(r"version=([^,]+),", 'version="%s",' % NEW_VER,
+            lines.append(re.sub(r"version=([^,]+),", f'version="{NEW_VER}",',
                                 l.rstrip()))
     with open("setup.py", "w") as f:
         f.write("\n".join(lines))

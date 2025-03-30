@@ -98,9 +98,6 @@ lint.isort.split-on-trailing-comma = false
 "__init__.py" = ["F401"]
 "*/tests/*" = ["D"]
 "tasks.py" = ["D"]
-"pymatgen/analysis/*" = ["D"]
-"pymatgen/vis/*" = ["D"]
-"pymatgen/io/*" = ["D"]
 "dev_scripts/*" = ["D"]
 
 [tool.pytest.ini_options]
