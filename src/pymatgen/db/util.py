@@ -46,11 +46,11 @@ def get_database(config_file=None, settings=None, admin=False, **kwargs):
         conn = MongoClient(
             host=d["host"], port=d["port"], username=user, password=passwd, authSource=d["database"], **kwargs
         )
-        db = conn[d["database"]]
+        return conn[d["database"]]
     except (KeyError, TypeError, ValueError) as ex:
         print(str(ex))
         _log.warning("No {admin,readonly}_user/password found in config. file, accessing DB without authentication")
-    return db
+    return None
 
 
 def get_collection(config_file, admin=False, settings=None):
