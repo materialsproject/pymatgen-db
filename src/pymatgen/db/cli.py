@@ -9,17 +9,15 @@ import logging
 import multiprocessing
 import sys
 
-from pymatgen.apps.borg.queen import BorgQueen
-from pymatgen.db import (
-    DEFAULT_SETTINGS,
-    SETTINGS,
-    DBConfig,
-    MongoJSONEncoder,
-    QueryEngine,
-    VaspToDbTaskDrone,
-    get_settings,
-)
 from pymongo import ASCENDING, MongoClient
+
+from pymatgen.apps.borg.queen import BorgQueen
+from pymatgen.db import SETTINGS
+
+from .config import DBConfig, get_settings
+from .creator import VaspToDbTaskDrone
+from .query_engine import QueryEngine
+from .util import MongoJSONEncoder
 
 _log = logging.getLogger("mg")  # parent
 
@@ -42,7 +40,7 @@ def init_db(args):
         and DEFAULT_SETTINGS.
     """
     settings = DBConfig.ALL_SETTINGS
-    defaults = dict(DEFAULT_SETTINGS)
+    defaults = settings
     doc = {}
     print("Please supply the following configuration values")
     print("(press Enter if you want to accept the defaults)\n")

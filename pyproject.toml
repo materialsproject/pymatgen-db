@@ -140,6 +140,15 @@ fase,rute,reson,titels,ges,scalr,strat,struc,hda,nin,ons,pres,kno,loos,lamda,lew
 """
 check-filenames = true
 
+[tool.pyright]
+typeCheckingMode = "off"
+reportPossiblyUnboundVariable = true
+reportUnboundVariable = true
+reportMissingImports = false
+reportMissingModuleSource = false
+reportInvalidTypeForm = false
+exclude = ["**/tests"]
+
 [dependency-groups]
 dev = [
     "mongomock>=4.3.0",
