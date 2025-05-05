@@ -1,6 +1,6 @@
  running on   24 nodes
  distr:  one band on   24 nodes,    1 groups
- vasp.5.2.11 01Dec10 complex 
+ vasp.5.2.11 01Dec10 complex
  POSCAR found type information on POSCAR  B  O  Zn Tb
  POSCAR found :  4 types and      68 ions
  scaLAPACK will be used
@@ -12,7 +12,7 @@
  FFT: planning ...(           16 )
  reading WAVECAR
  the WAVECAR file was read sucessfully
- charge-density read from file: RubyVaspy                               
+ charge-density read from file: RubyVaspy
  magnetization density read from file 1
  entering main loop
        N       E                     dE             d eps       ncg     rms          rms(c)
