@@ -1,4 +1,4 @@
-  PAW_PBE P 17Jan2003                    
+  PAW_PBE P 17Jan2003
  5.00000000000000000
  parameters from PSCTR are:
    VRHFIN =P : s2p3
@@ -22,7 +22,7 @@
    RAUG   =    1.300    factor for augmentation sphere
    RDEP   =    1.931    radius for radial grids
    QCUT   =   -4.330; QGAM   =    8.659    optimization parameters
- 
+
    Description
      l     E      TYP  RCUT    TYP  RCUT
      0   .000     23  1.900
@@ -830,7 +830,7 @@ END of PSCTR-controll parameters
   -.17969617E+00  -.13972148E+00  -.10243689E+00  -.69488293E-01  -.41895002E-01
  PAW radial sets
  321 0.958667401852039358
-(5E20.12)                                
+(5E20.12)
  augmentation charges (non sperical)
   -.219385257745E+00  -.920977912455E-03  -.101499937968E+00  -.138143678212E-02  -.920977912455E-03
   -.465077895659E-04   .935409809313E-04  -.348871438307E-04  -.101499937968E+00   .935409809313E-04
@@ -1790,7 +1790,7 @@ END of PSCTR-controll parameters
    RAUG   =    1.300    factor for augmentation sphere
    RDEP   =    2.296    radius for radial grids
    QCUT   =   -4.642; QGAM   =    9.285    optimization parameters
- 
+
    Description
      l     E      TYP  RCUT    TYP  RCUT
      1   .000     23  2.000
@@ -2687,7 +2687,7 @@ END of PSCTR-controll parameters
    .32896719E-01   .19009710E-01   .88008308E-02   .18704504E-02  -.23048780E-02
  PAW radial sets
  333 0.950033776649352624
-(5E20.12)                                
+(5E20.12)
  augmentation charges (non sperical)
    .733505396324E+00  -.555083358825E+00   .607622380246E+00  -.144722249601E+00  -.155901199920E+00
    .333092622850E-01  -.555083358825E+00   .375689312757E+00  -.426370429086E+00   .967291105417E-01
@@ -3887,7 +3887,7 @@ END of PSCTR-controll parameters
    RAUG   =    1.300    factor for augmentation sphere
    RDEP   =    2.926    radius for radial grids
    QCUT   =   -4.265; QGAM   =    8.529    optimization parameters
- 
+
    Description
      l     E      TYP  RCUT    TYP  RCUT
      0   .000     23  2.800
@@ -4872,7 +4872,7 @@ END of PSCTR-controll parameters
   -.11693933E-01   .10611680E-01   .21231851E-01   .23884060E-01   .21590139E-01
  PAW radial sets
  313 1.19846800324373626
-(5E20.12)                                
+(5E20.12)
  augmentation charges (non sperical)
   -.381165695036E+00  -.127630628467E-03  -.301885969422E+00   .281675684536E-01  -.131504509370E+00
   -.578570739200E-02   .268099421831E+00   .731433301794E-01  -.127630628467E-03   .899581819705E-01

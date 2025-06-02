@@ -22,7 +22,7 @@
    RAUG   =    1.300    factor for augmentation sphere
    RDEP   =    1.757    radius for radial grids
    QCUT   =   -4.839; QGAM   =    9.678    optimization parameters
- 
+
    Description
      l     E      TYP  RCUT    TYP  RCUT
      0   .000     23  1.500
@@ -629,7 +629,7 @@ END of PSCTR-controll parameters
   -.81477894E-01  -.62264575E-01  -.44877219E-01  -.29894700E-01  -.17624931E-01
  PAW radial sets
  329 0.767152376481002651
-(5E20.12)                                
+(5E20.12)
  augmentation charges (non sperical)
   -.624327290015E-01  -.446456349209E-02  -.375412992160E-01   .167302333554E-02  -.446456349209E-02
   -.372955779835E-03  -.252131330897E-03   .485686370431E-04  -.375412992160E-01  -.252131330897E-03
@@ -1536,7 +1536,7 @@ END of PSCTR-controll parameters
    RAUG   =    1.300    factor for augmentation sphere
    RDEP   =    1.550    radius for radial grids
    QCUT   =   -5.520; QGAM   =   11.041    optimization parameters
- 
+
    Description
      l     E      TYP  RCUT    TYP  RCUT
      0   .000     23  1.200
@@ -2143,7 +2143,7 @@ END of PSCTR-controll parameters
    .27568557E-01   .21590035E-01   .15928553E-01   .10869144E-01   .65951677E-02
  PAW radial sets
  321 0.721520152002725790
-(5E20.12)                                
+(5E20.12)
  augmentation charges (non sperical)
   -.157752259102E+00   .256865056813E-01   .447401437060E-01   .282550287931E-02   .256865056813E-01
   -.513111026050E-02  -.610189826978E-02   .234333105778E-03   .447401437060E-01  -.610189826978E-02
@@ -3103,7 +3103,7 @@ END of PSCTR-controll parameters
    RAUG   =    1.300    factor for augmentation sphere
    RDEP   =    2.324    radius for radial grids
    QCUT   =   -4.510; QGAM   =    9.020    optimization parameters
- 
+
    Description
      l     E      TYP  RCUT    TYP  RCUT
      2   .000     23  2.300
@@ -4000,7 +4000,7 @@ END of PSCTR-controll parameters
    .23880909E-01   .20794923E-01   .16693513E-01   .12283853E-01   .80812880E-02
  PAW radial sets
  319 0.952052814129582425
-(5E20.12)                                
+(5E20.12)
  augmentation charges (non sperical)
    .822719185424E+00  -.483857184083E+00  -.792410347617E-01   .461558402330E-02  -.124444865802E+00
    .379934064720E-01  -.483857184083E+00   .286997533360E+00   .368592776037E-01  -.215686693116E-02
@@ -5149,7 +5149,7 @@ END of PSCTR-controll parameters
    RAUG   =    1.300    factor for augmentation sphere
    RDEP   =    3.125    radius for radial grids
    QCUT   =   -3.382; QGAM   =    6.764    optimization parameters
- 
+
    Description
      l     E      TYP  RCUT    TYP  RCUT
      0   .000     23  3.000
@@ -6045,7 +6045,7 @@ END of PSCTR-controll parameters
    .11881954E+00   .15379633E+00   .15985407E+00   .14605696E+00   .12023407E+00
  PAW radial sets
  319 1.36463397899170213
-(5E20.12)                                
+(5E20.12)
  augmentation charges (non sperical)
   -.155564200220E-01  -.691742860274E-02  -.214161495452E+00   .356358228300E-01  -.124614692359E+00
   -.119714306998E-01  -.691742860274E-02   .123117329821E-02   .292074919326E-01  -.565902589590E-03

@@ -1,6 +1,6 @@
  running on   24 nodes
  distr:  one band on   24 nodes,    1 groups
- vasp.5.2.11 01Dec10 complex 
+ vasp.5.2.11 01Dec10 complex
  POSCAR found :  4 types and      68 ions
  scaLAPACK will be used
  LDA part: xc-table for Pade appr. of Perdew
