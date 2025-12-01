@@ -21,8 +21,6 @@ import gridfs
 import numpy as np
 from monty.io import zopen
 from monty.json import MontyEncoder
-from pymongo import MongoClient
-
 from pymatgen.analysis.bond_valence import BVAnalyzer
 from pymatgen.analysis.local_env import VoronoiNN
 from pymatgen.analysis.structure_analyzer import oxide_type
@@ -34,6 +32,7 @@ from pymatgen.ext.matproj import MPRester
 from pymatgen.io.cif import CifWriter
 from pymatgen.io.vasp import Incar, Kpoints, Oszicar, Outcar, Poscar, Potcar, Vasprun
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+from pymongo import MongoClient
 
 __author__ = "Shyue Ping Ong"
 __copyright__ = "Copyright 2012, The Materials Project"
@@ -587,7 +586,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         3. Directories containing vasp output with ".relax1" and ".relax2" are
            also considered as 2 parts of an aflow style run.
         """
-        (parent, subdirs, files) = path
+        (parent, subdirs, _files) = path
         if set(self.runs).intersection(subdirs):
             return [parent]
         if (

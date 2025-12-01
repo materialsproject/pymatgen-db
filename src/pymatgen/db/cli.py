@@ -9,9 +9,9 @@ import logging
 import multiprocessing
 import sys
 
+from pymatgen.apps.borg.queen import BorgQueen
 from pymongo import ASCENDING, MongoClient
 
-from pymatgen.apps.borg.queen import BorgQueen
 from pymatgen.db import SETTINGS
 
 from .config import DBConfig, get_settings
