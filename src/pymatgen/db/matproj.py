@@ -9,7 +9,6 @@ from __future__ import annotations
 import itertools
 
 import pymongo
-
 from pymatgen.entries.computed_entries import ComputedStructureEntry
 from pymatgen.ext.matproj import MPRester
 
