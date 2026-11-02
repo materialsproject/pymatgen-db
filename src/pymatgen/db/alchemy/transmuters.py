@@ -13,7 +13,7 @@ __maintainer__ = "Shyue Ping Ong"
 __email__ = "shyue@mit.edu"
 __date__ = "Mar 4, 2012"
 
-import datetime
+import datetime as dt
 
 from pymatgen.alchemy.materials import TransformedStructure
 from pymatgen.alchemy.transmuters import StandardTransmuter
@@ -54,7 +54,7 @@ class QeTransmuter(StandardTransmuter):
                     "source": source,
                     "criteria": criteria,
                     "entry": entry.as_dict(),
-                    "datetime": datetime.datetime.utcnow(),
+                    "datetime": dt.datetime.utcnow(),
                 }
             ]
 

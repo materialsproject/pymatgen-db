@@ -5,7 +5,7 @@ Mongo database.
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import glob
 import json
 import logging
@@ -269,7 +269,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                             calc["dos_fs_id"] = dosid
                             del calc["dos"]
 
-                d["last_updated"] = datetime.datetime.today()
+                d["last_updated"] = dt.datetime.today()
                 if result is None:
                     if ("task_id" not in d) or (not d["task_id"]):
                         result = db.counter.find_one_and_update(filter={"_id": "taskid"}, update={"$inc": {"c": 1}})
@@ -472,7 +472,7 @@ class VaspToDbTaskDrone(AbstractDrone):
         r = Vasprun(vasprun_file, parse_projected_eigen=parse_projected_eigen)
         d = r.as_dict()
         d["dir_name"] = os.path.abspath(dir_name)
-        d["completed_at"] = str(datetime.datetime.fromtimestamp(os.path.getmtime(vasprun_file)))
+        d["completed_at"] = str(dt.datetime.fromtimestamp(os.path.getmtime(vasprun_file)))
         d["cif"] = str(CifWriter(r.final_structure))
         d["density"] = r.final_structure.density
         if self.parse_dos and (self.parse_dos != "final" or taskname == self.runs[-1]):
@@ -566,7 +566,7 @@ class VaspToDbTaskDrone(AbstractDrone):
                 "hall": sg.get_hall(),
             }
             d["oxide_type"] = d2["oxide_type"]
-            d["last_updated"] = datetime.datetime.today()
+            d["last_updated"] = dt.datetime.today()
             return d
         except Exception:
             import traceback

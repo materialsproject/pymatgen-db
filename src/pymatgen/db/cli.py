@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-import datetime
+import datetime as dt
 import json
 import logging
 import multiprocessing
@@ -91,7 +91,7 @@ def update_db(args):
 
     d = get_settings(args.config_file)
 
-    _log.info(f"Db insertion started at {datetime.datetime.now()}.")
+    _log.info(f"Db insertion started at {dt.datetime.now()}.")
     additional_fields = {"author": args.author, "tags": args.tag}
     drone = VaspToDbTaskDrone(
         host=d["host"],
@@ -110,7 +110,7 @@ def update_db(args):
     queen = BorgQueen(drone, number_of_drones=ncpus)
     queen.parallel_assimilate(args.directory)
     tids = list(map(int, filter(lambda x: x, queen.get_data())))
-    _log.info(f"Db update completed at {datetime.datetime.now()}.")
+    _log.info(f"Db update completed at {dt.datetime.now()}.")
     _log.info(f"{len(tids)} new task ids inserted.")
 
 

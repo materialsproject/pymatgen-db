@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import json
 import logging
 
@@ -25,7 +25,7 @@ class MongoJSONEncoder(json.JSONEncoder):
         """Override default to support ObjectID and datetime."""
         if isinstance(o, bson.objectid.ObjectId):
             return str(o)
-        if isinstance(o, datetime.datetime):
+        if isinstance(o, dt.datetime):
             return o.isoformat()
         return json.JSONEncoder.default(self, o)
 
